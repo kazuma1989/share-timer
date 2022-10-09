@@ -30,7 +30,13 @@ export function useCollection<T>(
   const subscribe = useCallback(
     (onStoreChange: () => void): (() => void) =>
       onSnapshot(query, (doc) => {
-        data$.current = doc.docs.map((doc) => converter$.current(doc.data()))
+        data$.current = doc.docs.map((doc) =>
+          converter$.current(
+            doc.data({
+              serverTimestamps: "estimate",
+            })
+          )
+        )
 
         onStoreChange()
       }),

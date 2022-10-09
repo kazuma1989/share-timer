@@ -1,33 +1,37 @@
 import { css } from "@emotion/css"
-import { collection, orderBy, query, Timestamp } from "firebase/firestore"
-import { useReducer, useState } from "react"
+import {
+  collection,
+  orderBy,
+  query,
+  serverTimestamp,
+  Timestamp,
+} from "firebase/firestore"
+import { useState } from "react"
 import { z } from "zod"
 import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
+import { useAddDoc } from "./useAddDoc"
 import { useCollection } from "./useCollection"
 import { useTimer } from "./useTimer"
 
 export function App() {
+  // TODO take id from URL
+  const roomId = "OfzJLddWnrLkPZOJN34A"
+
   const actions = useCollection(
     (db) =>
-      query(
-        collection(db, "rooms", "OfzJLddWnrLkPZOJN34A", "actions"),
-        orderBy("at", "asc")
-      ),
+      query(collection(db, "rooms", roomId, "actions"), orderBy("at", "asc")),
     (rawData) => timerAction.parse(rawData)
   )
 
-  const x = actions.reduce(reducer, {
+  const state = actions.reduce(reducer, {
     mode: "paused",
     restDuration: 5 * 60_000,
   })
 
-  console.log(x)
-
-  const [state, dispatch] = useReducer(reducer, {
-    mode: "paused",
-    restDuration: 5 * 60_000,
-  })
+  const dispatch = useAddDoc<z.input<typeof timerAction>>((db) =>
+    collection(db, "rooms", roomId, "actions")
+  )
 
   const [timeInput, setTimeInput] = useState("")
 
@@ -109,7 +113,7 @@ export function App() {
           onClick={() => {
             dispatch({
               type: "pause",
-              at: Date.now(),
+              at: serverTimestamp() as Timestamp,
             })
           }}
         >
@@ -122,7 +126,7 @@ export function App() {
           onClick={() => {
             dispatch({
               type: "start",
-              at: Date.now(),
+              at: serverTimestamp() as Timestamp,
             })
           }}
         >
