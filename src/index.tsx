@@ -1,17 +1,12 @@
 import { initializeApp } from "firebase/app"
+import { getFirestore } from "firebase/firestore"
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import { App } from "./App"
 import "./global.css"
+import { FirestoreProvider } from "./useFirestore"
 
-createRoot(globalThis.document.getElementById("root")!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-)
-
-// Initialize Firebase
-const app = initializeApp({
+const firebaseApp = initializeApp({
   apiKey: "AIzaSyB02s7OAFZJwB8npC9OTmFJPLFCz-Ax1Rk",
   authDomain: "share-timer-2b51a.firebaseapp.com",
   projectId: "share-timer-2b51a",
@@ -19,3 +14,13 @@ const app = initializeApp({
   messagingSenderId: "996149287532",
   appId: "1:996149287532:web:dd1dfe4c3ef583514bd649",
 })
+
+const firestore = getFirestore(firebaseApp)
+
+createRoot(globalThis.document.getElementById("root")!).render(
+  <StrictMode>
+    <FirestoreProvider value={firestore}>
+      <App />
+    </FirestoreProvider>
+  </StrictMode>
+)
