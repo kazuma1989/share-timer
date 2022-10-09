@@ -18,6 +18,17 @@ export function App() {
     <form
       onSubmit={(e) => {
         e.preventDefault()
+
+        const duration = parseTimeInput(timeInput)
+        if (duration === undefined) {
+          alert(`invalid format ${timeInput}`)
+          return
+        }
+
+        dispatch({
+          type: "edit-done",
+          duration,
+        })
       }}
     >
       <div
@@ -46,26 +57,14 @@ export function App() {
       </div>
 
       {state.mode === "editing" ? (
-        <button
-          type="submit"
-          onClick={() => {
-            const duration = parseTimeInput(timeInput)
-            if (duration === undefined) {
-              alert(`invalid format ${timeInput}`)
-              return
-            }
-
-            dispatch({
-              type: "edit-done",
-              duration,
-            })
-          }}
-        >
+        <button key="done" type="submit">
           Done
         </button>
       ) : (
         <button
+          key="edit"
           type="button"
+          disabled={state.mode !== "paused"}
           onClick={() => {
             dispatch({
               type: "edit",
