@@ -1,30 +1,52 @@
 import { css } from "@emotion/css"
-import { collection, doc, orderBy, query } from "firebase/firestore"
+import { collection, orderBy, query } from "firebase/firestore"
 import { useReducer, useState } from "react"
+import { z } from "zod"
 import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
 import { useCollection } from "./useCollection"
-import { useDoc } from "./useDoc"
 import { useTimer } from "./useTimer"
 
+const timerAction = z.union([
+  z.object({
+    type: z.enum(["edit"]),
+  }),
+
+  z.object({
+    type: z.enum(["edit-done"]),
+    duration: z.number(),
+  }),
+
+  z.object({
+    type: z.enum(["start"]),
+    at: z.number(),
+  }),
+
+  z.object({
+    type: z.enum(["pause"]),
+    at: z.number(),
+  }),
+])
+
 export function App() {
-  console.log(
-    useDoc(
-      (db) => doc(db, "rooms", "OfzJLddWnrLkPZOJN34A"),
-      (rawData) => rawData
-    )
+  const actions = useCollection(
+    (db) =>
+      query(
+        collection(db, "rooms", "OfzJLddWnrLkPZOJN34A", "actions"),
+        orderBy("at", "asc")
+      ),
+    (rawData): TimerAction => timerAction.parse(rawData)
   )
 
-  console.log(
-    useCollection(
-      (db) =>
-        query(
-          collection(db, "rooms", "OfzJLddWnrLkPZOJN34A", "actions"),
-          orderBy("at", "asc")
-        ),
-      (rawData) => rawData
-    )
+  const x = actions.reduce<TimerState>(
+    (state, action) => reducer(state, action),
+    {
+      mode: "paused",
+      restDuration: 5 * 60_000,
+    }
   )
+
+  console.log(x)
 
   const [state, dispatch] = useReducer(reducer, {
     mode: "paused",
@@ -144,22 +166,7 @@ type TimerState =
       restDuration: number
     }
 
-type TimerAction =
-  | {
-      type: "edit"
-    }
-  | {
-      type: "edit-done"
-      duration: number
-    }
-  | {
-      type: "start"
-      at: number
-    }
-  | {
-      type: "pause"
-      at: number
-    }
+type TimerAction = z.infer<typeof timerAction>
 
 function reducer(state: TimerState, action: TimerAction): TimerState {
   switch (action.type) {
