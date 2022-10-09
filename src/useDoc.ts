@@ -1,23 +1,35 @@
-import { doc, DocumentData, onSnapshot } from "firebase/firestore"
+import {
+  DocumentData,
+  DocumentReference,
+  Firestore,
+  onSnapshot,
+  refEqual,
+} from "firebase/firestore"
 import { useCallback, useRef, useSyncExternalStore } from "react"
 import { useFirestore } from "./useFirestore"
 
 export function useDoc<T>(
-  path: [string, ...string[]],
+  getRef: (db: Firestore) => DocumentReference<DocumentData>,
   converter: (rawData: DocumentData) => T
 ): T | undefined {
   const data$ = useRef<T>()
 
-  const db = useFirestore()
-
   const converter$ = useRef(converter)
   converter$.current = converter
 
-  const pathString = JSON.stringify(path)
+  const db = useFirestore()
+
+  let ref = getRef(db)
+  const prevRef$ = useRef(ref)
+  if (refEqual(ref, prevRef$.current)) {
+    ref = prevRef$.current
+  } else {
+    prevRef$.current = ref
+  }
 
   const subscribe = useCallback(
     (onStoreChange: () => void): (() => void) =>
-      onSnapshot(doc(db, ...(JSON.parse(pathString) as typeof path)), (doc) => {
+      onSnapshot(ref, (doc) => {
         const rawData = doc.data()
         if (rawData) {
           data$.current = converter$.current(rawData)
@@ -25,7 +37,7 @@ export function useDoc<T>(
 
         onStoreChange()
       }),
-    [db, pathString]
+    [ref]
   )
 
   return useSyncExternalStore(subscribe, () => data$.current)

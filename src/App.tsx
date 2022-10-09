@@ -1,12 +1,20 @@
 import { css } from "@emotion/css"
-import { collection, orderBy, query } from "firebase/firestore"
+import { collection, doc, orderBy, query } from "firebase/firestore"
 import { useReducer, useState } from "react"
 import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
 import { useCollection } from "./useCollection"
+import { useDoc } from "./useDoc"
 import { useTimer } from "./useTimer"
 
 export function App() {
+  console.log(
+    useDoc(
+      (db) => doc(db, "rooms", "OfzJLddWnrLkPZOJN34A"),
+      (rawData) => rawData
+    )
+  )
+
   console.log(
     useCollection(
       (db) =>
@@ -272,16 +280,4 @@ if (import.meta.vitest) {
       restDuration: 5 * 60_000 - 40_000,
     })
   })
-
-  // test("", () => {
-  //   // console.log(where("foo", "==", "a"))
-
-  //   // where("foo", "==", "a").type
-
-  //   // expect(where("foo", "==", "a")).toStrictEqual(where("foo", "==", "a"))
-
-  //   expect(
-  //     queryEqual(where("foo", "==", "a"), where("foo", "==", "a"))
-  //   ).toBeTruthy()
-  // })
 }
