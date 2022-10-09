@@ -1,5 +1,4 @@
 import { css } from "@emotion/css"
-import { millisecondsToSeconds } from "date-fns"
 import { useReducer, useState } from "react"
 import { useTimer } from "./useTimer"
 
@@ -36,13 +35,13 @@ export function App() {
             }}
           />
         ) : state.mode === "running" ? (
-          <span>{millisecondsToSeconds(now - state.startedAt)}</span>
+          <span>
+            {formatDuration(state.duration - (now - state.startedAt))}
+          </span>
         ) : (
           <span>{formatDuration(state.restDuration)}</span>
         )}
       </div>
-
-      <div>{now}</div>
 
       {state.mode === "editing" ? (
         <button
