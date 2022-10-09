@@ -1,11 +1,13 @@
 import { css } from "@emotion/css"
-import { useState } from "react"
+import { useState, useSyncExternalStore } from "react"
 
 type Mode = "editing" | "running" | "paused"
 
 export function App() {
   const [mode, setMode] = useState<Mode>("paused")
   const [timeInput, setTimeInput] = useState("5:00")
+
+  const now = useSyncExternalStore(tickTimer, () => Date.now())
 
   return (
     <form
@@ -33,6 +35,8 @@ export function App() {
           <span>{timeInput}</span>
         )}
       </div>
+
+      <div>{now}</div>
 
       {mode === "editing" ? (
         <button
@@ -76,4 +80,12 @@ export function App() {
       )}
     </form>
   )
+}
+
+function tickTimer(onStoreChange: () => void): () => void {
+  const timer = setInterval(onStoreChange, 1_000)
+
+  return () => {
+    clearInterval(timer)
+  }
 }
