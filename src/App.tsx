@@ -1,4 +1,5 @@
 import { css } from "@emotion/css"
+import { collection, orderBy, query } from "firebase/firestore"
 import { useReducer, useState } from "react"
 import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
@@ -6,7 +7,16 @@ import { useCollection } from "./useCollection"
 import { useTimer } from "./useTimer"
 
 export function App() {
-  console.log(useCollection(["rooms"], (rawData) => rawData))
+  console.log(
+    useCollection(
+      (db) =>
+        query(
+          collection(db, "rooms", "OfzJLddWnrLkPZOJN34A", "actions"),
+          orderBy("at", "asc")
+        ),
+      (rawData) => rawData
+    )
+  )
 
   const [state, dispatch] = useReducer(reducer, {
     mode: "paused",
@@ -262,4 +272,16 @@ if (import.meta.vitest) {
       restDuration: 5 * 60_000 - 40_000,
     })
   })
+
+  // test("", () => {
+  //   // console.log(where("foo", "==", "a"))
+
+  //   // where("foo", "==", "a").type
+
+  //   // expect(where("foo", "==", "a")).toStrictEqual(where("foo", "==", "a"))
+
+  //   expect(
+  //     queryEqual(where("foo", "==", "a"), where("foo", "==", "a"))
+  //   ).toBeTruthy()
+  // })
 }

@@ -1,31 +1,40 @@
-import { collection, DocumentData, onSnapshot } from "firebase/firestore"
+import {
+  DocumentData,
+  Firestore,
+  onSnapshot,
+  Query,
+  queryEqual,
+} from "firebase/firestore"
 import { useCallback, useRef, useSyncExternalStore } from "react"
 import { useFirestore } from "./useFirestore"
 
 export function useCollection<T>(
-  path: [string, ...string[]],
+  getQuery: (db: Firestore) => Query<DocumentData>,
   converter: (rawData: DocumentData) => T
 ): T[] {
   const data$ = useRef<T[]>([])
 
-  const db = useFirestore()
-
   const converter$ = useRef(converter)
   converter$.current = converter
 
-  const pathString = JSON.stringify(path)
+  const db = useFirestore()
+
+  let query = getQuery(db)
+  const prevQuery$ = useRef(query)
+  if (queryEqual(query, prevQuery$.current)) {
+    query = prevQuery$.current
+  } else {
+    prevQuery$.current = query
+  }
 
   const subscribe = useCallback(
     (onStoreChange: () => void): (() => void) =>
-      onSnapshot(
-        collection(db, ...(JSON.parse(pathString) as typeof path)),
-        (doc) => {
-          data$.current = doc.docs.map((doc) => converter$.current(doc.data()))
+      onSnapshot(query, (doc) => {
+        data$.current = doc.docs.map((doc) => converter$.current(doc.data()))
 
-          onStoreChange()
-        }
-      ),
-    [db, pathString]
+        onStoreChange()
+      }),
+    [query]
   )
 
   return useSyncExternalStore(subscribe, () => data$.current)
