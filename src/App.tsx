@@ -1,6 +1,7 @@
 import { css } from "@emotion/css"
 import { millisecondsToSeconds } from "date-fns"
-import { useState, useSyncExternalStore } from "react"
+import { useState } from "react"
+import { useTimer } from "./useTimer"
 
 type Mode =
   | { mode: "editing" }
@@ -14,7 +15,7 @@ export function App() {
   })
   const [timeInput, setTimeInput] = useState("5:00")
 
-  const now = useSyncExternalStore(tickTimer, () => Date.now())
+  const now = useTimer()
 
   return (
     <form
@@ -98,14 +99,6 @@ export function App() {
       )}
     </form>
   )
-}
-
-function tickTimer(onStoreChange: () => void): () => void {
-  const timer = setInterval(onStoreChange, 1_000)
-
-  return () => {
-    clearInterval(timer)
-  }
 }
 
 function parse(timeInput: string): number | undefined {
