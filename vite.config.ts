@@ -41,6 +41,11 @@ export default defineConfig(async ({ command, mode }) => {
       port: (PREVIEW_PORT && parseInt(PREVIEW_PORT)) || 3000,
     },
 
+    define: {
+      // https://vitest.dev/guide/in-source.html#production-build
+      "import.meta.vitest": "undefined",
+    },
+
     plugins: [
       // The all-in-one Vite plugin for React projects.
       react(),
@@ -52,6 +57,7 @@ export default defineConfig(async ({ command, mode }) => {
     // Vitest
     test: {
       setupFiles: ["./src/test.setup.ts"],
+      includeSource: ["./src/**/*.{ts,tsx}"],
     },
   }
 })
