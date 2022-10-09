@@ -1,10 +1,17 @@
 import { css } from "@emotion/css"
+import { millisecondsToSeconds } from "date-fns"
 import { useState, useSyncExternalStore } from "react"
 
-type Mode = "editing" | "running" | "paused"
+type Mode =
+  | { mode: "editing" }
+  | { mode: "running"; startedAt: number }
+  | { mode: "paused"; restDuration: number }
 
 export function App() {
-  const [mode, setMode] = useState<Mode>("paused")
+  const [_mode, setMode] = useState<Mode>({
+    mode: "paused",
+    restDuration: 5 * 60_000,
+  })
   const [timeInput, setTimeInput] = useState("5:00")
 
   const now = useSyncExternalStore(tickTimer, () => Date.now())
@@ -20,7 +27,7 @@ export function App() {
           font-size: 30vmin;
         `}
       >
-        {mode === "editing" ? (
+        {_mode.mode === "editing" ? (
           <input
             value={timeInput}
             size={5}
@@ -31,6 +38,8 @@ export function App() {
               setTimeInput(e.currentTarget.value)
             }}
           />
+        ) : _mode.mode === "running" ? (
+          <span>{millisecondsToSeconds(now - _mode.startedAt)}</span>
         ) : (
           <span>{timeInput}</span>
         )}
@@ -38,11 +47,17 @@ export function App() {
 
       <div>{now}</div>
 
-      {mode === "editing" ? (
+      {_mode.mode === "editing" ? (
         <button
           type="submit"
           onClick={() => {
-            setMode("paused")
+            const restDuration = parse(timeInput)
+            if (restDuration === undefined) {
+              alert(`invalid format ${timeInput}`)
+              return
+            }
+
+            setMode({ mode: "paused", restDuration })
           }}
         >
           Done
@@ -51,18 +66,21 @@ export function App() {
         <button
           type="button"
           onClick={() => {
-            setMode("editing")
+            setMode({ mode: "editing" })
           }}
         >
           Edit
         </button>
       )}
 
-      {mode === "running" ? (
+      {_mode.mode === "running" ? (
         <button
           type="button"
           onClick={() => {
-            setMode("paused")
+            setMode({
+              mode: "paused",
+              restDuration: Date.now() - _mode.startedAt,
+            })
           }}
         >
           Pause
@@ -70,9 +88,9 @@ export function App() {
       ) : (
         <button
           type="button"
-          disabled={mode === "editing"}
+          disabled={_mode.mode === "editing"}
           onClick={() => {
-            setMode("running")
+            setMode({ mode: "running", startedAt: Date.now() })
           }}
         >
           Start
@@ -88,4 +106,36 @@ function tickTimer(onStoreChange: () => void): () => void {
   return () => {
     clearInterval(timer)
   }
+}
+
+function parse(timeInput: string): number | undefined {
+  const [, minutesPart, secondsPart] =
+    timeInput.match(/^(?:\s*(\d+)\s*:)?\s*(\d+)\s*$/) ?? []
+
+  // Invalid format
+  if (secondsPart === undefined) {
+    return undefined
+  }
+
+  const minutes = minutesPart === undefined ? 0 : parseInt(minutesPart)
+  const seconds = parseInt(secondsPart)
+  // Need NaN check?
+
+  return minutes * 60_000 + seconds * 1_000
+}
+
+if (import.meta.vitest) {
+  const { test, expect } = import.meta.vitest
+
+  test("basic", () => {
+    expect(parse("5:00")).toBe(5 * 60_000)
+  })
+
+  test("white spaces", () => {
+    expect(parse(" 3    :  01   ")).toBe(3 * 60_000 + 1_000)
+  })
+
+  test("invalid format", () => {
+    expect(parse("x:00")).toBeUndefined()
+  })
 }
