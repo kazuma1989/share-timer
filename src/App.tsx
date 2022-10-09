@@ -9,21 +9,21 @@ import { useTimer } from "./useTimer"
 
 const timerAction = z.union([
   z.object({
-    type: z.enum(["edit"]),
+    type: z.literal("edit"),
   }),
 
   z.object({
-    type: z.enum(["edit-done"]),
+    type: z.literal("edit-done"),
     duration: z.number(),
   }),
 
   z.object({
-    type: z.enum(["start"]),
+    type: z.literal("start"),
     at: z.number(),
   }),
 
   z.object({
-    type: z.enum(["pause"]),
+    type: z.literal("pause"),
     at: z.number(),
   }),
 ])
