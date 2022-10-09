@@ -12,7 +12,7 @@ export function App() {
 
   const [timeInput, setTimeInput] = useState("5:00")
 
-  const now = useTimer()
+  const now = useTimer(state.mode !== "running")
 
   return (
     <form
