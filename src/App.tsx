@@ -1,32 +1,11 @@
 import { css } from "@emotion/css"
-import { collection, orderBy, query } from "firebase/firestore"
+import { collection, orderBy, query, Timestamp } from "firebase/firestore"
 import { useReducer, useState } from "react"
 import { z } from "zod"
 import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
 import { useCollection } from "./useCollection"
 import { useTimer } from "./useTimer"
-
-const timerAction = z.union([
-  z.object({
-    type: z.literal("edit"),
-  }),
-
-  z.object({
-    type: z.literal("edit-done"),
-    duration: z.number(),
-  }),
-
-  z.object({
-    type: z.literal("start"),
-    at: z.number(),
-  }),
-
-  z.object({
-    type: z.literal("pause"),
-    at: z.number(),
-  }),
-])
 
 export function App() {
   const actions = useCollection(
@@ -171,7 +150,28 @@ type TimerState =
       restDuration: number
     }
 
-type TimerAction = z.infer<typeof timerAction>
+const timerAction = z.union([
+  z.object({
+    type: z.literal("edit"),
+  }),
+
+  z.object({
+    type: z.literal("edit-done"),
+    duration: z.number(),
+  }),
+
+  z.object({
+    type: z.literal("start"),
+    at: z.instanceof(Timestamp).transform((t) => t.toMillis()),
+  }),
+
+  z.object({
+    type: z.literal("pause"),
+    at: z.instanceof(Timestamp).transform((t) => t.toMillis()),
+  }),
+])
+
+type TimerAction = z.output<typeof timerAction>
 
 function reducer(state: TimerState, action: TimerAction): TimerState {
   switch (action.type) {
