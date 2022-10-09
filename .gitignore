@@ -1,0 +1,6 @@
+/build
+/coverage
+/.env*.local
+
+node_modules
+*.log

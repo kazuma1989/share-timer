@@ -1,0 +1,42 @@
+{
+  // 各プラグインのおすすめルールを適用する。
+  // プラグインの読み込みも設定してくれるので、plugins オプションも不要。
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/base",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime",
+    "plugin:react-hooks/recommended",
+
+    // Prettier の整形と衝突するルールを無効にする。
+    // ほかのおすすめルールを上書きできるように最後に置く。
+    "prettier"
+  ],
+
+  "settings": {
+    // eslint-plugin-react からワーニングが出ないように明示的に指定。
+    "react": {
+      "version": "detect"
+    }
+  },
+
+  "rules": {
+    // no-unused-vars ルールは TypeScript の型エイリアスを未使用の変数と誤判定するので無効にする。
+    // 代わりに @typescript-eslint/no-unused-vars を有効にする。
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
+
+    // console.log() の消し忘れに気づけるようにする。
+    "no-console": ["warn", { "allow": ["info", "warn", "error"] }]
+  },
+
+  "overrides": [
+    {
+      "files": ["**/*.test.ts"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "off"
+      }
+    }
+  ]
+}

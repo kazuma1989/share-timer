@@ -1,0 +1,16 @@
+{
+  // 保存時にPrettier適用
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // 保存時にESLint適用
+  "eslint.run": "onSave",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  // TS, TSXファイルのみ対象とする。
+  "eslint.probe": ["typescript", "typescriptreact"],
+
+  // TypeScriptバージョンをリポジトリのものに揃える。
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

@@ -1,0 +1,49 @@
+body {
+  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN",
+    "Hiragino Sans", Meiryo, sans-serif;
+  color: var(--black);
+  overflow-wrap: anywhere;
+  background-color: var(--white);
+  -webkit-font-smoothing: antialiased;
+}
+
+::placeholder {
+  color: var(--gray);
+}
+
+progress {
+  /* Safari でスタイルを制御できるように */
+  background-repeat: initial;
+}
+
+a {
+  color: inherit;
+  text-decoration: unset;
+}
+
+/* ress.css で無効になったアウトラインを復活させる */
+a:active,
+a:hover {
+  outline-width: revert;
+}
+
+[role="button"]:focus,
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  /* https://css-tricks.com/copy-the-browsers-native-focus-styles/ */
+  outline: Highlight auto medium;
+  outline: -webkit-focus-ring-color auto medium;
+}
+
+/* https://stackoverflow.com/a/23860302/8662861 */
+input[type="file"],
+input[type="file"]::-webkit-file-upload-button {
+  cursor: unset;
+}
+
+summary {
+  cursor: pointer;
+}

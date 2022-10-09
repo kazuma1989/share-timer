@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    // Prettier
+    "esbenp.prettier-vscode",
+
+    // ESLint
+    "dbaeumer.vscode-eslint",
+
+    // CSS in JS syntax
+    "styled-components.vscode-styled-components"
+  ]
+}
