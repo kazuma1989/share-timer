@@ -1,18 +1,14 @@
 import { css } from "@emotion/css"
 import { millisecondsToSeconds } from "date-fns"
-import { useState } from "react"
+import { useReducer, useState } from "react"
 import { useTimer } from "./useTimer"
 
-type Mode =
-  | { mode: "editing" }
-  | { mode: "running"; startedAt: number }
-  | { mode: "paused"; restDuration: number }
-
 export function App() {
-  const [_mode, setMode] = useState<Mode>({
+  const [state, dispatch] = useReducer(reducer, {
     mode: "paused",
     restDuration: 5 * 60_000,
   })
+
   const [timeInput, setTimeInput] = useState("5:00")
 
   const now = useTimer()
@@ -28,7 +24,7 @@ export function App() {
           font-size: 30vmin;
         `}
       >
-        {_mode.mode === "editing" ? (
+        {state.mode === "editing" ? (
           <input
             value={timeInput}
             size={5}
@@ -39,26 +35,29 @@ export function App() {
               setTimeInput(e.currentTarget.value)
             }}
           />
-        ) : _mode.mode === "running" ? (
-          <span>{millisecondsToSeconds(now - _mode.startedAt)}</span>
+        ) : state.mode === "running" ? (
+          <span>{millisecondsToSeconds(now - state.startedAt)}</span>
         ) : (
-          <span>{formatDuration(_mode.restDuration)}</span>
+          <span>{formatDuration(state.restDuration)}</span>
         )}
       </div>
 
       <div>{now}</div>
 
-      {_mode.mode === "editing" ? (
+      {state.mode === "editing" ? (
         <button
           type="submit"
           onClick={() => {
-            const restDuration = parse(timeInput)
-            if (restDuration === undefined) {
+            const duration = parse(timeInput)
+            if (duration === undefined) {
               alert(`invalid format ${timeInput}`)
               return
             }
 
-            setMode({ mode: "paused", restDuration })
+            dispatch({
+              type: "edit-done",
+              duration,
+            })
           }}
         >
           Done
@@ -67,20 +66,22 @@ export function App() {
         <button
           type="button"
           onClick={() => {
-            setMode({ mode: "editing" })
+            dispatch({
+              type: "edit",
+            })
           }}
         >
           Edit
         </button>
       )}
 
-      {_mode.mode === "running" ? (
+      {state.mode === "running" ? (
         <button
           type="button"
           onClick={() => {
-            setMode({
-              mode: "paused",
-              restDuration: Date.now() - _mode.startedAt,
+            dispatch({
+              type: "pause",
+              at: Date.now(),
             })
           }}
         >
@@ -89,9 +90,12 @@ export function App() {
       ) : (
         <button
           type="button"
-          disabled={_mode.mode === "editing"}
+          disabled={state.mode === "editing"}
           onClick={() => {
-            setMode({ mode: "running", startedAt: Date.now() })
+            dispatch({
+              type: "start",
+              at: Date.now(),
+            })
           }}
         >
           Start
@@ -99,6 +103,138 @@ export function App() {
       )}
     </form>
   )
+}
+
+type TimerState =
+  | {
+      mode: "editing"
+    }
+  | {
+      mode: "running"
+      startedAt: number
+      duration: number
+    }
+  | {
+      mode: "paused"
+      restDuration: number
+    }
+
+type TimerAction =
+  | {
+      type: "edit"
+    }
+  | {
+      type: "edit-done"
+      duration: number
+    }
+  | {
+      type: "start"
+      at: number
+    }
+  | {
+      type: "pause"
+      at: number
+    }
+
+function reducer(state: TimerState, action: TimerAction): TimerState {
+  switch (action.type) {
+    case "edit": {
+      return state
+    }
+
+    case "edit-done": {
+      return state
+    }
+
+    case "start": {
+      return state
+    }
+
+    case "pause": {
+      return state
+    }
+
+    // Do not use "default" here to be exhaustive for all types
+  }
+}
+
+if (import.meta.vitest) {
+  const { test, expect } = import.meta.vitest
+
+  test("edit", () => {
+    expect(
+      reducer(
+        {
+          mode: "paused",
+          restDuration: 5 * 60_000,
+        },
+        {
+          type: "edit",
+        }
+      )
+    ).toStrictEqual({
+      mode: "editing",
+    })
+  })
+
+  test("edit-done", () => {
+    expect(
+      reducer(
+        {
+          mode: "editing",
+        },
+        {
+          type: "edit-done",
+          duration: 5 * 60_000,
+        }
+      )
+    ).toStrictEqual({
+      mode: "paused",
+      restDuration: 5 * 60_000,
+    })
+  })
+
+  test("start", () => {
+    const now = Date.now()
+
+    expect(
+      reducer(
+        {
+          mode: "paused",
+          restDuration: 5 * 60_000,
+        },
+        {
+          type: "start",
+          at: now,
+        }
+      )
+    ).toStrictEqual({
+      mode: "running",
+      duration: 5 * 60_000,
+      startedAt: now,
+    })
+  })
+
+  test("pause", () => {
+    const now = Date.now()
+
+    expect(
+      reducer(
+        {
+          mode: "running",
+          duration: 5 * 60_000,
+          startedAt: now - 40_000,
+        },
+        {
+          type: "pause",
+          at: now,
+        }
+      )
+    ).toStrictEqual({
+      mode: "paused",
+      restDuration: 5 * 60_000 - 40_000,
+    })
+  })
 }
 
 function parse(timeInput: string): number | undefined {
