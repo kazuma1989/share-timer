@@ -1,5 +1,7 @@
 import { css } from "@emotion/css"
 import { useReducer, useState } from "react"
+import { formatDuration } from "./formatDuration"
+import { parseTimeInput } from "./parseTimeInput"
 import { useTimer } from "./useTimer"
 
 export function App() {
@@ -47,7 +49,7 @@ export function App() {
         <button
           type="submit"
           onClick={() => {
-            const duration = parse(timeInput)
+            const duration = parseTimeInput(timeInput)
             if (duration === undefined) {
               alert(`invalid format ${timeInput}`)
               return
@@ -253,67 +255,5 @@ if (import.meta.vitest) {
       mode: "paused",
       restDuration: 5 * 60_000 - 40_000,
     })
-  })
-}
-
-function parse(timeInput: string): number | undefined {
-  const [, minutesPart, secondsPart] =
-    timeInput.match(/^(?:\s*(\d+)\s*:)?\s*(\d+)\s*$/) ?? []
-
-  // Invalid format
-  if (secondsPart === undefined) {
-    return undefined
-  }
-
-  const minutes = minutesPart === undefined ? 0 : parseInt(minutesPart)
-  const seconds = parseInt(secondsPart)
-  // Need NaN check?
-
-  return minutes * 60_000 + seconds * 1_000
-}
-
-if (import.meta.vitest) {
-  const { test, expect } = import.meta.vitest
-
-  test("basic", () => {
-    expect(parse("5:00")).toBe(5 * 60_000)
-  })
-
-  test("white spaces", () => {
-    expect(parse(" 3    :  01   ")).toBe(3 * 60_000 + 1_000)
-  })
-
-  test("invalid format", () => {
-    expect(parse("x:00")).toBeUndefined()
-  })
-}
-
-function formatDuration(durationMs: number): string {
-  // durationMs = 321_456
-
-  // milliseconds = 456
-  const milliseconds = durationMs % 1_000
-
-  // durationSec = 321
-  const durationSec = (durationMs - milliseconds) / 1_000
-
-  // seconds = 21
-  const seconds = durationSec % 60
-
-  // minutes = 3
-  const minutes = (durationSec - seconds) / 60
-
-  return [minutes.toString(), seconds.toString().padStart(2, "0")].join(":")
-}
-
-if (import.meta.vitest) {
-  const { test, expect } = import.meta.vitest
-
-  test("basic", () => {
-    expect(formatDuration(5 * 60_000)).toBe("5:00")
-  })
-
-  test("omit milliseconds unit", () => {
-    expect(formatDuration(3 * 60_000 + 1_000 + 789)).toBe("3:01")
   })
 }
