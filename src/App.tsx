@@ -81,10 +81,15 @@ export function App() {
       >
         {state.mode === "editing" ? (
           <input
+            type="text"
             value={timeInput}
             size={5}
             className={css`
-              width: 100%;
+              && {
+                height: unset;
+                margin: 0;
+                padding: 0;
+              }
             `}
             onChange={(e) => {
               setTimeInput(e.currentTarget.value)
