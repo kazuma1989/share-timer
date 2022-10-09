@@ -16,7 +16,7 @@
     "start": "vite serve",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "vitest",
     "format": "prettier --write \"./{public,src}/**/*.{css,html,js,ts,tsx}\"",
     "lint": "eslint \"./src/**/*.{ts,tsx}\""
   },
