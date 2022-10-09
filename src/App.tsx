@@ -10,7 +10,7 @@ export function App() {
     restDuration: 5 * 60_000,
   })
 
-  const [timeInput, setTimeInput] = useState("5:00")
+  const [timeInput, setTimeInput] = useState("")
 
   const now = useTimer(state.mode !== "running")
 
