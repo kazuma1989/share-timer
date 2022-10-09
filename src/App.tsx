@@ -2,9 +2,12 @@ import { css } from "@emotion/css"
 import { useReducer, useState } from "react"
 import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
+import { useDoc } from "./useDoc"
 import { useTimer } from "./useTimer"
 
 export function App() {
+  console.log(useDoc(["rooms", "gAbaEbOVeZ1KSfLR8GcZ"], (rawData) => rawData))
+
   const [state, dispatch] = useReducer(reducer, {
     mode: "paused",
     restDuration: 5 * 60_000,
