@@ -69,6 +69,10 @@ export function App() {
             dispatch({
               type: "edit",
             })
+
+            if (state.mode === "paused") {
+              setTimeInput(formatDuration(state.restDuration))
+            }
           }}
         >
           Edit
