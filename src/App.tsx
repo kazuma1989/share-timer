@@ -139,22 +139,42 @@ type TimerAction =
 function reducer(state: TimerState, action: TimerAction): TimerState {
   switch (action.type) {
     case "edit": {
-      return state
+      return {
+        mode: "editing",
+      }
     }
 
     case "edit-done": {
-      return state
+      return {
+        mode: "paused",
+        restDuration: action.duration,
+      }
     }
 
     case "start": {
-      return state
+      if (state.mode !== "paused") {
+        return state
+      }
+
+      return {
+        mode: "running",
+        duration: state.restDuration,
+        startedAt: action.at,
+      }
     }
 
     case "pause": {
-      return state
+      if (state.mode !== "running") {
+        return state
+      }
+
+      return {
+        mode: "paused",
+        restDuration: state.duration - (action.at - state.startedAt),
+      }
     }
 
-    // Do not use "default" here to be exhaustive for all types
+    // Do not use "default" here to be exhaustive for the all types.
   }
 }
 
