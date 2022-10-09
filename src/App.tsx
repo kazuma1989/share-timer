@@ -14,16 +14,13 @@ export function App() {
         collection(db, "rooms", "OfzJLddWnrLkPZOJN34A", "actions"),
         orderBy("at", "asc")
       ),
-    (rawData): TimerAction => timerAction.parse(rawData)
+    (rawData) => timerAction.parse(rawData)
   )
 
-  const x = actions.reduce<TimerState>(
-    (state, action) => reducer(state, action),
-    {
-      mode: "paused",
-      restDuration: 5 * 60_000,
-    }
-  )
+  const x = actions.reduce(reducer, {
+    mode: "paused",
+    restDuration: 5 * 60_000,
+  })
 
   console.log(x)
 
