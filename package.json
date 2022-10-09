@@ -18,7 +18,10 @@
     "preview": "vite preview",
     "test": "vitest",
     "format": "prettier --write \"./{public,src}/**/*.{css,html,js,ts,tsx}\"",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\""
+    "lint": "eslint \"./src/**/*.{ts,tsx}\"",
+    "firebase-login": "firebase login",
+    "firebase-init": "firebase init",
+    "firebase-deploy": "firebase deploy --only hosting:sharetimer"
   },
   "dependencies": {
     "@emotion/css": "11.10.x",
