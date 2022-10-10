@@ -48,22 +48,24 @@ export function useCollection<T>(
 }
 
 class Store<V> {
-  private latestValue?: V
+  static readonly Empty = Symbol("empty")
+
+  private latestValue: V | typeof Store.Empty = Store.Empty
 
   constructor(
-    private readonly createSubscription: (
+    private readonly getSubscription: (
       onChange: (value: V) => void
     ) => () => void
   ) {}
 
   subscribe = (onStoreChange: () => void): (() => void) =>
-    this.createSubscription((value) => {
+    this.getSubscription((value) => {
       this.latestValue = value
       onStoreChange()
     })
 
   getOrThrow = (): V => {
-    if (this.latestValue) {
+    if (this.latestValue !== Store.Empty) {
       return this.latestValue
     }
 
