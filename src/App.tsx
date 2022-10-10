@@ -1,5 +1,6 @@
 import { query } from "firebase/firestore"
 import { collection } from "./collection"
+import { Debug } from "./Debug"
 import { FullViewportProgress } from "./FullViewportProgress"
 import { orderBy } from "./orderBy"
 import { Timer } from "./Timer"
@@ -23,5 +24,11 @@ export function App() {
     return <FullViewportProgress />
   }
 
-  return <Timer key={roomId} roomId={roomId} actions={actions} />
+  return (
+    <>
+      <Timer key={roomId} roomId={roomId} actions={actions} />
+
+      {import.meta.env.DEV && <Debug />}
+    </>
+  )
 }
