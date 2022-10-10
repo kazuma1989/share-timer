@@ -28,9 +28,23 @@ export function App() {
     (rawData) => timerAction.parse(rawData)
   )
 
+  if (!actions) {
+    return <progress />
+  }
+
+  return <Timer key={roomId} roomId={roomId} actions={actions} />
+}
+
+function Timer({
+  roomId,
+  actions,
+}: {
+  roomId: string
+  actions: TimerAction[]
+}) {
   const state = actions.reduce(reducer, {
     mode: "paused",
-    restDuration: 5 * 60_000,
+    restDuration: 0,
   })
 
   const dispatch = useAddDoc<z.input<typeof timerAction>>((db) =>

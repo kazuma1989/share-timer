@@ -11,8 +11,8 @@ import { useFirestore } from "./useFirestore"
 export function useCollection<T>(
   getQuery: (db: Firestore) => Query<DocumentData>,
   converter: (rawData: DocumentData) => T
-): T[] {
-  const data$ = useRef<T[]>([])
+): T[] | undefined {
+  const data$ = useRef<T[]>()
 
   const converter$ = useRef(converter)
   converter$.current = converter
