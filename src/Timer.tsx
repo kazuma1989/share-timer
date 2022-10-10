@@ -1,13 +1,8 @@
 import { css } from "@emotion/css"
-import {
-  DocumentData,
-  onSnapshot,
-  Query,
-  query,
-  serverTimestamp,
-} from "firebase/firestore"
-import { useRef, useSyncExternalStore } from "react"
+import { query, serverTimestamp } from "firebase/firestore"
+import { useRef } from "react"
 import { collection } from "./collection"
+import { createCollectionStore } from "./createCollectionStore"
 import { formatDuration } from "./formatDuration"
 import { orderBy } from "./orderBy"
 import { parseTimeInput } from "./parseTimeInput"
@@ -16,38 +11,12 @@ import { timerAction, TimerAction, TimerActionOnFirestore } from "./timerAction"
 import { TimeViewer } from "./TimeViewer"
 import { useAddDoc } from "./useAddDoc"
 import { useFirestore } from "./useFirestore"
+import { useStore } from "./useStore"
 
-const storeMap = new Map<string, Store<TimerAction[]>>()
+type RoomId = string
+const storeMap = new Map<RoomId, Store<TimerAction[]>>()
 
-function useStore<T>(store: Store<T>): T {
-  return useSyncExternalStore(store.subscribe, store.getOrThrow)
-}
-
-function createCollectionStore<T>(
-  query: Query,
-  converter: (rawData: DocumentData) => T
-): Store<T[]> {
-  return new Store((onChange) =>
-    onSnapshot(query, (doc) => {
-      const data = doc.docs.flatMap<T>((doc) => {
-        const data = doc.data({
-          serverTimestamps: "estimate",
-        })
-
-        try {
-          return [converter(data)]
-        } catch (error) {
-          console.debug(data, error)
-          return []
-        }
-      })
-
-      onChange(data)
-    })
-  )
-}
-
-export function Timer({ roomId }: { roomId: string }) {
+export function Timer({ roomId }: { roomId: RoomId }) {
   const db = useFirestore()
 
   let store = storeMap.get(roomId)
