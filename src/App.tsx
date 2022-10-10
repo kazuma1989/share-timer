@@ -6,7 +6,7 @@ import {
   serverTimestamp,
   Timestamp,
 } from "firebase/firestore"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { z } from "zod"
 import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
@@ -16,7 +16,7 @@ import { useTimer } from "./useTimer"
 
 export function App() {
   // TODO take id from URL
-  const roomId = "OfzJLddWnrLkPZOJN34A"
+  const roomId = "dMozjV2pszCOzRxfhScB"
 
   const actions = useCollection(
     (db) =>
@@ -136,7 +136,60 @@ export function App() {
           Start
         </button>
       )}
+
+      {import.meta.env.DEV && <InitNewRoom />}
     </form>
+  )
+}
+
+function InitNewRoom() {
+  const addRoom = useAddDoc<{}>((db) => collection(db, "rooms"))
+
+  const [roomId, setRoomId] = useState("")
+  const roomId$ = useRef(roomId)
+  roomId$.current = roomId
+
+  const addAction = useAddDoc<z.input<typeof timerAction>>((db) =>
+    collection(db, "rooms", roomId$.current, "actions")
+  )
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={async () => {
+          const roomId = (await addRoom({})).id
+
+          setRoomId(roomId)
+          roomId$.current = roomId
+
+          await addAction({
+            type: "edit",
+          })
+
+          await addAction({
+            type: "edit-done",
+            duration: 5 * 60_000,
+          })
+
+          await addAction({
+            type: "start",
+            at: Timestamp.fromMillis(Date.now() - 30_000),
+          })
+
+          await addAction({
+            type: "pause",
+            at: Timestamp.fromMillis(Date.now()),
+          })
+        }}
+      >
+        init new room
+      </button>
+
+      <div>
+        <code>{roomId}</code>
+      </div>
+    </div>
   )
 }
 
