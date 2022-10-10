@@ -10,7 +10,7 @@ import { useFirestore } from "./useFirestore"
 
 export function useCollection<T>(
   getQuery: (db: Firestore) => Query,
-  converter: (rawData: DocumentData) => T | undefined
+  converter: (rawData: DocumentData) => T
 ): T[] | undefined {
   const data$ = useRef<T[]>()
 
@@ -30,15 +30,18 @@ export function useCollection<T>(
   const subscribe = useCallback(
     (onStoreChange: () => void): (() => void) =>
       onSnapshot(query, (doc) => {
-        data$.current = doc.docs
-          .map((doc) =>
-            converter$.current(
-              doc.data({
-                serverTimestamps: "estimate",
-              })
-            )
-          )
-          .filter((_: T | undefined): _ is T => _ !== undefined)
+        data$.current = doc.docs.flatMap<T>((doc) => {
+          const data = doc.data({
+            serverTimestamps: "estimate",
+          })
+
+          try {
+            return [converter$.current(data)]
+          } catch (error) {
+            console.debug(data, error)
+            return []
+          }
+        })
 
         onStoreChange()
       }),

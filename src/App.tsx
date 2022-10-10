@@ -16,12 +16,7 @@ export function App() {
         collection(db, "rooms", roomId, "actions"),
         orderBy("createdAt", "asc")
       ),
-    (rawData) => {
-      const _ = timerAction.safeParse(rawData)
-      if (_.success) {
-        return _.data
-      }
-    }
+    (rawData) => timerAction.parse(rawData)
   )
 
   if (!actions) {
