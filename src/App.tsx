@@ -12,11 +12,11 @@ import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
 import { useAddDoc } from "./useAddDoc"
 import { useCollection } from "./useCollection"
+import { useHash } from "./useHash"
 import { useTimer } from "./useTimer"
 
 export function App() {
-  // TODO take id from URL
-  const roomId = "dMozjV2pszCOzRxfhScB"
+  const roomId = useHash().slice("#".length)
 
   const actions = useCollection(
     (db) =>
