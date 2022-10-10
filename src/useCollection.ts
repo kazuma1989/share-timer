@@ -54,10 +54,14 @@ class Store<V> {
 
   private onStoreChange?: () => void
 
+  private resolve?: () => void
+
   constructor(init: (onChange: (value: V) => void) => () => void) {
     this.unsubscribe = init((value) => {
       this.latestValue = value
       this.onStoreChange?.()
+
+      this.resolve?.()
     })
   }
 
@@ -74,8 +78,8 @@ class Store<V> {
       return this.latestValue
     }
 
-    throw new Promise((resolve) => {
-      setTimeout(resolve, 1_000)
+    throw new Promise<void>((resolve) => {
+      this.resolve = resolve
     })
   }
 }
