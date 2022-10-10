@@ -44,15 +44,11 @@ export function useCollection<T>(
 
   const store = queryMap.get(query)! as Store<T[]>
 
-  store.subscribe(() => {})
-
   return useSyncExternalStore(store.subscribe, store.getOrThrow)
 }
 
 class Store<V> {
   private latestValue?: V
-
-  private resolve?: () => void
 
   constructor(
     private readonly createSubscription: (
@@ -64,8 +60,6 @@ class Store<V> {
     this.createSubscription((value) => {
       this.latestValue = value
       onStoreChange()
-
-      this.resolve?.()
     })
 
   getOrThrow = (): V => {
@@ -74,7 +68,10 @@ class Store<V> {
     }
 
     throw new Promise<void>((resolve) => {
-      this.resolve = resolve
+      const unsubscribe = this.subscribe(() => {
+        unsubscribe()
+        resolve()
+      })
     })
   }
 }
