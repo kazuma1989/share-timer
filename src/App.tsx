@@ -17,6 +17,14 @@ import { useTimer } from "./useTimer"
 
 export function App() {
   const roomId = useHash().slice("#".length)
+  if (!roomId) {
+    throw new Promise((resolve) => {
+      window.addEventListener("hashchange", resolve, {
+        passive: true,
+        once: true,
+      })
+    })
+  }
 
   const actions = useCollection(
     (db) =>
