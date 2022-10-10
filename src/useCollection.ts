@@ -44,34 +44,29 @@ export function useCollection<T>(
 
   const store = queryMap.get(query)! as Store<T[]>
 
+  store.subscribe(() => {})
+
   return useSyncExternalStore(store.subscribe, store.getOrThrow)
 }
 
 class Store<V> {
   private latestValue?: V
 
-  private unsubscribe: () => void
-
-  private onStoreChange?: () => void
-
   private resolve?: () => void
 
-  constructor(init: (onChange: (value: V) => void) => () => void) {
-    this.unsubscribe = init((value) => {
+  constructor(
+    private readonly createSubscription: (
+      onChange: (value: V) => void
+    ) => () => void
+  ) {}
+
+  subscribe = (onStoreChange: () => void): (() => void) =>
+    this.createSubscription((value) => {
       this.latestValue = value
-      this.onStoreChange?.()
+      onStoreChange()
 
       this.resolve?.()
     })
-  }
-
-  subscribe = (onStoreChange: () => void): (() => void) => {
-    this.onStoreChange = onStoreChange
-
-    // FIXME this.unsubscribeを返すとすぐ購読が止まってしまうのはなぜなのだ。Suspenseによってコンポーネントが破棄される？からか？
-    // return this.unsubscribe
-    return () => {}
-  }
 
   getOrThrow = (): V => {
     if (this.latestValue) {
