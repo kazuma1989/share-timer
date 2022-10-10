@@ -20,7 +20,10 @@ export function App() {
 
   const actions = useCollection(
     (db) =>
-      query(collection(db, "rooms", roomId, "actions"), orderBy("at", "asc")),
+      query(
+        collection(db, "rooms", roomId, "actions"),
+        orderBy("createdAt", "asc")
+      ),
     (rawData) => timerAction.parse(rawData)
   )
 
@@ -113,7 +116,7 @@ export function App() {
           onClick={() => {
             dispatch({
               type: "pause",
-              at: serverTimestamp() as Timestamp,
+              at: serverTimestamp(),
             })
           }}
         >
@@ -126,7 +129,7 @@ export function App() {
           onClick={() => {
             dispatch({
               type: "start",
-              at: serverTimestamp() as Timestamp,
+              at: serverTimestamp(),
             })
           }}
         >
