@@ -1,4 +1,5 @@
 import { collection, orderBy, query } from "firebase/firestore"
+import { FullViewportProgress } from "./FullViewportProgress"
 import { Timer } from "./Timer"
 import { timerAction } from "./timerAction"
 import { useCollection } from "./useCollection"
@@ -22,7 +23,7 @@ export function App() {
   )
 
   if (!actions) {
-    return <progress />
+    return <FullViewportProgress />
   }
 
   return <Timer key={roomId} roomId={roomId} actions={actions} />
