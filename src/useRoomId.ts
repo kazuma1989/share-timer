@@ -4,6 +4,7 @@ import { TimerActionOnFirestore } from "./timerAction"
 import { useFirestore } from "./useFirestore"
 import { useHash } from "./useHash"
 
+// FIXME 存在しないroomIdを指定された場合はどうする？
 export function useRoomId(): string {
   const db = useFirestore()
 
