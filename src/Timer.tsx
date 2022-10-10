@@ -1,10 +1,9 @@
 import { css } from "@emotion/css"
 import { collection, serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
-import { z } from "zod"
 import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
-import { timerAction, TimerAction } from "./timerAction"
+import { TimerAction, TimerActionOnFirestore } from "./timerAction"
 import { TimeViewer } from "./TimeViewer"
 import { useAddDoc } from "./useAddDoc"
 
@@ -20,7 +19,7 @@ export function Timer({
     restDuration: 0,
   })
 
-  const dispatch = useAddDoc<z.input<typeof timerAction>>((db) =>
+  const dispatch = useAddDoc<TimerActionOnFirestore>((db) =>
     collection(db, "rooms", roomId, "actions")
   )
 

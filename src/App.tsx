@@ -13,7 +13,12 @@ export function App() {
         collection(db, "rooms", roomId, "actions"),
         orderBy("createdAt", "asc")
       ),
-    (rawData) => timerAction.parse(rawData)
+    (rawData) => {
+      const _ = timerAction.safeParse(rawData)
+      if (_.success) {
+        return _.data
+      }
+    }
   )
 
   if (!actions) {

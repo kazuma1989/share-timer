@@ -23,3 +23,5 @@ export const timerAction = z.union([
 ])
 
 export type TimerAction = z.output<typeof timerAction>
+
+export type TimerActionOnFirestore = z.input<typeof timerAction>
