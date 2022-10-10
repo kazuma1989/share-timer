@@ -10,6 +10,7 @@ import { useRef, useState } from "react"
 import { z } from "zod"
 import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
+import { timerAction, TimerAction } from "./timerAction"
 import { useAddDoc } from "./useAddDoc"
 import { useCollection } from "./useCollection"
 import { useRoomId } from "./useRoomId"
@@ -206,29 +207,6 @@ type TimerState =
       mode: "paused"
       restDuration: number
     }
-
-const timerAction = z.union([
-  z.object({
-    type: z.literal("edit"),
-  }),
-
-  z.object({
-    type: z.literal("edit-done"),
-    duration: z.number(),
-  }),
-
-  z.object({
-    type: z.literal("start"),
-    at: z.instanceof(Timestamp).transform((t) => t.toMillis()),
-  }),
-
-  z.object({
-    type: z.literal("pause"),
-    at: z.instanceof(Timestamp).transform((t) => t.toMillis()),
-  }),
-])
-
-type TimerAction = z.output<typeof timerAction>
 
 function reducer(state: TimerState, action: TimerAction): TimerState {
   switch (action.type) {
