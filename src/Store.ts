@@ -1,11 +1,11 @@
-export class Store<V> {
+export class Store<T> {
   static readonly Empty = Symbol("empty")
 
-  private latestValue: V | typeof Store.Empty = Store.Empty
+  private latestValue: T | typeof Store.Empty = Store.Empty
 
   constructor(
     private readonly getSubscription: (
-      onChange: (value: V) => void
+      onChange: (value: T) => void
     ) => () => void
   ) {}
 
@@ -15,7 +15,7 @@ export class Store<V> {
       onStoreChange()
     })
 
-  getOrThrow = (): V => {
+  getOrThrow = (): T => {
     if (this.latestValue !== Store.Empty) {
       return this.latestValue
     }
