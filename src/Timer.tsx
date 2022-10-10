@@ -5,8 +5,8 @@ import { z } from "zod"
 import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
 import { timerAction, TimerAction } from "./timerAction"
+import { TimeViewer } from "./TimeViewer"
 import { useAddDoc } from "./useAddDoc"
-import { useTimer } from "./useTimer"
 
 export function Timer({
   roomId,
@@ -23,8 +23,6 @@ export function Timer({
   const dispatch = useAddDoc<z.input<typeof timerAction>>((db) =>
     collection(db, "rooms", roomId, "actions")
   )
-
-  const now = useTimer(state.mode !== "running")
 
   const timeInput$ = useRef<HTMLInputElement>(null)
 
@@ -67,9 +65,7 @@ export function Timer({
             `}
           />
         ) : state.mode === "running" ? (
-          <span>
-            {formatDuration(state.duration - (now - state.startedAt))}
-          </span>
+          <TimeViewer duration={state.duration} startedAt={state.startedAt} />
         ) : (
           <span>{formatDuration(state.restDuration)}</span>
         )}
