@@ -1,6 +1,7 @@
 /// <reference types="vitest" />
 import react from "@vitejs/plugin-react"
 import { defineConfig, Plugin } from "vite"
+import { bundleBuddy } from "./vite-bundleBuddy"
 
 export default defineConfig(async ({ command, mode }) => {
   const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env
@@ -52,6 +53,9 @@ export default defineConfig(async ({ command, mode }) => {
 
       // type-check
       checkerPlugin,
+
+      // bundle analyze
+      bundleBuddy(),
     ],
 
     // Vitest

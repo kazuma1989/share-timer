@@ -1,6 +1,6 @@
 // https://www.typescriptlang.org/ja/tsconfig
 {
-  "include": ["./vite.config.ts"],
+  "include": ["./vite.config.ts", "./vite-*.ts"],
 
   "compilerOptions": {
     "composite": true,
