@@ -1,28 +1,21 @@
-import { useCallback, useRef, useSyncExternalStore } from "react"
+import { useSyncExternalStore } from "react"
 
-export function useTimer(paused = false): number {
-  const now$ = useRef(Date.now())
+let now = Date.now()
 
-  const subscribe = useCallback(
-    (onStoreChange: () => void): (() => void) => {
-      if (paused) {
-        return () => {}
-      }
+export function useTimer(): number {
+  return useSyncExternalStore(subscribe, () => now)
+}
 
-      now$.current = Date.now()
+function subscribe(onStoreChange: () => void): () => void {
+  now = Date.now()
 
-      const timer = setInterval(() => {
-        now$.current = Date.now()
+  const timer = setInterval(() => {
+    now = Date.now()
 
-        onStoreChange()
-      }, 1000)
+    onStoreChange()
+  }, 1000)
 
-      return () => {
-        clearInterval(timer)
-      }
-    },
-    [paused]
-  )
-
-  return useSyncExternalStore(subscribe, () => now$.current)
+  return () => {
+    clearInterval(timer)
+  }
 }
