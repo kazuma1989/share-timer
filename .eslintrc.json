@@ -28,7 +28,20 @@
     "@typescript-eslint/no-unused-vars": "warn",
 
     // console.log() の消し忘れに気づけるようにする。
-    "no-console": ["warn", { "allow": ["info", "warn", "error"] }]
+    "no-console": ["warn", { "allow": ["info", "warn", "error"] }],
+
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "firebase/firestore",
+            "importNames": ["collection", "orderBy"],
+            "message": "Please use type-safe wrapper functions instead."
+          }
+        ]
+      }
+    ]
   },
 
   "overrides": [
