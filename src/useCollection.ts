@@ -64,7 +64,9 @@ class Store<V> {
   subscribe = (onStoreChange: () => void): (() => void) => {
     this.onStoreChange = onStoreChange
 
-    return this.unsubscribe
+    // FIXME this.unsubscribeを返すとすぐ購読が止まってしまうのはなぜなのだ。Suspenseによってコンポーネントが破棄される？からか？
+    // return this.unsubscribe
+    return () => {}
   }
 
   getOrThrow = (): V => {
