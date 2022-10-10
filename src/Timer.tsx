@@ -1,20 +1,25 @@
 import { css } from "@emotion/css"
-import { serverTimestamp } from "firebase/firestore"
+import { query, serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
 import { collection } from "./collection"
 import { formatDuration } from "./formatDuration"
+import { orderBy } from "./orderBy"
 import { parseTimeInput } from "./parseTimeInput"
-import { TimerAction, TimerActionOnFirestore } from "./timerAction"
+import { timerAction, TimerAction, TimerActionOnFirestore } from "./timerAction"
 import { TimeViewer } from "./TimeViewer"
 import { useAddDoc } from "./useAddDoc"
+import { useCollection } from "./useCollection"
 
-export function Timer({
-  roomId,
-  actions,
-}: {
-  roomId: string
-  actions: TimerAction[]
-}) {
+export function Timer({ roomId }: { roomId: string }) {
+  const actions = useCollection(
+    (db) =>
+      query(
+        collection(db, "rooms", roomId, "actions"),
+        orderBy("createdAt", "asc")
+      ),
+    (rawData) => timerAction.parse(rawData)
+  )
+
   const state = actions.reduce(reducer, {
     mode: "paused",
     restDuration: 0,
