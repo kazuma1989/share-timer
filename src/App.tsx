@@ -12,19 +12,11 @@ import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
 import { useAddDoc } from "./useAddDoc"
 import { useCollection } from "./useCollection"
-import { useHash } from "./useHash"
+import { useRoomId } from "./useRoomId"
 import { useTimer } from "./useTimer"
 
 export function App() {
-  const roomId = useHash().slice("#".length)
-  if (!roomId) {
-    throw new Promise((resolve) => {
-      window.addEventListener("hashchange", resolve, {
-        passive: true,
-        once: true,
-      })
-    })
-  }
+  const roomId = useRoomId()
 
   const actions = useCollection(
     (db) =>
