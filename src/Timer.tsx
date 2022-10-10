@@ -1,6 +1,6 @@
 import { css } from "@emotion/css"
 import { collection, serverTimestamp } from "firebase/firestore"
-import { useState } from "react"
+import { useRef } from "react"
 import { z } from "zod"
 import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
@@ -24,14 +24,16 @@ export function Timer({
     collection(db, "rooms", roomId, "actions")
   )
 
-  const [timeInput, setTimeInput] = useState("")
-
   const now = useTimer(state.mode !== "running")
+
+  const timeInput$ = useRef<HTMLInputElement>(null)
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault()
+
+        const timeInput = timeInput$.current?.value ?? ""
 
         const duration = parseTimeInput(timeInput)
         if (duration === undefined) {
@@ -52,8 +54,9 @@ export function Timer({
       >
         {state.mode === "editing" ? (
           <input
+            ref={timeInput$}
             type="text"
-            value={timeInput}
+            defaultValue={formatDuration(state.initialDuration)}
             size={5}
             className={css`
               && {
@@ -62,9 +65,6 @@ export function Timer({
                 padding: 0;
               }
             `}
-            onChange={(e) => {
-              setTimeInput(e.currentTarget.value)
-            }}
           />
         ) : state.mode === "running" ? (
           <span>
@@ -88,10 +88,6 @@ export function Timer({
             dispatch({
               type: "edit",
             })
-
-            if (state.mode === "paused") {
-              setTimeInput(formatDuration(state.restDuration))
-            }
           }}
         >
           Edit
@@ -131,6 +127,7 @@ export function Timer({
 type TimerState =
   | {
       mode: "editing"
+      initialDuration: number
     }
   | {
       mode: "running"
@@ -145,8 +142,13 @@ type TimerState =
 function reducer(state: TimerState, action: TimerAction): TimerState {
   switch (action.type) {
     case "edit": {
+      if (state.mode !== "paused") {
+        return state
+      }
+
       return {
         mode: "editing",
+        initialDuration: state.restDuration,
       }
     }
 
@@ -200,6 +202,7 @@ if (import.meta.vitest) {
       )
     ).toStrictEqual({
       mode: "editing",
+      initialDuration: 5 * 60_000,
     })
   })
 
@@ -208,6 +211,7 @@ if (import.meta.vitest) {
       reducer(
         {
           mode: "editing",
+          initialDuration: 3 * 60_000,
         },
         {
           type: "edit-done",
