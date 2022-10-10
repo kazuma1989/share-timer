@@ -1,5 +1,7 @@
-import { collection, orderBy, query } from "firebase/firestore"
+import { query } from "firebase/firestore"
+import { collection } from "./collection"
 import { FullViewportProgress } from "./FullViewportProgress"
+import { orderBy } from "./orderBy"
 import { Timer } from "./Timer"
 import { timerAction } from "./timerAction"
 import { useCollection } from "./useCollection"

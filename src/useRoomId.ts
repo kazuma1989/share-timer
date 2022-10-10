@@ -1,10 +1,5 @@
-import {
-  collection,
-  doc,
-  Firestore,
-  serverTimestamp,
-  writeBatch,
-} from "firebase/firestore"
+import { doc, Firestore, serverTimestamp, writeBatch } from "firebase/firestore"
+import { collection } from "./collection"
 import { TimerActionOnFirestore } from "./timerAction"
 import { useFirestore } from "./useFirestore"
 import { useHash } from "./useHash"
@@ -33,7 +28,7 @@ async function setupNewRoom(db: Firestore): Promise<string> {
     createdAt: serverTimestamp(),
   })
 
-  const actions = collection(rooms, newRoomId, "actions")
+  const actions = collection(db, "rooms", newRoomId, "actions")
   const newActionId = doc(actions).id
   const newAction: TimerActionOnFirestore = {
     type: "edit-done",

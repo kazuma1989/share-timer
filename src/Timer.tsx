@@ -1,6 +1,7 @@
 import { css } from "@emotion/css"
-import { collection, serverTimestamp } from "firebase/firestore"
+import { serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
+import { collection } from "./collection"
 import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
 import { TimerAction, TimerActionOnFirestore } from "./timerAction"
