@@ -13,41 +13,44 @@ import { useFirestore } from "./useFirestore"
 
 const storeMap = new Map<string, Store<TimerAction[]>>()
 
+function useStore<T>(store: Store<T>): T {
+  return useSyncExternalStore(store.subscribe, store.getOrThrow)
+}
+
 export function Timer({ roomId }: { roomId: string }) {
   const db = useFirestore()
 
-  if (!storeMap.has(roomId)) {
-    storeMap.set(
-      roomId,
-      new Store((onChange) =>
-        onSnapshot(
-          query(
-            collection(db, "rooms", roomId, "actions"),
-            orderBy("createdAt", "asc")
-          ),
-          (doc) => {
-            const data = doc.docs.flatMap<TimerAction>((doc) => {
-              const data = doc.data({
-                serverTimestamps: "estimate",
-              })
-
-              try {
-                return [timerAction.parse(data)]
-              } catch (error) {
-                console.debug(data, error)
-                return []
-              }
+  let store = storeMap.get(roomId)
+  if (!store) {
+    store = new Store((onChange) =>
+      onSnapshot(
+        query(
+          collection(db, "rooms", roomId, "actions"),
+          orderBy("createdAt", "asc")
+        ),
+        (doc) => {
+          const data = doc.docs.flatMap<TimerAction>((doc) => {
+            const data = doc.data({
+              serverTimestamps: "estimate",
             })
 
-            onChange(data)
-          }
-        )
+            try {
+              return [timerAction.parse(data)]
+            } catch (error) {
+              console.debug(data, error)
+              return []
+            }
+          })
+
+          onChange(data)
+        }
       )
     )
+
+    storeMap.set(roomId, store)
   }
 
-  const store = storeMap.get(roomId)!
-  const actions = useSyncExternalStore(store.subscribe, store.getOrThrow)
+  const actions = useStore(store)
 
   const state = actions.reduce(reducer, {
     mode: "paused",
