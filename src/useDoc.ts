@@ -9,7 +9,7 @@ import { useCallback, useRef, useSyncExternalStore } from "react"
 import { useFirestore } from "./useFirestore"
 
 export function useDoc<T>(
-  getRef: (db: Firestore) => DocumentReference<DocumentData>,
+  getRef: (db: Firestore) => DocumentReference,
   converter: (rawData: DocumentData) => T
 ): T | undefined {
   const data$ = useRef<T>()

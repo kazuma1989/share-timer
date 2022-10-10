@@ -10,8 +10,8 @@ import {
 import { useFirestore } from "./useFirestore"
 
 export function useAddDoc<T extends DocumentData>(
-  getCollection: (db: Firestore) => CollectionReference<DocumentData>
-): (data: WithFieldValue<T>) => Promise<DocumentReference<DocumentData>> {
+  getCollection: (db: Firestore) => CollectionReference
+): (data: WithFieldValue<T>) => Promise<DocumentReference> {
   const db = useFirestore()
 
   return (data) =>
