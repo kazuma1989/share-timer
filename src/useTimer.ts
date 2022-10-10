@@ -7,15 +7,20 @@ export function useTimer(): number {
 }
 
 function subscribe(onStoreChange: () => void): () => void {
-  now = Date.now()
+  const abort = new AbortController()
 
-  const timer = setInterval(() => {
+  const tick = () => {
+    if (abort.signal.aborted) return
+
+    requestAnimationFrame(tick)
+
     now = Date.now()
-
     onStoreChange()
-  }, 1000)
+  }
+
+  tick()
 
   return () => {
-    clearInterval(timer)
+    abort.abort()
   }
 }
