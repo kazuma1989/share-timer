@@ -6,6 +6,7 @@ import {
   queryEqual,
 } from "firebase/firestore"
 import { useRef, useSyncExternalStore } from "react"
+import { Store } from "./Store"
 import { useFirestore } from "./useFirestore"
 
 export function useCollection<T>(
@@ -45,37 +46,6 @@ export function useCollection<T>(
   const store = queryMap.get(query)! as Store<T[]>
 
   return useSyncExternalStore(store.subscribe, store.getOrThrow)
-}
-
-class Store<V> {
-  static readonly Empty = Symbol("empty")
-
-  private latestValue: V | typeof Store.Empty = Store.Empty
-
-  constructor(
-    private readonly getSubscription: (
-      onChange: (value: V) => void
-    ) => () => void
-  ) {}
-
-  subscribe = (onStoreChange: () => void): (() => void) =>
-    this.getSubscription((value) => {
-      this.latestValue = value
-      onStoreChange()
-    })
-
-  getOrThrow = (): V => {
-    if (this.latestValue !== Store.Empty) {
-      return this.latestValue
-    }
-
-    throw new Promise<void>((resolve) => {
-      const unsubscribe = this.subscribe(() => {
-        unsubscribe()
-        resolve()
-      })
-    })
-  }
 }
 
 class QueryMap implements WeakMap<Query, Store<unknown>> {
