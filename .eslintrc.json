@@ -28,7 +28,7 @@
     "@typescript-eslint/no-unused-vars": "warn",
 
     // console.log() の消し忘れに気づけるようにする。
-    "no-console": ["warn", { "allow": ["info", "warn", "error"] }],
+    "no-console": ["warn", { "allow": ["debug", "info", "warn", "error"] }],
 
     "no-restricted-imports": [
       "error",
