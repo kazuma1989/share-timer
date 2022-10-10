@@ -19,9 +19,10 @@
     "test": "vitest",
     "format": "prettier --write \"./{public,src}/**/*.{css,html,js,ts,tsx}\"",
     "lint": "eslint \"./src/**/*.{ts,tsx}\"",
+    "deploy": "firebase deploy",
     "firebase-login": "firebase login",
     "firebase-init": "firebase init",
-    "firebase-deploy": "firebase deploy"
+    "firebase-target-apply": "firebase target:apply hosting app sharetimer"
   },
   "dependencies": {
     "@emotion/css": "11.10.x",

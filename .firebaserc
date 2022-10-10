@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "share-timer-2b51a"
-  }
+  },
+  "targets": {
+    "share-timer-2b51a": {
+      "hosting": {
+        "app": [
+          "sharetimer"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
