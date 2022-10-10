@@ -296,4 +296,43 @@ if (import.meta.vitest) {
       restDuration: 5 * 60_000 - 40_000,
     })
   })
+
+  test("multiple actions", () => {
+    const now = Date.now()
+    const actions: TimerAction[] = [
+      {
+        type: "edit",
+      },
+      {
+        type: "edit-done",
+        duration: 7 * 60_000,
+      },
+      {
+        type: "start",
+        at: now,
+      },
+      {
+        type: "pause",
+        at: now + 10_000,
+      },
+      {
+        type: "start",
+        at: now + 60_000,
+      },
+      {
+        type: "pause",
+        at: now + 80_000,
+      },
+    ]
+
+    const state = actions.reduce(reducer, {
+      mode: "paused",
+      restDuration: 5 * 60_000,
+    })
+
+    expect(state).toStrictEqual({
+      mode: "paused",
+      restDuration: 6 * 60_000 + 30_000,
+    })
+  })
 }
