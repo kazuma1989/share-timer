@@ -192,7 +192,7 @@ if (import.meta.vitest) {
       reducer(
         {
           mode: "paused",
-          restDuration: 5 * 60000,
+          restDuration: 5 * 60_000,
         },
         {
           type: "edit",
@@ -211,12 +211,12 @@ if (import.meta.vitest) {
         },
         {
           type: "edit-done",
-          duration: 5 * 60000,
+          duration: 5 * 60_000,
         }
       )
     ).toStrictEqual({
       mode: "paused",
-      restDuration: 5 * 60000,
+      restDuration: 5 * 60_000,
     })
   })
 
@@ -227,7 +227,7 @@ if (import.meta.vitest) {
       reducer(
         {
           mode: "paused",
-          restDuration: 5 * 60000,
+          restDuration: 5 * 60_000,
         },
         {
           type: "start",
@@ -236,7 +236,7 @@ if (import.meta.vitest) {
       )
     ).toStrictEqual({
       mode: "running",
-      duration: 5 * 60000,
+      duration: 5 * 60_000,
       startedAt: now,
     })
   })
@@ -248,8 +248,8 @@ if (import.meta.vitest) {
       reducer(
         {
           mode: "running",
-          duration: 5 * 60000,
-          startedAt: now - 40000,
+          duration: 5 * 60_000,
+          startedAt: now - 40_000,
         },
         {
           type: "pause",
@@ -258,7 +258,7 @@ if (import.meta.vitest) {
       )
     ).toStrictEqual({
       mode: "paused",
-      restDuration: 5 * 60000 - 40000,
+      restDuration: 5 * 60_000 - 40_000,
     })
   })
 
@@ -270,7 +270,7 @@ if (import.meta.vitest) {
       },
       {
         type: "edit-done",
-        duration: 7 * 60000,
+        duration: 7 * 60_000,
       },
       {
         type: "start",
@@ -278,26 +278,26 @@ if (import.meta.vitest) {
       },
       {
         type: "pause",
-        at: now + 10000,
+        at: now + 10_000,
       },
       {
         type: "start",
-        at: now + 60000,
+        at: now + 60_000,
       },
       {
         type: "pause",
-        at: now + 80000,
+        at: now + 80_000,
       },
     ]
 
     const state = actions.reduce(reducer, {
       mode: "paused",
-      restDuration: 5 * 60000,
+      restDuration: 5 * 60_000,
     })
 
     expect(state).toStrictEqual({
       mode: "paused",
-      restDuration: 6 * 60000 + 30000,
+      restDuration: 6 * 60_000 + 30_000,
     })
   })
 }
