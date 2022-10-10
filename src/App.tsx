@@ -1,7 +1,6 @@
 import { query } from "firebase/firestore"
 import { collection } from "./collection"
 import { Debug } from "./Debug"
-import { FullViewportProgress } from "./FullViewportProgress"
 import { orderBy } from "./orderBy"
 import { Timer } from "./Timer"
 import { timerAction } from "./timerAction"
@@ -19,10 +18,6 @@ export function App() {
       ),
     (rawData) => timerAction.parse(rawData)
   )
-
-  if (!actions) {
-    return <FullViewportProgress />
-  }
 
   return (
     <>
