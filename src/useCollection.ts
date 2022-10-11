@@ -1,110 +1,24 @@
-import {
-  DocumentData,
-  Firestore,
-  onSnapshot,
-  Query,
-  queryEqual,
-} from "firebase/firestore"
-import { useRef, useSyncExternalStore } from "react"
+import { DocumentData, Firestore, Query } from "firebase/firestore"
+import { createCollectionStore } from "./createCollectionStore"
 import { Store } from "./Store"
 import { useFirestore } from "./useFirestore"
+import { useStore } from "./useStore"
+
+const storeMap = new Map<string, Store<unknown>>()
 
 export function useCollection<T>(
+  key: string,
   getQuery: (db: Firestore) => Query,
   converter: (rawData: DocumentData) => T
 ): T[] {
-  const converter$ = useRef(converter)
-  converter$.current = converter
-
   const db = useFirestore()
-  const query = getQuery(db)
 
-  if (!queryMap.has(query)) {
-    queryMap.set(
-      query,
-      new Store<T[]>((onChange) =>
-        onSnapshot(query, (doc) => {
-          const data = doc.docs.flatMap<T>((doc) => {
-            const data = doc.data({
-              serverTimestamps: "estimate",
-            })
+  let store = storeMap.get(key) as Store<T[]> | undefined
+  if (!store) {
+    store = createCollectionStore(getQuery(db), converter)
 
-            try {
-              return [converter$.current(data)]
-            } catch (error) {
-              console.debug(data, error)
-              return []
-            }
-          })
-
-          onChange(data)
-        })
-      )
-    )
+    storeMap.set(key, store)
   }
 
-  const store = queryMap.get(query)! as Store<T[]>
-
-  return useSyncExternalStore(store.subscribe, store.getOrThrow)
+  return useStore(store)
 }
-
-class QueryMap implements WeakMap<Query, Store<unknown>> {
-  private internal = new Set<[Query, Store<unknown>]>()
-
-  delete(key: Query): boolean {
-    let foundEntry: [Query, Store<unknown>] | undefined
-    this.internal.forEach((entry) => {
-      if (queryEqual(entry[0], key)) {
-        foundEntry = entry
-      }
-    })
-
-    if (!foundEntry) {
-      return false
-    }
-
-    return this.internal.delete(foundEntry)
-  }
-
-  get(key: Query): Store<unknown> | undefined {
-    let value: Store<unknown> | undefined
-    this.internal.forEach((entry) => {
-      if (queryEqual(entry[0], key)) {
-        value = entry[1]
-      }
-    })
-
-    return value
-  }
-
-  has(key: Query): boolean {
-    let found = false
-    this.internal.forEach((entry) => {
-      if (queryEqual(entry[0], key)) {
-        found = true
-      }
-    })
-
-    return found
-  }
-
-  set(key: Query, value: Store<unknown>): this {
-    let found = false
-    this.internal.forEach((entry) => {
-      if (queryEqual(entry[0], key)) {
-        found = true
-        entry[1] = value
-      }
-    })
-
-    if (!found) {
-      this.internal.add([key, value])
-    }
-
-    return this
-  }
-
-  [Symbol.toStringTag] = "QueryMap"
-}
-
-const queryMap = new QueryMap()
