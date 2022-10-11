@@ -1,6 +1,6 @@
 import { css } from "@emotion/css"
 import { query, serverTimestamp } from "firebase/firestore"
-import { useRef } from "react"
+import { useRef, useSyncExternalStore } from "react"
 import { collection } from "./collection"
 import { createCollectionStore } from "./createCollectionStore"
 import { formatDuration } from "./formatDuration"
@@ -12,7 +12,6 @@ import { timerAction, TimerAction, TimerActionOnFirestore } from "./timerAction"
 import { TimeViewer } from "./TimeViewer"
 import { useAddDoc } from "./useAddDoc"
 import { useFirestore } from "./useFirestore"
-import { useStore } from "./useStore"
 
 type RoomId = string
 const getOrPut = mapGetOrPut(new Map<RoomId, Store<TimerAction[]>>())
@@ -29,7 +28,7 @@ export function Timer({ roomId }: { roomId: RoomId }) {
     )
   )
 
-  const actions = useStore(store)
+  const actions = useSyncExternalStore(store.subscribe, store.getOrThrow)
   const state = actions.reduce(reducer, {
     mode: "paused",
     restDuration: 0,

@@ -1,8 +1,8 @@
 import { DocumentData, Firestore, Query } from "firebase/firestore"
+import { useSyncExternalStore } from "react"
 import { createCollectionStore } from "./createCollectionStore"
 import { Store } from "./Store"
 import { useFirestore } from "./useFirestore"
-import { useStore } from "./useStore"
 
 const storeMap = new Map<string, Store<unknown>>()
 
@@ -20,5 +20,5 @@ export function useCollection<T>(
     storeMap.set(key, store)
   }
 
-  return useStore(store)
+  return useSyncExternalStore(store.subscribe, store.getOrThrow)
 }
