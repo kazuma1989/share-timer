@@ -4,6 +4,7 @@ import { useRef } from "react"
 import { collection } from "./collection"
 import { createCollectionStore } from "./createCollectionStore"
 import { formatDuration } from "./formatDuration"
+import { mapGetOrPut } from "./mapGetOrPut"
 import { orderBy } from "./orderBy"
 import { parseTimeInput } from "./parseTimeInput"
 import { Store } from "./Store"
@@ -14,26 +15,21 @@ import { useFirestore } from "./useFirestore"
 import { useStore } from "./useStore"
 
 type RoomId = string
-const storeMap = new Map<RoomId, Store<TimerAction[]>>()
+const getOrPut = mapGetOrPut(new Map<RoomId, Store<TimerAction[]>>())
 
 export function Timer({ roomId }: { roomId: RoomId }) {
   const db = useFirestore()
-
-  let store = storeMap.get(roomId)
-  if (!store) {
-    store = createCollectionStore(
+  const store = getOrPut(roomId, () =>
+    createCollectionStore(
       query(
         collection(db, "rooms", roomId, "actions"),
         orderBy("createdAt", "asc")
       ),
       timerAction.parse
     )
-
-    storeMap.set(roomId, store)
-  }
+  )
 
   const actions = useStore(store)
-
   const state = actions.reduce(reducer, {
     mode: "paused",
     restDuration: 0,
