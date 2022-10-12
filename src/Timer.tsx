@@ -1,34 +1,27 @@
 import { css } from "@emotion/css"
-import { doc, query, runTransaction, serverTimestamp } from "firebase/firestore"
-import { useRef, useSyncExternalStore } from "react"
+import {
+  doc,
+  runTransaction,
+  serverTimestamp,
+  Timestamp,
+} from "firebase/firestore"
+import { useRef } from "react"
 import { collection } from "./collection"
-import { createCollectionStore } from "./createCollectionStore"
 import { formatDuration } from "./formatDuration"
-import { mapGetOrPut } from "./mapGetOrPut"
-import { orderBy } from "./orderBy"
 import { parseTimeInput } from "./parseTimeInput"
-import { Store } from "./Store"
-import { timerAction, TimerAction, TimerActionOnFirestore } from "./timerAction"
+import { TimerAction, TimerActionOnFirestore } from "./timerAction"
 import { TimeViewer } from "./TimeViewer"
+import { useActions } from "./useActions"
 import { useAddDoc } from "./useAddDoc"
 import { useFirestore } from "./useFirestore"
+import { RoomOnFirestore } from "./useRoomId"
 
 type RoomId = string
-const getOrPut = mapGetOrPut(new Map<RoomId, Store<TimerAction[]>>())
 
 export function Timer({ roomId }: { roomId: RoomId }) {
   const db = useFirestore()
-  const store = getOrPut(roomId, () =>
-    createCollectionStore(
-      query(
-        collection(db, "rooms", roomId, "actions"),
-        orderBy("createdAt", "asc")
-      ),
-      timerAction.parse
-    )
-  )
 
-  const actions = useSyncExternalStore(store.subscribe, store.getOrThrow)
+  const actions = useActions(roomId)
   const state = actions.reduce(reducer, {
     mode: "paused",
     restDuration: 0,
@@ -72,9 +65,10 @@ export function Timer({ roomId }: { roomId: RoomId }) {
               createdAt: serverTimestamp(),
             })
 
-            transaction.update(room, {
-              lastEditDoneAction: newActionId,
-            })
+            const roomUpdate: Partial<RoomOnFirestore> = {
+              lastEditAt: serverTimestamp() as Timestamp,
+            }
+            transaction.update(room, roomUpdate)
           },
           {
             maxAttempts: 1,
