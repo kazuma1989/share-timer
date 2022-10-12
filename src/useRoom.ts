@@ -9,7 +9,7 @@ import {
 import { ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
 import { mapGetOrPut } from "./mapGetOrPut"
-import { Room, RoomOnFirestore, roomZod } from "./roomZod"
+import { Room, roomIdZod, RoomOnFirestore, roomZod } from "./roomZod"
 import { Store } from "./Store"
 import { useFirestore } from "./useFirestore"
 import { setHash, useHash } from "./useHash"
@@ -19,8 +19,8 @@ export function useRoom(): Room {
   const db = useFirestore()
 
   let roomId = useHash().slice("#".length)
-  if (!roomId) {
-    roomId = doc(collection(db, "rooms")).id
+  if (!roomIdZod.safeParse(roomId).success) {
+    roomId = roomIdZod.parse(doc(collection(db, "rooms")).id)
     setHash(roomId)
   }
 
