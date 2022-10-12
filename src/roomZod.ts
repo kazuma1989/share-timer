@@ -1,5 +1,5 @@
 import { Timestamp } from "firebase/firestore"
-import { z } from "zod"
+import * as z from "zod"
 
 export const roomZod = z.object({
   lastEditAt: z.instanceof(Timestamp),
