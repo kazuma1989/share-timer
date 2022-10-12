@@ -1,39 +1,15 @@
 import {
   doc,
   Firestore,
-  onSnapshot,
   serverTimestamp,
   Timestamp,
   writeBatch,
 } from "firebase/firestore"
-import { useSyncExternalStore } from "react"
 import { collection } from "./collection"
-import { mapGetOrPut } from "./mapGetOrPut"
-import { Room, RoomOnFirestore, roomZod } from "./roomZod"
-import { Store } from "./Store"
+import { RoomOnFirestore } from "./roomZod"
 import { TimerActionOnFirestore } from "./timerAction"
 import { useFirestore } from "./useFirestore"
 import { useHash } from "./useHash"
-
-const getOrPut = mapGetOrPut(new Map<Room["id"], Store<Room>>())
-
-function useRoom(roomId: string): Room {
-  const db = useFirestore()
-  const store = getOrPut(
-    roomId,
-    () =>
-      new Store((onChange) =>
-        onSnapshot(doc(collection(db, "rooms"), roomId), (doc) => {
-          onChange({
-            ...roomZod.parse(doc.data()),
-            id: doc.id,
-          })
-        })
-      )
-  )
-
-  return useSyncExternalStore(store.subscribe, store.getOrThrow)
-}
 
 // FIXME 存在しないroomIdを指定された場合はどうする？
 export function useRoomId(): string {
