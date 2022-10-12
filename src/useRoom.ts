@@ -13,6 +13,7 @@ import { Room, RoomOnFirestore, roomZod } from "./roomZod"
 import { Store } from "./Store"
 import { useFirestore } from "./useFirestore"
 import { setHash, useHash } from "./useHash"
+import { withMeta } from "./withMeta"
 
 export function useRoom(): Room {
   const db = useFirestore()
@@ -65,24 +66,24 @@ async function setupRoom(db: Firestore, newRoomId: string): Promise<void> {
   const batch = writeBatch(db)
 
   const rooms = collection(db, "rooms")
-  const newRoom: RoomOnFirestore = {
-    lastEditAt: serverTimestamp() as Timestamp,
-  }
-  batch.set(doc(rooms, newRoomId), {
-    ...newRoom,
-    createdAt: serverTimestamp(),
-  })
+  batch.set(
+    doc(rooms, newRoomId),
+    withMeta<RoomOnFirestore>({
+      lastEditAt: serverTimestamp() as Timestamp,
+    })
+  )
 
   const actions = collection(db, "rooms", newRoomId, "actions")
   const newActionId = doc(actions).id
-  const newAction: ActionOnFirestore = {
-    type: "edit-done",
-    duration: 3 * 60_000,
-  }
-  batch.set(doc(actions, newActionId), {
-    ...newAction,
-    createdAt: serverTimestamp(),
-  })
+  batch.set(
+    doc(actions, newActionId),
+    withMeta<ActionOnFirestore>({
+      type: "edit-done",
+      duration: defaultDuration,
+    })
+  )
 
   await batch.commit()
 }
+
+const defaultDuration = 3 * 60_000

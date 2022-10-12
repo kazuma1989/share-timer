@@ -1,5 +1,6 @@
 import { css } from "@emotion/css"
 import {
+  addDoc,
   doc,
   runTransaction,
   serverTimestamp,
@@ -13,8 +14,8 @@ import { parseTimeInput } from "./parseTimeInput"
 import { Room, RoomOnFirestore } from "./roomZod"
 import { TimeViewer } from "./TimeViewer"
 import { useActions } from "./useActions"
-import { useAddDoc } from "./useAddDoc"
 import { useFirestore } from "./useFirestore"
+import { withMeta } from "./withMeta"
 
 export function Timer({ roomId }: { roomId: Room["id"] }) {
   const db = useFirestore()
@@ -25,9 +26,9 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
     restDuration: 0,
   })
 
-  const dispatch = useAddDoc<ActionOnFirestore>((db) =>
-    collection(db, "rooms", roomId, "actions")
-  )
+  const dispatch = (action: ActionOnFirestore) => {
+    addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
+  }
 
   const timeInput$ = useRef<HTMLInputElement>(null)
 
@@ -52,21 +53,20 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
             const getOptimisticLock = () => transaction.get(room)
             await getOptimisticLock()
 
-            const actions = collection(db, "rooms", roomId, "actions")
-            const newActionId = doc(actions).id
-            const newAction: ActionOnFirestore = {
-              type: "edit-done",
-              duration,
-            }
-            transaction.set(doc(actions, newActionId), {
-              ...newAction,
-              createdAt: serverTimestamp(),
-            })
-
             const roomUpdate: Partial<RoomOnFirestore> = {
               lastEditAt: serverTimestamp() as Timestamp,
             }
             transaction.update(room, roomUpdate)
+
+            const actions = collection(db, "rooms", roomId, "actions")
+            const newActionId = doc(actions).id
+            transaction.set(
+              doc(actions, newActionId),
+              withMeta<ActionOnFirestore>({
+                type: "edit-done",
+                duration,
+              })
+            )
           },
           {
             maxAttempts: 1,
@@ -139,7 +139,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
           onClick={() => {
             dispatch({
               type: "pause",
-              at: serverTimestamp(),
+              at: serverTimestamp() as Timestamp,
             })
           }}
         >
@@ -152,7 +152,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
           onClick={() => {
             dispatch({
               type: "start",
-              at: serverTimestamp(),
+              at: serverTimestamp() as Timestamp,
             })
           }}
         >
