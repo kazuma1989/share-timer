@@ -21,6 +21,7 @@
     "lint": "eslint \"./src/**/*.{ts,tsx}\"",
     "lint:unused": "npx -y ts-unused-exports ./tsconfig.json",
     "deploy": "firebase deploy",
+    "deploy:rules": "firebase deploy --only firestore:rules",
     "firebase-login": "firebase login",
     "firebase-init": "firebase init",
     "firebase-target-apply": "firebase target:apply hosting app sharetimer"
