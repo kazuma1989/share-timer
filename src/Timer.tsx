@@ -1,5 +1,5 @@
 import { css } from "@emotion/css"
-import { query, serverTimestamp } from "firebase/firestore"
+import { doc, query, runTransaction, serverTimestamp } from "firebase/firestore"
 import { useRef, useSyncExternalStore } from "react"
 import { collection } from "./collection"
 import { createCollectionStore } from "./createCollectionStore"
@@ -42,7 +42,7 @@ export function Timer({ roomId }: { roomId: RoomId }) {
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault()
 
         const timeInput = timeInput$.current?.value ?? ""
@@ -53,10 +53,33 @@ export function Timer({ roomId }: { roomId: RoomId }) {
           return
         }
 
-        dispatch({
-          type: "edit-done",
-          duration,
-        })
+        await runTransaction(
+          db,
+          async (transaction) => {
+            const room = doc(collection(db, "rooms"), roomId)
+
+            const getOptimisticLock = () => transaction.get(room)
+            await getOptimisticLock()
+
+            const actions = collection(db, "rooms", roomId, "actions")
+            const newActionId = doc(actions).id
+            const newAction: TimerActionOnFirestore = {
+              type: "edit-done",
+              duration,
+            }
+            transaction.set(doc(actions, newActionId), {
+              ...newAction,
+              createdAt: serverTimestamp(),
+            })
+
+            transaction.update(room, {
+              lastEditDoneAction: newActionId,
+            })
+          },
+          {
+            maxAttempts: 1,
+          }
+        )
       }}
     >
       <div
