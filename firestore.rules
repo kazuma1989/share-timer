@@ -8,6 +8,7 @@ service cloud.firestore {
     match /rooms-dev/{room} {
       allow get;
       allow create: if hasCreatedAt();
+      allow update;
 
       match /actions/{action} {
         allow list;
@@ -18,6 +19,7 @@ service cloud.firestore {
     match /rooms-v1/{room} {
       allow get;
       allow create: if hasCreatedAt();
+      allow update;
 
       match /actions/{action} {
         allow list;
