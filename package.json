@@ -19,6 +19,7 @@
     "test": "vitest",
     "format": "prettier --write \"./{public,src}/**/*.{css,html,js,ts,tsx}\"",
     "lint": "eslint \"./src/**/*.{ts,tsx}\"",
+    "lint:unused": "npx -y ts-unused-exports ./tsconfig.json",
     "deploy": "firebase deploy",
     "firebase-login": "firebase login",
     "firebase-init": "firebase init",
