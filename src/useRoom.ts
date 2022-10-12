@@ -34,7 +34,7 @@ export function useRoom(): Room {
         getDoc(roomRef).then(async (roomDoc) => {
           if (abort.signal.aborted) return
 
-          if (!roomDoc.exists()) {
+          if (!roomDoc.exists() || !roomZod.safeParse(roomDoc.data()).success) {
             await setupRoom(db, roomId)
             if (abort.signal.aborted) return
 
