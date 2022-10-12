@@ -9,16 +9,14 @@ import { useRef } from "react"
 import { collection } from "./collection"
 import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
+import { Room, RoomOnFirestore } from "./roomZod"
 import { TimerAction, TimerActionOnFirestore } from "./timerAction"
 import { TimeViewer } from "./TimeViewer"
 import { useActions } from "./useActions"
 import { useAddDoc } from "./useAddDoc"
 import { useFirestore } from "./useFirestore"
-import { RoomOnFirestore } from "./useRoomId"
 
-type RoomId = string
-
-export function Timer({ roomId }: { roomId: RoomId }) {
+export function Timer({ roomId }: { roomId: Room["id"] }) {
   const db = useFirestore()
 
   const actions = useActions(roomId)

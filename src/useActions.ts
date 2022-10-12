@@ -9,12 +9,10 @@ import { useSyncExternalStore } from "react"
 import { collection } from "./collection"
 import { mapGetOrPut } from "./mapGetOrPut"
 import { orderBy } from "./orderBy"
+import { Room, roomZod } from "./roomZod"
 import { Store } from "./Store"
 import { TimerAction, timerAction } from "./timerAction"
 import { useFirestore } from "./useFirestore"
-import { Room, roomZod } from "./useRoomId"
-
-const getOrPut = mapGetOrPut(new Map<Room["id"], Store<TimerAction[]>>())
 
 export function useActions(roomId: Room["id"]): TimerAction[] {
   const db = useFirestore()
@@ -78,3 +76,5 @@ export function useActions(roomId: Room["id"]): TimerAction[] {
 
   return useSyncExternalStore(store.subscribe, store.getOrThrow)
 }
+
+const getOrPut = mapGetOrPut(new Map<Room["id"], Store<TimerAction[]>>())

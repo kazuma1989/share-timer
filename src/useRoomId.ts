@@ -7,23 +7,13 @@ import {
   writeBatch,
 } from "firebase/firestore"
 import { useSyncExternalStore } from "react"
-import { z } from "zod"
 import { collection } from "./collection"
 import { mapGetOrPut } from "./mapGetOrPut"
+import { Room, RoomOnFirestore, roomZod } from "./roomZod"
 import { Store } from "./Store"
 import { TimerActionOnFirestore } from "./timerAction"
 import { useFirestore } from "./useFirestore"
 import { useHash } from "./useHash"
-
-export const roomZod = z.object({
-  lastEditAt: z.instanceof(Timestamp),
-})
-
-export interface Room extends z.output<typeof roomZod> {
-  id: string
-}
-
-export interface RoomOnFirestore extends z.input<typeof roomZod> {}
 
 const getOrPut = mapGetOrPut(new Map<Room["id"], Store<Room>>())
 
