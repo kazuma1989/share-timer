@@ -48,16 +48,17 @@ export function useActions(roomId: Room["id"]): Action[] {
                 ),
                 (doc) => {
                   const actions = doc.docs.flatMap<Action>((doc) => {
-                    const data = doc.data({
+                    const rawData = doc.data({
                       serverTimestamps: "estimate",
                     })
 
-                    try {
-                      return [actionZod.parse(data)]
-                    } catch (error) {
-                      console.debug(data, error)
-                      return []
+                    const parsed = actionZod.safeParse(rawData)
+                    if (parsed.success) {
+                      return [parsed.data]
                     }
+
+                    console.debug(rawData, parsed.error)
+                    return []
                   })
 
                   onChange(actions)
