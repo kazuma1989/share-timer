@@ -16,3 +16,7 @@ function subscribe(onStoreChange: () => void): () => void {
     abort.abort()
   }
 }
+
+export function setHash(hash: string): void {
+  window.location.hash = hash
+}
