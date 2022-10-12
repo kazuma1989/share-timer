@@ -36,8 +36,10 @@ export function useRoom(): Room {
 
           if (!roomDoc.exists()) {
             await setupRoom(db, roomId)
+            if (abort.signal.aborted) return
 
             roomDoc = await getDoc(roomRef)
+            if (abort.signal.aborted) return
           }
 
           const room: Room = {

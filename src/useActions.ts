@@ -32,12 +32,12 @@ export function useActions(roomId: Room["id"]): TimerAction[] {
         const unsubscribe = onSnapshot(
           doc(collection(db, "rooms"), roomId),
           (roomDoc) => {
+            clearSubscriptions()
+
             const room: Room = {
               ...roomZod.parse(roomDoc.data()),
               id: roomDoc.id,
             }
-
-            clearSubscriptions()
 
             subscriptions.add(
               onSnapshot(
