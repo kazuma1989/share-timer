@@ -5,6 +5,8 @@ import {
   doc,
   getDoc,
   getDocs,
+  runTransaction,
+  serverTimestamp,
   Timestamp,
   updateDoc,
 } from "firebase/firestore"
@@ -16,6 +18,51 @@ export function Debug() {
 
   return (
     <div>
+      <p>
+        <button
+          type="button"
+          onClick={async () => {
+            const roomRef = doc(collection(db, "rooms"), "jzl9G0aZOVAkoBqsFza1")
+
+            await Promise.all([
+              wait(500).then(async () => {
+                await updateDoc(roomRef, {
+                  lastEditDone: serverTimestamp(),
+                  name: "A",
+                })
+              }),
+
+              runTransaction(
+                db,
+                async (transaction) => {
+                  console.count("runTransaction")
+
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                  const room = await transaction.get(roomRef)
+                  // if (!room.exists()) {
+                  //   throw "Document does not exist!"
+                  // }
+
+                  await wait(750)
+
+                  transaction.update(roomRef, {
+                    lastEditDone: serverTimestamp(),
+                    name: "B",
+                  })
+                },
+                {
+                  maxAttempts: 1,
+                }
+              ),
+            ])
+
+            console.countReset("runTransaction")
+          }}
+        >
+          トランザクション実験
+        </button>
+      </p>
+
       <p>
         <button
           type="button"
@@ -120,4 +167,10 @@ export function Debug() {
       </p>
     </div>
   )
+}
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
 }
