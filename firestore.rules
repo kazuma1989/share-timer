@@ -1,23 +1,27 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function hasCreatedAt() {
+      return request.resource.data.createdAt == request.time;
+    }
+
     match /rooms-dev/{room} {
-    	allow get;
-      allow create;
+      allow get;
+      allow create: if hasCreatedAt();
 
       match /actions/{action} {
-      	allow list;
-        allow create;
+        allow list;
+        allow create: if hasCreatedAt();
       }
     }
 
     match /rooms-v1/{room} {
-    	allow get;
-      allow create;
+      allow get;
+      allow create: if hasCreatedAt();
 
       match /actions/{action} {
-      	allow list;
-        allow create;
+        allow list;
+        allow create: if hasCreatedAt();
       }
     }
   }
