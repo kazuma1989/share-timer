@@ -1,48 +1,40 @@
 import { css } from "@emotion/css"
-import { query, serverTimestamp } from "firebase/firestore"
-import { useRef, useSyncExternalStore } from "react"
+import {
+  addDoc,
+  doc,
+  runTransaction,
+  serverTimestamp,
+  Timestamp,
+} from "firebase/firestore"
+import { useRef } from "react"
+import { Action, ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
-import { createCollectionStore } from "./createCollectionStore"
 import { formatDuration } from "./formatDuration"
-import { mapGetOrPut } from "./mapGetOrPut"
-import { orderBy } from "./orderBy"
 import { parseTimeInput } from "./parseTimeInput"
-import { Store } from "./Store"
-import { timerAction, TimerAction, TimerActionOnFirestore } from "./timerAction"
+import { Room, RoomOnFirestore } from "./roomZod"
 import { TimeViewer } from "./TimeViewer"
-import { useAddDoc } from "./useAddDoc"
+import { useActions } from "./useActions"
 import { useFirestore } from "./useFirestore"
+import { withMeta } from "./withMeta"
 
-type RoomId = string
-const getOrPut = mapGetOrPut(new Map<RoomId, Store<TimerAction[]>>())
-
-export function Timer({ roomId }: { roomId: RoomId }) {
+export function Timer({ roomId }: { roomId: Room["id"] }) {
   const db = useFirestore()
-  const store = getOrPut(roomId, () =>
-    createCollectionStore(
-      query(
-        collection(db, "rooms", roomId, "actions"),
-        orderBy("createdAt", "asc")
-      ),
-      timerAction.parse
-    )
-  )
 
-  const actions = useSyncExternalStore(store.subscribe, store.getOrThrow)
+  const actions = useActions(roomId)
   const state = actions.reduce(reducer, {
     mode: "paused",
     restDuration: 0,
   })
 
-  const dispatch = useAddDoc<TimerActionOnFirestore>((db) =>
-    collection(db, "rooms", roomId, "actions")
-  )
+  const dispatch = (action: ActionOnFirestore) => {
+    addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
+  }
 
   const timeInput$ = useRef<HTMLInputElement>(null)
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault()
 
         const timeInput = timeInput$.current?.value ?? ""
@@ -53,10 +45,33 @@ export function Timer({ roomId }: { roomId: RoomId }) {
           return
         }
 
-        dispatch({
-          type: "edit-done",
-          duration,
-        })
+        await runTransaction(
+          db,
+          async (transaction) => {
+            const room = doc(collection(db, "rooms"), roomId)
+
+            const getOptimisticLock = () => transaction.get(room)
+            await getOptimisticLock()
+
+            const roomUpdate: Partial<RoomOnFirestore> = {
+              lastEditAt: serverTimestamp() as Timestamp,
+            }
+            transaction.update(room, roomUpdate)
+
+            const actions = collection(db, "rooms", roomId, "actions")
+            const newActionId = doc(actions).id
+            transaction.set(
+              doc(actions, newActionId),
+              withMeta<ActionOnFirestore>({
+                type: "edit-done",
+                duration,
+              })
+            )
+          },
+          {
+            maxAttempts: 1,
+          }
+        )
       }}
     >
       <div
@@ -73,15 +88,29 @@ export function Timer({ roomId }: { roomId: RoomId }) {
             className={css`
               && {
                 height: unset;
-                margin: 0;
-                padding: 0;
+                margin: unset;
+                padding: 0.05em;
+                line-height: 1;
               }
             `}
           />
-        ) : state.mode === "running" ? (
-          <TimeViewer duration={state.duration} startedAt={state.startedAt} />
         ) : (
-          <span>{formatDuration(state.restDuration)}</span>
+          <div
+            className={css`
+              padding: 0.05em;
+              line-height: 1.18;
+              border: 1px solid transparent;
+            `}
+          >
+            {state.mode === "running" ? (
+              <TimeViewer
+                duration={state.duration}
+                startedAt={state.startedAt}
+              />
+            ) : (
+              <span>{formatDuration(state.restDuration)}</span>
+            )}
+          </div>
         )}
       </div>
 
@@ -110,7 +139,7 @@ export function Timer({ roomId }: { roomId: RoomId }) {
           onClick={() => {
             dispatch({
               type: "pause",
-              at: serverTimestamp(),
+              at: serverTimestamp() as Timestamp,
             })
           }}
         >
@@ -123,7 +152,7 @@ export function Timer({ roomId }: { roomId: RoomId }) {
           onClick={() => {
             dispatch({
               type: "start",
-              at: serverTimestamp(),
+              at: serverTimestamp() as Timestamp,
             })
           }}
         >
@@ -149,7 +178,7 @@ type TimerState =
       restDuration: number
     }
 
-function reducer(state: TimerState, action: TimerAction): TimerState {
+function reducer(state: TimerState, action: Action): TimerState {
   switch (action.type) {
     case "edit": {
       if (state.mode !== "paused") {
@@ -278,7 +307,7 @@ if (import.meta.vitest) {
 
   test("multiple actions", () => {
     const now = Date.now()
-    const actions: TimerAction[] = [
+    const actions: Action[] = [
       {
         type: "edit",
       },

@@ -1,7 +1,7 @@
 import { Timestamp } from "firebase/firestore"
-import { z } from "zod"
+import * as z from "zod"
 
-export const timerAction = z.union([
+export const actionZod = z.union([
   z.object({
     type: z.literal("edit"),
   }),
@@ -22,6 +22,6 @@ export const timerAction = z.union([
   }),
 ])
 
-export type TimerAction = z.output<typeof timerAction>
+export type Action = z.output<typeof actionZod>
 
-export type TimerActionOnFirestore = z.input<typeof timerAction>
+export type ActionOnFirestore = z.input<typeof actionZod>

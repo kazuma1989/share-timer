@@ -21,10 +21,6 @@ textarea:focus {
   outline: -webkit-focus-ring-color auto medium;
 }
 
-input {
-  font: inherit;
-}
-
 /* https://stackoverflow.com/a/23860302/8662861 */
 input[type="file"]::-webkit-file-upload-button {
   cursor: inherit;

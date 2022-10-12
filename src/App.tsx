@@ -1,13 +1,13 @@
 import { Debug } from "./Debug"
 import { Timer } from "./Timer"
-import { useRoomId } from "./useRoomId"
+import { useRoom } from "./useRoom"
 
 export function App() {
-  const roomId = useRoomId()
+  const room = useRoom()
 
   return (
     <>
-      <Timer key={roomId} roomId={roomId} />
+      <Timer key={room.id} roomId={room.id} />
 
       {import.meta.env.DEV && <Debug />}
     </>
