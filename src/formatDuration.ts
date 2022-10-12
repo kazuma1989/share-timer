@@ -1,10 +1,10 @@
 export function formatDuration(durationMs: number): string {
   // durationMs = 321_456
   // milliseconds = 456
-  const milliseconds = durationMs % 1000
+  const milliseconds = durationMs % 1_000
 
   // durationSec = 321
-  const durationSec = (durationMs - milliseconds) / 1000
+  const durationSec = (durationMs - milliseconds) / 1_000
 
   // seconds = 21
   const seconds = durationSec % 60
@@ -19,10 +19,10 @@ if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
 
   test("basic", () => {
-    expect(formatDuration(5 * 60000)).toBe("5:00")
+    expect(formatDuration(5 * 60_000)).toBe("5:00")
   })
 
   test("omit milliseconds unit", () => {
-    expect(formatDuration(3 * 60000 + 1000 + 789)).toBe("3:01")
+    expect(formatDuration(3 * 60_000 + 1_000 + 789)).toBe("3:01")
   })
 }
