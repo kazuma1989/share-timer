@@ -1,5 +1,4 @@
-import { doc, onSnapshot } from "firebase/firestore"
-import { useSyncExternalStore } from "react"
+import { doc, getDoc } from "firebase/firestore"
 import { collection } from "./collection"
 import { mapGetOrPut } from "./mapGetOrPut"
 import { Room, roomZod } from "./roomZod"
@@ -12,19 +11,27 @@ export function useRoom(roomId: string): Room {
   const store = getOrPut(
     roomId,
     () =>
-      new Store((onChange) =>
-        onSnapshot(doc(collection(db, "rooms"), roomId), (doc) => {
+      new Store((onChange) => {
+        const abort = new AbortController()
+
+        getDoc(doc(collection(db, "rooms"), roomId)).then((roomDoc) => {
+          if (abort.signal.aborted) return
+
           const room: Room = {
-            ...roomZod.parse(doc.data()),
-            id: doc.id,
+            ...roomZod.parse(roomDoc.data()),
+            id: roomDoc.id,
           }
 
           onChange(room)
         })
-      )
+
+        return () => {
+          abort.abort()
+        }
+      })
   )
 
-  return useSyncExternalStore(store.subscribe, store.getOrThrow)
+  return store.getOrThrow()
 }
 
 const getOrPut = mapGetOrPut(new Map<Room["id"], Store<Room>>())
