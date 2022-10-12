@@ -73,15 +73,29 @@ export function Timer({ roomId }: { roomId: RoomId }) {
             className={css`
               && {
                 height: unset;
-                margin: 0;
-                padding: 0;
+                margin: unset;
+                padding: 0.05em;
+                line-height: 1;
               }
             `}
           />
-        ) : state.mode === "running" ? (
-          <TimeViewer duration={state.duration} startedAt={state.startedAt} />
         ) : (
-          <span>{formatDuration(state.restDuration)}</span>
+          <div
+            className={css`
+              padding: 0.05em;
+              line-height: 1.18;
+              border: 1px solid transparent;
+            `}
+          >
+            {state.mode === "running" ? (
+              <TimeViewer
+                duration={state.duration}
+                startedAt={state.startedAt}
+              />
+            ) : (
+              <span>{formatDuration(state.restDuration)}</span>
+            )}
+          </div>
         )}
       </div>
 
