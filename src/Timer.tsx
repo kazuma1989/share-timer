@@ -6,11 +6,11 @@ import {
   Timestamp,
 } from "firebase/firestore"
 import { useRef } from "react"
+import { Action, ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
 import { formatDuration } from "./formatDuration"
 import { parseTimeInput } from "./parseTimeInput"
 import { Room, RoomOnFirestore } from "./roomZod"
-import { TimerAction, TimerActionOnFirestore } from "./timerAction"
 import { TimeViewer } from "./TimeViewer"
 import { useActions } from "./useActions"
 import { useAddDoc } from "./useAddDoc"
@@ -25,7 +25,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
     restDuration: 0,
   })
 
-  const dispatch = useAddDoc<TimerActionOnFirestore>((db) =>
+  const dispatch = useAddDoc<ActionOnFirestore>((db) =>
     collection(db, "rooms", roomId, "actions")
   )
 
@@ -54,7 +54,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
 
             const actions = collection(db, "rooms", roomId, "actions")
             const newActionId = doc(actions).id
-            const newAction: TimerActionOnFirestore = {
+            const newAction: ActionOnFirestore = {
               type: "edit-done",
               duration,
             }
@@ -178,7 +178,7 @@ type TimerState =
       restDuration: number
     }
 
-function reducer(state: TimerState, action: TimerAction): TimerState {
+function reducer(state: TimerState, action: Action): TimerState {
   switch (action.type) {
     case "edit": {
       if (state.mode !== "paused") {
@@ -307,7 +307,7 @@ if (import.meta.vitest) {
 
   test("multiple actions", () => {
     const now = Date.now()
-    const actions: TimerAction[] = [
+    const actions: Action[] = [
       {
         type: "edit",
       },

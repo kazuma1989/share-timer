@@ -6,11 +6,11 @@ import {
   Timestamp,
   writeBatch,
 } from "firebase/firestore"
+import { ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
 import { mapGetOrPut } from "./mapGetOrPut"
 import { Room, RoomOnFirestore, roomZod } from "./roomZod"
 import { Store } from "./Store"
-import { TimerActionOnFirestore } from "./timerAction"
 import { useFirestore } from "./useFirestore"
 import { setHash, useHash } from "./useHash"
 
@@ -75,7 +75,7 @@ async function setupRoom(db: Firestore, newRoomId: string): Promise<void> {
 
   const actions = collection(db, "rooms", newRoomId, "actions")
   const newActionId = doc(actions).id
-  const newAction: TimerActionOnFirestore = {
+  const newAction: ActionOnFirestore = {
     type: "edit-done",
     duration: 3 * 60_000,
   }
