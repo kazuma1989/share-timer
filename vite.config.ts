@@ -31,6 +31,10 @@ export default defineConfig(async ({ command, mode }) => {
     },
 
     build: {
+      // Support top-level await
+      // https://caniuse.com/mdn-javascript_operators_await_top_level
+      target: ["chrome89", "edge89", "safari15", "firefox89", "opera75"],
+
       // Create React App のデフォルトの出力先と同じにする。
       outDir: BUILD_PATH || "./build/",
 
