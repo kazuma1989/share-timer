@@ -1,5 +1,4 @@
 import * as z from "zod"
-import { undefined, ZodError } from "zod"
 
 const nonNegativeInt = z.preprocess(Number, z.number().nonnegative().int())
 
@@ -19,15 +18,15 @@ if (import.meta.vitest) {
   })
 
   test("nonNegativeInt", () => {
-    expect(() => nonNegativeInt.parse("12.4")).toThrow(ZodError)
+    expect(() => nonNegativeInt.parse("12.4")).toThrow(z.ZodError)
   })
 
   test("nonNegativeInt", () => {
-    expect(() => nonNegativeInt.parse(undefined)).toThrow(ZodError)
+    expect(() => nonNegativeInt.parse(undefined)).toThrow(z.ZodError)
   })
 
   test("nonNegativeInt", () => {
-    expect(() => nonNegativeInt.parse("-99")).toThrow(ZodError)
+    expect(() => nonNegativeInt.parse("-99")).toThrow(z.ZodError)
   })
 
   test("basic", () => {
@@ -43,6 +42,6 @@ if (import.meta.vitest) {
   })
 
   test("invalid format", () => {
-    expect(() => timeInputZod.parse("x:00")).toThrow(ZodError)
+    expect(() => timeInputZod.parse("x:00")).toThrow(z.ZodError)
   })
 }
