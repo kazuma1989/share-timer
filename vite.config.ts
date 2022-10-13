@@ -27,6 +27,15 @@ export default defineConfig(async ({ command, mode }) => {
       // もしくは CLI オプションで `--no-open` を渡す。
       // (e.g.) $ npm start -- --no-open
       open: BROWSER || true,
+
+      proxy: {
+        "/__": {
+          // FIXME firebasercからドメイン情報持って来られるといいよね
+          // FIXME ビルド時もJSONが持って来られるといいよね
+          target: "https://sharetimer.web.app",
+          changeOrigin: true,
+        },
+      },
     },
 
     build: {
