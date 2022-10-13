@@ -2,10 +2,6 @@ import { useReducer, useSyncExternalStore } from "react"
 import { mapGetOrPut } from "./mapGetOrPut"
 import { Store } from "./Store"
 
-const getOrPut = mapGetOrPut(
-  new WeakMap<Set<Promise<unknown>>, Store<boolean>>()
-)
-
 export function useAllSettled(): [
   allSettled: boolean,
   add: (promise: Promise<unknown>) => void
@@ -37,3 +33,7 @@ export function useAllSettled(): [
 
   return [typeof allSettled === "boolean" ? allSettled : false, add]
 }
+
+const getOrPut = mapGetOrPut(
+  new WeakMap<Set<Promise<unknown>>, Store<boolean>>()
+)
