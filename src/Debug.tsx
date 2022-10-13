@@ -11,13 +11,36 @@ import {
   updateDoc,
 } from "firebase/firestore"
 import { collection } from "./collection"
+import { useAllSettled } from "./useAllSettled"
 import { useFirestore } from "./useFirestore"
 
 export function Debug() {
   const db = useFirestore()
 
+  const [allSettled, add] = useAllSettled()
+
   return (
     <div>
+      <p>
+        {allSettled ? "settled" : "pending"}
+
+        <button
+          type="button"
+          onClick={() => {
+            add(
+              new Promise<void>((resolve) => {
+                setTimeout(() => {
+                  console.count("resolve")
+                  resolve()
+                }, 1_000)
+              })
+            )
+          }}
+        >
+          Promiseをloading stateに使う実験
+        </button>
+      </p>
+
       <p>
         <button
           type="button"

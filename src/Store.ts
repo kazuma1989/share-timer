@@ -15,6 +15,10 @@ export class Store<T> {
       onStoreChange()
     })
 
+  get = (): T | typeof Store.Empty => {
+    return this.latestValue
+  }
+
   getOrThrow = (): T => {
     if (this.latestValue !== Store.Empty) {
       return this.latestValue
