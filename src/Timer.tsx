@@ -10,8 +10,8 @@ import { useRef } from "react"
 import { Action, ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
 import { formatDuration } from "./formatDuration"
-import { parseTimeInput } from "./parseTimeInput"
 import { Room, RoomOnFirestore } from "./roomZod"
+import { timeInputZod } from "./timeInputZod"
 import { TimeViewer } from "./TimeViewer"
 import { useActions } from "./useActions"
 import { useFirestore } from "./useFirestore"
@@ -39,11 +39,13 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
 
         const timeInput = timeInput$.current?.value ?? ""
 
-        const duration = parseTimeInput(timeInput)
-        if (duration === undefined) {
+        const parsed = timeInputZod.safeParse(timeInput)
+        if (!parsed.success) {
           alert(`invalid format ${timeInput}`)
           return
         }
+
+        const duration = parsed.data
 
         await runTransaction(
           db,
