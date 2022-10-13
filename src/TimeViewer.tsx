@@ -10,11 +10,11 @@ export function TimeViewer({
   startedAt?: number
   className?: string
 }) {
-  const now = useTimer()
+  const delta = useTimer(startedAt ?? 0)
 
   return (
     <span className={className}>
-      {formatDuration(duration && startedAt ? duration - (now - startedAt) : 0)}
+      {formatDuration(duration ? duration - delta : 0)}
     </span>
   )
 }
