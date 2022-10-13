@@ -14,6 +14,7 @@ import { Room, RoomOnFirestore } from "./roomZod"
 import { timeInputZod } from "./timeInputZod"
 import { TimeViewer } from "./TimeViewer"
 import { useActions } from "./useActions"
+import { useAllSettled } from "./useAllSettled"
 import { useFirestore } from "./useFirestore"
 import { withMeta } from "./withMeta"
 
@@ -26,15 +27,20 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
     restDuration: 0,
   })
 
+  const [allSettled, addPromise] = useAllSettled()
+  const pending = !allSettled
+
   const dispatch = (action: ActionOnFirestore) => {
-    addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
+    addPromise(
+      addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
+    )
   }
 
   const timeInput$ = useRef<HTMLInputElement>(null)
 
   return (
     <form
-      onSubmit={async (e) => {
+      onSubmit={(e) => {
         e.preventDefault()
 
         const timeInput = timeInput$.current?.value ?? ""
@@ -47,32 +53,34 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
 
         const duration = parsed.data
 
-        await runTransaction(
-          db,
-          async (transaction) => {
-            const room = doc(collection(db, "rooms"), roomId)
+        addPromise(
+          runTransaction(
+            db,
+            async (transaction) => {
+              const room = doc(collection(db, "rooms"), roomId)
 
-            const getOptimisticLock = () => transaction.get(room)
-            await getOptimisticLock()
+              const getOptimisticLock = () => transaction.get(room)
+              await getOptimisticLock()
 
-            const roomUpdate: Partial<RoomOnFirestore> = {
-              lastEditAt: serverTimestamp() as Timestamp,
+              const roomUpdate: Partial<RoomOnFirestore> = {
+                lastEditAt: serverTimestamp() as Timestamp,
+              }
+              transaction.update(room, roomUpdate)
+
+              const actions = collection(db, "rooms", roomId, "actions")
+              const newActionId = doc(actions).id
+              transaction.set(
+                doc(actions, newActionId),
+                withMeta<ActionOnFirestore>({
+                  type: "edit-done",
+                  duration,
+                })
+              )
+            },
+            {
+              maxAttempts: 1,
             }
-            transaction.update(room, roomUpdate)
-
-            const actions = collection(db, "rooms", roomId, "actions")
-            const newActionId = doc(actions).id
-            transaction.set(
-              doc(actions, newActionId),
-              withMeta<ActionOnFirestore>({
-                type: "edit-done",
-                duration,
-              })
-            )
-          },
-          {
-            maxAttempts: 1,
-          }
+          )
         )
       }}
     >
@@ -86,6 +94,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
             ref={timeInput$}
             type="text"
             defaultValue={formatDuration(state.initialDuration)}
+            disabled={pending}
             size={5}
             className={css`
               && {
@@ -117,14 +126,14 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
       </div>
 
       {state.mode === "editing" ? (
-        <button key="done" type="submit">
+        <button key="done" type="submit" disabled={pending}>
           Done
         </button>
       ) : (
         <button
           key="edit"
           type="button"
-          disabled={state.mode !== "paused"}
+          disabled={pending || state.mode !== "paused"}
           onClick={() => {
             dispatch({
               type: "edit",
@@ -138,6 +147,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
       {state.mode === "running" ? (
         <button
           type="button"
+          disabled={pending}
           onClick={() => {
             dispatch({
               type: "pause",
@@ -150,7 +160,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
       ) : (
         <button
           type="button"
-          disabled={state.mode === "editing"}
+          disabled={pending || state.mode === "editing"}
           onClick={() => {
             dispatch({
               type: "start",
