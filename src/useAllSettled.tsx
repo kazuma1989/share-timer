@@ -26,6 +26,7 @@ export function useAllSettled(): [
     () =>
       new Store((onChange) => {
         Promise.allSettled(promises).then(() => {
+          promises.clear()
           onChange(true)
         })
         return () => {}
