@@ -7,17 +7,19 @@ import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { FirestoreProvider } from "./useFirestore"
 
-const firebaseApp = initializeApp(
-  await fetch("/__/firebase/init.json").then((_) => _.json())
-)
-const firestore = getFirestore(firebaseApp)
+Promise.resolve().then(async () => {
+  const firebaseApp = initializeApp(
+    await fetch("/__/firebase/init.json").then((_) => _.json())
+  )
+  const firestore = getFirestore(firebaseApp)
 
-createRoot(globalThis.document.getElementById("root")!).render(
-  <StrictMode>
-    <FirestoreProvider value={firestore}>
-      <Suspense fallback={<FullViewportProgress />}>
-        <App />
-      </Suspense>
-    </FirestoreProvider>
-  </StrictMode>
-)
+  createRoot(globalThis.document.getElementById("root")!).render(
+    <StrictMode>
+      <FirestoreProvider value={firestore}>
+        <Suspense fallback={<FullViewportProgress />}>
+          <App />
+        </Suspense>
+      </FirestoreProvider>
+    </StrictMode>
+  )
+})
