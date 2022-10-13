@@ -1,55 +1,33 @@
 import * as z from "zod"
-import { undefined } from "zod"
+import { undefined, ZodError } from "zod"
 
-const pattern = /^(?:\s*(\d+)\s*:)?\s*(\d+)\s*$/
+const nonNegativeInt = z.preprocess(Number, z.number().nonnegative().int())
 
 export const timeInputZod = z
-  .string()
-  .regex(pattern)
-  .transform((v) => {
-    const [, minutesPart, secondsPart] = v.match(pattern) ?? []
-
-    const minutes = nonNegativeInt.parse(minutesPart)
-    const seconds = nonNegativeInt.parse(secondsPart)
-
-    return minutes * 60_000 + seconds * 1_000
-  })
-
-const nanAsZero = z
-  .unknown()
-  .refine(Number.isNaN)
-  .transform(() => 0)
-
-const nonNegativeInt = z.preprocess(
-  Number,
-  z.number().nonnegative().int().or(nanAsZero)
-)
+  .preprocess(
+    (_) =>
+      typeof _ === "string" ? _.replaceAll(/\s/g, "").split(":").reverse() : _,
+    z.array(nonNegativeInt).nonempty()
+  )
+  .transform(([seconds, minutes = 0]) => minutes * 60_000 + seconds * 1_000)
 
 if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
-
-  test("nanAsZero", () => {
-    expect(() => nanAsZero.parse({})).toThrow()
-  })
-
-  test("nanAsZero", () => {
-    expect(nanAsZero.parse(Number({}))).toBe(0)
-  })
 
   test("nonNegativeInt", () => {
     expect(nonNegativeInt.parse("124")).toBe(124)
   })
 
   test("nonNegativeInt", () => {
-    expect(() => nonNegativeInt.parse("12.4")).toThrow()
+    expect(() => nonNegativeInt.parse("12.4")).toThrow(ZodError)
   })
 
   test("nonNegativeInt", () => {
-    expect(nonNegativeInt.parse(undefined)).toBe(0)
+    expect(() => nonNegativeInt.parse(undefined)).toThrow(ZodError)
   })
 
   test("nonNegativeInt", () => {
-    expect(() => nonNegativeInt.parse("-99")).toThrow()
+    expect(() => nonNegativeInt.parse("-99")).toThrow(ZodError)
   })
 
   test("basic", () => {
@@ -65,6 +43,6 @@ if (import.meta.vitest) {
   })
 
   test("invalid format", () => {
-    expect(() => timeInputZod.parse(":00")).toThrow()
+    expect(() => timeInputZod.parse("x:00")).toThrow(ZodError)
   })
 }
