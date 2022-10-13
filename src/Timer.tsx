@@ -31,6 +31,8 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
   const pending = !_allSettled
 
   const dispatch = (action: ActionOnFirestore) => {
+    if (pending) return
+
     if (action.type === "edit-done") {
       return addPromise(
         runTransaction(
@@ -132,7 +134,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
         <button
           key="edit"
           type="button"
-          disabled={pending || state.mode !== "paused"}
+          disabled={state.mode !== "paused"}
           onClick={() => {
             dispatch({
               type: "edit",
@@ -146,7 +148,6 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
       {state.mode === "running" ? (
         <button
           type="button"
-          disabled={pending}
           onClick={() => {
             dispatch({
               type: "pause",
@@ -159,7 +160,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
       ) : (
         <button
           type="button"
-          disabled={pending || state.mode === "editing"}
+          disabled={state.mode === "editing"}
           onClick={() => {
             dispatch({
               type: "start",
