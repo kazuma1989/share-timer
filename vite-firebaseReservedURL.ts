@@ -1,5 +1,5 @@
 import * as fs from "node:fs/promises"
-import { PluginOption } from "vite"
+import { Plugin } from "vite"
 
 interface Firebaserc {
   projects: {
@@ -7,27 +7,25 @@ interface Firebaserc {
   }
 }
 
-export async function firebaseReservedURL(): Promise<PluginOption> {
-  const firebaserc = await fs
-    .readFile("./.firebaserc", { encoding: "utf-8" })
-    .then<Firebaserc>(JSON.parse)
-    .catch(() => null)
-
-  if (!firebaserc) {
-    return null
-  }
-
-  const domain = `https://${firebaserc.projects.default}.web.app`
+export function firebaseReservedURL(): Plugin {
+  const firebaserc = () =>
+    fs
+      .readFile("./.firebaserc", { encoding: "utf-8" })
+      .then<Firebaserc>(JSON.parse)
+      .catch(() => null)
 
   return {
     name: "firebaseReservedURL",
 
-    config() {
+    async config() {
+      const rc = await firebaserc()
+      if (!rc) return
+
       return {
         server: {
           proxy: {
             "/__": {
-              target: domain,
+              target: `https://${rc.projects.default}.web.app`,
               changeOrigin: true,
             },
           },
@@ -41,10 +39,13 @@ export async function firebaseReservedURL(): Promise<PluginOption> {
      * @see https://bundle-buddy.com/rollup
      */
     async generateBundle() {
+      const rc = await firebaserc()
+      if (!rc) return
+
       // @ts-expect-error Node.js 18にはfetchが生えているはずだ
-      const initJSON = await fetch(domain + "/__/firebase/init.json").then(
-        (_: any) => _.json()
-      )
+      const initJSON = await fetch(
+        `https://${rc.projects.default}.web.app` + "/__/firebase/init.json"
+      ).then((_: any) => _.json())
 
       // https://rollupjs.org/guide/en/#thisemitfile
       this.emitFile({
