@@ -2,6 +2,7 @@
 import react from "@vitejs/plugin-react"
 import { defineConfig, Plugin } from "vite"
 import { bundleBuddy } from "./vite-bundleBuddy"
+import { firebaseReservedURL } from "./vite-firebaseReservedURL"
 
 export default defineConfig(async ({ command, mode }) => {
   const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env
@@ -27,15 +28,6 @@ export default defineConfig(async ({ command, mode }) => {
       // もしくは CLI オプションで `--no-open` を渡す。
       // (e.g.) $ npm start -- --no-open
       open: BROWSER || true,
-
-      proxy: {
-        "/__": {
-          // FIXME firebasercからドメイン情報持って来られるといいよね
-          // FIXME ビルド時もJSONが持って来られるといいよね
-          target: "https://sharetimer.web.app",
-          changeOrigin: true,
-        },
-      },
     },
 
     build: {
@@ -62,6 +54,9 @@ export default defineConfig(async ({ command, mode }) => {
 
       // type-check
       checkerPlugin,
+
+      // Firebase
+      firebaseReservedURL(),
 
       // bundle analyze
       bundleBuddy(),
