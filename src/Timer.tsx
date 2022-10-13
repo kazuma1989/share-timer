@@ -27,11 +27,37 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
     restDuration: 0,
   })
 
-  const [allSettled, addPromise] = useAllSettled()
-  const pending = !allSettled
+  const [_allSettled, addPromise] = useAllSettled()
+  const pending = !_allSettled
 
   const dispatch = (action: ActionOnFirestore) => {
-    addPromise(
+    if (action.type === "edit-done") {
+      return addPromise(
+        runTransaction(
+          db,
+          async (transaction) => {
+            const room = doc(collection(db, "rooms"), roomId)
+
+            const getOptimisticLock = () => transaction.get(room)
+            await getOptimisticLock()
+
+            const roomUpdate: Partial<RoomOnFirestore> = {
+              lastEditAt: serverTimestamp() as Timestamp,
+            }
+            transaction.update(room, roomUpdate)
+
+            const actions = collection(db, "rooms", roomId, "actions")
+            const newActionId = doc(actions).id
+            transaction.set(doc(actions, newActionId), withMeta(action))
+          },
+          {
+            maxAttempts: 1,
+          }
+        )
+      )
+    }
+
+    return addPromise(
       addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
     )
   }
@@ -51,37 +77,10 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
           return
         }
 
-        const duration = parsed.data
-
-        addPromise(
-          runTransaction(
-            db,
-            async (transaction) => {
-              const room = doc(collection(db, "rooms"), roomId)
-
-              const getOptimisticLock = () => transaction.get(room)
-              await getOptimisticLock()
-
-              const roomUpdate: Partial<RoomOnFirestore> = {
-                lastEditAt: serverTimestamp() as Timestamp,
-              }
-              transaction.update(room, roomUpdate)
-
-              const actions = collection(db, "rooms", roomId, "actions")
-              const newActionId = doc(actions).id
-              transaction.set(
-                doc(actions, newActionId),
-                withMeta<ActionOnFirestore>({
-                  type: "edit-done",
-                  duration,
-                })
-              )
-            },
-            {
-              maxAttempts: 1,
-            }
-          )
-        )
+        dispatch({
+          type: "edit-done",
+          duration: parsed.data,
+        })
       }}
     >
       <div
