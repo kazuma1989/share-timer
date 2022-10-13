@@ -27,7 +27,7 @@ export function bundleBuddy(): Plugin {
       // https://rollupjs.org/guide/en/#thisemitfile
       this.emitFile({
         type: "asset",
-        fileName: "graph.json",
+        fileName: ".graph.json",
         source: JSON.stringify(deps, null, 2),
       })
     },
