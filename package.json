@@ -25,7 +25,8 @@
     "deploy:rules": "firebase deploy --only firestore:rules",
     "firebase-login": "firebase login",
     "firebase-init": "firebase init",
-    "firebase-target-apply": "firebase target:apply hosting app sharetimer"
+    "firebase-target-apply": "firebase target:apply hosting app sharetimer",
+    "firebase-indexes-export": "firebase firestore:indexes > firestore.indexes.json"
   },
   "dependencies": {
     "@emotion/css": "11.10.x",
