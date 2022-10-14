@@ -1,4 +1,8 @@
 export function formatDuration(durationMs: number): string {
+  if (durationMs <= 0) {
+    return "0:00"
+  }
+
   // durationMs = 321_456
   // milliseconds = 456
   const milliseconds = durationMs % 1_000
@@ -24,5 +28,9 @@ if (import.meta.vitest) {
 
   test("omit milliseconds unit", () => {
     expect(formatDuration(3 * 60_000 + 1_000 + 789)).toBe("3:01")
+  })
+
+  test("negative", () => {
+    expect(formatDuration(-60_000)).toBe("0:00")
   })
 }
