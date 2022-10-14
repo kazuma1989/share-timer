@@ -24,7 +24,7 @@ export class Store<T> {
 
   private latestValue: T | typeof Store.Empty = Store.Empty
 
-  constructor(private readonly getSubscription: GetSubscription<T>) {}
+  private constructor(private readonly getSubscription: GetSubscription<T>) {}
 
   subscribe = (onStoreChange: () => void): (() => void) =>
     this.getSubscription((value) => {
