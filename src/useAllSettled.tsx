@@ -16,16 +16,13 @@ export function useAllSettled(): [
     return new Set(promises.values()).add(promise)
   }, new Set())
 
-  const store = getOrPut(
-    promises,
-    () =>
-      new Store((onChange) => {
-        Promise.allSettled(promises).then(() => {
-          promises.clear()
-          onChange(true)
-        })
-        return () => {}
+  const store = getOrPut(promises, () =>
+    Store.from(
+      Promise.allSettled(promises).then(() => {
+        promises.clear()
+        return true
       })
+    )
   )
 
   const allSettled = useSyncExternalStore(store.subscribe, store.get)

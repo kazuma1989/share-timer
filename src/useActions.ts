@@ -17,62 +17,60 @@ import { useFirestore } from "./useFirestore"
 export function useActions(roomId: Room["id"]): Action[] {
   const db = useFirestore()
 
-  const store = getOrPut(
-    roomId,
-    () =>
-      new Store((onChange) => {
-        const subscriptions = new Set<Unsubscribe>()
-        const clearSubscriptions = () => {
-          subscriptions.forEach((unsubscribe) => {
-            unsubscribe()
-          })
-          subscriptions.clear()
-        }
+  const store = getOrPut(roomId, () =>
+    Store.from((onChange) => {
+      const subscriptions = new Set<Unsubscribe>()
+      const clearSubscriptions = () => {
+        subscriptions.forEach((unsubscribe) => {
+          unsubscribe()
+        })
+        subscriptions.clear()
+      }
 
-        const unsubscribe = onSnapshot(
-          doc(collection(db, "rooms"), roomId),
-          (roomDoc) => {
-            clearSubscriptions()
+      const unsubscribe = onSnapshot(
+        doc(collection(db, "rooms"), roomId),
+        (roomDoc) => {
+          clearSubscriptions()
 
-            const room: Room = {
-              ...roomZod.parse(roomDoc.data()),
-              id: roomDoc.id,
-            }
+          const room: Room = {
+            ...roomZod.parse(roomDoc.data()),
+            id: roomDoc.id,
+          }
 
-            subscriptions.add(
-              onSnapshot(
-                query(
-                  collection(db, "rooms", roomId, "actions"),
-                  orderBy("createdAt", "asc"),
-                  startAt(room.lastEditAt)
-                ),
-                (doc) => {
-                  const actions = doc.docs.flatMap<Action>((doc) => {
-                    const rawData = doc.data({
-                      serverTimestamps: "estimate",
-                    })
-
-                    const parsed = actionZod.safeParse(rawData)
-                    if (parsed.success) {
-                      return [parsed.data]
-                    }
-
-                    console.debug(rawData, parsed.error)
-                    return []
+          subscriptions.add(
+            onSnapshot(
+              query(
+                collection(db, "rooms", roomId, "actions"),
+                orderBy("createdAt", "asc"),
+                startAt(room.lastEditAt)
+              ),
+              (doc) => {
+                const actions = doc.docs.flatMap<Action>((doc) => {
+                  const rawData = doc.data({
+                    serverTimestamps: "estimate",
                   })
 
-                  onChange(actions)
-                }
-              )
-            )
-          }
-        )
+                  const parsed = actionZod.safeParse(rawData)
+                  if (parsed.success) {
+                    return [parsed.data]
+                  }
 
-        return () => {
-          clearSubscriptions()
-          unsubscribe()
+                  console.debug(rawData, parsed.error)
+                  return []
+                })
+
+                onChange(actions)
+              }
+            )
+          )
         }
-      })
+      )
+
+      return () => {
+        clearSubscriptions()
+        unsubscribe()
+      }
+    })
   )
 
   return useSyncExternalStore(store.subscribe, store.getOrThrow)
