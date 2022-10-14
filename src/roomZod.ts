@@ -1,9 +1,6 @@
-import { Timestamp } from "firebase/firestore"
 import * as z from "zod"
 
-export const roomZod = z.object({
-  lastEditAt: z.instanceof(Timestamp),
-})
+export const roomZod = z.object({})
 
 export const roomIdZod = z.string().regex(/^[A-Za-z0-9]{20}$/)
 

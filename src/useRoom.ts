@@ -1,11 +1,4 @@
-import {
-  doc,
-  Firestore,
-  getDoc,
-  serverTimestamp,
-  Timestamp,
-  writeBatch,
-} from "firebase/firestore"
+import { doc, Firestore, getDoc, writeBatch } from "firebase/firestore"
 import { ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
 import { mapGetOrPut } from "./mapGetOrPut"
@@ -54,12 +47,7 @@ async function setupRoom(db: Firestore, newRoomId: string): Promise<void> {
   const batch = writeBatch(db)
 
   const rooms = collection(db, "rooms")
-  batch.set(
-    doc(rooms, newRoomId),
-    withMeta<RoomOnFirestore>({
-      lastEditAt: serverTimestamp() as Timestamp,
-    })
-  )
+  batch.set(doc(rooms, newRoomId), withMeta<RoomOnFirestore>({}))
 
   const actions = collection(db, "rooms", newRoomId, "actions")
   const newActionId = doc(actions).id

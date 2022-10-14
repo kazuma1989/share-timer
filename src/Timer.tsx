@@ -1,16 +1,10 @@
 import { css } from "@emotion/css"
-import {
-  addDoc,
-  doc,
-  runTransaction,
-  serverTimestamp,
-  Timestamp,
-} from "firebase/firestore"
+import { addDoc, serverTimestamp, Timestamp } from "firebase/firestore"
 import { useEffect, useRef } from "react"
 import { Action, ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
 import { formatDuration } from "./formatDuration"
-import { Room, RoomOnFirestore } from "./roomZod"
+import { Room } from "./roomZod"
 import { timeInputZod } from "./timeInputZod"
 import TimerWorker from "./TimerWorker?worker"
 import { TimeViewer } from "./TimeViewer"
@@ -35,32 +29,6 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
 
   const dispatch = (action: ActionOnFirestore) => {
     if (pending) return
-
-    if (action.type === "edit-done") {
-      return addPromise(
-        runTransaction(
-          db,
-          async (transaction) => {
-            const room = doc(collection(db, "rooms"), roomId)
-
-            const getOptimisticLock = () => transaction.get(room)
-            await getOptimisticLock()
-
-            const roomUpdate: Partial<RoomOnFirestore> = {
-              lastEditAt: serverTimestamp() as Timestamp,
-            }
-            transaction.update(room, roomUpdate)
-
-            const actions = collection(db, "rooms", roomId, "actions")
-            const newActionId = doc(actions).id
-            transaction.set(doc(actions, newActionId), withMeta(action))
-          },
-          {
-            maxAttempts: 1,
-          }
-        )
-      )
-    }
 
     return addPromise(
       addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
