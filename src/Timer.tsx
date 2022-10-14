@@ -11,7 +11,6 @@ import { Action, ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
 import { formatDuration } from "./formatDuration"
 import { Room, RoomOnFirestore } from "./roomZod"
-import { now, subscribeTimer } from "./subscribeTimer"
 import { timeInputZod } from "./timeInputZod"
 import { TimeViewer } from "./TimeViewer"
 import { useActions } from "./useActions"
@@ -240,6 +239,10 @@ function reducer(state: TimerState, action: Action): TimerState {
   }
 }
 
+import MyWorker from "./worker?worker"
+
+const worker = new MyWorker()
+
 function useTitle(state: TimerState) {
   let restDuration = NaN
   let duration = NaN
@@ -270,17 +273,31 @@ function useTitle(state: TimerState) {
       }
 
       case "running": {
-        let previous: number
-        return subscribeTimer(() => {
-          const d = now() - startedAt
-          const delta = d - (d % 1_000)
+        const abort = new AbortController()
 
-          const current = duration - delta > 0 ? duration - delta : 0
-          if (current !== previous) {
-            document.title = formatDuration(current)
-            previous = current
-          }
-        })
+        let previous: number
+        worker.addEventListener(
+          "message",
+          (e) => {
+            const now =
+              typeof e.data === "number" && !Number.isNaN(e.data) && e.data
+            if (!now) return
+
+            const d = now - startedAt
+            const delta = d - (d % 1_000)
+
+            const current = duration - delta > 0 ? duration - delta : 0
+            if (current !== previous) {
+              document.title = formatDuration(current)
+              previous = current
+            }
+          },
+          { passive: true, signal: abort.signal }
+        )
+
+        return () => {
+          abort.abort()
+        }
       }
 
       case "editing": {
