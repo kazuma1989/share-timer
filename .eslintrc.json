@@ -36,7 +36,7 @@
         "paths": [
           {
             "name": "firebase/firestore",
-            "importNames": ["collection", "orderBy"],
+            "importNames": ["collection", "orderBy", "where"],
             "message": "Please use type-safe wrapper functions instead."
           }
         ]

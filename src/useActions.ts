@@ -4,7 +4,6 @@ import {
   query,
   startAt,
   Unsubscribe,
-  where,
 } from "firebase/firestore"
 import { useSyncExternalStore } from "react"
 import { Action, actionZod } from "./actionZod"
@@ -14,6 +13,7 @@ import { orderBy } from "./orderBy"
 import { Room } from "./roomZod"
 import { Store } from "./Store"
 import { useFirestore } from "./useFirestore"
+import { where } from "./where"
 
 export function useActions(roomId: Room["id"]): Action[] {
   const db = useFirestore()
