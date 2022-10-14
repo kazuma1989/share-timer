@@ -1,16 +1,17 @@
 import {
-  doc,
+  limitToLast,
   onSnapshot,
   query,
   startAt,
   Unsubscribe,
+  where,
 } from "firebase/firestore"
 import { useSyncExternalStore } from "react"
 import { Action, actionZod } from "./actionZod"
 import { collection } from "./collection"
 import { mapGetOrPut } from "./mapGetOrPut"
 import { orderBy } from "./orderBy"
-import { Room, roomZod } from "./roomZod"
+import { Room } from "./roomZod"
 import { Store } from "./Store"
 import { useFirestore } from "./useFirestore"
 
@@ -28,23 +29,27 @@ export function useActions(roomId: Room["id"]): Action[] {
       }
 
       const unsubscribe = onSnapshot(
-        doc(collection(db, "rooms"), roomId),
-        (roomDoc) => {
+        query(
+          collection(db, "rooms", roomId, "actions"),
+          where("type", "==", "edit-done"),
+          orderBy("createdAt", "asc"),
+          limitToLast(1)
+        ),
+        (doc) => {
           clearSubscriptions()
 
-          const room: Room = {
-            ...roomZod.parse(roomDoc.data()),
-            id: roomDoc.id,
-          }
+          const latestEditDoneAction = doc.docs[0]!
 
           subscriptions.add(
             onSnapshot(
               query(
                 collection(db, "rooms", roomId, "actions"),
                 orderBy("createdAt", "asc"),
-                startAt(room.lastEditAt)
+                startAt(latestEditDoneAction)
               ),
               (doc) => {
+                console.debug("read %d actions", doc.size)
+
                 const actions = doc.docs.flatMap<Action>((doc) => {
                   const rawData = doc.data({
                     serverTimestamps: "estimate",
