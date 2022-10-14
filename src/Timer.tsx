@@ -6,11 +6,12 @@ import {
   serverTimestamp,
   Timestamp,
 } from "firebase/firestore"
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
 import { Action, ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
 import { formatDuration } from "./formatDuration"
 import { Room, RoomOnFirestore } from "./roomZod"
+import { now, subscribeTimer } from "./subscribeTimer"
 import { timeInputZod } from "./timeInputZod"
 import { TimeViewer } from "./TimeViewer"
 import { useActions } from "./useActions"
@@ -26,6 +27,8 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
     mode: "paused",
     restDuration: 0,
   })
+
+  useTitle(state)
 
   const [_allSettled, addPromise] = useAllSettled()
   const pending = !_allSettled
@@ -235,6 +238,57 @@ function reducer(state: TimerState, action: Action): TimerState {
 
     // Do not use "default" here to be exhaustive for the all types.
   }
+}
+
+function useTitle(state: TimerState) {
+  let restDuration = NaN
+  let duration = NaN
+  let startedAt = NaN
+  switch (state.mode) {
+    case "paused": {
+      restDuration = state.restDuration
+      break
+    }
+
+    case "running": {
+      duration = state.duration
+      startedAt = state.startedAt
+      break
+    }
+
+    case "editing": {
+      break
+    }
+  }
+
+  const mode = state.mode
+  useEffect(() => {
+    switch (mode) {
+      case "paused": {
+        document.title = formatDuration(restDuration)
+        return
+      }
+
+      case "running": {
+        let previous: number
+        return subscribeTimer(() => {
+          const d = now() - startedAt
+          const delta = d - (d % 1_000)
+
+          const current = duration - delta > 0 ? duration - delta : 0
+          if (current !== previous) {
+            document.title = formatDuration(current)
+            previous = current
+          }
+        })
+      }
+
+      case "editing": {
+        document.title = "share-timer"
+        return
+      }
+    }
+  }, [duration, mode, restDuration, startedAt])
 }
 
 if (import.meta.vitest) {
