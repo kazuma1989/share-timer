@@ -14,6 +14,7 @@ import { Room, RoomOnFirestore } from "./roomZod"
 import { timeInputZod } from "./timeInputZod"
 import { TimeViewer } from "./TimeViewer"
 import { useActions } from "./useActions"
+import { useAllSettled } from "./useAllSettled"
 import { useFirestore } from "./useFirestore"
 import { withMeta } from "./withMeta"
 
@@ -26,28 +27,15 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
     restDuration: 0,
   })
 
+  const [_allSettled, addPromise] = useAllSettled()
+  const pending = !_allSettled
+
   const dispatch = (action: ActionOnFirestore) => {
-    addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
-  }
+    if (pending) return
 
-  const timeInput$ = useRef<HTMLInputElement>(null)
-
-  return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault()
-
-        const timeInput = timeInput$.current?.value ?? ""
-
-        const parsed = timeInputZod.safeParse(timeInput)
-        if (!parsed.success) {
-          alert(`invalid format ${timeInput}`)
-          return
-        }
-
-        const duration = parsed.data
-
-        await runTransaction(
+    if (action.type === "edit-done") {
+      return addPromise(
+        runTransaction(
           db,
           async (transaction) => {
             const room = doc(collection(db, "rooms"), roomId)
@@ -62,18 +50,39 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
 
             const actions = collection(db, "rooms", roomId, "actions")
             const newActionId = doc(actions).id
-            transaction.set(
-              doc(actions, newActionId),
-              withMeta<ActionOnFirestore>({
-                type: "edit-done",
-                duration,
-              })
-            )
+            transaction.set(doc(actions, newActionId), withMeta(action))
           },
           {
             maxAttempts: 1,
           }
         )
+      )
+    }
+
+    return addPromise(
+      addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
+    )
+  }
+
+  const timeInput$ = useRef<HTMLInputElement>(null)
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+
+        const timeInput = timeInput$.current?.value ?? ""
+
+        const parsed = timeInputZod.safeParse(timeInput)
+        if (!parsed.success) {
+          alert(`invalid format ${timeInput}`)
+          return
+        }
+
+        dispatch({
+          type: "edit-done",
+          duration: parsed.data,
+        })
       }}
     >
       <div
@@ -86,6 +95,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
             ref={timeInput$}
             type="text"
             defaultValue={formatDuration(state.initialDuration)}
+            disabled={pending}
             size={5}
             className={css`
               && {
@@ -117,7 +127,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
       </div>
 
       {state.mode === "editing" ? (
-        <button key="done" type="submit">
+        <button key="done" type="submit" disabled={pending}>
           Done
         </button>
       ) : (

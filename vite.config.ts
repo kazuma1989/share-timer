@@ -2,6 +2,7 @@
 import react from "@vitejs/plugin-react"
 import { defineConfig, Plugin } from "vite"
 import { bundleBuddy } from "./vite-bundleBuddy"
+import { firebaseReservedURL } from "./vite-firebaseReservedURL"
 
 export default defineConfig(async ({ command, mode }) => {
   const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env
@@ -30,6 +31,10 @@ export default defineConfig(async ({ command, mode }) => {
     },
 
     build: {
+      // Support top-level await
+      // https://caniuse.com/mdn-javascript_operators_await_top_level
+      target: ["chrome89", "edge89", "safari15", "firefox89", "opera75"],
+
       // Create React App のデフォルトの出力先と同じにする。
       outDir: BUILD_PATH || "./build/",
 
@@ -53,6 +58,9 @@ export default defineConfig(async ({ command, mode }) => {
 
       // type-check
       checkerPlugin,
+
+      // Firebase
+      firebaseReservedURL(),
 
       // bundle analyze
       bundleBuddy(),

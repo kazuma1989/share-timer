@@ -24,37 +24,25 @@ export function useRoom(): Room {
     setHash(roomId)
   }
 
-  const store = getOrPut(
-    roomId,
-    () =>
-      new Store((onChange) => {
-        const abort = new AbortController()
+  const store = getOrPut(roomId, () =>
+    Store.from(
+      (async () => {
+        const getRoom = () => getDoc(doc(collection(db, "rooms"), roomId))
 
-        const roomRef = doc(collection(db, "rooms"), roomId)
+        let roomDoc = await getRoom()
+        if (!roomDoc.exists() || !roomZod.safeParse(roomDoc.data()).success) {
+          await setupRoom(db, roomId)
 
-        getDoc(roomRef).then(async (roomDoc) => {
-          if (abort.signal.aborted) return
-
-          if (!roomDoc.exists() || !roomZod.safeParse(roomDoc.data()).success) {
-            await setupRoom(db, roomId)
-            if (abort.signal.aborted) return
-
-            roomDoc = await getDoc(roomRef)
-            if (abort.signal.aborted) return
-          }
-
-          const room: Room = {
-            ...roomZod.parse(roomDoc.data()),
-            id: roomDoc.id,
-          }
-
-          onChange(room)
-        })
-
-        return () => {
-          abort.abort()
+          roomDoc = await getRoom()
         }
-      })
+
+        const room: Room = {
+          ...roomZod.parse(roomDoc.data()),
+          id: roomDoc.id,
+        }
+        return room
+      })()
+    )
   )
 
   return store.getOrThrow()

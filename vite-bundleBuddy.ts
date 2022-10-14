@@ -12,7 +12,7 @@ export function bundleBuddy(): Plugin {
      * @see https://rollupjs.org/guide/en/#generatebundle
      * @see https://bundle-buddy.com/rollup
      */
-    async generateBundle() {
+    generateBundle() {
       // https://bundle-buddy.com/rollup
       const deps = []
       for (const id of this.getModuleIds()) {
@@ -27,7 +27,7 @@ export function bundleBuddy(): Plugin {
       // https://rollupjs.org/guide/en/#thisemitfile
       this.emitFile({
         type: "asset",
-        fileName: "graph.json",
+        fileName: ".graph.json",
         source: JSON.stringify(deps, null, 2),
       })
     },
