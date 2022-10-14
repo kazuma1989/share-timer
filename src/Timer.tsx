@@ -209,6 +209,8 @@ function reducer(state: TimerState, action: Action): TimerState {
 }
 
 function useTitle(state: TimerState) {
+  const mode = state.mode
+
   let restDuration = NaN
   let duration = NaN
   let startedAt = NaN
@@ -223,54 +225,32 @@ function useTitle(state: TimerState) {
       startedAt = state.startedAt
       break
     }
-
-    case "editing": {
-      break
-    }
   }
 
-  const mode = state.mode
   useEffect(() => {
-    switch (mode) {
-      case "paused": {
-        document.title = formatDuration(restDuration)
-        return
+    const title = document.title
+
+    const abort = new AbortController()
+    const timer = new TimerWorker()
+
+    timer.addEventListener(
+      "message",
+      (e) => {
+        document.title = formatDuration(e.data)
+      },
+      {
+        passive: true,
+        signal: abort.signal,
       }
+    )
 
-      case "running": {
-        const timer = new TimerWorker()
-        const abort = new AbortController()
+    timer.postMessage({ mode, restDuration, duration, startedAt })
 
-        let previous: number
-        timer.addEventListener(
-          "message",
-          (e) => {
-            const now =
-              typeof e.data === "number" && !Number.isNaN(e.data) && e.data
-            if (!now) return
+    return () => {
+      document.title = title
 
-            const d = now - startedAt
-            const delta = d - (d % 1_000)
-
-            const current = duration - delta > 0 ? duration - delta : 0
-            if (current !== previous) {
-              document.title = formatDuration(current)
-              previous = current
-            }
-          },
-          { passive: true, signal: abort.signal }
-        )
-
-        return () => {
-          timer.terminate()
-          abort.abort()
-        }
-      }
-
-      case "editing": {
-        document.title = "share-timer"
-        return
-      }
+      abort.abort()
+      timer.terminate()
     }
   }, [duration, mode, restDuration, startedAt])
 }
