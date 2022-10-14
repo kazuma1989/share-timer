@@ -12,6 +12,7 @@ import { collection } from "./collection"
 import { formatDuration } from "./formatDuration"
 import { Room, RoomOnFirestore } from "./roomZod"
 import { timeInputZod } from "./timeInputZod"
+import TimerWorker from "./TimerWorker?worker"
 import { TimeViewer } from "./TimeViewer"
 import { useActions } from "./useActions"
 import { useAllSettled } from "./useAllSettled"
@@ -239,10 +240,6 @@ function reducer(state: TimerState, action: Action): TimerState {
   }
 }
 
-import MyWorker from "./worker?worker"
-
-const worker = new MyWorker()
-
 function useTitle(state: TimerState) {
   let restDuration = NaN
   let duration = NaN
@@ -273,10 +270,11 @@ function useTitle(state: TimerState) {
       }
 
       case "running": {
+        const timer = new TimerWorker()
         const abort = new AbortController()
 
         let previous: number
-        worker.addEventListener(
+        timer.addEventListener(
           "message",
           (e) => {
             const now =
@@ -296,6 +294,7 @@ function useTitle(state: TimerState) {
         )
 
         return () => {
+          timer.terminate()
           abort.abort()
         }
       }
