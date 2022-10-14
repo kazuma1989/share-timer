@@ -1,5 +1,6 @@
+import { useSyncExternalStore } from "react"
 import { formatDuration } from "./formatDuration"
-import { useTimer } from "./useTimer"
+import { now, subscribeTimer } from "./subscribeTimer"
 
 export function TimeViewer({
   duration,
@@ -10,7 +11,10 @@ export function TimeViewer({
   startedAt?: number
   className?: string
 }) {
-  const delta = useTimer(startedAt ?? 0)
+  const delta = useSyncExternalStore(subscribeTimer, () => {
+    const d = startedAt ? now() - startedAt : 0
+    return d - (d % 1_000)
+  })
 
   return (
     <span className={className}>
