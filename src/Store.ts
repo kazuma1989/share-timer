@@ -22,21 +22,28 @@ export class Store<T> {
     )
   }
 
-  private latestValue: T | typeof Store.Empty = Store.Empty
+  private observable: Observable<T>
 
-  private constructor(private readonly getSubscription: GetSubscription<T>) {}
+  private constructor(getSubscription: GetSubscription<T>) {
+    this.observable = new Observable(getSubscription)
+  }
 
-  subscribe = (onStoreChange: () => void): (() => void) =>
-    this.getSubscription((value) => {
-      this.latestValue = value
-      onStoreChange()
-    })
+  subscribe = (onStoreChange: Listener): Unsubscribe =>
+    this.observable.subscribe(onStoreChange)
 
-  getValue = (): T | typeof Store.Empty => this.latestValue
+  getValue = (): T | typeof Store.Empty => {
+    const value = this.observable.getValue()
+    if (value !== Observable.Empty) {
+      return value
+    }
+
+    return Store.Empty
+  }
 
   getOrThrow = (): T => {
-    if (this.latestValue !== Store.Empty) {
-      return this.latestValue
+    const value = this.getValue()
+    if (value !== Store.Empty) {
+      return value
     }
 
     throw new Promise<void>((resolve) => {
@@ -49,5 +56,50 @@ export class Store<T> {
 }
 
 interface GetSubscription<T> {
-  (onChange: (value: T) => void): () => void
+  (onChange: (value: T) => void): Unsubscribe
+}
+
+interface Unsubscribe {
+  (): void
+}
+
+interface Listener {
+  (): void
+}
+
+class Observable<T> {
+  static readonly Empty = Symbol("empty")
+
+  readonly terminate: () => void
+
+  private readonly listeners = new Set<Listener>()
+
+  private latestValue: T | typeof Observable.Empty = Observable.Empty
+
+  constructor(getSubscription: GetSubscription<T>) {
+    this.terminate = getSubscription((value) => {
+      this.latestValue = value
+
+      this.listeners.forEach((listener) => {
+        listener()
+      })
+    })
+  }
+
+  subscribe(listener: Listener): Unsubscribe {
+    this.listeners.add(listener)
+
+    return () => {
+      this.listeners.delete(listener)
+    }
+  }
+
+  getValue(): T | typeof Observable.Empty {
+    return this.latestValue
+  }
+
+  // TODO
+  toPromise(): Promise<any> {
+    return Promise.resolve()
+  }
 }
