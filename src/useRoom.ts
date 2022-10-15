@@ -11,9 +11,11 @@ import { withMeta } from "./withMeta"
 export function useRoom(): Room {
   const db = useFirestore()
 
-  let roomId = useHash().slice("#".length)
-  if (!roomIdZod.safeParse(roomId).success) {
-    roomId = roomIdZod.parse(doc(collection(db, "rooms")).id)
+  const _ = roomIdZod.safeParse(useHash().slice("#".length))
+  const roomId = _.success
+    ? _.data
+    : roomIdZod.parse(doc(collection(db, "rooms")).id)
+  if (!_.success) {
     setHash(roomId)
   }
 
@@ -31,7 +33,7 @@ export function useRoom(): Room {
 
         const room: Room = {
           ...roomZod.parse(roomDoc.data()),
-          id: roomDoc.id,
+          id: roomId,
         }
         return room
       })()
@@ -55,11 +57,11 @@ async function setupRoom(db: Firestore, newRoomId: string): Promise<void> {
     doc(actions, newActionId),
     withMeta<ActionOnFirestore>({
       type: "edit-done",
-      duration: defaultDuration,
+      duration: DEFAULT_DURATION,
     })
   )
 
   await batch.commit()
 }
 
-const defaultDuration = 3 * 60_000
+const DEFAULT_DURATION = 3 * 60_000
