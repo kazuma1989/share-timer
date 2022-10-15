@@ -17,8 +17,7 @@ jobs:
       - run: |
           export GOOGLE_APPLICATION_CREDENTIALS="$(mktemp -u).json"
           echo "${FIREBASE_SERVICE_ACCOUNT}" > "${GOOGLE_APPLICATION_CREDENTIALS}"
-          head "${GOOGLE_APPLICATION_CREDENTIALS}"
-          npm run deploy:rules -- --project share-timer-2b51a --debug
+          npm run deploy:rules -- --debug --project share-timer-2b51a
         env:
           FIREBASE_SERVICE_ACCOUNT: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_SHARE_TIMER_2B51A }}"
       - uses: FirebaseExtended/action-hosting-deploy@v0
