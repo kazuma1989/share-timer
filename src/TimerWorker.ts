@@ -4,44 +4,33 @@ export {}
 declare const self: DedicatedWorkerGlobalScope
 
 interface Data {
-  mode: "paused" | "running" | "editing"
-  restDuration: number
   duration: number
   startedAt: number
 }
 
 onMessage<Data>((e) => {
-  const { mode, restDuration, duration, startedAt } = e.data
+  const { duration, startedAt } = e.data
 
-  switch (mode) {
-    case "paused": {
-      postMessageNumber(restDuration)
-      return
+  let previous: number
+
+  const timer = self.setInterval(() => {
+    const d = Date.now() - startedAt
+    const delta = d - (d % 1_000)
+
+    const current = duration - delta > 0 ? duration - delta : 0
+    if (current !== previous) {
+      postMessage(current)
+
+      previous = current
     }
+  }, 100)
 
-    case "running": {
-      let previous: number
-
-      const timer = self.setInterval(() => {
-        const d = Date.now() - startedAt
-        const delta = d - (d % 1_000)
-
-        const current = duration - delta > 0 ? duration - delta : 0
-        if (current !== previous) {
-          postMessageNumber(current)
-
-          previous = current
-        }
-      }, 100)
-
-      return () => {
-        self.clearInterval(timer)
-      }
-    }
+  return () => {
+    self.clearInterval(timer)
   }
 })
 
-function postMessageNumber(message: number): void {
+function postMessage(message: number): void {
   self.postMessage(message)
 }
 

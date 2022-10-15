@@ -30,23 +30,30 @@ export function useTitleAsTimeViewer(state: TimerState): void {
       document.title = previousTitle
     })
 
-    const timer = new TimerWorker()
-    abort.signal.addEventListener("abort", () => {
-      timer.terminate()
-    })
+    const setTitle = (duration: number) => {
+      document.title = formatDuration(duration)
+    }
 
-    timer.addEventListener(
-      "message",
-      (e) => {
-        document.title = formatDuration(e.data)
-      },
-      {
-        passive: true,
-        signal: abort.signal,
+    switch (mode) {
+      case "paused": {
+        setTitle(restDuration)
+        break
       }
-    )
 
-    timer.postMessage({ mode, restDuration, duration, startedAt })
+      case "running": {
+        const timer = new TimerWorker()
+        abort.signal.addEventListener("abort", () => {
+          timer.terminate()
+        })
+
+        timer.addEventListener("message", (e) => {
+          setTitle(e.data)
+        })
+
+        timer.postMessage({ duration, startedAt })
+        break
+      }
+    }
 
     return () => {
       abort.abort()
