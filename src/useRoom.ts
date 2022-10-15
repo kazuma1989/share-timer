@@ -1,4 +1,5 @@
-import { doc, Firestore, getDoc, writeBatch } from "firebase/firestore"
+import { doc, Firestore, onSnapshot, writeBatch } from "firebase/firestore"
+import { useSyncExternalStore } from "react"
 import { ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
 import { mapGetOrPut } from "./mapGetOrPut"
@@ -20,27 +21,22 @@ export function useRoom(): Room {
   }
 
   const store = getOrPut(roomId, () =>
-    Store.from(
-      (async () => {
-        const getRoom = () => getDoc(doc(collection(db, "rooms"), roomId))
-
-        let roomDoc = await getRoom()
+    Store.from((next) =>
+      onSnapshot(doc(collection(db, "rooms"), roomId), (roomDoc) => {
         if (!roomDoc.exists() || !roomZod.safeParse(roomDoc.data()).success) {
-          await setupRoom(db, roomId)
-
-          roomDoc = await getRoom()
+          setupRoom(db, roomId)
+          return
         }
 
-        const room: Room = {
+        next({
           ...roomZod.parse(roomDoc.data()),
           id: roomId,
-        }
-        return room
-      })()
+        })
+      })
     )
   )
 
-  return store.getOrThrow()
+  return useSyncExternalStore(store.subscribe, store.getOrThrow)
 }
 
 const getOrPut = mapGetOrPut(new Map<Room["id"], Store<Room>>())

@@ -7,6 +7,8 @@ export function App() {
 
   return (
     <>
+      <p>{room.name}</p>
+
       <Timer key={room.id} roomId={room.id} />
 
       {import.meta.env.DEV && <Debug />}
