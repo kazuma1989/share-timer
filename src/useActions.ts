@@ -1,4 +1,5 @@
 import {
+  getDocs,
   limitToLast,
   onSnapshot,
   query,
@@ -28,53 +29,49 @@ export function useActions(roomId: Room["id"]): Action[] {
         subscriptions.clear()
       }
 
-      const unsubscribe = onSnapshot(
+      getDocs(
         query(
           collection(db, "rooms", roomId, "actions"),
           where("type", "==", "edit-done"),
           orderBy("createdAt", "asc"),
           limitToLast(1)
-        ),
-        (doc) => {
-          clearSubscriptions()
+        )
+      ).then((doc) => {
+        clearSubscriptions()
 
-          const latestEditDoneAction = doc.docs[0]!
+        const latestEditDoneAction = doc.docs[0]!
 
-          subscriptions.add(
-            onSnapshot(
-              query(
-                collection(db, "rooms", roomId, "actions"),
-                orderBy("createdAt", "asc"),
-                startAt(latestEditDoneAction)
-              ),
-              (doc) => {
-                console.debug("read %d actions", doc.size)
+        subscriptions.add(
+          onSnapshot(
+            query(
+              collection(db, "rooms", roomId, "actions"),
+              orderBy("createdAt", "asc"),
+              startAt(latestEditDoneAction)
+            ),
+            (doc) => {
+              console.debug("listen %d docChanges", doc.docChanges().length)
 
-                const actions = doc.docs.flatMap<Action>((doc) => {
-                  const rawData = doc.data({
-                    serverTimestamps: "estimate",
-                  })
-
-                  const parsed = actionZod.safeParse(rawData)
-                  if (parsed.success) {
-                    return [parsed.data]
-                  }
-
-                  console.debug(rawData, parsed.error)
-                  return []
+              const actions = doc.docs.flatMap<Action>((doc) => {
+                const rawData = doc.data({
+                  serverTimestamps: "estimate",
                 })
 
-                onChange(actions)
-              }
-            )
-          )
-        }
-      )
+                const parsed = actionZod.safeParse(rawData)
+                if (parsed.success) {
+                  return [parsed.data]
+                }
 
-      return () => {
-        clearSubscriptions()
-        unsubscribe()
-      }
+                console.debug(rawData, parsed.error)
+                return []
+              })
+
+              onChange(actions)
+            }
+          )
+        )
+      })
+
+      return clearSubscriptions
     })
   )
 
