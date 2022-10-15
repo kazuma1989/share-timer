@@ -4,7 +4,6 @@ import {
   onSnapshot,
   query,
   startAt,
-  Unsubscribe,
 } from "firebase/firestore"
 import { useSyncExternalStore } from "react"
 import { Action, actionZod } from "./actionZod"
@@ -23,13 +22,7 @@ export function useActions(roomId: Room["id"]): Action[] {
     Store.from((next) => {
       console.debug("actions listener attached")
 
-      const subscriptions = new Set<Unsubscribe>()
-      const clearSubscriptions = () => {
-        subscriptions.forEach((unsubscribe) => {
-          unsubscribe()
-        })
-        subscriptions.clear()
-      }
+      const abort = new AbortController()
 
       getDocs(
         query(
@@ -39,41 +32,48 @@ export function useActions(roomId: Room["id"]): Action[] {
           limitToLast(1)
         )
       ).then((doc) => {
-        clearSubscriptions()
+        if (abort.signal.aborted) return
 
-        const [latestEditDoneAction] = doc.docs
+        const _ = doc.docs[0]
+        const serverTimestampCommitted =
+          _ && !_.metadata.fromCache && !_.metadata.hasPendingWrites
+        const startAtLatestEditDone = serverTimestampCommitted
+          ? [startAt(_)]
+          : []
 
-        subscriptions.add(
-          onSnapshot(
-            query(
-              collection(db, "rooms", roomId, "actions"),
-              orderBy("createdAt", "asc"),
-              ...(latestEditDoneAction ? [startAt(latestEditDoneAction)] : [])
-            ),
-            (doc) => {
-              console.debug("listen %d docChanges", doc.docChanges().length)
+        const unsubscribe = onSnapshot(
+          query(
+            collection(db, "rooms", roomId, "actions"),
+            orderBy("createdAt", "asc"),
+            ...startAtLatestEditDone
+          ),
+          (doc) => {
+            console.debug("listen %d docChanges", doc.docChanges().length)
 
-              const actions = doc.docs.flatMap<Action>((doc) => {
-                const rawData = doc.data({
-                  serverTimestamps: "estimate",
-                })
-
-                const parsed = actionZod.safeParse(rawData)
-                if (parsed.success) {
-                  return [parsed.data]
-                }
-
-                console.debug(rawData, parsed.error)
-                return []
+            const actions = doc.docs.flatMap<Action>((doc) => {
+              const rawData = doc.data({
+                serverTimestamps: "estimate",
               })
 
-              next(actions)
-            }
-          )
+              const parsed = actionZod.safeParse(rawData)
+              if (parsed.success) {
+                return [parsed.data]
+              }
+
+              console.debug(rawData, parsed.error)
+              return []
+            })
+
+            next(actions)
+          }
         )
+
+        abort.signal.addEventListener("abort", unsubscribe)
       })
 
-      return clearSubscriptions
+      return () => {
+        abort.abort()
+      }
     })
   )
 
