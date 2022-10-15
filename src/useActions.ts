@@ -20,7 +20,7 @@ export function useActions(roomId: Room["id"]): Action[] {
   const db = useFirestore()
 
   const store = getOrPut(roomId, () =>
-    Store.from((onChange) => {
+    Store.from((next) => {
       const subscriptions = new Set<Unsubscribe>()
       const clearSubscriptions = () => {
         subscriptions.forEach((unsubscribe) => {
@@ -65,7 +65,7 @@ export function useActions(roomId: Room["id"]): Action[] {
                 return []
               })
 
-              onChange(actions)
+              next(actions)
             }
           )
         )

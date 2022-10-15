@@ -1,6 +1,6 @@
 let _now = Date.now()
 
-export function subscribeTimer(onChange: () => void): () => void {
+export function subscribeTimer(next: () => void): () => void {
   const abort = new AbortController()
 
   const tick = () => {
@@ -9,7 +9,7 @@ export function subscribeTimer(onChange: () => void): () => void {
     requestAnimationFrame(tick)
 
     _now = Date.now()
-    onChange()
+    next()
   }
 
   tick()

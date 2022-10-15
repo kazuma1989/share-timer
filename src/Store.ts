@@ -7,12 +7,12 @@ export class Store<T> {
     return new Store(
       typeof seed === "function"
         ? seed
-        : (onChange) => {
+        : (next) => {
             const abort = new AbortController()
 
             seed.then((value) => {
               if (abort.signal.aborted) return
-              onChange(value)
+              next(value)
             })
 
             return () => {
@@ -53,16 +53,18 @@ export class Store<T> {
     }
 
     throw new Promise<void>((resolve) => {
-      const unsubscribe = this.subscribe(() => {
-        unsubscribe()
+      const listener = () => {
         resolve()
-      })
+        this.listeners.delete(listener)
+      }
+
+      this.listeners.add(listener)
     })
   }
 }
 
 interface GetSubscription<T> {
-  (onChange: (value: T) => void): Unsubscribe
+  (next: (value: T) => void): Unsubscribe
 }
 
 interface Unsubscribe {
