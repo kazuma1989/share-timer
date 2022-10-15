@@ -1,10 +1,10 @@
 /// <reference types="vitest" />
 import react from "@vitejs/plugin-react"
-import { defineConfig, Plugin, splitVendorChunkPlugin } from "vite"
+import { defineConfig, Plugin, UserConfig } from "vite"
 import { bundleBuddy } from "./vite-bundleBuddy"
 import { firebaseReservedURL } from "./vite-firebaseReservedURL"
 
-export default defineConfig(async ({ command, mode }) => {
+export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
   const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env
 
   let checkerPlugin: Plugin | undefined
@@ -40,6 +40,17 @@ export default defineConfig(async ({ command, mode }) => {
 
       // デバッグのためソースマップを有効にしておく。
       sourcemap: true,
+
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            emotion: ["@emotion/css"],
+            firebase: ["firebase/app", "firebase/firestore"],
+            react: ["react", "react-dom"],
+            zod: ["zod"],
+          },
+        },
+      },
     },
 
     preview: {
@@ -61,9 +72,6 @@ export default defineConfig(async ({ command, mode }) => {
 
       // Firebase
       firebaseReservedURL(),
-
-      // Split chunks
-      splitVendorChunkPlugin(),
 
       // bundle analyze
       bundleBuddy(),
