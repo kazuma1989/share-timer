@@ -10,34 +10,50 @@ interface Data {
   startedAt: number
 }
 
-let timer: number
-
-self.addEventListener("message", (e) => {
-  const { mode, restDuration, duration, startedAt }: Data = e.data
+onMessage<Data>((e) => {
+  const { mode, restDuration, duration, startedAt } = e.data
 
   switch (mode) {
     case "paused": {
-      self.postMessage(restDuration)
-      break
+      postMessageNumber(restDuration)
+      return
     }
 
     case "running": {
       let previous: number
 
-      self.clearInterval(timer)
-
-      timer = self.setInterval(() => {
+      const timer = self.setInterval(() => {
         const d = Date.now() - startedAt
         const delta = d - (d % 1_000)
 
         const current = duration - delta > 0 ? duration - delta : 0
         if (current !== previous) {
-          self.postMessage(current)
+          postMessageNumber(current)
 
           previous = current
         }
       }, 100)
-      break
+
+      return () => {
+        self.clearInterval(timer)
+      }
     }
   }
 })
+
+function postMessageNumber(message: number): void {
+  self.postMessage(message)
+}
+
+function onMessage<T>(
+  listener: (e: MessageEvent<T>) => (() => void) | void
+): void {
+  let unsubscribe: ReturnType<typeof listener>
+
+  self.addEventListener("message", (e) => {
+    unsubscribe?.()
+
+    // NOTICE: unsafe cast MessageEvent<any>
+    unsubscribe = listener(e)
+  })
+}
