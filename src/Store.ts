@@ -4,22 +4,7 @@ export class Store<T> {
   static from<T>(callback: GetSubscription<T>): Store<T>
   static from<T>(promise: PromiseLike<T>): Store<T>
   static from<T>(seed: GetSubscription<T> | PromiseLike<T>): Store<T> {
-    return new Store(
-      typeof seed === "function"
-        ? seed
-        : (next) => {
-            const abort = new AbortController()
-
-            seed.then((value) => {
-              if (abort.signal.aborted) return
-              next(value)
-            })
-
-            return () => {
-              abort.abort()
-            }
-          }
-    )
+    return new Store(typeof seed === "function" ? seed : fromPromise(seed))
   }
 
   private readonly listeners = new Set<Listener>()
@@ -73,4 +58,19 @@ interface Unsubscribe {
 
 interface Listener {
   (): void
+}
+
+function fromPromise<T>(promise: PromiseLike<T>): GetSubscription<T> {
+  return (next) => {
+    const abort = new AbortController()
+
+    promise.then((value) => {
+      if (abort.signal.aborted) return
+      next(value)
+    })
+
+    return () => {
+      abort.abort()
+    }
+  }
 }
