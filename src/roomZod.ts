@@ -37,7 +37,7 @@ if (import.meta.vitest) {
   test("invalid room name", () => {
     expect(() =>
       roomZod.parse({
-        name: "a".repeat(1_001),
+        name: "𩸽".repeat(501),
       })
     ).toThrow(z.ZodError)
   })
