@@ -13,13 +13,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: npm ci --omit=dev && npm run build
-      - run: |
+
+      - name: Install and build
+        run: npm ci --omit=dev && npm run build
+
+      - name: Deploy Firestore (indexes and rules)
+        run: |
           export GOOGLE_APPLICATION_CREDENTIALS="$(mktemp -u).json"
           echo "${FIREBASE_SERVICE_ACCOUNT}" > "${GOOGLE_APPLICATION_CREDENTIALS}"
-          npm run deploy:rules -- --debug --project share-timer-2b51a
+          npm run deploy:firestore -- --debug --project share-timer-2b51a
         env:
           FIREBASE_SERVICE_ACCOUNT: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_SHARE_TIMER_2B51A }}"
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"

@@ -22,6 +22,7 @@
     "lint:unused": "npx -y ts-unused-exports ./tsconfig.json",
     "upgrade": "npx -y npm-check-updates --upgrade",
     "deploy": "firebase deploy",
+    "deploy:firestore": "firebase deploy --only firestore",
     "deploy:rules": "firebase deploy --only firestore:rules",
     "firebase-login": "firebase login",
     "firebase-init": "firebase init",
