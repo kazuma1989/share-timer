@@ -1,5 +1,6 @@
 import {
-  doc,
+  getDocs,
+  limitToLast,
   onSnapshot,
   query,
   startAt,
@@ -10,15 +11,18 @@ import { Action, actionZod } from "./actionZod"
 import { collection } from "./collection"
 import { mapGetOrPut } from "./mapGetOrPut"
 import { orderBy } from "./orderBy"
-import { Room, roomZod } from "./roomZod"
+import { Room } from "./roomZod"
 import { Store } from "./Store"
 import { useFirestore } from "./useFirestore"
+import { where } from "./where"
 
 export function useActions(roomId: Room["id"]): Action[] {
   const db = useFirestore()
 
   const store = getOrPut(roomId, () =>
-    Store.from((onChange) => {
+    Store.from((next) => {
+      console.debug("actions listener attached")
+
       const subscriptions = new Set<Unsubscribe>()
       const clearSubscriptions = () => {
         subscriptions.forEach((unsubscribe) => {
@@ -27,49 +31,49 @@ export function useActions(roomId: Room["id"]): Action[] {
         subscriptions.clear()
       }
 
-      const unsubscribe = onSnapshot(
-        doc(collection(db, "rooms"), roomId),
-        (roomDoc) => {
-          clearSubscriptions()
+      getDocs(
+        query(
+          collection(db, "rooms", roomId, "actions"),
+          where("type", "==", "edit-done"),
+          orderBy("createdAt", "asc"),
+          limitToLast(1)
+        )
+      ).then((doc) => {
+        clearSubscriptions()
 
-          const room: Room = {
-            ...roomZod.parse(roomDoc.data()),
-            id: roomDoc.id,
-          }
+        const latestEditDoneAction = doc.docs[0]!
 
-          subscriptions.add(
-            onSnapshot(
-              query(
-                collection(db, "rooms", roomId, "actions"),
-                orderBy("createdAt", "asc"),
-                startAt(room.lastEditAt)
-              ),
-              (doc) => {
-                const actions = doc.docs.flatMap<Action>((doc) => {
-                  const rawData = doc.data({
-                    serverTimestamps: "estimate",
-                  })
+        subscriptions.add(
+          onSnapshot(
+            query(
+              collection(db, "rooms", roomId, "actions"),
+              orderBy("createdAt", "asc"),
+              startAt(latestEditDoneAction)
+            ),
+            (doc) => {
+              console.debug("listen %d docChanges", doc.docChanges().length)
 
-                  const parsed = actionZod.safeParse(rawData)
-                  if (parsed.success) {
-                    return [parsed.data]
-                  }
-
-                  console.debug(rawData, parsed.error)
-                  return []
+              const actions = doc.docs.flatMap<Action>((doc) => {
+                const rawData = doc.data({
+                  serverTimestamps: "estimate",
                 })
 
-                onChange(actions)
-              }
-            )
-          )
-        }
-      )
+                const parsed = actionZod.safeParse(rawData)
+                if (parsed.success) {
+                  return [parsed.data]
+                }
 
-      return () => {
-        clearSubscriptions()
-        unsubscribe()
-      }
+                console.debug(rawData, parsed.error)
+                return []
+              })
+
+              next(actions)
+            }
+          )
+        )
+      })
+
+      return clearSubscriptions
     })
   )
 

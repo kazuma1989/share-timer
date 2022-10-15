@@ -1,10 +1,10 @@
 /// <reference types="vitest" />
 import react from "@vitejs/plugin-react"
-import { defineConfig, Plugin } from "vite"
+import { defineConfig, Plugin, UserConfig } from "vite"
 import { bundleBuddy } from "./vite-bundleBuddy"
 import { firebaseReservedURL } from "./vite-firebaseReservedURL"
 
-export default defineConfig(async ({ command, mode }) => {
+export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
   const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env
 
   let checkerPlugin: Plugin | undefined
@@ -40,6 +40,26 @@ export default defineConfig(async ({ command, mode }) => {
 
       // デバッグのためソースマップを有効にしておく。
       sourcemap: true,
+
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            switch (true) {
+              case id.includes("/node_modules/@firebase"):
+              case id.includes("/node_modules/firebase"):
+                return "firebase"
+
+              case id.includes("/node_modules/@emotion"):
+              case id.includes("/node_modules/emotion"):
+              case id.includes("/node_modules/react"):
+                return "react-emotion"
+
+              case id.includes("/node_modules/zod"):
+                return "zod"
+            }
+          },
+        },
+      },
     },
 
     preview: {

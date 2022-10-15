@@ -4,37 +4,59 @@ export class Store<T> {
   static from<T>(callback: GetSubscription<T>): Store<T>
   static from<T>(promise: PromiseLike<T>): Store<T>
   static from<T>(seed: GetSubscription<T> | PromiseLike<T>): Store<T> {
-    return new Store(
-      typeof seed === "function"
-        ? seed
-        : (onChange) => {
-            const abort = new AbortController()
+    return new Store(typeof seed === "function" ? seed : fromPromise(seed))
+  }
 
-            seed.then((value) => {
-              if (abort.signal.aborted) return
-              onChange(value)
-            })
+  private readonly listeners = new Set<Listener>()
 
-            return () => {
-              abort.abort()
-            }
-          }
-    )
+  private readonly rootSubscription: {
+    subscribe(): void
+    unsubscribe(): void
   }
 
   private latestValue: T | typeof Store.Empty = Store.Empty
 
-  private constructor(private readonly getSubscription: GetSubscription<T>) {}
+  private constructor(getSubscription: GetSubscription<T>) {
+    const subscribe = () =>
+      getSubscription((value) => {
+        this.latestValue = value
 
-  subscribe = (onStoreChange: () => void): (() => void) =>
-    this.getSubscription((value) => {
-      this.latestValue = value
-      onStoreChange()
-    })
+        this.listeners.forEach((listener) => {
+          listener()
+        })
+      })
 
-  get = (): T | typeof Store.Empty => {
-    return this.latestValue
+    let unsubscribe: Unsubscribe | null
+    this.rootSubscription = {
+      subscribe() {
+        if (!unsubscribe) {
+          unsubscribe = subscribe()
+        }
+      },
+
+      unsubscribe() {
+        if (unsubscribe) {
+          unsubscribe()
+          unsubscribe = null
+        }
+      },
+    }
   }
+
+  subscribe = (listener: Listener): Unsubscribe => {
+    this.listeners.add(listener)
+    this.rootSubscription.subscribe()
+
+    return () => {
+      this.listeners.delete(listener)
+
+      if (this.listeners.size === 0) {
+        this.rootSubscription.unsubscribe()
+      }
+    }
+  }
+
+  getValue = (): T | typeof Store.Empty => this.latestValue
 
   getOrThrow = (): T => {
     if (this.latestValue !== Store.Empty) {
@@ -42,14 +64,40 @@ export class Store<T> {
     }
 
     throw new Promise<void>((resolve) => {
-      const unsubscribe = this.subscribe(() => {
-        unsubscribe()
+      const listener = () => {
         resolve()
-      })
+        this.listeners.delete(listener)
+      }
+
+      this.listeners.add(listener)
+      this.rootSubscription.subscribe()
     })
   }
 }
 
 interface GetSubscription<T> {
-  (onChange: (value: T) => void): () => void
+  (next: (value: T) => void): Unsubscribe
+}
+
+interface Unsubscribe {
+  (): void
+}
+
+interface Listener {
+  (): void
+}
+
+function fromPromise<T>(promise: PromiseLike<T>): GetSubscription<T> {
+  return (next) => {
+    const abort = new AbortController()
+
+    promise.then((value) => {
+      if (abort.signal.aborted) return
+      next(value)
+    })
+
+    return () => {
+      abort.abort()
+    }
+  }
 }

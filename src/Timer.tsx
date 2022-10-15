@@ -1,22 +1,32 @@
 import { css } from "@emotion/css"
-import {
-  addDoc,
-  doc,
-  runTransaction,
-  serverTimestamp,
-  Timestamp,
-} from "firebase/firestore"
+import { addDoc, serverTimestamp, Timestamp } from "firebase/firestore"
 import { useRef } from "react"
 import { Action, ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
 import { formatDuration } from "./formatDuration"
-import { Room, RoomOnFirestore } from "./roomZod"
+import { Room } from "./roomZod"
 import { timeInputZod } from "./timeInputZod"
 import { TimeViewer } from "./TimeViewer"
 import { useActions } from "./useActions"
 import { useAllSettled } from "./useAllSettled"
 import { useFirestore } from "./useFirestore"
+import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { withMeta } from "./withMeta"
+
+export type TimerState =
+  | {
+      mode: "editing"
+      initialDuration: number
+    }
+  | {
+      mode: "running"
+      startedAt: number
+      duration: number
+    }
+  | {
+      mode: "paused"
+      restDuration: number
+    }
 
 export function Timer({ roomId }: { roomId: Room["id"] }) {
   const db = useFirestore()
@@ -27,37 +37,13 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
     restDuration: 0,
   })
 
+  useTitleAsTimeViewer(state)
+
   const [_allSettled, addPromise] = useAllSettled()
   const pending = !_allSettled
 
   const dispatch = (action: ActionOnFirestore) => {
     if (pending) return
-
-    if (action.type === "edit-done") {
-      return addPromise(
-        runTransaction(
-          db,
-          async (transaction) => {
-            const room = doc(collection(db, "rooms"), roomId)
-
-            const getOptimisticLock = () => transaction.get(room)
-            await getOptimisticLock()
-
-            const roomUpdate: Partial<RoomOnFirestore> = {
-              lastEditAt: serverTimestamp() as Timestamp,
-            }
-            transaction.update(room, roomUpdate)
-
-            const actions = collection(db, "rooms", roomId, "actions")
-            const newActionId = doc(actions).id
-            transaction.set(doc(actions, newActionId), withMeta(action))
-          },
-          {
-            maxAttempts: 1,
-          }
-        )
-      )
-    }
 
     return addPromise(
       addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
@@ -174,21 +160,6 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
     </form>
   )
 }
-
-type TimerState =
-  | {
-      mode: "editing"
-      initialDuration: number
-    }
-  | {
-      mode: "running"
-      startedAt: number
-      duration: number
-    }
-  | {
-      mode: "paused"
-      restDuration: number
-    }
 
 function reducer(state: TimerState, action: Action): TimerState {
   switch (action.type) {
