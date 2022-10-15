@@ -1,1 +1,346 @@
-[{"value":"🎃","name":"jack-o-lantern"},{"value":"🎄","name":"Christmas tree"},{"value":"🎆","name":"fireworks"},{"value":"🎇","name":"sparkler"},{"value":"🧨","name":"firecracker"},{"value":"✨","name":"sparkles"},{"value":"🎈","name":"balloon"},{"value":"🎉","name":"party popper"},{"value":"🎊","name":"confetti ball"},{"value":"🎋","name":"tanabata tree"},{"value":"🎍","name":"pine decoration"},{"value":"🎎","name":"Japanese dolls"},{"value":"🎏","name":"carp streamer"},{"value":"🎐","name":"wind chime"},{"value":"🎑","name":"moon viewing ceremony"},{"value":"🧧","name":"red envelope"},{"value":"🎀","name":"ribbon"},{"value":"🎁","name":"wrapped gift"},{"value":"🎗️","name":"reminder ribbon"},{"value":"🎟️","name":"admission tickets"},{"value":"🎫","name":"ticket"},{"value":"🎖️","name":"military medal"},{"value":"🏆","name":"trophy"},{"value":"🏅","name":"sports medal"},{"value":"🥇","name":"1st place medal"},{"value":"🥈","name":"2nd place medal"},{"value":"🥉","name":"3rd place medal"},{"value":"⚽","name":"soccer ball"},{"value":"⚾","name":"baseball"},{"value":"🥎","name":"softball"},{"value":"🏀","name":"basketball"},{"value":"🏐","name":"volleyball"},{"value":"🏈","name":"american football"},{"value":"🏉","name":"rugby football"},{"value":"🎾","name":"tennis"},{"value":"🥏","name":"flying disc"},{"value":"🎳","name":"bowling"},{"value":"🏏","name":"cricket game"},{"value":"🏑","name":"field hockey"},{"value":"🏒","name":"ice hockey"},{"value":"🥍","name":"lacrosse"},{"value":"🏓","name":"ping pong"},{"value":"🏸","name":"badminton"},{"value":"🥊","name":"boxing glove"},{"value":"🥋","name":"martial arts uniform"},{"value":"🥅","name":"goal net"},{"value":"⛳","name":"flag in hole"},{"value":"⛸️","name":"ice skate"},{"value":"🎣","name":"fishing pole"},{"value":"🤿","name":"diving mask"},{"value":"🎽","name":"running shirt"},{"value":"🎿","name":"skis"},{"value":"🛷","name":"sled"},{"value":"🥌","name":"curling stone"},{"value":"🎯","name":"bullseye"},{"value":"🪀","name":"yo-yo"},{"value":"🪁","name":"kite"},{"value":"🎱","name":"pool 8 ball"},{"value":"🔮","name":"crystal ball"},{"value":"🪄","name":"magic wand"},{"value":"🧿","name":"nazar amulet"},{"value":"🪬","name":"hamsa"},{"value":"🎮","name":"video game"},{"value":"🕹️","name":"joystick"},{"value":"🎰","name":"slot machine"},{"value":"🎲","name":"game die"},{"value":"🧩","name":"puzzle piece"},{"value":"🧸","name":"teddy bear"},{"value":"🪅","name":"piñata"},{"value":"🪩","name":"mirror ball"},{"value":"🪆","name":"nesting dolls"},{"value":"♠️","name":"spade suit"},{"value":"♥️","name":"heart suit"},{"value":"♦️","name":"diamond suit"},{"value":"♣️","name":"club suit"},{"value":"♟️","name":"chess pawn"},{"value":"🃏","name":"joker"},{"value":"🀄","name":"mahjong red dragon"},{"value":"🎴","name":"flower playing cards"},{"value":"🎭","name":"performing arts"},{"value":"🖼️","name":"framed picture"},{"value":"🎨","name":"artist palette"},{"value":"🧵","name":"thread"},{"value":"🪡","name":"sewing needle"},{"value":"🧶","name":"yarn"},{"value":"🪢","name":"knot"}]
+[
+  {
+    "value": "🎃",
+    "name": "jack-o-lantern"
+  },
+  {
+    "value": "🎄",
+    "name": "Christmas tree"
+  },
+  {
+    "value": "🎆",
+    "name": "fireworks"
+  },
+  {
+    "value": "🎇",
+    "name": "sparkler"
+  },
+  {
+    "value": "🧨",
+    "name": "firecracker"
+  },
+  {
+    "value": "✨",
+    "name": "sparkles"
+  },
+  {
+    "value": "🎈",
+    "name": "balloon"
+  },
+  {
+    "value": "🎉",
+    "name": "party popper"
+  },
+  {
+    "value": "🎊",
+    "name": "confetti ball"
+  },
+  {
+    "value": "🎋",
+    "name": "tanabata tree"
+  },
+  {
+    "value": "🎍",
+    "name": "pine decoration"
+  },
+  {
+    "value": "🎎",
+    "name": "Japanese dolls"
+  },
+  {
+    "value": "🎏",
+    "name": "carp streamer"
+  },
+  {
+    "value": "🎐",
+    "name": "wind chime"
+  },
+  {
+    "value": "🎑",
+    "name": "moon viewing ceremony"
+  },
+  {
+    "value": "🧧",
+    "name": "red envelope"
+  },
+  {
+    "value": "🎀",
+    "name": "ribbon"
+  },
+  {
+    "value": "🎁",
+    "name": "wrapped gift"
+  },
+  {
+    "value": "🎗️",
+    "name": "reminder ribbon"
+  },
+  {
+    "value": "🎟️",
+    "name": "admission tickets"
+  },
+  {
+    "value": "🎫",
+    "name": "ticket"
+  },
+  {
+    "value": "🎖️",
+    "name": "military medal"
+  },
+  {
+    "value": "🏆",
+    "name": "trophy"
+  },
+  {
+    "value": "🏅",
+    "name": "sports medal"
+  },
+  {
+    "value": "🥇",
+    "name": "1st place medal"
+  },
+  {
+    "value": "🥈",
+    "name": "2nd place medal"
+  },
+  {
+    "value": "🥉",
+    "name": "3rd place medal"
+  },
+  {
+    "value": "⚽",
+    "name": "soccer ball"
+  },
+  {
+    "value": "⚾",
+    "name": "baseball"
+  },
+  {
+    "value": "🥎",
+    "name": "softball"
+  },
+  {
+    "value": "🏀",
+    "name": "basketball"
+  },
+  {
+    "value": "🏐",
+    "name": "volleyball"
+  },
+  {
+    "value": "🏈",
+    "name": "american football"
+  },
+  {
+    "value": "🏉",
+    "name": "rugby football"
+  },
+  {
+    "value": "🎾",
+    "name": "tennis"
+  },
+  {
+    "value": "🥏",
+    "name": "flying disc"
+  },
+  {
+    "value": "🎳",
+    "name": "bowling"
+  },
+  {
+    "value": "🏏",
+    "name": "cricket game"
+  },
+  {
+    "value": "🏑",
+    "name": "field hockey"
+  },
+  {
+    "value": "🏒",
+    "name": "ice hockey"
+  },
+  {
+    "value": "🥍",
+    "name": "lacrosse"
+  },
+  {
+    "value": "🏓",
+    "name": "ping pong"
+  },
+  {
+    "value": "🏸",
+    "name": "badminton"
+  },
+  {
+    "value": "🥊",
+    "name": "boxing glove"
+  },
+  {
+    "value": "🥋",
+    "name": "martial arts uniform"
+  },
+  {
+    "value": "🥅",
+    "name": "goal net"
+  },
+  {
+    "value": "⛳",
+    "name": "flag in hole"
+  },
+  {
+    "value": "⛸️",
+    "name": "ice skate"
+  },
+  {
+    "value": "🎣",
+    "name": "fishing pole"
+  },
+  {
+    "value": "🤿",
+    "name": "diving mask"
+  },
+  {
+    "value": "🎽",
+    "name": "running shirt"
+  },
+  {
+    "value": "🎿",
+    "name": "skis"
+  },
+  {
+    "value": "🛷",
+    "name": "sled"
+  },
+  {
+    "value": "🥌",
+    "name": "curling stone"
+  },
+  {
+    "value": "🎯",
+    "name": "bullseye"
+  },
+  {
+    "value": "🪀",
+    "name": "yo-yo"
+  },
+  {
+    "value": "🪁",
+    "name": "kite"
+  },
+  {
+    "value": "🎱",
+    "name": "pool 8 ball"
+  },
+  {
+    "value": "🔮",
+    "name": "crystal ball"
+  },
+  {
+    "value": "🪄",
+    "name": "magic wand"
+  },
+  {
+    "value": "🧿",
+    "name": "nazar amulet"
+  },
+  {
+    "value": "🪬",
+    "name": "hamsa"
+  },
+  {
+    "value": "🎮",
+    "name": "video game"
+  },
+  {
+    "value": "🕹️",
+    "name": "joystick"
+  },
+  {
+    "value": "🎰",
+    "name": "slot machine"
+  },
+  {
+    "value": "🎲",
+    "name": "game die"
+  },
+  {
+    "value": "🧩",
+    "name": "puzzle piece"
+  },
+  {
+    "value": "🧸",
+    "name": "teddy bear"
+  },
+  {
+    "value": "🪅",
+    "name": "piñata"
+  },
+  {
+    "value": "🪩",
+    "name": "mirror ball"
+  },
+  {
+    "value": "🪆",
+    "name": "nesting dolls"
+  },
+  {
+    "value": "♠️",
+    "name": "spade suit"
+  },
+  {
+    "value": "♥️",
+    "name": "heart suit"
+  },
+  {
+    "value": "♦️",
+    "name": "diamond suit"
+  },
+  {
+    "value": "♣️",
+    "name": "club suit"
+  },
+  {
+    "value": "♟️",
+    "name": "chess pawn"
+  },
+  {
+    "value": "🃏",
+    "name": "joker"
+  },
+  {
+    "value": "🀄",
+    "name": "mahjong red dragon"
+  },
+  {
+    "value": "🎴",
+    "name": "flower playing cards"
+  },
+  {
+    "value": "🎭",
+    "name": "performing arts"
+  },
+  {
+    "value": "🖼️",
+    "name": "framed picture"
+  },
+  {
+    "value": "🎨",
+    "name": "artist palette"
+  },
+  {
+    "value": "🧵",
+    "name": "thread"
+  },
+  {
+    "value": "🪡",
+    "name": "sewing needle"
+  },
+  {
+    "value": "🧶",
+    "name": "yarn"
+  },
+  {
+    "value": "🪢",
+    "name": "knot"
+  }
+]

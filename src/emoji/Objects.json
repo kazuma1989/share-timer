@@ -1,1 +1,1022 @@
-[{"value":"👓","name":"glasses"},{"value":"🕶️","name":"sunglasses"},{"value":"🥽","name":"goggles"},{"value":"🥼","name":"lab coat"},{"value":"🦺","name":"safety vest"},{"value":"👔","name":"necktie"},{"value":"👕","name":"t-shirt"},{"value":"👖","name":"jeans"},{"value":"🧣","name":"scarf"},{"value":"🧤","name":"gloves"},{"value":"🧥","name":"coat"},{"value":"🧦","name":"socks"},{"value":"👗","name":"dress"},{"value":"👘","name":"kimono"},{"value":"🥻","name":"sari"},{"value":"🩱","name":"one-piece swimsuit"},{"value":"🩲","name":"briefs"},{"value":"🩳","name":"shorts"},{"value":"👙","name":"bikini"},{"value":"👚","name":"woman’s clothes"},{"value":"👛","name":"purse"},{"value":"👜","name":"handbag"},{"value":"👝","name":"clutch bag"},{"value":"🛍️","name":"shopping bags"},{"value":"🎒","name":"backpack"},{"value":"🩴","name":"thong sandal"},{"value":"👞","name":"man’s shoe"},{"value":"👟","name":"running shoe"},{"value":"🥾","name":"hiking boot"},{"value":"🥿","name":"flat shoe"},{"value":"👠","name":"high-heeled shoe"},{"value":"👡","name":"woman’s sandal"},{"value":"🩰","name":"ballet shoes"},{"value":"👢","name":"woman’s boot"},{"value":"👑","name":"crown"},{"value":"👒","name":"woman’s hat"},{"value":"🎩","name":"top hat"},{"value":"🎓","name":"graduation cap"},{"value":"🧢","name":"billed cap"},{"value":"🪖","name":"military helmet"},{"value":"⛑️","name":"rescue worker’s helmet"},{"value":"📿","name":"prayer beads"},{"value":"💄","name":"lipstick"},{"value":"💍","name":"ring"},{"value":"💎","name":"gem stone"},{"value":"🔇","name":"muted speaker"},{"value":"🔈","name":"speaker low volume"},{"value":"🔉","name":"speaker medium volume"},{"value":"🔊","name":"speaker high volume"},{"value":"📢","name":"loudspeaker"},{"value":"📣","name":"megaphone"},{"value":"📯","name":"postal horn"},{"value":"🔔","name":"bell"},{"value":"🔕","name":"bell with slash"},{"value":"🎼","name":"musical score"},{"value":"🎵","name":"musical note"},{"value":"🎶","name":"musical notes"},{"value":"🎙️","name":"studio microphone"},{"value":"🎚️","name":"level slider"},{"value":"🎛️","name":"control knobs"},{"value":"🎤","name":"microphone"},{"value":"🎧","name":"headphone"},{"value":"📻","name":"radio"},{"value":"🎷","name":"saxophone"},{"value":"🪗","name":"accordion"},{"value":"🎸","name":"guitar"},{"value":"🎹","name":"musical keyboard"},{"value":"🎺","name":"trumpet"},{"value":"🎻","name":"violin"},{"value":"🪕","name":"banjo"},{"value":"🥁","name":"drum"},{"value":"🪘","name":"long drum"},{"value":"📱","name":"mobile phone"},{"value":"📲","name":"mobile phone with arrow"},{"value":"☎️","name":"telephone"},{"value":"📞","name":"telephone receiver"},{"value":"📟","name":"pager"},{"value":"📠","name":"fax machine"},{"value":"🔋","name":"battery"},{"value":"🪫","name":"low battery"},{"value":"🔌","name":"electric plug"},{"value":"💻","name":"laptop"},{"value":"🖥️","name":"desktop computer"},{"value":"🖨️","name":"printer"},{"value":"⌨️","name":"keyboard"},{"value":"🖱️","name":"computer mouse"},{"value":"🖲️","name":"trackball"},{"value":"💽","name":"computer disk"},{"value":"💾","name":"floppy disk"},{"value":"💿","name":"optical disk"},{"value":"📀","name":"dvd"},{"value":"🧮","name":"abacus"},{"value":"🎥","name":"movie camera"},{"value":"🎞️","name":"film frames"},{"value":"📽️","name":"film projector"},{"value":"🎬","name":"clapper board"},{"value":"📺","name":"television"},{"value":"📷","name":"camera"},{"value":"📸","name":"camera with flash"},{"value":"📹","name":"video camera"},{"value":"📼","name":"videocassette"},{"value":"🔍","name":"magnifying glass tilted left"},{"value":"🔎","name":"magnifying glass tilted right"},{"value":"🕯️","name":"candle"},{"value":"💡","name":"light bulb"},{"value":"🔦","name":"flashlight"},{"value":"🏮","name":"red paper lantern"},{"value":"🪔","name":"diya lamp"},{"value":"📔","name":"notebook with decorative cover"},{"value":"📕","name":"closed book"},{"value":"📖","name":"open book"},{"value":"📗","name":"green book"},{"value":"📘","name":"blue book"},{"value":"📙","name":"orange book"},{"value":"📚","name":"books"},{"value":"📓","name":"notebook"},{"value":"📒","name":"ledger"},{"value":"📃","name":"page with curl"},{"value":"📜","name":"scroll"},{"value":"📄","name":"page facing up"},{"value":"📰","name":"newspaper"},{"value":"🗞️","name":"rolled-up newspaper"},{"value":"📑","name":"bookmark tabs"},{"value":"🔖","name":"bookmark"},{"value":"🏷️","name":"label"},{"value":"💰","name":"money bag"},{"value":"🪙","name":"coin"},{"value":"💴","name":"yen banknote"},{"value":"💵","name":"dollar banknote"},{"value":"💶","name":"euro banknote"},{"value":"💷","name":"pound banknote"},{"value":"💸","name":"money with wings"},{"value":"💳","name":"credit card"},{"value":"🧾","name":"receipt"},{"value":"💹","name":"chart increasing with yen"},{"value":"✉️","name":"envelope"},{"value":"📧","name":"e-mail"},{"value":"📨","name":"incoming envelope"},{"value":"📩","name":"envelope with arrow"},{"value":"📤","name":"outbox tray"},{"value":"📥","name":"inbox tray"},{"value":"📦","name":"package"},{"value":"📫","name":"closed mailbox with raised flag"},{"value":"📪","name":"closed mailbox with lowered flag"},{"value":"📬","name":"open mailbox with raised flag"},{"value":"📭","name":"open mailbox with lowered flag"},{"value":"📮","name":"postbox"},{"value":"🗳️","name":"ballot box with ballot"},{"value":"✏️","name":"pencil"},{"value":"✒️","name":"black nib"},{"value":"🖋️","name":"fountain pen"},{"value":"🖊️","name":"pen"},{"value":"🖌️","name":"paintbrush"},{"value":"🖍️","name":"crayon"},{"value":"📝","name":"memo"},{"value":"💼","name":"briefcase"},{"value":"📁","name":"file folder"},{"value":"📂","name":"open file folder"},{"value":"🗂️","name":"card index dividers"},{"value":"📅","name":"calendar"},{"value":"📆","name":"tear-off calendar"},{"value":"🗒️","name":"spiral notepad"},{"value":"🗓️","name":"spiral calendar"},{"value":"📇","name":"card index"},{"value":"📈","name":"chart increasing"},{"value":"📉","name":"chart decreasing"},{"value":"📊","name":"bar chart"},{"value":"📋","name":"clipboard"},{"value":"📌","name":"pushpin"},{"value":"📍","name":"round pushpin"},{"value":"📎","name":"paperclip"},{"value":"🖇️","name":"linked paperclips"},{"value":"📏","name":"straight ruler"},{"value":"📐","name":"triangular ruler"},{"value":"✂️","name":"scissors"},{"value":"🗃️","name":"card file box"},{"value":"🗄️","name":"file cabinet"},{"value":"🗑️","name":"wastebasket"},{"value":"🔒","name":"locked"},{"value":"🔓","name":"unlocked"},{"value":"🔏","name":"locked with pen"},{"value":"🔐","name":"locked with key"},{"value":"🔑","name":"key"},{"value":"🗝️","name":"old key"},{"value":"🔨","name":"hammer"},{"value":"🪓","name":"axe"},{"value":"⛏️","name":"pick"},{"value":"⚒️","name":"hammer and pick"},{"value":"🛠️","name":"hammer and wrench"},{"value":"🗡️","name":"dagger"},{"value":"⚔️","name":"crossed swords"},{"value":"🔫","name":"water pistol"},{"value":"🪃","name":"boomerang"},{"value":"🏹","name":"bow and arrow"},{"value":"🛡️","name":"shield"},{"value":"🪚","name":"carpentry saw"},{"value":"🔧","name":"wrench"},{"value":"🪛","name":"screwdriver"},{"value":"🔩","name":"nut and bolt"},{"value":"⚙️","name":"gear"},{"value":"🗜️","name":"clamp"},{"value":"⚖️","name":"balance scale"},{"value":"🦯","name":"white cane"},{"value":"🔗","name":"link"},{"value":"⛓️","name":"chains"},{"value":"🪝","name":"hook"},{"value":"🧰","name":"toolbox"},{"value":"🧲","name":"magnet"},{"value":"🪜","name":"ladder"},{"value":"⚗️","name":"alembic"},{"value":"🧪","name":"test tube"},{"value":"🧫","name":"petri dish"},{"value":"🧬","name":"dna"},{"value":"🔬","name":"microscope"},{"value":"🔭","name":"telescope"},{"value":"📡","name":"satellite antenna"},{"value":"💉","name":"syringe"},{"value":"🩸","name":"drop of blood"},{"value":"💊","name":"pill"},{"value":"🩹","name":"adhesive bandage"},{"value":"🩼","name":"crutch"},{"value":"🩺","name":"stethoscope"},{"value":"🩻","name":"x-ray"},{"value":"🚪","name":"door"},{"value":"🛗","name":"elevator"},{"value":"🪞","name":"mirror"},{"value":"🪟","name":"window"},{"value":"🛏️","name":"bed"},{"value":"🛋️","name":"couch and lamp"},{"value":"🪑","name":"chair"},{"value":"🚽","name":"toilet"},{"value":"🪠","name":"plunger"},{"value":"🚿","name":"shower"},{"value":"🛁","name":"bathtub"},{"value":"🪤","name":"mouse trap"},{"value":"🪒","name":"razor"},{"value":"🧴","name":"lotion bottle"},{"value":"🧷","name":"safety pin"},{"value":"🧹","name":"broom"},{"value":"🧺","name":"basket"},{"value":"🧻","name":"roll of paper"},{"value":"🪣","name":"bucket"},{"value":"🧼","name":"soap"},{"value":"🫧","name":"bubbles"},{"value":"🪥","name":"toothbrush"},{"value":"🧽","name":"sponge"},{"value":"🧯","name":"fire extinguisher"},{"value":"🛒","name":"shopping cart"},{"value":"🚬","name":"cigarette"},{"value":"⚰️","name":"coffin"},{"value":"🪦","name":"headstone"},{"value":"⚱️","name":"funeral urn"},{"value":"🗿","name":"moai"},{"value":"🪧","name":"placard"},{"value":"🪪","name":"identification card"}]
+[
+  {
+    "value": "👓",
+    "name": "glasses"
+  },
+  {
+    "value": "🕶️",
+    "name": "sunglasses"
+  },
+  {
+    "value": "🥽",
+    "name": "goggles"
+  },
+  {
+    "value": "🥼",
+    "name": "lab coat"
+  },
+  {
+    "value": "🦺",
+    "name": "safety vest"
+  },
+  {
+    "value": "👔",
+    "name": "necktie"
+  },
+  {
+    "value": "👕",
+    "name": "t-shirt"
+  },
+  {
+    "value": "👖",
+    "name": "jeans"
+  },
+  {
+    "value": "🧣",
+    "name": "scarf"
+  },
+  {
+    "value": "🧤",
+    "name": "gloves"
+  },
+  {
+    "value": "🧥",
+    "name": "coat"
+  },
+  {
+    "value": "🧦",
+    "name": "socks"
+  },
+  {
+    "value": "👗",
+    "name": "dress"
+  },
+  {
+    "value": "👘",
+    "name": "kimono"
+  },
+  {
+    "value": "🥻",
+    "name": "sari"
+  },
+  {
+    "value": "🩱",
+    "name": "one-piece swimsuit"
+  },
+  {
+    "value": "🩲",
+    "name": "briefs"
+  },
+  {
+    "value": "🩳",
+    "name": "shorts"
+  },
+  {
+    "value": "👙",
+    "name": "bikini"
+  },
+  {
+    "value": "👚",
+    "name": "woman’s clothes"
+  },
+  {
+    "value": "👛",
+    "name": "purse"
+  },
+  {
+    "value": "👜",
+    "name": "handbag"
+  },
+  {
+    "value": "👝",
+    "name": "clutch bag"
+  },
+  {
+    "value": "🛍️",
+    "name": "shopping bags"
+  },
+  {
+    "value": "🎒",
+    "name": "backpack"
+  },
+  {
+    "value": "🩴",
+    "name": "thong sandal"
+  },
+  {
+    "value": "👞",
+    "name": "man’s shoe"
+  },
+  {
+    "value": "👟",
+    "name": "running shoe"
+  },
+  {
+    "value": "🥾",
+    "name": "hiking boot"
+  },
+  {
+    "value": "🥿",
+    "name": "flat shoe"
+  },
+  {
+    "value": "👠",
+    "name": "high-heeled shoe"
+  },
+  {
+    "value": "👡",
+    "name": "woman’s sandal"
+  },
+  {
+    "value": "🩰",
+    "name": "ballet shoes"
+  },
+  {
+    "value": "👢",
+    "name": "woman’s boot"
+  },
+  {
+    "value": "👑",
+    "name": "crown"
+  },
+  {
+    "value": "👒",
+    "name": "woman’s hat"
+  },
+  {
+    "value": "🎩",
+    "name": "top hat"
+  },
+  {
+    "value": "🎓",
+    "name": "graduation cap"
+  },
+  {
+    "value": "🧢",
+    "name": "billed cap"
+  },
+  {
+    "value": "🪖",
+    "name": "military helmet"
+  },
+  {
+    "value": "⛑️",
+    "name": "rescue worker’s helmet"
+  },
+  {
+    "value": "📿",
+    "name": "prayer beads"
+  },
+  {
+    "value": "💄",
+    "name": "lipstick"
+  },
+  {
+    "value": "💍",
+    "name": "ring"
+  },
+  {
+    "value": "💎",
+    "name": "gem stone"
+  },
+  {
+    "value": "🔇",
+    "name": "muted speaker"
+  },
+  {
+    "value": "🔈",
+    "name": "speaker low volume"
+  },
+  {
+    "value": "🔉",
+    "name": "speaker medium volume"
+  },
+  {
+    "value": "🔊",
+    "name": "speaker high volume"
+  },
+  {
+    "value": "📢",
+    "name": "loudspeaker"
+  },
+  {
+    "value": "📣",
+    "name": "megaphone"
+  },
+  {
+    "value": "📯",
+    "name": "postal horn"
+  },
+  {
+    "value": "🔔",
+    "name": "bell"
+  },
+  {
+    "value": "🔕",
+    "name": "bell with slash"
+  },
+  {
+    "value": "🎼",
+    "name": "musical score"
+  },
+  {
+    "value": "🎵",
+    "name": "musical note"
+  },
+  {
+    "value": "🎶",
+    "name": "musical notes"
+  },
+  {
+    "value": "🎙️",
+    "name": "studio microphone"
+  },
+  {
+    "value": "🎚️",
+    "name": "level slider"
+  },
+  {
+    "value": "🎛️",
+    "name": "control knobs"
+  },
+  {
+    "value": "🎤",
+    "name": "microphone"
+  },
+  {
+    "value": "🎧",
+    "name": "headphone"
+  },
+  {
+    "value": "📻",
+    "name": "radio"
+  },
+  {
+    "value": "🎷",
+    "name": "saxophone"
+  },
+  {
+    "value": "🪗",
+    "name": "accordion"
+  },
+  {
+    "value": "🎸",
+    "name": "guitar"
+  },
+  {
+    "value": "🎹",
+    "name": "musical keyboard"
+  },
+  {
+    "value": "🎺",
+    "name": "trumpet"
+  },
+  {
+    "value": "🎻",
+    "name": "violin"
+  },
+  {
+    "value": "🪕",
+    "name": "banjo"
+  },
+  {
+    "value": "🥁",
+    "name": "drum"
+  },
+  {
+    "value": "🪘",
+    "name": "long drum"
+  },
+  {
+    "value": "📱",
+    "name": "mobile phone"
+  },
+  {
+    "value": "📲",
+    "name": "mobile phone with arrow"
+  },
+  {
+    "value": "☎️",
+    "name": "telephone"
+  },
+  {
+    "value": "📞",
+    "name": "telephone receiver"
+  },
+  {
+    "value": "📟",
+    "name": "pager"
+  },
+  {
+    "value": "📠",
+    "name": "fax machine"
+  },
+  {
+    "value": "🔋",
+    "name": "battery"
+  },
+  {
+    "value": "🪫",
+    "name": "low battery"
+  },
+  {
+    "value": "🔌",
+    "name": "electric plug"
+  },
+  {
+    "value": "💻",
+    "name": "laptop"
+  },
+  {
+    "value": "🖥️",
+    "name": "desktop computer"
+  },
+  {
+    "value": "🖨️",
+    "name": "printer"
+  },
+  {
+    "value": "⌨️",
+    "name": "keyboard"
+  },
+  {
+    "value": "🖱️",
+    "name": "computer mouse"
+  },
+  {
+    "value": "🖲️",
+    "name": "trackball"
+  },
+  {
+    "value": "💽",
+    "name": "computer disk"
+  },
+  {
+    "value": "💾",
+    "name": "floppy disk"
+  },
+  {
+    "value": "💿",
+    "name": "optical disk"
+  },
+  {
+    "value": "📀",
+    "name": "dvd"
+  },
+  {
+    "value": "🧮",
+    "name": "abacus"
+  },
+  {
+    "value": "🎥",
+    "name": "movie camera"
+  },
+  {
+    "value": "🎞️",
+    "name": "film frames"
+  },
+  {
+    "value": "📽️",
+    "name": "film projector"
+  },
+  {
+    "value": "🎬",
+    "name": "clapper board"
+  },
+  {
+    "value": "📺",
+    "name": "television"
+  },
+  {
+    "value": "📷",
+    "name": "camera"
+  },
+  {
+    "value": "📸",
+    "name": "camera with flash"
+  },
+  {
+    "value": "📹",
+    "name": "video camera"
+  },
+  {
+    "value": "📼",
+    "name": "videocassette"
+  },
+  {
+    "value": "🔍",
+    "name": "magnifying glass tilted left"
+  },
+  {
+    "value": "🔎",
+    "name": "magnifying glass tilted right"
+  },
+  {
+    "value": "🕯️",
+    "name": "candle"
+  },
+  {
+    "value": "💡",
+    "name": "light bulb"
+  },
+  {
+    "value": "🔦",
+    "name": "flashlight"
+  },
+  {
+    "value": "🏮",
+    "name": "red paper lantern"
+  },
+  {
+    "value": "🪔",
+    "name": "diya lamp"
+  },
+  {
+    "value": "📔",
+    "name": "notebook with decorative cover"
+  },
+  {
+    "value": "📕",
+    "name": "closed book"
+  },
+  {
+    "value": "📖",
+    "name": "open book"
+  },
+  {
+    "value": "📗",
+    "name": "green book"
+  },
+  {
+    "value": "📘",
+    "name": "blue book"
+  },
+  {
+    "value": "📙",
+    "name": "orange book"
+  },
+  {
+    "value": "📚",
+    "name": "books"
+  },
+  {
+    "value": "📓",
+    "name": "notebook"
+  },
+  {
+    "value": "📒",
+    "name": "ledger"
+  },
+  {
+    "value": "📃",
+    "name": "page with curl"
+  },
+  {
+    "value": "📜",
+    "name": "scroll"
+  },
+  {
+    "value": "📄",
+    "name": "page facing up"
+  },
+  {
+    "value": "📰",
+    "name": "newspaper"
+  },
+  {
+    "value": "🗞️",
+    "name": "rolled-up newspaper"
+  },
+  {
+    "value": "📑",
+    "name": "bookmark tabs"
+  },
+  {
+    "value": "🔖",
+    "name": "bookmark"
+  },
+  {
+    "value": "🏷️",
+    "name": "label"
+  },
+  {
+    "value": "💰",
+    "name": "money bag"
+  },
+  {
+    "value": "🪙",
+    "name": "coin"
+  },
+  {
+    "value": "💴",
+    "name": "yen banknote"
+  },
+  {
+    "value": "💵",
+    "name": "dollar banknote"
+  },
+  {
+    "value": "💶",
+    "name": "euro banknote"
+  },
+  {
+    "value": "💷",
+    "name": "pound banknote"
+  },
+  {
+    "value": "💸",
+    "name": "money with wings"
+  },
+  {
+    "value": "💳",
+    "name": "credit card"
+  },
+  {
+    "value": "🧾",
+    "name": "receipt"
+  },
+  {
+    "value": "💹",
+    "name": "chart increasing with yen"
+  },
+  {
+    "value": "✉️",
+    "name": "envelope"
+  },
+  {
+    "value": "📧",
+    "name": "e-mail"
+  },
+  {
+    "value": "📨",
+    "name": "incoming envelope"
+  },
+  {
+    "value": "📩",
+    "name": "envelope with arrow"
+  },
+  {
+    "value": "📤",
+    "name": "outbox tray"
+  },
+  {
+    "value": "📥",
+    "name": "inbox tray"
+  },
+  {
+    "value": "📦",
+    "name": "package"
+  },
+  {
+    "value": "📫",
+    "name": "closed mailbox with raised flag"
+  },
+  {
+    "value": "📪",
+    "name": "closed mailbox with lowered flag"
+  },
+  {
+    "value": "📬",
+    "name": "open mailbox with raised flag"
+  },
+  {
+    "value": "📭",
+    "name": "open mailbox with lowered flag"
+  },
+  {
+    "value": "📮",
+    "name": "postbox"
+  },
+  {
+    "value": "🗳️",
+    "name": "ballot box with ballot"
+  },
+  {
+    "value": "✏️",
+    "name": "pencil"
+  },
+  {
+    "value": "✒️",
+    "name": "black nib"
+  },
+  {
+    "value": "🖋️",
+    "name": "fountain pen"
+  },
+  {
+    "value": "🖊️",
+    "name": "pen"
+  },
+  {
+    "value": "🖌️",
+    "name": "paintbrush"
+  },
+  {
+    "value": "🖍️",
+    "name": "crayon"
+  },
+  {
+    "value": "📝",
+    "name": "memo"
+  },
+  {
+    "value": "💼",
+    "name": "briefcase"
+  },
+  {
+    "value": "📁",
+    "name": "file folder"
+  },
+  {
+    "value": "📂",
+    "name": "open file folder"
+  },
+  {
+    "value": "🗂️",
+    "name": "card index dividers"
+  },
+  {
+    "value": "📅",
+    "name": "calendar"
+  },
+  {
+    "value": "📆",
+    "name": "tear-off calendar"
+  },
+  {
+    "value": "🗒️",
+    "name": "spiral notepad"
+  },
+  {
+    "value": "🗓️",
+    "name": "spiral calendar"
+  },
+  {
+    "value": "📇",
+    "name": "card index"
+  },
+  {
+    "value": "📈",
+    "name": "chart increasing"
+  },
+  {
+    "value": "📉",
+    "name": "chart decreasing"
+  },
+  {
+    "value": "📊",
+    "name": "bar chart"
+  },
+  {
+    "value": "📋",
+    "name": "clipboard"
+  },
+  {
+    "value": "📌",
+    "name": "pushpin"
+  },
+  {
+    "value": "📍",
+    "name": "round pushpin"
+  },
+  {
+    "value": "📎",
+    "name": "paperclip"
+  },
+  {
+    "value": "🖇️",
+    "name": "linked paperclips"
+  },
+  {
+    "value": "📏",
+    "name": "straight ruler"
+  },
+  {
+    "value": "📐",
+    "name": "triangular ruler"
+  },
+  {
+    "value": "✂️",
+    "name": "scissors"
+  },
+  {
+    "value": "🗃️",
+    "name": "card file box"
+  },
+  {
+    "value": "🗄️",
+    "name": "file cabinet"
+  },
+  {
+    "value": "🗑️",
+    "name": "wastebasket"
+  },
+  {
+    "value": "🔒",
+    "name": "locked"
+  },
+  {
+    "value": "🔓",
+    "name": "unlocked"
+  },
+  {
+    "value": "🔏",
+    "name": "locked with pen"
+  },
+  {
+    "value": "🔐",
+    "name": "locked with key"
+  },
+  {
+    "value": "🔑",
+    "name": "key"
+  },
+  {
+    "value": "🗝️",
+    "name": "old key"
+  },
+  {
+    "value": "🔨",
+    "name": "hammer"
+  },
+  {
+    "value": "🪓",
+    "name": "axe"
+  },
+  {
+    "value": "⛏️",
+    "name": "pick"
+  },
+  {
+    "value": "⚒️",
+    "name": "hammer and pick"
+  },
+  {
+    "value": "🛠️",
+    "name": "hammer and wrench"
+  },
+  {
+    "value": "🗡️",
+    "name": "dagger"
+  },
+  {
+    "value": "⚔️",
+    "name": "crossed swords"
+  },
+  {
+    "value": "🔫",
+    "name": "water pistol"
+  },
+  {
+    "value": "🪃",
+    "name": "boomerang"
+  },
+  {
+    "value": "🏹",
+    "name": "bow and arrow"
+  },
+  {
+    "value": "🛡️",
+    "name": "shield"
+  },
+  {
+    "value": "🪚",
+    "name": "carpentry saw"
+  },
+  {
+    "value": "🔧",
+    "name": "wrench"
+  },
+  {
+    "value": "🪛",
+    "name": "screwdriver"
+  },
+  {
+    "value": "🔩",
+    "name": "nut and bolt"
+  },
+  {
+    "value": "⚙️",
+    "name": "gear"
+  },
+  {
+    "value": "🗜️",
+    "name": "clamp"
+  },
+  {
+    "value": "⚖️",
+    "name": "balance scale"
+  },
+  {
+    "value": "🦯",
+    "name": "white cane"
+  },
+  {
+    "value": "🔗",
+    "name": "link"
+  },
+  {
+    "value": "⛓️",
+    "name": "chains"
+  },
+  {
+    "value": "🪝",
+    "name": "hook"
+  },
+  {
+    "value": "🧰",
+    "name": "toolbox"
+  },
+  {
+    "value": "🧲",
+    "name": "magnet"
+  },
+  {
+    "value": "🪜",
+    "name": "ladder"
+  },
+  {
+    "value": "⚗️",
+    "name": "alembic"
+  },
+  {
+    "value": "🧪",
+    "name": "test tube"
+  },
+  {
+    "value": "🧫",
+    "name": "petri dish"
+  },
+  {
+    "value": "🧬",
+    "name": "dna"
+  },
+  {
+    "value": "🔬",
+    "name": "microscope"
+  },
+  {
+    "value": "🔭",
+    "name": "telescope"
+  },
+  {
+    "value": "📡",
+    "name": "satellite antenna"
+  },
+  {
+    "value": "💉",
+    "name": "syringe"
+  },
+  {
+    "value": "🩸",
+    "name": "drop of blood"
+  },
+  {
+    "value": "💊",
+    "name": "pill"
+  },
+  {
+    "value": "🩹",
+    "name": "adhesive bandage"
+  },
+  {
+    "value": "🩼",
+    "name": "crutch"
+  },
+  {
+    "value": "🩺",
+    "name": "stethoscope"
+  },
+  {
+    "value": "🩻",
+    "name": "x-ray"
+  },
+  {
+    "value": "🚪",
+    "name": "door"
+  },
+  {
+    "value": "🛗",
+    "name": "elevator"
+  },
+  {
+    "value": "🪞",
+    "name": "mirror"
+  },
+  {
+    "value": "🪟",
+    "name": "window"
+  },
+  {
+    "value": "🛏️",
+    "name": "bed"
+  },
+  {
+    "value": "🛋️",
+    "name": "couch and lamp"
+  },
+  {
+    "value": "🪑",
+    "name": "chair"
+  },
+  {
+    "value": "🚽",
+    "name": "toilet"
+  },
+  {
+    "value": "🪠",
+    "name": "plunger"
+  },
+  {
+    "value": "🚿",
+    "name": "shower"
+  },
+  {
+    "value": "🛁",
+    "name": "bathtub"
+  },
+  {
+    "value": "🪤",
+    "name": "mouse trap"
+  },
+  {
+    "value": "🪒",
+    "name": "razor"
+  },
+  {
+    "value": "🧴",
+    "name": "lotion bottle"
+  },
+  {
+    "value": "🧷",
+    "name": "safety pin"
+  },
+  {
+    "value": "🧹",
+    "name": "broom"
+  },
+  {
+    "value": "🧺",
+    "name": "basket"
+  },
+  {
+    "value": "🧻",
+    "name": "roll of paper"
+  },
+  {
+    "value": "🪣",
+    "name": "bucket"
+  },
+  {
+    "value": "🧼",
+    "name": "soap"
+  },
+  {
+    "value": "🫧",
+    "name": "bubbles"
+  },
+  {
+    "value": "🪥",
+    "name": "toothbrush"
+  },
+  {
+    "value": "🧽",
+    "name": "sponge"
+  },
+  {
+    "value": "🧯",
+    "name": "fire extinguisher"
+  },
+  {
+    "value": "🛒",
+    "name": "shopping cart"
+  },
+  {
+    "value": "🚬",
+    "name": "cigarette"
+  },
+  {
+    "value": "⚰️",
+    "name": "coffin"
+  },
+  {
+    "value": "🪦",
+    "name": "headstone"
+  },
+  {
+    "value": "⚱️",
+    "name": "funeral urn"
+  },
+  {
+    "value": "🗿",
+    "name": "moai"
+  },
+  {
+    "value": "🪧",
+    "name": "placard"
+  },
+  {
+    "value": "🪪",
+    "name": "identification card"
+  }
+]

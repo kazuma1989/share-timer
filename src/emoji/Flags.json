@@ -1,1 +1,1078 @@
-[{"value":"🏁","name":"chequered flag"},{"value":"🚩","name":"triangular flag"},{"value":"🎌","name":"crossed flags"},{"value":"🏴","name":"black flag"},{"value":"🏳️","name":"white flag"},{"value":"🏳️‍🌈","name":"rainbow flag"},{"value":"🏳️‍⚧️","name":"transgender flag"},{"value":"🏴‍☠️","name":"pirate flag"},{"value":"🇦🇨","name":"flag Ascension Island"},{"value":"🇦🇩","name":"flag Andorra"},{"value":"🇦🇪","name":"flag United Arab Emirates"},{"value":"🇦🇫","name":"flag Afghanistan"},{"value":"🇦🇬","name":"flag Antigua & Barbuda"},{"value":"🇦🇮","name":"flag Anguilla"},{"value":"🇦🇱","name":"flag Albania"},{"value":"🇦🇲","name":"flag Armenia"},{"value":"🇦🇴","name":"flag Angola"},{"value":"🇦🇶","name":"flag Antarctica"},{"value":"🇦🇷","name":"flag Argentina"},{"value":"🇦🇸","name":"flag American Samoa"},{"value":"🇦🇹","name":"flag Austria"},{"value":"🇦🇺","name":"flag Australia"},{"value":"🇦🇼","name":"flag Aruba"},{"value":"🇦🇽","name":"flag Åland Islands"},{"value":"🇦🇿","name":"flag Azerbaijan"},{"value":"🇧🇦","name":"flag Bosnia & Herzegovina"},{"value":"🇧🇧","name":"flag Barbados"},{"value":"🇧🇩","name":"flag Bangladesh"},{"value":"🇧🇪","name":"flag Belgium"},{"value":"🇧🇫","name":"flag Burkina Faso"},{"value":"🇧🇬","name":"flag Bulgaria"},{"value":"🇧🇭","name":"flag Bahrain"},{"value":"🇧🇮","name":"flag Burundi"},{"value":"🇧🇯","name":"flag Benin"},{"value":"🇧🇱","name":"flag St. Barthélemy"},{"value":"🇧🇲","name":"flag Bermuda"},{"value":"🇧🇳","name":"flag Brunei"},{"value":"🇧🇴","name":"flag Bolivia"},{"value":"🇧🇶","name":"flag Caribbean Netherlands"},{"value":"🇧🇷","name":"flag Brazil"},{"value":"🇧🇸","name":"flag Bahamas"},{"value":"🇧🇹","name":"flag Bhutan"},{"value":"🇧🇻","name":"flag Bouvet Island"},{"value":"🇧🇼","name":"flag Botswana"},{"value":"🇧🇾","name":"flag Belarus"},{"value":"🇧🇿","name":"flag Belize"},{"value":"🇨🇦","name":"flag Canada"},{"value":"🇨🇨","name":"flag Cocos (Keeling) Islands"},{"value":"🇨🇩","name":"flag Congo - Kinshasa"},{"value":"🇨🇫","name":"flag Central African Republic"},{"value":"🇨🇬","name":"flag Congo - Brazzaville"},{"value":"🇨🇭","name":"flag Switzerland"},{"value":"🇨🇮","name":"flag Côte d’Ivoire"},{"value":"🇨🇰","name":"flag Cook Islands"},{"value":"🇨🇱","name":"flag Chile"},{"value":"🇨🇲","name":"flag Cameroon"},{"value":"🇨🇳","name":"flag China"},{"value":"🇨🇴","name":"flag Colombia"},{"value":"🇨🇵","name":"flag Clipperton Island"},{"value":"🇨🇷","name":"flag Costa Rica"},{"value":"🇨🇺","name":"flag Cuba"},{"value":"🇨🇻","name":"flag Cape Verde"},{"value":"🇨🇼","name":"flag Curaçao"},{"value":"🇨🇽","name":"flag Christmas Island"},{"value":"🇨🇾","name":"flag Cyprus"},{"value":"🇨🇿","name":"flag Czechia"},{"value":"🇩🇪","name":"flag Germany"},{"value":"🇩🇬","name":"flag Diego Garcia"},{"value":"🇩🇯","name":"flag Djibouti"},{"value":"🇩🇰","name":"flag Denmark"},{"value":"🇩🇲","name":"flag Dominica"},{"value":"🇩🇴","name":"flag Dominican Republic"},{"value":"🇩🇿","name":"flag Algeria"},{"value":"🇪🇦","name":"flag Ceuta & Melilla"},{"value":"🇪🇨","name":"flag Ecuador"},{"value":"🇪🇪","name":"flag Estonia"},{"value":"🇪🇬","name":"flag Egypt"},{"value":"🇪🇭","name":"flag Western Sahara"},{"value":"🇪🇷","name":"flag Eritrea"},{"value":"🇪🇸","name":"flag Spain"},{"value":"🇪🇹","name":"flag Ethiopia"},{"value":"🇪🇺","name":"flag European Union"},{"value":"🇫🇮","name":"flag Finland"},{"value":"🇫🇯","name":"flag Fiji"},{"value":"🇫🇰","name":"flag Falkland Islands"},{"value":"🇫🇲","name":"flag Micronesia"},{"value":"🇫🇴","name":"flag Faroe Islands"},{"value":"🇫🇷","name":"flag France"},{"value":"🇬🇦","name":"flag Gabon"},{"value":"🇬🇧","name":"flag United Kingdom"},{"value":"🇬🇩","name":"flag Grenada"},{"value":"🇬🇪","name":"flag Georgia"},{"value":"🇬🇫","name":"flag French Guiana"},{"value":"🇬🇬","name":"flag Guernsey"},{"value":"🇬🇭","name":"flag Ghana"},{"value":"🇬🇮","name":"flag Gibraltar"},{"value":"🇬🇱","name":"flag Greenland"},{"value":"🇬🇲","name":"flag Gambia"},{"value":"🇬🇳","name":"flag Guinea"},{"value":"🇬🇵","name":"flag Guadeloupe"},{"value":"🇬🇶","name":"flag Equatorial Guinea"},{"value":"🇬🇷","name":"flag Greece"},{"value":"🇬🇸","name":"flag South Georgia & South Sandwich Islands"},{"value":"🇬🇹","name":"flag Guatemala"},{"value":"🇬🇺","name":"flag Guam"},{"value":"🇬🇼","name":"flag Guinea-Bissau"},{"value":"🇬🇾","name":"flag Guyana"},{"value":"🇭🇰","name":"flag Hong Kong SAR China"},{"value":"🇭🇲","name":"flag Heard & McDonald Islands"},{"value":"🇭🇳","name":"flag Honduras"},{"value":"🇭🇷","name":"flag Croatia"},{"value":"🇭🇹","name":"flag Haiti"},{"value":"🇭🇺","name":"flag Hungary"},{"value":"🇮🇨","name":"flag Canary Islands"},{"value":"🇮🇩","name":"flag Indonesia"},{"value":"🇮🇪","name":"flag Ireland"},{"value":"🇮🇱","name":"flag Israel"},{"value":"🇮🇲","name":"flag Isle of Man"},{"value":"🇮🇳","name":"flag India"},{"value":"🇮🇴","name":"flag British Indian Ocean Territory"},{"value":"🇮🇶","name":"flag Iraq"},{"value":"🇮🇷","name":"flag Iran"},{"value":"🇮🇸","name":"flag Iceland"},{"value":"🇮🇹","name":"flag Italy"},{"value":"🇯🇪","name":"flag Jersey"},{"value":"🇯🇲","name":"flag Jamaica"},{"value":"🇯🇴","name":"flag Jordan"},{"value":"🇯🇵","name":"flag Japan"},{"value":"🇰🇪","name":"flag Kenya"},{"value":"🇰🇬","name":"flag Kyrgyzstan"},{"value":"🇰🇭","name":"flag Cambodia"},{"value":"🇰🇮","name":"flag Kiribati"},{"value":"🇰🇲","name":"flag Comoros"},{"value":"🇰🇳","name":"flag St. Kitts & Nevis"},{"value":"🇰🇵","name":"flag North Korea"},{"value":"🇰🇷","name":"flag South Korea"},{"value":"🇰🇼","name":"flag Kuwait"},{"value":"🇰🇾","name":"flag Cayman Islands"},{"value":"🇰🇿","name":"flag Kazakhstan"},{"value":"🇱🇦","name":"flag Laos"},{"value":"🇱🇧","name":"flag Lebanon"},{"value":"🇱🇨","name":"flag St. Lucia"},{"value":"🇱🇮","name":"flag Liechtenstein"},{"value":"🇱🇰","name":"flag Sri Lanka"},{"value":"🇱🇷","name":"flag Liberia"},{"value":"🇱🇸","name":"flag Lesotho"},{"value":"🇱🇹","name":"flag Lithuania"},{"value":"🇱🇺","name":"flag Luxembourg"},{"value":"🇱🇻","name":"flag Latvia"},{"value":"🇱🇾","name":"flag Libya"},{"value":"🇲🇦","name":"flag Morocco"},{"value":"🇲🇨","name":"flag Monaco"},{"value":"🇲🇩","name":"flag Moldova"},{"value":"🇲🇪","name":"flag Montenegro"},{"value":"🇲🇫","name":"flag St. Martin"},{"value":"🇲🇬","name":"flag Madagascar"},{"value":"🇲🇭","name":"flag Marshall Islands"},{"value":"🇲🇰","name":"flag North Macedonia"},{"value":"🇲🇱","name":"flag Mali"},{"value":"🇲🇲","name":"flag Myanmar (Burma)"},{"value":"🇲🇳","name":"flag Mongolia"},{"value":"🇲🇴","name":"flag Macao SAR China"},{"value":"🇲🇵","name":"flag Northern Mariana Islands"},{"value":"🇲🇶","name":"flag Martinique"},{"value":"🇲🇷","name":"flag Mauritania"},{"value":"🇲🇸","name":"flag Montserrat"},{"value":"🇲🇹","name":"flag Malta"},{"value":"🇲🇺","name":"flag Mauritius"},{"value":"🇲🇻","name":"flag Maldives"},{"value":"🇲🇼","name":"flag Malawi"},{"value":"🇲🇽","name":"flag Mexico"},{"value":"🇲🇾","name":"flag Malaysia"},{"value":"🇲🇿","name":"flag Mozambique"},{"value":"🇳🇦","name":"flag Namibia"},{"value":"🇳🇨","name":"flag New Caledonia"},{"value":"🇳🇪","name":"flag Niger"},{"value":"🇳🇫","name":"flag Norfolk Island"},{"value":"🇳🇬","name":"flag Nigeria"},{"value":"🇳🇮","name":"flag Nicaragua"},{"value":"🇳🇱","name":"flag Netherlands"},{"value":"🇳🇴","name":"flag Norway"},{"value":"🇳🇵","name":"flag Nepal"},{"value":"🇳🇷","name":"flag Nauru"},{"value":"🇳🇺","name":"flag Niue"},{"value":"🇳🇿","name":"flag New Zealand"},{"value":"🇴🇲","name":"flag Oman"},{"value":"🇵🇦","name":"flag Panama"},{"value":"🇵🇪","name":"flag Peru"},{"value":"🇵🇫","name":"flag French Polynesia"},{"value":"🇵🇬","name":"flag Papua New Guinea"},{"value":"🇵🇭","name":"flag Philippines"},{"value":"🇵🇰","name":"flag Pakistan"},{"value":"🇵🇱","name":"flag Poland"},{"value":"🇵🇲","name":"flag St. Pierre & Miquelon"},{"value":"🇵🇳","name":"flag Pitcairn Islands"},{"value":"🇵🇷","name":"flag Puerto Rico"},{"value":"🇵🇸","name":"flag Palestinian Territories"},{"value":"🇵🇹","name":"flag Portugal"},{"value":"🇵🇼","name":"flag Palau"},{"value":"🇵🇾","name":"flag Paraguay"},{"value":"🇶🇦","name":"flag Qatar"},{"value":"🇷🇪","name":"flag Réunion"},{"value":"🇷🇴","name":"flag Romania"},{"value":"🇷🇸","name":"flag Serbia"},{"value":"🇷🇺","name":"flag Russia"},{"value":"🇷🇼","name":"flag Rwanda"},{"value":"🇸🇦","name":"flag Saudi Arabia"},{"value":"🇸🇧","name":"flag Solomon Islands"},{"value":"🇸🇨","name":"flag Seychelles"},{"value":"🇸🇩","name":"flag Sudan"},{"value":"🇸🇪","name":"flag Sweden"},{"value":"🇸🇬","name":"flag Singapore"},{"value":"🇸🇭","name":"flag St. Helena"},{"value":"🇸🇮","name":"flag Slovenia"},{"value":"🇸🇯","name":"flag Svalbard & Jan Mayen"},{"value":"🇸🇰","name":"flag Slovakia"},{"value":"🇸🇱","name":"flag Sierra Leone"},{"value":"🇸🇲","name":"flag San Marino"},{"value":"🇸🇳","name":"flag Senegal"},{"value":"🇸🇴","name":"flag Somalia"},{"value":"🇸🇷","name":"flag Suriname"},{"value":"🇸🇸","name":"flag South Sudan"},{"value":"🇸🇹","name":"flag São Tomé & Príncipe"},{"value":"🇸🇻","name":"flag El Salvador"},{"value":"🇸🇽","name":"flag Sint Maarten"},{"value":"🇸🇾","name":"flag Syria"},{"value":"🇸🇿","name":"flag Eswatini"},{"value":"🇹🇦","name":"flag Tristan da Cunha"},{"value":"🇹🇨","name":"flag Turks & Caicos Islands"},{"value":"🇹🇩","name":"flag Chad"},{"value":"🇹🇫","name":"flag French Southern Territories"},{"value":"🇹🇬","name":"flag Togo"},{"value":"🇹🇭","name":"flag Thailand"},{"value":"🇹🇯","name":"flag Tajikistan"},{"value":"🇹🇰","name":"flag Tokelau"},{"value":"🇹🇱","name":"flag Timor-Leste"},{"value":"🇹🇲","name":"flag Turkmenistan"},{"value":"🇹🇳","name":"flag Tunisia"},{"value":"🇹🇴","name":"flag Tonga"},{"value":"🇹🇷","name":"flag Turkey"},{"value":"🇹🇹","name":"flag Trinidad & Tobago"},{"value":"🇹🇻","name":"flag Tuvalu"},{"value":"🇹🇼","name":"flag Taiwan"},{"value":"🇹🇿","name":"flag Tanzania"},{"value":"🇺🇦","name":"flag Ukraine"},{"value":"🇺🇬","name":"flag Uganda"},{"value":"🇺🇲","name":"flag U.S. Outlying Islands"},{"value":"🇺🇳","name":"flag United Nations"},{"value":"🇺🇸","name":"flag United States"},{"value":"🇺🇾","name":"flag Uruguay"},{"value":"🇺🇿","name":"flag Uzbekistan"},{"value":"🇻🇦","name":"flag Vatican City"},{"value":"🇻🇨","name":"flag St. Vincent & Grenadines"},{"value":"🇻🇪","name":"flag Venezuela"},{"value":"🇻🇬","name":"flag British Virgin Islands"},{"value":"🇻🇮","name":"flag U.S. Virgin Islands"},{"value":"🇻🇳","name":"flag Vietnam"},{"value":"🇻🇺","name":"flag Vanuatu"},{"value":"🇼🇫","name":"flag Wallis & Futuna"},{"value":"🇼🇸","name":"flag Samoa"},{"value":"🇽🇰","name":"flag Kosovo"},{"value":"🇾🇪","name":"flag Yemen"},{"value":"🇾🇹","name":"flag Mayotte"},{"value":"🇿🇦","name":"flag South Africa"},{"value":"🇿🇲","name":"flag Zambia"},{"value":"🇿🇼","name":"flag Zimbabwe"},{"value":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","name":"flag England"},{"value":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","name":"flag Scotland"},{"value":"🏴󠁧󠁢󠁷󠁬󠁳󠁿","name":"flag Wales"}]
+[
+  {
+    "value": "🏁",
+    "name": "chequered flag"
+  },
+  {
+    "value": "🚩",
+    "name": "triangular flag"
+  },
+  {
+    "value": "🎌",
+    "name": "crossed flags"
+  },
+  {
+    "value": "🏴",
+    "name": "black flag"
+  },
+  {
+    "value": "🏳️",
+    "name": "white flag"
+  },
+  {
+    "value": "🏳️‍🌈",
+    "name": "rainbow flag"
+  },
+  {
+    "value": "🏳️‍⚧️",
+    "name": "transgender flag"
+  },
+  {
+    "value": "🏴‍☠️",
+    "name": "pirate flag"
+  },
+  {
+    "value": "🇦🇨",
+    "name": "flag Ascension Island"
+  },
+  {
+    "value": "🇦🇩",
+    "name": "flag Andorra"
+  },
+  {
+    "value": "🇦🇪",
+    "name": "flag United Arab Emirates"
+  },
+  {
+    "value": "🇦🇫",
+    "name": "flag Afghanistan"
+  },
+  {
+    "value": "🇦🇬",
+    "name": "flag Antigua & Barbuda"
+  },
+  {
+    "value": "🇦🇮",
+    "name": "flag Anguilla"
+  },
+  {
+    "value": "🇦🇱",
+    "name": "flag Albania"
+  },
+  {
+    "value": "🇦🇲",
+    "name": "flag Armenia"
+  },
+  {
+    "value": "🇦🇴",
+    "name": "flag Angola"
+  },
+  {
+    "value": "🇦🇶",
+    "name": "flag Antarctica"
+  },
+  {
+    "value": "🇦🇷",
+    "name": "flag Argentina"
+  },
+  {
+    "value": "🇦🇸",
+    "name": "flag American Samoa"
+  },
+  {
+    "value": "🇦🇹",
+    "name": "flag Austria"
+  },
+  {
+    "value": "🇦🇺",
+    "name": "flag Australia"
+  },
+  {
+    "value": "🇦🇼",
+    "name": "flag Aruba"
+  },
+  {
+    "value": "🇦🇽",
+    "name": "flag Åland Islands"
+  },
+  {
+    "value": "🇦🇿",
+    "name": "flag Azerbaijan"
+  },
+  {
+    "value": "🇧🇦",
+    "name": "flag Bosnia & Herzegovina"
+  },
+  {
+    "value": "🇧🇧",
+    "name": "flag Barbados"
+  },
+  {
+    "value": "🇧🇩",
+    "name": "flag Bangladesh"
+  },
+  {
+    "value": "🇧🇪",
+    "name": "flag Belgium"
+  },
+  {
+    "value": "🇧🇫",
+    "name": "flag Burkina Faso"
+  },
+  {
+    "value": "🇧🇬",
+    "name": "flag Bulgaria"
+  },
+  {
+    "value": "🇧🇭",
+    "name": "flag Bahrain"
+  },
+  {
+    "value": "🇧🇮",
+    "name": "flag Burundi"
+  },
+  {
+    "value": "🇧🇯",
+    "name": "flag Benin"
+  },
+  {
+    "value": "🇧🇱",
+    "name": "flag St. Barthélemy"
+  },
+  {
+    "value": "🇧🇲",
+    "name": "flag Bermuda"
+  },
+  {
+    "value": "🇧🇳",
+    "name": "flag Brunei"
+  },
+  {
+    "value": "🇧🇴",
+    "name": "flag Bolivia"
+  },
+  {
+    "value": "🇧🇶",
+    "name": "flag Caribbean Netherlands"
+  },
+  {
+    "value": "🇧🇷",
+    "name": "flag Brazil"
+  },
+  {
+    "value": "🇧🇸",
+    "name": "flag Bahamas"
+  },
+  {
+    "value": "🇧🇹",
+    "name": "flag Bhutan"
+  },
+  {
+    "value": "🇧🇻",
+    "name": "flag Bouvet Island"
+  },
+  {
+    "value": "🇧🇼",
+    "name": "flag Botswana"
+  },
+  {
+    "value": "🇧🇾",
+    "name": "flag Belarus"
+  },
+  {
+    "value": "🇧🇿",
+    "name": "flag Belize"
+  },
+  {
+    "value": "🇨🇦",
+    "name": "flag Canada"
+  },
+  {
+    "value": "🇨🇨",
+    "name": "flag Cocos (Keeling) Islands"
+  },
+  {
+    "value": "🇨🇩",
+    "name": "flag Congo - Kinshasa"
+  },
+  {
+    "value": "🇨🇫",
+    "name": "flag Central African Republic"
+  },
+  {
+    "value": "🇨🇬",
+    "name": "flag Congo - Brazzaville"
+  },
+  {
+    "value": "🇨🇭",
+    "name": "flag Switzerland"
+  },
+  {
+    "value": "🇨🇮",
+    "name": "flag Côte d’Ivoire"
+  },
+  {
+    "value": "🇨🇰",
+    "name": "flag Cook Islands"
+  },
+  {
+    "value": "🇨🇱",
+    "name": "flag Chile"
+  },
+  {
+    "value": "🇨🇲",
+    "name": "flag Cameroon"
+  },
+  {
+    "value": "🇨🇳",
+    "name": "flag China"
+  },
+  {
+    "value": "🇨🇴",
+    "name": "flag Colombia"
+  },
+  {
+    "value": "🇨🇵",
+    "name": "flag Clipperton Island"
+  },
+  {
+    "value": "🇨🇷",
+    "name": "flag Costa Rica"
+  },
+  {
+    "value": "🇨🇺",
+    "name": "flag Cuba"
+  },
+  {
+    "value": "🇨🇻",
+    "name": "flag Cape Verde"
+  },
+  {
+    "value": "🇨🇼",
+    "name": "flag Curaçao"
+  },
+  {
+    "value": "🇨🇽",
+    "name": "flag Christmas Island"
+  },
+  {
+    "value": "🇨🇾",
+    "name": "flag Cyprus"
+  },
+  {
+    "value": "🇨🇿",
+    "name": "flag Czechia"
+  },
+  {
+    "value": "🇩🇪",
+    "name": "flag Germany"
+  },
+  {
+    "value": "🇩🇬",
+    "name": "flag Diego Garcia"
+  },
+  {
+    "value": "🇩🇯",
+    "name": "flag Djibouti"
+  },
+  {
+    "value": "🇩🇰",
+    "name": "flag Denmark"
+  },
+  {
+    "value": "🇩🇲",
+    "name": "flag Dominica"
+  },
+  {
+    "value": "🇩🇴",
+    "name": "flag Dominican Republic"
+  },
+  {
+    "value": "🇩🇿",
+    "name": "flag Algeria"
+  },
+  {
+    "value": "🇪🇦",
+    "name": "flag Ceuta & Melilla"
+  },
+  {
+    "value": "🇪🇨",
+    "name": "flag Ecuador"
+  },
+  {
+    "value": "🇪🇪",
+    "name": "flag Estonia"
+  },
+  {
+    "value": "🇪🇬",
+    "name": "flag Egypt"
+  },
+  {
+    "value": "🇪🇭",
+    "name": "flag Western Sahara"
+  },
+  {
+    "value": "🇪🇷",
+    "name": "flag Eritrea"
+  },
+  {
+    "value": "🇪🇸",
+    "name": "flag Spain"
+  },
+  {
+    "value": "🇪🇹",
+    "name": "flag Ethiopia"
+  },
+  {
+    "value": "🇪🇺",
+    "name": "flag European Union"
+  },
+  {
+    "value": "🇫🇮",
+    "name": "flag Finland"
+  },
+  {
+    "value": "🇫🇯",
+    "name": "flag Fiji"
+  },
+  {
+    "value": "🇫🇰",
+    "name": "flag Falkland Islands"
+  },
+  {
+    "value": "🇫🇲",
+    "name": "flag Micronesia"
+  },
+  {
+    "value": "🇫🇴",
+    "name": "flag Faroe Islands"
+  },
+  {
+    "value": "🇫🇷",
+    "name": "flag France"
+  },
+  {
+    "value": "🇬🇦",
+    "name": "flag Gabon"
+  },
+  {
+    "value": "🇬🇧",
+    "name": "flag United Kingdom"
+  },
+  {
+    "value": "🇬🇩",
+    "name": "flag Grenada"
+  },
+  {
+    "value": "🇬🇪",
+    "name": "flag Georgia"
+  },
+  {
+    "value": "🇬🇫",
+    "name": "flag French Guiana"
+  },
+  {
+    "value": "🇬🇬",
+    "name": "flag Guernsey"
+  },
+  {
+    "value": "🇬🇭",
+    "name": "flag Ghana"
+  },
+  {
+    "value": "🇬🇮",
+    "name": "flag Gibraltar"
+  },
+  {
+    "value": "🇬🇱",
+    "name": "flag Greenland"
+  },
+  {
+    "value": "🇬🇲",
+    "name": "flag Gambia"
+  },
+  {
+    "value": "🇬🇳",
+    "name": "flag Guinea"
+  },
+  {
+    "value": "🇬🇵",
+    "name": "flag Guadeloupe"
+  },
+  {
+    "value": "🇬🇶",
+    "name": "flag Equatorial Guinea"
+  },
+  {
+    "value": "🇬🇷",
+    "name": "flag Greece"
+  },
+  {
+    "value": "🇬🇸",
+    "name": "flag South Georgia & South Sandwich Islands"
+  },
+  {
+    "value": "🇬🇹",
+    "name": "flag Guatemala"
+  },
+  {
+    "value": "🇬🇺",
+    "name": "flag Guam"
+  },
+  {
+    "value": "🇬🇼",
+    "name": "flag Guinea-Bissau"
+  },
+  {
+    "value": "🇬🇾",
+    "name": "flag Guyana"
+  },
+  {
+    "value": "🇭🇰",
+    "name": "flag Hong Kong SAR China"
+  },
+  {
+    "value": "🇭🇲",
+    "name": "flag Heard & McDonald Islands"
+  },
+  {
+    "value": "🇭🇳",
+    "name": "flag Honduras"
+  },
+  {
+    "value": "🇭🇷",
+    "name": "flag Croatia"
+  },
+  {
+    "value": "🇭🇹",
+    "name": "flag Haiti"
+  },
+  {
+    "value": "🇭🇺",
+    "name": "flag Hungary"
+  },
+  {
+    "value": "🇮🇨",
+    "name": "flag Canary Islands"
+  },
+  {
+    "value": "🇮🇩",
+    "name": "flag Indonesia"
+  },
+  {
+    "value": "🇮🇪",
+    "name": "flag Ireland"
+  },
+  {
+    "value": "🇮🇱",
+    "name": "flag Israel"
+  },
+  {
+    "value": "🇮🇲",
+    "name": "flag Isle of Man"
+  },
+  {
+    "value": "🇮🇳",
+    "name": "flag India"
+  },
+  {
+    "value": "🇮🇴",
+    "name": "flag British Indian Ocean Territory"
+  },
+  {
+    "value": "🇮🇶",
+    "name": "flag Iraq"
+  },
+  {
+    "value": "🇮🇷",
+    "name": "flag Iran"
+  },
+  {
+    "value": "🇮🇸",
+    "name": "flag Iceland"
+  },
+  {
+    "value": "🇮🇹",
+    "name": "flag Italy"
+  },
+  {
+    "value": "🇯🇪",
+    "name": "flag Jersey"
+  },
+  {
+    "value": "🇯🇲",
+    "name": "flag Jamaica"
+  },
+  {
+    "value": "🇯🇴",
+    "name": "flag Jordan"
+  },
+  {
+    "value": "🇯🇵",
+    "name": "flag Japan"
+  },
+  {
+    "value": "🇰🇪",
+    "name": "flag Kenya"
+  },
+  {
+    "value": "🇰🇬",
+    "name": "flag Kyrgyzstan"
+  },
+  {
+    "value": "🇰🇭",
+    "name": "flag Cambodia"
+  },
+  {
+    "value": "🇰🇮",
+    "name": "flag Kiribati"
+  },
+  {
+    "value": "🇰🇲",
+    "name": "flag Comoros"
+  },
+  {
+    "value": "🇰🇳",
+    "name": "flag St. Kitts & Nevis"
+  },
+  {
+    "value": "🇰🇵",
+    "name": "flag North Korea"
+  },
+  {
+    "value": "🇰🇷",
+    "name": "flag South Korea"
+  },
+  {
+    "value": "🇰🇼",
+    "name": "flag Kuwait"
+  },
+  {
+    "value": "🇰🇾",
+    "name": "flag Cayman Islands"
+  },
+  {
+    "value": "🇰🇿",
+    "name": "flag Kazakhstan"
+  },
+  {
+    "value": "🇱🇦",
+    "name": "flag Laos"
+  },
+  {
+    "value": "🇱🇧",
+    "name": "flag Lebanon"
+  },
+  {
+    "value": "🇱🇨",
+    "name": "flag St. Lucia"
+  },
+  {
+    "value": "🇱🇮",
+    "name": "flag Liechtenstein"
+  },
+  {
+    "value": "🇱🇰",
+    "name": "flag Sri Lanka"
+  },
+  {
+    "value": "🇱🇷",
+    "name": "flag Liberia"
+  },
+  {
+    "value": "🇱🇸",
+    "name": "flag Lesotho"
+  },
+  {
+    "value": "🇱🇹",
+    "name": "flag Lithuania"
+  },
+  {
+    "value": "🇱🇺",
+    "name": "flag Luxembourg"
+  },
+  {
+    "value": "🇱🇻",
+    "name": "flag Latvia"
+  },
+  {
+    "value": "🇱🇾",
+    "name": "flag Libya"
+  },
+  {
+    "value": "🇲🇦",
+    "name": "flag Morocco"
+  },
+  {
+    "value": "🇲🇨",
+    "name": "flag Monaco"
+  },
+  {
+    "value": "🇲🇩",
+    "name": "flag Moldova"
+  },
+  {
+    "value": "🇲🇪",
+    "name": "flag Montenegro"
+  },
+  {
+    "value": "🇲🇫",
+    "name": "flag St. Martin"
+  },
+  {
+    "value": "🇲🇬",
+    "name": "flag Madagascar"
+  },
+  {
+    "value": "🇲🇭",
+    "name": "flag Marshall Islands"
+  },
+  {
+    "value": "🇲🇰",
+    "name": "flag North Macedonia"
+  },
+  {
+    "value": "🇲🇱",
+    "name": "flag Mali"
+  },
+  {
+    "value": "🇲🇲",
+    "name": "flag Myanmar (Burma)"
+  },
+  {
+    "value": "🇲🇳",
+    "name": "flag Mongolia"
+  },
+  {
+    "value": "🇲🇴",
+    "name": "flag Macao SAR China"
+  },
+  {
+    "value": "🇲🇵",
+    "name": "flag Northern Mariana Islands"
+  },
+  {
+    "value": "🇲🇶",
+    "name": "flag Martinique"
+  },
+  {
+    "value": "🇲🇷",
+    "name": "flag Mauritania"
+  },
+  {
+    "value": "🇲🇸",
+    "name": "flag Montserrat"
+  },
+  {
+    "value": "🇲🇹",
+    "name": "flag Malta"
+  },
+  {
+    "value": "🇲🇺",
+    "name": "flag Mauritius"
+  },
+  {
+    "value": "🇲🇻",
+    "name": "flag Maldives"
+  },
+  {
+    "value": "🇲🇼",
+    "name": "flag Malawi"
+  },
+  {
+    "value": "🇲🇽",
+    "name": "flag Mexico"
+  },
+  {
+    "value": "🇲🇾",
+    "name": "flag Malaysia"
+  },
+  {
+    "value": "🇲🇿",
+    "name": "flag Mozambique"
+  },
+  {
+    "value": "🇳🇦",
+    "name": "flag Namibia"
+  },
+  {
+    "value": "🇳🇨",
+    "name": "flag New Caledonia"
+  },
+  {
+    "value": "🇳🇪",
+    "name": "flag Niger"
+  },
+  {
+    "value": "🇳🇫",
+    "name": "flag Norfolk Island"
+  },
+  {
+    "value": "🇳🇬",
+    "name": "flag Nigeria"
+  },
+  {
+    "value": "🇳🇮",
+    "name": "flag Nicaragua"
+  },
+  {
+    "value": "🇳🇱",
+    "name": "flag Netherlands"
+  },
+  {
+    "value": "🇳🇴",
+    "name": "flag Norway"
+  },
+  {
+    "value": "🇳🇵",
+    "name": "flag Nepal"
+  },
+  {
+    "value": "🇳🇷",
+    "name": "flag Nauru"
+  },
+  {
+    "value": "🇳🇺",
+    "name": "flag Niue"
+  },
+  {
+    "value": "🇳🇿",
+    "name": "flag New Zealand"
+  },
+  {
+    "value": "🇴🇲",
+    "name": "flag Oman"
+  },
+  {
+    "value": "🇵🇦",
+    "name": "flag Panama"
+  },
+  {
+    "value": "🇵🇪",
+    "name": "flag Peru"
+  },
+  {
+    "value": "🇵🇫",
+    "name": "flag French Polynesia"
+  },
+  {
+    "value": "🇵🇬",
+    "name": "flag Papua New Guinea"
+  },
+  {
+    "value": "🇵🇭",
+    "name": "flag Philippines"
+  },
+  {
+    "value": "🇵🇰",
+    "name": "flag Pakistan"
+  },
+  {
+    "value": "🇵🇱",
+    "name": "flag Poland"
+  },
+  {
+    "value": "🇵🇲",
+    "name": "flag St. Pierre & Miquelon"
+  },
+  {
+    "value": "🇵🇳",
+    "name": "flag Pitcairn Islands"
+  },
+  {
+    "value": "🇵🇷",
+    "name": "flag Puerto Rico"
+  },
+  {
+    "value": "🇵🇸",
+    "name": "flag Palestinian Territories"
+  },
+  {
+    "value": "🇵🇹",
+    "name": "flag Portugal"
+  },
+  {
+    "value": "🇵🇼",
+    "name": "flag Palau"
+  },
+  {
+    "value": "🇵🇾",
+    "name": "flag Paraguay"
+  },
+  {
+    "value": "🇶🇦",
+    "name": "flag Qatar"
+  },
+  {
+    "value": "🇷🇪",
+    "name": "flag Réunion"
+  },
+  {
+    "value": "🇷🇴",
+    "name": "flag Romania"
+  },
+  {
+    "value": "🇷🇸",
+    "name": "flag Serbia"
+  },
+  {
+    "value": "🇷🇺",
+    "name": "flag Russia"
+  },
+  {
+    "value": "🇷🇼",
+    "name": "flag Rwanda"
+  },
+  {
+    "value": "🇸🇦",
+    "name": "flag Saudi Arabia"
+  },
+  {
+    "value": "🇸🇧",
+    "name": "flag Solomon Islands"
+  },
+  {
+    "value": "🇸🇨",
+    "name": "flag Seychelles"
+  },
+  {
+    "value": "🇸🇩",
+    "name": "flag Sudan"
+  },
+  {
+    "value": "🇸🇪",
+    "name": "flag Sweden"
+  },
+  {
+    "value": "🇸🇬",
+    "name": "flag Singapore"
+  },
+  {
+    "value": "🇸🇭",
+    "name": "flag St. Helena"
+  },
+  {
+    "value": "🇸🇮",
+    "name": "flag Slovenia"
+  },
+  {
+    "value": "🇸🇯",
+    "name": "flag Svalbard & Jan Mayen"
+  },
+  {
+    "value": "🇸🇰",
+    "name": "flag Slovakia"
+  },
+  {
+    "value": "🇸🇱",
+    "name": "flag Sierra Leone"
+  },
+  {
+    "value": "🇸🇲",
+    "name": "flag San Marino"
+  },
+  {
+    "value": "🇸🇳",
+    "name": "flag Senegal"
+  },
+  {
+    "value": "🇸🇴",
+    "name": "flag Somalia"
+  },
+  {
+    "value": "🇸🇷",
+    "name": "flag Suriname"
+  },
+  {
+    "value": "🇸🇸",
+    "name": "flag South Sudan"
+  },
+  {
+    "value": "🇸🇹",
+    "name": "flag São Tomé & Príncipe"
+  },
+  {
+    "value": "🇸🇻",
+    "name": "flag El Salvador"
+  },
+  {
+    "value": "🇸🇽",
+    "name": "flag Sint Maarten"
+  },
+  {
+    "value": "🇸🇾",
+    "name": "flag Syria"
+  },
+  {
+    "value": "🇸🇿",
+    "name": "flag Eswatini"
+  },
+  {
+    "value": "🇹🇦",
+    "name": "flag Tristan da Cunha"
+  },
+  {
+    "value": "🇹🇨",
+    "name": "flag Turks & Caicos Islands"
+  },
+  {
+    "value": "🇹🇩",
+    "name": "flag Chad"
+  },
+  {
+    "value": "🇹🇫",
+    "name": "flag French Southern Territories"
+  },
+  {
+    "value": "🇹🇬",
+    "name": "flag Togo"
+  },
+  {
+    "value": "🇹🇭",
+    "name": "flag Thailand"
+  },
+  {
+    "value": "🇹🇯",
+    "name": "flag Tajikistan"
+  },
+  {
+    "value": "🇹🇰",
+    "name": "flag Tokelau"
+  },
+  {
+    "value": "🇹🇱",
+    "name": "flag Timor-Leste"
+  },
+  {
+    "value": "🇹🇲",
+    "name": "flag Turkmenistan"
+  },
+  {
+    "value": "🇹🇳",
+    "name": "flag Tunisia"
+  },
+  {
+    "value": "🇹🇴",
+    "name": "flag Tonga"
+  },
+  {
+    "value": "🇹🇷",
+    "name": "flag Turkey"
+  },
+  {
+    "value": "🇹🇹",
+    "name": "flag Trinidad & Tobago"
+  },
+  {
+    "value": "🇹🇻",
+    "name": "flag Tuvalu"
+  },
+  {
+    "value": "🇹🇼",
+    "name": "flag Taiwan"
+  },
+  {
+    "value": "🇹🇿",
+    "name": "flag Tanzania"
+  },
+  {
+    "value": "🇺🇦",
+    "name": "flag Ukraine"
+  },
+  {
+    "value": "🇺🇬",
+    "name": "flag Uganda"
+  },
+  {
+    "value": "🇺🇲",
+    "name": "flag U.S. Outlying Islands"
+  },
+  {
+    "value": "🇺🇳",
+    "name": "flag United Nations"
+  },
+  {
+    "value": "🇺🇸",
+    "name": "flag United States"
+  },
+  {
+    "value": "🇺🇾",
+    "name": "flag Uruguay"
+  },
+  {
+    "value": "🇺🇿",
+    "name": "flag Uzbekistan"
+  },
+  {
+    "value": "🇻🇦",
+    "name": "flag Vatican City"
+  },
+  {
+    "value": "🇻🇨",
+    "name": "flag St. Vincent & Grenadines"
+  },
+  {
+    "value": "🇻🇪",
+    "name": "flag Venezuela"
+  },
+  {
+    "value": "🇻🇬",
+    "name": "flag British Virgin Islands"
+  },
+  {
+    "value": "🇻🇮",
+    "name": "flag U.S. Virgin Islands"
+  },
+  {
+    "value": "🇻🇳",
+    "name": "flag Vietnam"
+  },
+  {
+    "value": "🇻🇺",
+    "name": "flag Vanuatu"
+  },
+  {
+    "value": "🇼🇫",
+    "name": "flag Wallis & Futuna"
+  },
+  {
+    "value": "🇼🇸",
+    "name": "flag Samoa"
+  },
+  {
+    "value": "🇽🇰",
+    "name": "flag Kosovo"
+  },
+  {
+    "value": "🇾🇪",
+    "name": "flag Yemen"
+  },
+  {
+    "value": "🇾🇹",
+    "name": "flag Mayotte"
+  },
+  {
+    "value": "🇿🇦",
+    "name": "flag South Africa"
+  },
+  {
+    "value": "🇿🇲",
+    "name": "flag Zambia"
+  },
+  {
+    "value": "🇿🇼",
+    "name": "flag Zimbabwe"
+  },
+  {
+    "value": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+    "name": "flag England"
+  },
+  {
+    "value": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+    "name": "flag Scotland"
+  },
+  {
+    "value": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
+    "name": "flag Wales"
+  }
+]

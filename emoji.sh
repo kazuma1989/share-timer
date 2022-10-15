@@ -1,4 +1,9 @@
-curl -L https://unpkg.com/unicode-emoji-json/data-by-group.json | jq -c 'to_entries | .[].value | map({ value: .emoji, name: .name })' | split -l 1 -d - ./src/emoji/
-curl -L https://unpkg.com/unicode-emoji-json/data-by-group.json | jq 'to_entries | map(.key)'
+json=$(curl -L https://unpkg.com/unicode-emoji-json/data-by-group.json)
 
-# then rename "00" -> "xxx.json" ...
+mkdir -p ./src/emoji/
+
+echo "$json" | jq -r 'to_entries | map(.key) | .[]' | while read key; do
+  query='.["'$key'"] | map({ value: .emoji, name: .name })'
+
+  echo "$json" | jq "$query" > ./src/emoji/"$key".json
+done
