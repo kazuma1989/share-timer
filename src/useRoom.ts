@@ -41,11 +41,12 @@ export function useRoom(): Room {
 
 const getOrPut = mapGetOrPut(new Map<Room["id"], Store<Room>>())
 
-import emoji from "./emoji/Animals & Nature.json"
-
 async function setupRoom(db: Firestore, newRoomId: string): Promise<void> {
   const batch = writeBatch(db)
 
+  const emoji = await import("./emoji/Animals & Nature.json").then(
+    (_) => _.default
+  )
   const e = emoji[(Math.random() * emoji.length) | 0]!
 
   const rooms = collection(db, "rooms")
