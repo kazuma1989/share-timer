@@ -1,0 +1,654 @@
+[
+  {
+    "value": "😀",
+    "name": "grinning face"
+  },
+  {
+    "value": "😃",
+    "name": "grinning face with big eyes"
+  },
+  {
+    "value": "😄",
+    "name": "grinning face with smiling eyes"
+  },
+  {
+    "value": "😁",
+    "name": "beaming face with smiling eyes"
+  },
+  {
+    "value": "😆",
+    "name": "grinning squinting face"
+  },
+  {
+    "value": "😅",
+    "name": "grinning face with sweat"
+  },
+  {
+    "value": "🤣",
+    "name": "rolling on the floor laughing"
+  },
+  {
+    "value": "😂",
+    "name": "face with tears of joy"
+  },
+  {
+    "value": "🙂",
+    "name": "slightly smiling face"
+  },
+  {
+    "value": "🙃",
+    "name": "upside-down face"
+  },
+  {
+    "value": "🫠",
+    "name": "melting face"
+  },
+  {
+    "value": "😉",
+    "name": "winking face"
+  },
+  {
+    "value": "😊",
+    "name": "smiling face with smiling eyes"
+  },
+  {
+    "value": "😇",
+    "name": "smiling face with halo"
+  },
+  {
+    "value": "🥰",
+    "name": "smiling face with hearts"
+  },
+  {
+    "value": "😍",
+    "name": "smiling face with heart-eyes"
+  },
+  {
+    "value": "🤩",
+    "name": "star-struck"
+  },
+  {
+    "value": "😘",
+    "name": "face blowing a kiss"
+  },
+  {
+    "value": "😗",
+    "name": "kissing face"
+  },
+  {
+    "value": "☺️",
+    "name": "smiling face"
+  },
+  {
+    "value": "😚",
+    "name": "kissing face with closed eyes"
+  },
+  {
+    "value": "😙",
+    "name": "kissing face with smiling eyes"
+  },
+  {
+    "value": "🥲",
+    "name": "smiling face with tear"
+  },
+  {
+    "value": "😋",
+    "name": "face savoring food"
+  },
+  {
+    "value": "😛",
+    "name": "face with tongue"
+  },
+  {
+    "value": "😜",
+    "name": "winking face with tongue"
+  },
+  {
+    "value": "🤪",
+    "name": "zany face"
+  },
+  {
+    "value": "😝",
+    "name": "squinting face with tongue"
+  },
+  {
+    "value": "🤑",
+    "name": "money-mouth face"
+  },
+  {
+    "value": "🤗",
+    "name": "smiling face with open hands"
+  },
+  {
+    "value": "🤭",
+    "name": "face with hand over mouth"
+  },
+  {
+    "value": "🫢",
+    "name": "face with open eyes and hand over mouth"
+  },
+  {
+    "value": "🫣",
+    "name": "face with peeking eye"
+  },
+  {
+    "value": "🤫",
+    "name": "shushing face"
+  },
+  {
+    "value": "🤔",
+    "name": "thinking face"
+  },
+  {
+    "value": "🫡",
+    "name": "saluting face"
+  },
+  {
+    "value": "🤐",
+    "name": "zipper-mouth face"
+  },
+  {
+    "value": "🤨",
+    "name": "face with raised eyebrow"
+  },
+  {
+    "value": "😐",
+    "name": "neutral face"
+  },
+  {
+    "value": "😑",
+    "name": "expressionless face"
+  },
+  {
+    "value": "😶",
+    "name": "face without mouth"
+  },
+  {
+    "value": "🫥",
+    "name": "dotted line face"
+  },
+  {
+    "value": "😶‍🌫️",
+    "name": "face in clouds"
+  },
+  {
+    "value": "😏",
+    "name": "smirking face"
+  },
+  {
+    "value": "😒",
+    "name": "unamused face"
+  },
+  {
+    "value": "🙄",
+    "name": "face with rolling eyes"
+  },
+  {
+    "value": "😬",
+    "name": "grimacing face"
+  },
+  {
+    "value": "😮‍💨",
+    "name": "face exhaling"
+  },
+  {
+    "value": "🤥",
+    "name": "lying face"
+  },
+  {
+    "value": "😌",
+    "name": "relieved face"
+  },
+  {
+    "value": "😔",
+    "name": "pensive face"
+  },
+  {
+    "value": "😪",
+    "name": "sleepy face"
+  },
+  {
+    "value": "🤤",
+    "name": "drooling face"
+  },
+  {
+    "value": "😴",
+    "name": "sleeping face"
+  },
+  {
+    "value": "😷",
+    "name": "face with medical mask"
+  },
+  {
+    "value": "🤒",
+    "name": "face with thermometer"
+  },
+  {
+    "value": "🤕",
+    "name": "face with head-bandage"
+  },
+  {
+    "value": "🤢",
+    "name": "nauseated face"
+  },
+  {
+    "value": "🤮",
+    "name": "face vomiting"
+  },
+  {
+    "value": "🤧",
+    "name": "sneezing face"
+  },
+  {
+    "value": "🥵",
+    "name": "hot face"
+  },
+  {
+    "value": "🥶",
+    "name": "cold face"
+  },
+  {
+    "value": "🥴",
+    "name": "woozy face"
+  },
+  {
+    "value": "😵",
+    "name": "face with crossed-out eyes"
+  },
+  {
+    "value": "😵‍💫",
+    "name": "face with spiral eyes"
+  },
+  {
+    "value": "🤯",
+    "name": "exploding head"
+  },
+  {
+    "value": "🤠",
+    "name": "cowboy hat face"
+  },
+  {
+    "value": "🥳",
+    "name": "partying face"
+  },
+  {
+    "value": "🥸",
+    "name": "disguised face"
+  },
+  {
+    "value": "😎",
+    "name": "smiling face with sunglasses"
+  },
+  {
+    "value": "🤓",
+    "name": "nerd face"
+  },
+  {
+    "value": "🧐",
+    "name": "face with monocle"
+  },
+  {
+    "value": "😕",
+    "name": "confused face"
+  },
+  {
+    "value": "🫤",
+    "name": "face with diagonal mouth"
+  },
+  {
+    "value": "😟",
+    "name": "worried face"
+  },
+  {
+    "value": "🙁",
+    "name": "slightly frowning face"
+  },
+  {
+    "value": "☹️",
+    "name": "frowning face"
+  },
+  {
+    "value": "😮",
+    "name": "face with open mouth"
+  },
+  {
+    "value": "😯",
+    "name": "hushed face"
+  },
+  {
+    "value": "😲",
+    "name": "astonished face"
+  },
+  {
+    "value": "😳",
+    "name": "flushed face"
+  },
+  {
+    "value": "🥺",
+    "name": "pleading face"
+  },
+  {
+    "value": "🥹",
+    "name": "face holding back tears"
+  },
+  {
+    "value": "😦",
+    "name": "frowning face with open mouth"
+  },
+  {
+    "value": "😧",
+    "name": "anguished face"
+  },
+  {
+    "value": "😨",
+    "name": "fearful face"
+  },
+  {
+    "value": "😰",
+    "name": "anxious face with sweat"
+  },
+  {
+    "value": "😥",
+    "name": "sad but relieved face"
+  },
+  {
+    "value": "😢",
+    "name": "crying face"
+  },
+  {
+    "value": "😭",
+    "name": "loudly crying face"
+  },
+  {
+    "value": "😱",
+    "name": "face screaming in fear"
+  },
+  {
+    "value": "😖",
+    "name": "confounded face"
+  },
+  {
+    "value": "😣",
+    "name": "persevering face"
+  },
+  {
+    "value": "😞",
+    "name": "disappointed face"
+  },
+  {
+    "value": "😓",
+    "name": "downcast face with sweat"
+  },
+  {
+    "value": "😩",
+    "name": "weary face"
+  },
+  {
+    "value": "😫",
+    "name": "tired face"
+  },
+  {
+    "value": "🥱",
+    "name": "yawning face"
+  },
+  {
+    "value": "😤",
+    "name": "face with steam from nose"
+  },
+  {
+    "value": "😡",
+    "name": "pouting face"
+  },
+  {
+    "value": "😠",
+    "name": "angry face"
+  },
+  {
+    "value": "🤬",
+    "name": "face with symbols on mouth"
+  },
+  {
+    "value": "😈",
+    "name": "smiling face with horns"
+  },
+  {
+    "value": "👿",
+    "name": "angry face with horns"
+  },
+  {
+    "value": "💀",
+    "name": "skull"
+  },
+  {
+    "value": "☠️",
+    "name": "skull and crossbones"
+  },
+  {
+    "value": "💩",
+    "name": "pile of poo"
+  },
+  {
+    "value": "🤡",
+    "name": "clown face"
+  },
+  {
+    "value": "👹",
+    "name": "ogre"
+  },
+  {
+    "value": "👺",
+    "name": "goblin"
+  },
+  {
+    "value": "👻",
+    "name": "ghost"
+  },
+  {
+    "value": "👽",
+    "name": "alien"
+  },
+  {
+    "value": "👾",
+    "name": "alien monster"
+  },
+  {
+    "value": "🤖",
+    "name": "robot"
+  },
+  {
+    "value": "😺",
+    "name": "grinning cat"
+  },
+  {
+    "value": "😸",
+    "name": "grinning cat with smiling eyes"
+  },
+  {
+    "value": "😹",
+    "name": "cat with tears of joy"
+  },
+  {
+    "value": "😻",
+    "name": "smiling cat with heart-eyes"
+  },
+  {
+    "value": "😼",
+    "name": "cat with wry smile"
+  },
+  {
+    "value": "😽",
+    "name": "kissing cat"
+  },
+  {
+    "value": "🙀",
+    "name": "weary cat"
+  },
+  {
+    "value": "😿",
+    "name": "crying cat"
+  },
+  {
+    "value": "😾",
+    "name": "pouting cat"
+  },
+  {
+    "value": "🙈",
+    "name": "see-no-evil monkey"
+  },
+  {
+    "value": "🙉",
+    "name": "hear-no-evil monkey"
+  },
+  {
+    "value": "🙊",
+    "name": "speak-no-evil monkey"
+  },
+  {
+    "value": "💋",
+    "name": "kiss mark"
+  },
+  {
+    "value": "💌",
+    "name": "love letter"
+  },
+  {
+    "value": "💘",
+    "name": "heart with arrow"
+  },
+  {
+    "value": "💝",
+    "name": "heart with ribbon"
+  },
+  {
+    "value": "💖",
+    "name": "sparkling heart"
+  },
+  {
+    "value": "💗",
+    "name": "growing heart"
+  },
+  {
+    "value": "💓",
+    "name": "beating heart"
+  },
+  {
+    "value": "💞",
+    "name": "revolving hearts"
+  },
+  {
+    "value": "💕",
+    "name": "two hearts"
+  },
+  {
+    "value": "💟",
+    "name": "heart decoration"
+  },
+  {
+    "value": "❣️",
+    "name": "heart exclamation"
+  },
+  {
+    "value": "💔",
+    "name": "broken heart"
+  },
+  {
+    "value": "❤️‍🔥",
+    "name": "heart on fire"
+  },
+  {
+    "value": "❤️‍🩹",
+    "name": "mending heart"
+  },
+  {
+    "value": "❤️",
+    "name": "red heart"
+  },
+  {
+    "value": "🧡",
+    "name": "orange heart"
+  },
+  {
+    "value": "💛",
+    "name": "yellow heart"
+  },
+  {
+    "value": "💚",
+    "name": "green heart"
+  },
+  {
+    "value": "💙",
+    "name": "blue heart"
+  },
+  {
+    "value": "💜",
+    "name": "purple heart"
+  },
+  {
+    "value": "🤎",
+    "name": "brown heart"
+  },
+  {
+    "value": "🖤",
+    "name": "black heart"
+  },
+  {
+    "value": "🤍",
+    "name": "white heart"
+  },
+  {
+    "value": "💯",
+    "name": "hundred points"
+  },
+  {
+    "value": "💢",
+    "name": "anger symbol"
+  },
+  {
+    "value": "💥",
+    "name": "collision"
+  },
+  {
+    "value": "💫",
+    "name": "dizzy"
+  },
+  {
+    "value": "💦",
+    "name": "sweat droplets"
+  },
+  {
+    "value": "💨",
+    "name": "dashing away"
+  },
+  {
+    "value": "🕳️",
+    "name": "hole"
+  },
+  {
+    "value": "💣",
+    "name": "bomb"
+  },
+  {
+    "value": "💬",
+    "name": "speech balloon"
+  },
+  {
+    "value": "👁️‍🗨️",
+    "name": "eye in speech bubble"
+  },
+  {
+    "value": "🗨️",
+    "name": "left speech bubble"
+  },
+  {
+    "value": "🗯️",
+    "name": "right anger bubble"
+  },
+  {
+    "value": "💭",
+    "name": "thought balloon"
+  },
+  {
+    "value": "💤",
+    "name": "zzz"
+  }
+]

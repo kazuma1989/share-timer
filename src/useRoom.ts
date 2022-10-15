@@ -1,4 +1,5 @@
-import { doc, Firestore, getDoc, writeBatch } from "firebase/firestore"
+import { doc, Firestore, onSnapshot, writeBatch } from "firebase/firestore"
+import { useSyncExternalStore } from "react"
 import { ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
 import { mapGetOrPut } from "./mapGetOrPut"
@@ -11,34 +12,31 @@ import { withMeta } from "./withMeta"
 export function useRoom(): Room {
   const db = useFirestore()
 
-  let roomId = useHash().slice("#".length)
-  if (!roomIdZod.safeParse(roomId).success) {
-    roomId = roomIdZod.parse(doc(collection(db, "rooms")).id)
+  const _ = roomIdZod.safeParse(useHash().slice("#".length))
+  const roomId = _.success
+    ? _.data
+    : roomIdZod.parse(doc(collection(db, "rooms")).id)
+  if (!_.success) {
     setHash(roomId)
   }
 
   const store = getOrPut(roomId, () =>
-    Store.from(
-      (async () => {
-        const getRoom = () => getDoc(doc(collection(db, "rooms"), roomId))
-
-        let roomDoc = await getRoom()
+    Store.from((next) =>
+      onSnapshot(doc(collection(db, "rooms"), roomId), (roomDoc) => {
         if (!roomDoc.exists() || !roomZod.safeParse(roomDoc.data()).success) {
-          await setupRoom(db, roomId)
-
-          roomDoc = await getRoom()
+          setupRoom(db, roomId)
+          return
         }
 
-        const room: Room = {
+        next({
           ...roomZod.parse(roomDoc.data()),
-          id: roomDoc.id,
-        }
-        return room
-      })()
+          id: roomId,
+        })
+      })
     )
   )
 
-  return store.getOrThrow()
+  return useSyncExternalStore(store.subscribe, store.getOrThrow)
 }
 
 const getOrPut = mapGetOrPut(new Map<Room["id"], Store<Room>>())
@@ -46,8 +44,18 @@ const getOrPut = mapGetOrPut(new Map<Room["id"], Store<Room>>())
 async function setupRoom(db: Firestore, newRoomId: string): Promise<void> {
   const batch = writeBatch(db)
 
+  const emoji = await import("./emoji/Animals & Nature.json").then(
+    (_) => _.default
+  )
+  const e = emoji[(Math.random() * emoji.length) | 0]!
+
   const rooms = collection(db, "rooms")
-  batch.set(doc(rooms, newRoomId), withMeta<RoomOnFirestore>({}))
+  batch.set(
+    doc(rooms, newRoomId),
+    withMeta<RoomOnFirestore>({
+      name: e.value + " " + e.name,
+    })
+  )
 
   const actions = collection(db, "rooms", newRoomId, "actions")
   const newActionId = doc(actions).id
@@ -55,11 +63,11 @@ async function setupRoom(db: Firestore, newRoomId: string): Promise<void> {
     doc(actions, newActionId),
     withMeta<ActionOnFirestore>({
       type: "edit-done",
-      duration: defaultDuration,
+      duration: DEFAULT_DURATION,
     })
   )
 
   await batch.commit()
 }
 
-const defaultDuration = 3 * 60_000
+const DEFAULT_DURATION = 3 * 60_000
