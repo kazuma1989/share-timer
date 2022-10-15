@@ -1,6 +1,6 @@
 /// <reference types="vitest" />
 import react from "@vitejs/plugin-react"
-import { defineConfig, Plugin } from "vite"
+import { defineConfig, Plugin, splitVendorChunkPlugin } from "vite"
 import { bundleBuddy } from "./vite-bundleBuddy"
 import { firebaseReservedURL } from "./vite-firebaseReservedURL"
 
@@ -61,6 +61,9 @@ export default defineConfig(async ({ command, mode }) => {
 
       // Firebase
       firebaseReservedURL(),
+
+      // Split chunks
+      splitVendorChunkPlugin(),
 
       // bundle analyze
       bundleBuddy(),
