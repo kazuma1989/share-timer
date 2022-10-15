@@ -1,17 +1,32 @@
 import { css } from "@emotion/css"
 import { addDoc, serverTimestamp, Timestamp } from "firebase/firestore"
-import { useEffect, useRef } from "react"
+import { useRef } from "react"
 import { Action, ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
 import { formatDuration } from "./formatDuration"
 import { Room } from "./roomZod"
 import { timeInputZod } from "./timeInputZod"
-import TimerWorker from "./TimerWorker?worker"
 import { TimeViewer } from "./TimeViewer"
 import { useActions } from "./useActions"
 import { useAllSettled } from "./useAllSettled"
 import { useFirestore } from "./useFirestore"
+import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { withMeta } from "./withMeta"
+
+export type TimerState =
+  | {
+      mode: "editing"
+      initialDuration: number
+    }
+  | {
+      mode: "running"
+      startedAt: number
+      duration: number
+    }
+  | {
+      mode: "paused"
+      restDuration: number
+    }
 
 export function Timer({ roomId }: { roomId: Room["id"] }) {
   const db = useFirestore()
@@ -22,7 +37,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
     restDuration: 0,
   })
 
-  useTitle(state)
+  useTitleAsTimeViewer(state)
 
   const [_allSettled, addPromise] = useAllSettled()
   const pending = !_allSettled
@@ -146,21 +161,6 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
   )
 }
 
-type TimerState =
-  | {
-      mode: "editing"
-      initialDuration: number
-    }
-  | {
-      mode: "running"
-      startedAt: number
-      duration: number
-    }
-  | {
-      mode: "paused"
-      restDuration: number
-    }
-
 function reducer(state: TimerState, action: Action): TimerState {
   switch (action.type) {
     case "edit": {
@@ -206,53 +206,6 @@ function reducer(state: TimerState, action: Action): TimerState {
 
     // Do not use "default" here to be exhaustive for the all types.
   }
-}
-
-function useTitle(state: TimerState) {
-  const mode = state.mode
-
-  let restDuration = NaN
-  let duration = NaN
-  let startedAt = NaN
-  switch (state.mode) {
-    case "paused": {
-      restDuration = state.restDuration
-      break
-    }
-
-    case "running": {
-      duration = state.duration
-      startedAt = state.startedAt
-      break
-    }
-  }
-
-  useEffect(() => {
-    const title = document.title
-
-    const abort = new AbortController()
-    const timer = new TimerWorker()
-
-    timer.addEventListener(
-      "message",
-      (e) => {
-        document.title = formatDuration(e.data)
-      },
-      {
-        passive: true,
-        signal: abort.signal,
-      }
-    )
-
-    timer.postMessage({ mode, restDuration, duration, startedAt })
-
-    return () => {
-      document.title = title
-
-      abort.abort()
-      timer.terminate()
-    }
-  }, [duration, mode, restDuration, startedAt])
 }
 
 if (import.meta.vitest) {
