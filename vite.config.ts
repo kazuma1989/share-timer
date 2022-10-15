@@ -43,11 +43,20 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
 
       rollupOptions: {
         output: {
-          manualChunks: {
-            emotion: ["@emotion/css"],
-            firebase: ["firebase/app", "firebase/firestore"],
-            react: ["react", "react-dom"],
-            zod: ["zod"],
+          manualChunks(id) {
+            switch (true) {
+              case id.includes("/node_modules/@firebase"):
+              case id.includes("/node_modules/firebase"):
+                return "firebase"
+
+              case id.includes("/node_modules/@emotion"):
+              case id.includes("/node_modules/emotion"):
+              case id.includes("/node_modules/react"):
+                return "react-emotion"
+
+              case id.includes("/node_modules/zod"):
+                return "zod"
+            }
           },
         },
       },
