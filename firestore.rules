@@ -5,10 +5,14 @@ service cloud.firestore {
       return request.resource.data.createdAt == request.time;
     }
 
+    function keepCreatedAt() {
+      return request.resource.data.createdAt == resource.data.createdAt;
+    }
+
     match /rooms-dev/{room} {
       allow get;
       allow create: if hasCreatedAt();
-      allow update;
+      allow update: if keepCreatedAt();
 
       match /actions/{action} {
         allow list;
@@ -19,7 +23,7 @@ service cloud.firestore {
     match /rooms-v1/{room} {
       allow get;
       allow create: if hasCreatedAt();
-      allow update;
+      allow update: if keepCreatedAt();
 
       match /actions/{action} {
         allow list;
