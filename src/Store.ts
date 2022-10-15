@@ -22,28 +22,34 @@ export class Store<T> {
     )
   }
 
-  private observable: Observable<T>
+  private readonly listeners = new Set<Listener>()
+
+  private latestValue: T | typeof Store.Empty = Store.Empty
 
   private constructor(getSubscription: GetSubscription<T>) {
-    this.observable = new Observable(getSubscription)
+    // FIXME call terminate properly
+    const terminate = getSubscription((value) => {
+      this.latestValue = value
+
+      this.listeners.forEach((listener) => {
+        listener()
+      })
+    })
   }
 
-  subscribe = (onStoreChange: Listener): Unsubscribe =>
-    this.observable.subscribe(onStoreChange)
+  subscribe = (listener: Listener): Unsubscribe => {
+    this.listeners.add(listener)
 
-  getValue = (): T | typeof Store.Empty => {
-    const value = this.observable.getValue()
-    if (value !== Observable.Empty) {
-      return value
+    return () => {
+      this.listeners.delete(listener)
     }
-
-    return Store.Empty
   }
+
+  getValue = (): T | typeof Store.Empty => this.latestValue
 
   getOrThrow = (): T => {
-    const value = this.getValue()
-    if (value !== Store.Empty) {
-      return value
+    if (this.latestValue !== Store.Empty) {
+      return this.latestValue
     }
 
     throw new Promise<void>((resolve) => {
@@ -65,46 +71,4 @@ interface Unsubscribe {
 
 interface Listener {
   (): void
-}
-
-class Observable<T> {
-  static readonly Empty = Symbol("empty")
-
-  readonly terminate: () => void
-
-  private readonly listeners = new Set<Listener>()
-
-  private latestValue: T | typeof Observable.Empty = Observable.Empty
-
-  constructor(getSubscription: GetSubscription<T>) {
-    const terminate = getSubscription((value) => {
-      this.latestValue = value
-
-      this.listeners.forEach((listener) => {
-        listener()
-      })
-    })
-
-    this.terminate = () => {
-      terminate()
-      this.listeners.clear()
-    }
-  }
-
-  subscribe(listener: Listener): Unsubscribe {
-    this.listeners.add(listener)
-
-    return () => {
-      this.listeners.delete(listener)
-    }
-  }
-
-  getValue(): T | typeof Observable.Empty {
-    return this.latestValue
-  }
-
-  // TODO
-  toPromise(): Promise<any> {
-    return Promise.resolve()
-  }
 }
