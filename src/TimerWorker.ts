@@ -19,7 +19,7 @@ onMessage<Data>((e) => {
 
     const current = duration - delta > 0 ? duration - delta : 0
     if (current !== previous) {
-      postMessage(current)
+      self.postMessage(current)
 
       previous = current
     }
@@ -29,10 +29,6 @@ onMessage<Data>((e) => {
     self.clearInterval(timer)
   }
 })
-
-function postMessage(message: number): void {
-  self.postMessage(message)
-}
 
 function onMessage<T>(
   listener: (e: MessageEvent<T>) => (() => void) | void

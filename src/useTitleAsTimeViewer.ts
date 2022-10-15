@@ -46,8 +46,11 @@ export function useTitleAsTimeViewer(state: TimerState): void {
           timer.terminate()
         })
 
-        timer.addEventListener("message", (e) => {
-          setTitle(e.data)
+        const current = () => duration - (Date.now() - startedAt)
+        setTitle(current())
+
+        timer.addEventListener("message", () => {
+          setTitle(current())
         })
 
         timer.postMessage({ duration, startedAt })
