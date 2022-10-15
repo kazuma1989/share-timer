@@ -41,14 +41,14 @@ export function useActions(roomId: Room["id"]): Action[] {
       ).then((doc) => {
         clearSubscriptions()
 
-        const latestEditDoneAction = doc.docs[0]!
+        const [latestEditDoneAction] = doc.docs
 
         subscriptions.add(
           onSnapshot(
             query(
               collection(db, "rooms", roomId, "actions"),
               orderBy("createdAt", "asc"),
-              startAt(latestEditDoneAction)
+              ...(latestEditDoneAction ? [startAt(latestEditDoneAction)] : [])
             ),
             (doc) => {
               console.debug("listen %d docChanges", doc.docChanges().length)
