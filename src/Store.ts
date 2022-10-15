@@ -9,24 +9,50 @@ export class Store<T> {
 
   private readonly listeners = new Set<Listener>()
 
+  private readonly rootSubscription: {
+    subscribe(): void
+    unsubscribe(): void
+  }
+
   private latestValue: T | typeof Store.Empty = Store.Empty
 
   private constructor(getSubscription: GetSubscription<T>) {
-    // FIXME call terminate properly
-    const terminate = getSubscription((value) => {
-      this.latestValue = value
+    const subscribe = () =>
+      getSubscription((value) => {
+        this.latestValue = value
 
-      this.listeners.forEach((listener) => {
-        listener()
+        this.listeners.forEach((listener) => {
+          listener()
+        })
       })
-    })
+
+    let unsubscribe: Unsubscribe | null
+    this.rootSubscription = {
+      subscribe() {
+        if (!unsubscribe) {
+          unsubscribe = subscribe()
+        }
+      },
+
+      unsubscribe() {
+        if (unsubscribe) {
+          unsubscribe()
+          unsubscribe = null
+        }
+      },
+    }
   }
 
   subscribe = (listener: Listener): Unsubscribe => {
     this.listeners.add(listener)
+    this.rootSubscription.subscribe()
 
     return () => {
       this.listeners.delete(listener)
+
+      if (this.listeners.size === 0) {
+        this.rootSubscription.unsubscribe()
+      }
     }
   }
 
@@ -44,6 +70,7 @@ export class Store<T> {
       }
 
       this.listeners.add(listener)
+      this.rootSubscription.subscribe()
     })
   }
 }
