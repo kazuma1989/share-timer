@@ -25,7 +25,7 @@ export function useAllSettled(): [
     )
   )
 
-  const allSettled = useSyncExternalStore(store.subscribe, store.get)
+  const allSettled = useSyncExternalStore(store.subscribe, store.getValue)
   const add: <T extends PromiseLike<unknown>>(promise: T) => T = (promise) => {
     dispatch(promise)
     return promise
