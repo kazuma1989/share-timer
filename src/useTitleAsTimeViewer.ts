@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { formatDuration } from "./formatDuration"
 import { TimerState } from "./Timer"
-import TimerWorker from "./TimerWorker?worker"
+import TimerWorker from "./TimerWorker?worker&inline"
 
 export function useTitleAsTimeViewer(state: TimerState): void {
   const mode = state.mode
