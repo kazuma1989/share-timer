@@ -77,13 +77,18 @@ class Observable<T> {
   private latestValue: T | typeof Observable.Empty = Observable.Empty
 
   constructor(getSubscription: GetSubscription<T>) {
-    this.terminate = getSubscription((value) => {
+    const terminate = getSubscription((value) => {
       this.latestValue = value
 
       this.listeners.forEach((listener) => {
         listener()
       })
     })
+
+    this.terminate = () => {
+      terminate()
+      this.listeners.clear()
+    }
   }
 
   subscribe(listener: Listener): Unsubscribe {
