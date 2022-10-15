@@ -6,12 +6,16 @@ import TimerWorker from "./TimerWorker?worker"
 export function useTitleAsTimeViewer(state: TimerState): void {
   const mode = state.mode
 
-  let restDuration = NaN
   let duration = NaN
   let startedAt = NaN
   switch (state.mode) {
     case "paused": {
-      restDuration = state.restDuration
+      duration = state.restDuration
+      break
+    }
+
+    case "editing": {
+      duration = state.initialDuration
       break
     }
 
@@ -30,13 +34,16 @@ export function useTitleAsTimeViewer(state: TimerState): void {
       document.title = previousTitle
     })
 
-    const setTitle = (duration: number) => {
-      document.title = formatDuration(duration)
+    const setTitle = (duration: number, startedAt?: number) => {
+      document.title = startedAt
+        ? formatDuration(duration - (Date.now() - startedAt))
+        : formatDuration(duration)
     }
 
     switch (mode) {
-      case "paused": {
-        setTitle(restDuration)
+      case "paused":
+      case "editing": {
+        setTitle(duration)
         break
       }
 
@@ -46,11 +53,9 @@ export function useTitleAsTimeViewer(state: TimerState): void {
           timer.terminate()
         })
 
-        const current = () => duration - (Date.now() - startedAt)
-        setTitle(current())
-
+        setTitle(duration, startedAt)
         timer.addEventListener("message", () => {
-          setTitle(current())
+          setTitle(duration, startedAt)
         })
 
         timer.postMessage({ duration, startedAt })
@@ -61,5 +66,5 @@ export function useTitleAsTimeViewer(state: TimerState): void {
     return () => {
       abort.abort()
     }
-  }, [duration, mode, restDuration, startedAt])
+  }, [duration, mode, startedAt])
 }
