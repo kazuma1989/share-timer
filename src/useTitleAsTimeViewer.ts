@@ -23,10 +23,17 @@ export function useTitleAsTimeViewer(state: TimerState): void {
   }
 
   useEffect(() => {
-    const title = document.title
-
     const abort = new AbortController()
+
+    const previousTitle = document.title
+    abort.signal.addEventListener("abort", () => {
+      document.title = previousTitle
+    })
+
     const timer = new TimerWorker()
+    abort.signal.addEventListener("abort", () => {
+      timer.terminate()
+    })
 
     timer.addEventListener(
       "message",
@@ -42,10 +49,7 @@ export function useTitleAsTimeViewer(state: TimerState): void {
     timer.postMessage({ mode, restDuration, duration, startedAt })
 
     return () => {
-      document.title = title
-
       abort.abort()
-      timer.terminate()
     }
   }, [duration, mode, restDuration, startedAt])
 }
