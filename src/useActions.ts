@@ -21,6 +21,8 @@ export function useActions(roomId: Room["id"]): Action[] {
 
   const store = getOrPut(roomId, () =>
     Store.from((next) => {
+      console.debug("actions listener attached")
+
       const subscriptions = new Set<Unsubscribe>()
       const clearSubscriptions = () => {
         subscriptions.forEach((unsubscribe) => {
