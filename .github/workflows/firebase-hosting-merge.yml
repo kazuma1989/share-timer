@@ -16,7 +16,9 @@ jobs:
       - run: npm ci --omit=dev && npm run build
       - run: |
           export GOOGLE_APPLICATION_CREDENTIALS="$(mktemp)"
+          echo "${GOOGLE_APPLICATION_CREDENTIALS}"
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_SHARE_TIMER_2B51A }}" > "${GOOGLE_APPLICATION_CREDENTIALS}"
+          cat "${GOOGLE_APPLICATION_CREDENTIALS}"
           npm run deploy:rules
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
