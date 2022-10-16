@@ -6,7 +6,7 @@ import {
   query,
   startAt,
 } from "firebase/firestore"
-import { useReducer, useSyncExternalStore } from "react"
+import { useSyncExternalStore } from "react"
 import { Action, ActionOnFirestore, actionZod } from "./actionZod"
 import { collection } from "./collection"
 import { mapGetOrPut } from "./mapGetOrPut"
@@ -17,54 +17,7 @@ import { useFirestore } from "./useFirestore"
 import { where } from "./where"
 import { withMeta } from "./withMeta"
 
-const Clear = Symbol()
-type Clear = typeof Clear
-
-export function useActions(
-  roomId: Room["id"]
-): [
-  actions: Action[],
-  dispatch: (action: ActionOnFirestore) => Promise<unknown>
-] {
-  const db = useFirestore()
-
-  const actions = useAsyncActions(roomId)
-
-  const [localActions, dispatchLocal] = useReducer(
-    (actions: Action[], action: ActionOnFirestore | Clear): typeof actions =>
-      action === Clear ? [] : [...actions, actionZod.parse(action)],
-    []
-  )
-
-  const dispatch = (action: ActionOnFirestore) => {
-    dispatchLocal(action)
-
-    return addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
-  }
-
-  if (isKnown(actions)) {
-    return [[...actions, ...localActions], dispatch]
-  }
-
-  console.log("clear!")
-  dispatchLocal(Clear)
-  return [actions, dispatch]
-}
-
-function isKnown<T extends object>(item: T): boolean {
-  const known = _knownObjects.has(item)
-  _knownObjects.add(item)
-
-  return known
-}
-const _knownObjects = new WeakSet()
-
-/**
- * Firestoreからactionsコレクションの配列を取得する。
- *
- * 同期的に解決せずReact的にすこしだけラグがあるかも、ということで"Async"という名前に。
- */
-function useAsyncActions(roomId: Room["id"]): Action[] {
+export function useActions(roomId: Room["id"]): [Action[], Dispatch] {
   const db = useFirestore()
 
   const store = getOrPut(roomId, () =>
@@ -113,9 +66,7 @@ function useAsyncActions(roomId: Room["id"]): Action[] {
               return []
             })
 
-            self.setTimeout(() => {
-              next(actions)
-            }, 1_000)
+            next(actions)
           }
         )
 
@@ -128,7 +79,22 @@ function useAsyncActions(roomId: Room["id"]): Action[] {
     })
   )
 
-  return useSyncExternalStore(store.subscribe, store.getOrThrow)
+  const actions = useSyncExternalStore(store.subscribe, store.getOrThrow)
+
+  const dispatch: Dispatch = (action) => {
+    store.next([...actions, actionZod.parse(action)])
+
+    return addDoc(
+      collection(db, "rooms", roomId, "actions"),
+      withMeta<ActionOnFirestore>(action)
+    )
+  }
+
+  return [actions, dispatch]
+}
+
+interface Dispatch {
+  (action: ActionOnFirestore): Promise<unknown>
 }
 
 const getOrPut = mapGetOrPut(new Map<Room["id"], Store<Action[]>>())

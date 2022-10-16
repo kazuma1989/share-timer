@@ -17,14 +17,7 @@ export class Store<T> {
   private latestValue: T | typeof Store.Empty = Store.Empty
 
   private constructor(getSubscription: GetSubscription<T>) {
-    const subscribe = () =>
-      getSubscription((value) => {
-        this.latestValue = value
-
-        this.listeners.forEach((listener) => {
-          listener()
-        })
-      })
+    const subscribe = () => getSubscription(this.next)
 
     let unsubscribe: Unsubscribe | null
     this.rootSubscription = {
@@ -43,7 +36,15 @@ export class Store<T> {
     }
   }
 
-  subscribe = (listener: Listener): Unsubscribe => {
+  readonly next = (value: T): void => {
+    this.latestValue = value
+
+    this.listeners.forEach((listener) => {
+      listener()
+    })
+  }
+
+  readonly subscribe = (listener: Listener): Unsubscribe => {
     this.listeners.add(listener)
     this.rootSubscription.subscribe()
 
@@ -56,9 +57,9 @@ export class Store<T> {
     }
   }
 
-  getValue = (): T | typeof Store.Empty => this.latestValue
+  readonly getValue = (): T | typeof Store.Empty => this.latestValue
 
-  getOrThrow = (): T => {
+  readonly getOrThrow = (): T => {
     if (this.latestValue !== Store.Empty) {
       return this.latestValue
     }
