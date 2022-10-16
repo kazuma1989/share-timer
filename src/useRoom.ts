@@ -24,14 +24,14 @@ export function useRoom(): Room {
   }
 
   const store = getOrPut(roomId, () =>
-    Store.from((next) =>
+    Store.from((store) =>
       onSnapshot(doc(collection(db, "rooms"), roomId), (roomDoc) => {
         if (!roomDoc.exists() || !roomZod.safeParse(roomDoc.data()).success) {
           setupRoom(db, roomId)
           return
         }
 
-        next({
+        store.next({
           ...roomZod.parse(roomDoc.data()),
           id: roomId,
         })

@@ -35,7 +35,7 @@ export function useTimerState(roomId: Room["id"]): TimerState {
   const db = useFirestore()
 
   const store = getOrPut(roomId, () =>
-    Store.from(function (next) {
+    Store.from((store) => {
       console.debug("actions listener attached")
 
       const abort = new AbortController()
@@ -93,7 +93,7 @@ export function useTimerState(roomId: Room["id"]): TimerState {
               estimate.add(newState)
             }
 
-            const currentState = this.getValue()
+            const currentState = store.getValue()
             if (
               currentState !== Store.Empty &&
               estimate.has(currentState) &&
@@ -107,7 +107,7 @@ export function useTimerState(roomId: Room["id"]): TimerState {
               return
             }
 
-            next(newState)
+            store.next(newState)
           }
         )
 

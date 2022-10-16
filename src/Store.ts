@@ -17,7 +17,7 @@ export class Store<T> {
   private latestValue: T | typeof Store.Empty = Store.Empty
 
   private constructor(getSubscription: GetSubscription<T>) {
-    const subscribe = () => getSubscription.call(this, this.next)
+    const subscribe = () => getSubscription(this)
 
     let unsubscribe: Unsubscribe | null
     this.rootSubscription = {
@@ -36,7 +36,7 @@ export class Store<T> {
     }
   }
 
-  private readonly next = (value: T): void => {
+  readonly next = (value: T): void => {
     this.latestValue = value
 
     this.listeners.forEach((listener) => {
@@ -77,7 +77,7 @@ export class Store<T> {
 }
 
 interface GetSubscription<T> {
-  (this: Store<T>, next: (value: T) => void): Unsubscribe
+  (store: Store<T>): Unsubscribe
 }
 
 interface Unsubscribe {
@@ -89,12 +89,12 @@ interface Listener {
 }
 
 function fromPromise<T>(promise: PromiseLike<T>): GetSubscription<T> {
-  return (next) => {
+  return (store) => {
     const abort = new AbortController()
 
     promise.then((value) => {
       if (abort.signal.aborted) return
-      next(value)
+      store.next(value)
     })
 
     return () => {
