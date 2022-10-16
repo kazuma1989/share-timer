@@ -2,10 +2,11 @@ import { Reducer, useReducer, useSyncExternalStore } from "react"
 import { mapGetOrPut } from "./mapGetOrPut"
 import { Store } from "./Store"
 
-export function useAllSettled(): [
-  allSettled: boolean,
-  add: <T extends PromiseLike<unknown>>(promise: T) => T
-] {
+interface Add {
+  <T extends PromiseLike<unknown>>(promise: T): T
+}
+
+export function useAllSettled(): [allSettled: boolean, add: Add] {
   const [promises, dispatch] = useReducer<
     Reducer<Set<PromiseLike<unknown>>, PromiseLike<unknown>>
   >((promises, promise) => {
@@ -18,22 +19,26 @@ export function useAllSettled(): [
 
   const store = getOrPut(promises, () =>
     Store.from(
-      Promise.allSettled(promises).then(() => {
+      Promise.allSettled(promises).then((): typeof Settled => {
         promises.clear()
-        return true
+        return Settled
       })
     )
   )
 
-  const allSettled = useSyncExternalStore(store.subscribe, store.getValue)
-  const add: <T extends PromiseLike<unknown>>(promise: T) => T = (promise) => {
+  const allSettled =
+    useSyncExternalStore(store.subscribe, store.getValue) === Settled
+
+  const add: Add = (promise) => {
     dispatch(promise)
     return promise
   }
 
-  return [typeof allSettled === "boolean" ? allSettled : false, add]
+  return [allSettled, add]
 }
 
+const Settled = Symbol("settled")
+
 const getOrPut = mapGetOrPut(
-  new WeakMap<Set<PromiseLike<unknown>>, Store<boolean>>()
+  new WeakMap<Set<PromiseLike<unknown>>, Store<typeof Settled>>()
 )
