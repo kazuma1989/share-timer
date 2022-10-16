@@ -9,10 +9,16 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
 
   let checkerPlugin: Plugin | undefined
   if (command === "serve" && mode !== "production") {
-    const checker = await import("vite-plugin-checker").then((m) => m.default)
+    const [checker, scripts] = await Promise.all([
+      import("vite-plugin-checker").then((_) => _.default),
+      import("./package.json").then((_) => _.scripts),
+    ])
 
     checkerPlugin = checker({
       typescript: true,
+      eslint: {
+        lintCommand: scripts["lint"],
+      },
     })
   }
 
