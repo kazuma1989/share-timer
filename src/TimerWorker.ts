@@ -3,29 +3,11 @@ export {}
 
 declare const self: DedicatedWorkerGlobalScope
 
-interface Data {
-  duration: number
-  startedAt: number
-}
+interface Data {}
 
-onMessage<Data>((e) => {
-  const { duration, startedAt } = e.data
-
-  let previous: number
-
+onMessage<Data>(() => {
   const timer = self.setInterval(() => {
-    // Workerコンテキストでnow()関数が使えない気がするのでeslintはdisableにしておく。
-    // うまく使う方法がわかったら解除して較正時刻を使いたい。
-    // eslint-disable-next-line no-restricted-globals
-    const d = Date.now() - startedAt
-    const delta = d - (d % 1_000)
-
-    const current = duration - delta > 0 ? duration - delta : 0
-    if (current !== previous) {
-      self.postMessage(current)
-
-      previous = current
-    }
+    self.postMessage(null)
   }, 100)
 
   return () => {

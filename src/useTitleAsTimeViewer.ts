@@ -35,10 +35,13 @@ export function useTitleAsTimeViewer(state: TimerState): void {
       document.title = previousTitle
     })
 
+    let previousRestDuration: number
     const setTitle = (duration: number, startedAt?: number) => {
-      document.title = startedAt
-        ? formatDuration(duration - (now() - startedAt))
-        : formatDuration(duration)
+      const restDuration = startedAt ? duration - (now() - startedAt) : duration
+      if (restDuration === previousRestDuration) return
+
+      previousRestDuration = restDuration
+      document.title = formatDuration(restDuration)
     }
 
     switch (mode) {
@@ -59,7 +62,7 @@ export function useTitleAsTimeViewer(state: TimerState): void {
           setTitle(duration, startedAt)
         })
 
-        timer.postMessage({ duration, startedAt })
+        timer.postMessage(null)
         break
       }
     }
