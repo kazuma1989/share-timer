@@ -23,7 +23,7 @@ export function now(): number {
 let _estimatedDiff = 0
 
 export async function calibrateClock(db: Firestore): Promise<void> {
-  const clientDoc = doc(collection(db, "rooms", "____", "actions"))
+  const clientDoc = doc(collection(db, "calibrations"))
   await setDoc(
     clientDoc,
     // TODO zod type check
@@ -41,4 +41,7 @@ export async function calibrateClock(db: Firestore): Promise<void> {
   }
 
   _estimatedDiff = serverTime.toMillis() - clientTime.toMillis()
+
+  import.meta.env.DEV &&
+    console.info("diff (serverTime - clientTime)", _estimatedDiff)
 }

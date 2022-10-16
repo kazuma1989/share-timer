@@ -17,7 +17,9 @@ if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
   connectFirestoreEmulator(firestore, "localhost", 8080)
 }
 
-calibrateClock(firestore)
+calibrateClock(firestore).catch((reason) => {
+  console.warn("calibration failed", reason)
+})
 
 createRoot(globalThis.document.getElementById("root")!).render(
   <StrictMode>
