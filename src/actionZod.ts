@@ -1,17 +1,13 @@
 import { FieldValue, Timestamp } from "firebase/firestore"
 import * as z from "zod"
-import { mapGetOrPut } from "./mapGetOrPut"
-import { now } from "./now"
 
 const timestamp = z
   .instanceof(Timestamp)
   .or(z.custom<FieldValue>((_) => _ instanceof FieldValue))
 
 const timestampToMillis = timestamp.transform((t) =>
-  t instanceof Timestamp ? t.toMillis() : getOrPut(t, now)
+  t instanceof Timestamp ? t.toMillis() : NaN
 )
-
-const getOrPut = mapGetOrPut(new WeakMap<FieldValue, number>())
 
 export const actionZod = z.union([
   z.object({
