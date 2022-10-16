@@ -1,10 +1,10 @@
 import { addDoc } from "firebase/firestore"
 import { useCallback } from "react"
-import { ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
-import { Room } from "./roomZod"
 import { useFirestore } from "./useFirestore"
 import { withMeta } from "./withMeta"
+import { ActionOnFirestore } from "./zod/actionZod"
+import { Room } from "./zod/roomZod"
 
 export function useDispatchAction(
   roomId: Room["id"]
