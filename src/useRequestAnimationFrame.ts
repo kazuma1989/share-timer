@@ -4,12 +4,12 @@ import { now } from "./now"
 export function useRequestAnimationFrame<T>(
   getSnapshot: (now: number) => T
 ): T {
-  return useSyncExternalStore(subscribeTimer, () => getSnapshot(_now))
+  return useSyncExternalStore(subscribe, () => getSnapshot(_now))
 }
 
 let _now = now()
 
-function subscribeTimer(next: () => void): () => void {
+function subscribe(next: () => void): () => void {
   const abort = new AbortController()
 
   const tick = () => {
