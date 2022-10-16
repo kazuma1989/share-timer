@@ -6,9 +6,9 @@ import {
   setDoc,
   Timestamp,
 } from "firebase/firestore"
-import * as z from "zod"
 import { collection } from "./collection"
 import { withMeta } from "./firestore/withMeta"
+import { Calibration, calibrationZod } from "./zod/calibrationZod"
 
 /**
  * クライアント時刻をなるべく較正してサーバー時刻に近づけた値を返す
@@ -46,10 +46,3 @@ export async function calibrateClock(db: Firestore): Promise<void> {
   import.meta.env.DEV &&
     console.info("diff (serverTime - clientTime)", _estimatedDiff)
 }
-
-const calibrationZod = z.object({
-  clientTime: z.instanceof(Timestamp),
-  serverTime: z.instanceof(Timestamp),
-})
-
-interface Calibration extends z.infer<typeof calibrationZod> {}
