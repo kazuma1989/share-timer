@@ -1,7 +1,7 @@
 import { css } from "@emotion/css"
-import { addDoc, serverTimestamp, Timestamp } from "firebase/firestore"
+import { addDoc, serverTimestamp } from "firebase/firestore"
 import { Reducer, useReducer, useRef } from "react"
-import { Action, ActionOnFirestore } from "./actionZod"
+import { Action, ActionOnFirestore, actionZod } from "./actionZod"
 import { collection } from "./collection"
 import { formatDuration } from "./formatDuration"
 import { now } from "./now"
@@ -44,26 +44,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
 
   const [localActions, dispatchLocal] = useReducer<
     Reducer<Action[], ActionOnFirestore>
-  >((actions, action) => {
-    switch (action.type) {
-      case "edit":
-      case "edit-done": {
-        return [...actions, action]
-      }
-
-      case "pause":
-      case "start": {
-        return [
-          ...actions,
-          {
-            ...action,
-            // FIXME remove side-effect!
-            at: now(),
-          },
-        ]
-      }
-    }
-  }, actions)
+  >((actions, action) => [...actions, actionZod.parse(action)], actions)
   if (isKnown(actions)) {
     actions = localActions
   }
@@ -175,7 +156,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
           onClick={() => {
             dispatch({
               type: "pause",
-              at: serverTimestamp() as Timestamp,
+              at: serverTimestamp(),
             })
           }}
         >
@@ -188,7 +169,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
           onClick={() => {
             dispatch({
               type: "start",
-              at: serverTimestamp() as Timestamp,
+              at: serverTimestamp(),
             })
           }}
         >
