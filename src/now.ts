@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore"
 import * as z from "zod"
 import { collection } from "./collection"
-import { withMeta } from "./withMeta"
+import { withMeta } from "./firestore/withMeta"
 
 /**
  * クライアント時刻をなるべく較正してサーバー時刻に近づけた値を返す

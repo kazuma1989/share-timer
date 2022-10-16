@@ -1,11 +1,11 @@
 import { doc, Firestore, onSnapshot, writeBatch } from "firebase/firestore"
 import { useSyncExternalStore } from "react"
 import { collection } from "./collection"
+import { withMeta } from "./firestore/withMeta"
 import { mapGetOrPut } from "./mapGetOrPut"
 import { Store } from "./Store"
 import { useFirestore } from "./useFirestore"
 import { setHash, useHash } from "./useHash"
-import { withMeta } from "./withMeta"
 import { ActionOnFirestore } from "./zod/actionZod"
 import { Room, roomIdZod, RoomOnFirestore, roomZod } from "./zod/roomZod"
 
