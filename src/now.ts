@@ -6,7 +6,7 @@ import {
   setDoc,
   Timestamp,
 } from "firebase/firestore"
-import { collection } from "./collection"
+import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { Calibration, calibrationZod } from "./zod/calibrationZod"
 

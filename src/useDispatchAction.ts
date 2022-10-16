@@ -1,6 +1,6 @@
 import { addDoc } from "firebase/firestore"
 import { useCallback } from "react"
-import { collection } from "./collection"
+import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { useFirestore } from "./useFirestore"
 import { ActionOnFirestore } from "./zod/actionZod"

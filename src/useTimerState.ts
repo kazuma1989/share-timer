@@ -6,7 +6,7 @@ import {
   startAt,
 } from "firebase/firestore"
 import { useSyncExternalStore } from "react"
-import { collection } from "./collection"
+import { collection } from "./firestore/collection"
 import { orderBy } from "./firestore/orderBy"
 import { where } from "./firestore/where"
 import { Store } from "./Store"

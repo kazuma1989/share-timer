@@ -1,6 +1,6 @@
 import { doc, Firestore, onSnapshot, writeBatch } from "firebase/firestore"
 import { useSyncExternalStore } from "react"
-import { collection } from "./collection"
+import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { Store } from "./Store"
 import { useFirestore } from "./useFirestore"
