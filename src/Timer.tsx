@@ -7,7 +7,7 @@ import { now } from "./now"
 import { Room } from "./roomZod"
 import { timeInputZod } from "./timeInputZod"
 import { TimeViewer } from "./TimeViewer"
-import { useActions } from "./useActions"
+import { useActions, useDispatchAction } from "./useActions"
 import { useAllSettled } from "./useAllSettled"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 
@@ -27,7 +27,7 @@ export type TimerState =
     }
 
 export function Timer({ roomId }: { roomId: Room["id"] }) {
-  const [actions, _dispatch] = useActions(roomId)
+  const actions = useActions(roomId)
   const state = actions.reduce(reducer, {
     mode: "paused",
     restDuration: 0,
@@ -38,6 +38,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
   const [_allSettled, addPromise] = useAllSettled()
   const pending = !_allSettled
 
+  const _dispatch = useDispatchAction(roomId)
   const dispatch: typeof _dispatch = (action) => addPromise(_dispatch(action))
 
   const timeInput$ = useRef<HTMLInputElement>(null)

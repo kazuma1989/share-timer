@@ -36,7 +36,7 @@ export class Store<T> {
     }
   }
 
-  readonly next = (value: T): void => {
+  private readonly next = (value: T): void => {
     this.latestValue = value
 
     this.listeners.forEach((listener) => {

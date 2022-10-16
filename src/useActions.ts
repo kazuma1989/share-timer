@@ -6,7 +6,7 @@ import {
   query,
   startAt,
 } from "firebase/firestore"
-import { useCallback, useRef, useSyncExternalStore } from "react"
+import { useCallback, useSyncExternalStore } from "react"
 import { Action, ActionOnFirestore, actionZod } from "./actionZod"
 import { collection } from "./collection"
 import { mapGetOrPut } from "./mapGetOrPut"
@@ -17,7 +17,7 @@ import { useFirestore } from "./useFirestore"
 import { where } from "./where"
 import { withMeta } from "./withMeta"
 
-export function useActions(roomId: Room["id"]): [Action[], Dispatch] {
+export function useActions(roomId: Room["id"]): Action[] {
   const db = useFirestore()
 
   const store = getOrPut(roomId, () =>
@@ -79,31 +79,22 @@ export function useActions(roomId: Room["id"]): [Action[], Dispatch] {
     })
   )
 
-  const actions = useSyncExternalStore(store.subscribe, store.getOrThrow)
-  const actions$ = useRef(actions)
-  actions$.current = actions
-
-  const dispatch = useCallback<Dispatch>(
-    (action) => {
-      try {
-        store.next([...actions$.current, actionZod.parse(action)])
-      } catch (e) {
-        console.warn(e)
-      }
-
-      return addDoc(
-        collection(db, "rooms", roomId, "actions"),
-        withMeta<ActionOnFirestore>(action)
-      )
-    },
-    [db, roomId, store]
-  )
-
-  return [actions, dispatch]
+  return useSyncExternalStore(store.subscribe, store.getOrThrow)
 }
 
-interface Dispatch {
-  (action: ActionOnFirestore): Promise<unknown>
+export function useDispatchAction(
+  roomId: Room["id"]
+): (action: ActionOnFirestore) => Promise<unknown> {
+  const db = useFirestore()
+
+  return useCallback(
+    (action) =>
+      addDoc(
+        collection(db, "rooms", roomId, "actions"),
+        withMeta<ActionOnFirestore>(action)
+      ),
+    [db, roomId]
+  )
 }
 
 const getOrPut = mapGetOrPut(new Map<Room["id"], Store<Action[]>>())
