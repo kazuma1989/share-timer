@@ -50,7 +50,17 @@ export function useActions(roomId: Room["id"]): Action[] {
             ...startAtLatestEditDone
           ),
           (doc) => {
-            console.debug("listen %d docChanges", doc.docChanges().length)
+            const changes = doc.docChanges()
+
+            // actionsはaddedしか起きないはずなので、modifiedになるのはローカルの変更がサーバーに同期され、
+            // serverTimestamps: "estimate" が解決したとき。
+            // どこかで帳尻が合うはずなので、UIのちらつき低減を優先してみる。
+            const onlyIncludeServerTimestampSettlements = changes.every(
+              (_) => _.type === "modified"
+            )
+            if (onlyIncludeServerTimestampSettlements) return
+
+            console.debug("listen %d docChanges", changes.length)
 
             const actions = doc.docs.flatMap<Action>((doc) => {
               const rawData = doc.data({
