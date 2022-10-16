@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { formatDuration } from "./formatDuration"
+import { now } from "./now"
 import { TimerState } from "./Timer"
 import TimerWorker from "./TimerWorker?worker&inline"
 
@@ -36,7 +37,7 @@ export function useTitleAsTimeViewer(state: TimerState): void {
 
     const setTitle = (duration: number, startedAt?: number) => {
       document.title = startedAt
-        ? formatDuration(duration - (Date.now() - startedAt))
+        ? formatDuration(duration - (now() - startedAt))
         : formatDuration(duration)
     }
 

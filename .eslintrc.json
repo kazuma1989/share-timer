@@ -47,7 +47,7 @@
       "error",
       {
         "name": "Date",
-        "message": "Please use calibrated server time instead."
+        "message": "Please use calibrated server time (the now() function) instead."
       }
     ]
   },

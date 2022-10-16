@@ -14,6 +14,9 @@ onMessage<Data>((e) => {
   let previous: number
 
   const timer = self.setInterval(() => {
+    // Workerコンテキストでnow()関数が使えない気がするのでeslintはdisableにしておく。
+    // うまく使う方法がわかったら解除して較正時刻を使いたい。
+    // eslint-disable-next-line no-restricted-globals
     const d = Date.now() - startedAt
     const delta = d - (d % 1_000)
 

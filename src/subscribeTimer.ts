@@ -1,4 +1,6 @@
-let _now = Date.now()
+import { now } from "./now"
+
+let _now = now()
 
 export function subscribeTimer(next: () => void): () => void {
   const abort = new AbortController()
@@ -8,7 +10,7 @@ export function subscribeTimer(next: () => void): () => void {
 
     requestAnimationFrame(tick)
 
-    _now = Date.now()
+    _now = now()
     next()
   }
 
