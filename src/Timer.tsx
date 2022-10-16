@@ -72,7 +72,6 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
             ref={timeInput$}
             type="text"
             defaultValue={formatDuration(state.initialDuration)}
-            disabled={pending}
             size={5}
             className={css`
               && {
@@ -104,7 +103,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
       </div>
 
       {state.mode === "editing" ? (
-        <button key="done" type="submit" disabled={pending}>
+        <button key="done" type="submit">
           Done
         </button>
       ) : (
@@ -137,7 +136,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
       ) : (
         <button
           type="button"
-          disabled={state.mode === "editing"}
+          disabled={pending || state.mode === "editing"}
           onClick={() => {
             dispatch({
               type: "start",
