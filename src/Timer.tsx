@@ -5,8 +5,8 @@ import { formatDuration } from "./formatDuration"
 import { Room } from "./roomZod"
 import { timeInputZod } from "./timeInputZod"
 import { TimeViewer } from "./TimeViewer"
-import { useDispatchAction, useTimerState } from "./useActions"
 import { useAllSettled } from "./useAllSettled"
+import { useDispatchAction, useTimerState } from "./useTimerState"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 
 export function Timer({ roomId }: { roomId: Room["id"] }) {
