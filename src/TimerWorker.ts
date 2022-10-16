@@ -3,26 +3,11 @@ export {}
 
 declare const self: DedicatedWorkerGlobalScope
 
-interface Data {
-  duration: number
-  startedAt: number
-}
+interface Data {}
 
-onMessage<Data>((e) => {
-  const { duration, startedAt } = e.data
-
-  let previous: number
-
+onMessage<Data>(() => {
   const timer = self.setInterval(() => {
-    const d = Date.now() - startedAt
-    const delta = d - (d % 1_000)
-
-    const current = duration - delta > 0 ? duration - delta : 0
-    if (current !== previous) {
-      self.postMessage(current)
-
-      previous = current
-    }
+    self.postMessage(null)
   }, 100)
 
   return () => {

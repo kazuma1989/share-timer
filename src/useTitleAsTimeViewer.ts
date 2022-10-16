@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { formatDuration } from "./formatDuration"
+import { now } from "./now"
 import { TimerState } from "./Timer"
 import TimerWorker from "./TimerWorker?worker&inline"
 
@@ -34,10 +35,13 @@ export function useTitleAsTimeViewer(state: TimerState): void {
       document.title = previousTitle
     })
 
+    let previousRestDuration: number
     const setTitle = (duration: number, startedAt?: number) => {
-      document.title = startedAt
-        ? formatDuration(duration - (Date.now() - startedAt))
-        : formatDuration(duration)
+      const restDuration = startedAt ? duration - (now() - startedAt) : duration
+      if (restDuration === previousRestDuration) return
+
+      previousRestDuration = restDuration
+      document.title = formatDuration(restDuration)
     }
 
     switch (mode) {
@@ -58,7 +62,7 @@ export function useTitleAsTimeViewer(state: TimerState): void {
           setTitle(duration, startedAt)
         })
 
-        timer.postMessage({ duration, startedAt })
+        timer.postMessage(null)
         break
       }
     }

@@ -4,6 +4,7 @@ import { useRef } from "react"
 import { Action, ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
 import { formatDuration } from "./formatDuration"
+import { now } from "./now"
 import { Room } from "./roomZod"
 import { timeInputZod } from "./timeInputZod"
 import { TimeViewer } from "./TimeViewer"
@@ -247,7 +248,7 @@ if (import.meta.vitest) {
   })
 
   test("start", () => {
-    const now = Date.now()
+    const _now = now()
 
     expect(
       reducer(
@@ -257,29 +258,29 @@ if (import.meta.vitest) {
         },
         {
           type: "start",
-          at: now,
+          at: _now,
         }
       )
     ).toStrictEqual({
       mode: "running",
       duration: 5 * 60_000,
-      startedAt: now,
+      startedAt: _now,
     })
   })
 
   test("pause", () => {
-    const now = Date.now()
+    const _now = now()
 
     expect(
       reducer(
         {
           mode: "running",
           duration: 5 * 60_000,
-          startedAt: now - 40_000,
+          startedAt: _now - 40_000,
         },
         {
           type: "pause",
-          at: now,
+          at: _now,
         }
       )
     ).toStrictEqual({
@@ -289,7 +290,7 @@ if (import.meta.vitest) {
   })
 
   test("multiple actions", () => {
-    const now = Date.now()
+    const _now = now()
     const actions: Action[] = [
       {
         type: "edit",
@@ -300,19 +301,19 @@ if (import.meta.vitest) {
       },
       {
         type: "start",
-        at: now,
+        at: _now,
       },
       {
         type: "pause",
-        at: now + 10_000,
+        at: _now + 10_000,
       },
       {
         type: "start",
-        at: now + 60_000,
+        at: _now + 60_000,
       },
       {
         type: "pause",
-        at: now + 80_000,
+        at: _now + 80_000,
       },
     ]
 

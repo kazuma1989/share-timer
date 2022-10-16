@@ -1,4 +1,6 @@
-let _now = Date.now()
+import { now } from "./now"
+
+let _now = now()
 
 export function subscribeTimer(next: () => void): () => void {
   const abort = new AbortController()
@@ -8,7 +10,7 @@ export function subscribeTimer(next: () => void): () => void {
 
     requestAnimationFrame(tick)
 
-    _now = Date.now()
+    _now = now()
     next()
   }
 
@@ -19,6 +21,10 @@ export function subscribeTimer(next: () => void): () => void {
   }
 }
 
-export function now() {
-  return _now
-}
+/**
+ * useSyncExternalStore で使う想定なので、現在時刻の値をキャッシュしておく必要がある。
+ * （subscribe を呼んでいないのに getSnapshot の結果が変わってはいけないため）
+ *
+ * そのキャッシュを返すメソッド。
+ */
+subscribeTimer.now = (): number => _now

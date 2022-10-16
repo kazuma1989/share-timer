@@ -41,6 +41,14 @@
           }
         ]
       }
+    ],
+
+    "no-restricted-globals": [
+      "error",
+      {
+        "name": "Date",
+        "message": "Please use calibrated server time (the now() function) instead."
+      }
     ]
   },
 

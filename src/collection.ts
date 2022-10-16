@@ -7,7 +7,7 @@ import {
 
 export function collection(
   db: Firestore,
-  ...paths: ["rooms"] | ["rooms", string, "actions"]
+  ...paths: ["rooms"] | ["rooms", string, "actions"] | ["calibrations"]
 ): CollectionReference {
   return _collection(db, ...withVersionSuffix(paths))
 }
@@ -15,7 +15,8 @@ export function collection(
 function withVersionSuffix(
   paths: [string, ...string[]]
 ): [string, ...string[]] {
-  return [`${paths[0]}-${import.meta.env.VITE_DB_VERSION}`, ...paths.splice(1)]
+  const [root, ...rest] = paths
+  return [root + "-" + import.meta.env.VITE_DB_VERSION, ...rest]
 }
 
 if (import.meta.vitest) {

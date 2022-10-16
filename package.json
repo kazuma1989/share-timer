@@ -27,7 +27,9 @@
     "firebase-login": "firebase login",
     "firebase-init": "firebase init",
     "firebase-target-apply": "firebase target:apply hosting app sharetimer",
-    "firebase-indexes-export": "firebase firestore:indexes > firestore.indexes.json"
+    "firebase-indexes-export": "firebase firestore:indexes > firestore.indexes.json",
+    "firebase-emulators-init": "firebase init emulators",
+    "firebase-emulators-start": "firebase emulators:start --only firestore"
   },
   "dependencies": {
     "@emotion/css": "11.10.x",
