@@ -17,6 +17,9 @@ import { useFirestore } from "./useFirestore"
 import { where } from "./where"
 import { withMeta } from "./withMeta"
 
+const Clear = Symbol()
+type Clear = typeof Clear
+
 export function useActions(
   roomId: Room["id"]
 ): [
@@ -28,17 +31,9 @@ export function useActions(
   const actions = useAsyncActions(roomId)
 
   const [localActions, dispatchLocal] = useReducer(
-    (
-      actions: Action[],
-      action: ActionOnFirestore | Action[]
-    ): typeof actions => {
-      if (Array.isArray(action)) {
-        return action
-      }
-
-      return [...actions, actionZod.parse(action)]
-    },
-    actions
+    (actions: Action[], action: ActionOnFirestore | Clear): typeof actions =>
+      action === Clear ? [] : [...actions, actionZod.parse(action)],
+    []
   )
 
   const dispatch = (action: ActionOnFirestore) => {
@@ -48,10 +43,11 @@ export function useActions(
   }
 
   if (isKnown(actions)) {
-    return [localActions, dispatch]
+    return [[...actions, ...localActions], dispatch]
   }
 
-  dispatchLocal(actions)
+  console.log("clear!")
+  dispatchLocal(Clear)
   return [actions, dispatch]
 }
 
@@ -117,7 +113,9 @@ function useAsyncActions(roomId: Room["id"]): Action[] {
               return []
             })
 
-            next(actions)
+            self.setTimeout(() => {
+              next(actions)
+            }, 1_000)
           }
         )
 

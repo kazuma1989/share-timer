@@ -11,7 +11,11 @@ const timestampToMillis = timestamp.transform((t) =>
   t instanceof Timestamp ? t.toMillis() : getOrPut(t, now)
 )
 
-const getOrPut = mapGetOrPut(new WeakMap<FieldValue, number>())
+const _getOrPut = mapGetOrPut(new WeakMap<FieldValue, number>())
+const getOrPut: typeof _getOrPut = (v, d) => {
+  console.log(v)
+  return _getOrPut(v, d)
+}
 
 export const actionZod = z.union([
   z.object({
