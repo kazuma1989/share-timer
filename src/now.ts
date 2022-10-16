@@ -6,6 +6,7 @@ import {
   setDoc,
   Timestamp,
 } from "firebase/firestore"
+import * as z from "zod"
 import { collection } from "./collection"
 import { withMeta } from "./withMeta"
 
@@ -18,7 +19,7 @@ export function now(): number {
 }
 
 /**
- * serverTimestamp() - Date.now()
+ * serverTimestamp() - Timestamp.now()
  */
 let _estimatedDiff = 0
 
@@ -26,22 +27,24 @@ export async function calibrateClock(db: Firestore): Promise<void> {
   const clientDoc = doc(collection(db, "calibrations"))
   await setDoc(
     clientDoc,
-    // TODO zod type check
-    withMeta({
+    withMeta<Calibration>({
       clientTime: Timestamp.now(),
-      serverTime: serverTimestamp(),
+      serverTime: serverTimestamp() as Timestamp,
     })
   )
 
   const serverDoc = await getDocFromServer(clientDoc)
-  // TODO zod validation
-  const { clientTime, serverTime } = serverDoc.data()! as {
-    clientTime: Timestamp
-    serverTime: Timestamp
-  }
+  const { clientTime, serverTime } = calibrationZod.parse(serverDoc.data())
 
   _estimatedDiff = serverTime.toMillis() - clientTime.toMillis()
 
   import.meta.env.DEV &&
     console.info("diff (serverTime - clientTime)", _estimatedDiff)
 }
+
+const calibrationZod = z.object({
+  clientTime: z.instanceof(Timestamp),
+  serverTime: z.instanceof(Timestamp),
+})
+
+interface Calibration extends z.infer<typeof calibrationZod> {}
