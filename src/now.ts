@@ -20,7 +20,7 @@ export function now(): number {
 // eslint-disable-next-line no-restricted-globals
 const _now = () => Date.now() + delta
 const delta = import.meta.env.DEV
-  ? Math.floor(2_000 * Math.random() - 1_000)
+  ? Math.floor(4_000 * Math.random() - 2_000)
   : 0
 
 /**
