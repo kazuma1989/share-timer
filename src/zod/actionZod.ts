@@ -1,6 +1,10 @@
 import { FieldValue, Timestamp } from "firebase/firestore"
 import * as z from "zod"
 
+export type Action = z.output<typeof actionZod>
+
+export type ActionOnFirestore = z.input<typeof actionZod>
+
 const timestamp = z
   .instanceof(Timestamp)
   .or(z.custom<FieldValue>((_) => _ instanceof FieldValue))
@@ -29,7 +33,3 @@ export const actionZod = z.union([
     at: timestampToMillis,
   }),
 ])
-
-export type Action = z.output<typeof actionZod>
-
-export type ActionOnFirestore = z.input<typeof actionZod>

@@ -1,5 +1,11 @@
 import * as z from "zod"
 
+export interface Room extends z.output<typeof roomZod> {
+  id: z.infer<typeof roomIdZod>
+}
+
+export interface RoomOnFirestore extends z.input<typeof roomZod> {}
+
 export const roomZod = z.object({
   name: z.string().max(1_000).optional(),
 })
@@ -8,12 +14,6 @@ export const roomIdZod = z
   .string()
   .regex(/^[A-Za-z0-9]{20}$/)
   .brand()
-
-export interface Room extends z.output<typeof roomZod> {
-  id: z.infer<typeof roomIdZod>
-}
-
-export interface RoomOnFirestore extends z.input<typeof roomZod> {}
 
 if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
