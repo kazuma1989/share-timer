@@ -16,8 +16,11 @@ export function useRoom(): Room {
   const roomId = _.success
     ? _.data
     : roomIdZod.parse(doc(collection(db, "rooms")).id)
+
   if (!_.success) {
-    setHash(roomId)
+    throw Promise.resolve().then(() => {
+      setHash(roomId)
+    })
   }
 
   const store = getOrPut(roomId, () =>
