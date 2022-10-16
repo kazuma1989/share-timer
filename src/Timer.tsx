@@ -1,6 +1,6 @@
 import { css } from "@emotion/css"
 import { addDoc, serverTimestamp, Timestamp } from "firebase/firestore"
-import { useRef } from "react"
+import { Reducer, useReducer, useRef } from "react"
 import { Action, ActionOnFirestore } from "./actionZod"
 import { collection } from "./collection"
 import { formatDuration } from "./formatDuration"
@@ -29,10 +29,45 @@ export type TimerState =
       restDuration: number
     }
 
+const knownObjects = new WeakSet()
+const isKnown = <T extends object>(item: T): boolean => {
+  const known = knownObjects.has(item)
+  knownObjects.add(item)
+
+  return known
+}
+
 export function Timer({ roomId }: { roomId: Room["id"] }) {
   const db = useFirestore()
 
-  const actions = useActions(roomId)
+  let actions = useActions(roomId)
+
+  const [localActions, dispatchLocal] = useReducer<
+    Reducer<Action[], ActionOnFirestore>
+  >((actions, action) => {
+    switch (action.type) {
+      case "edit":
+      case "edit-done": {
+        return [...actions, action]
+      }
+
+      case "pause":
+      case "start": {
+        return [
+          ...actions,
+          {
+            ...action,
+            // FIXME remove side-effect!
+            at: now(),
+          },
+        ]
+      }
+    }
+  }, actions)
+  if (isKnown(actions)) {
+    actions = localActions
+  }
+
   const state = actions.reduce(reducer, {
     mode: "paused",
     restDuration: 0,
@@ -45,6 +80,8 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
 
   const dispatch = (action: ActionOnFirestore) => {
     if (pending) return
+
+    dispatchLocal(action)
 
     return addPromise(
       addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
