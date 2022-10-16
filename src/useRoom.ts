@@ -58,9 +58,8 @@ async function setupRoom(db: Firestore, newRoomId: string): Promise<void> {
   )
 
   const actions = collection(db, "rooms", newRoomId, "actions")
-  const newActionId = doc(actions).id
   batch.set(
-    doc(actions, newActionId),
+    doc(actions),
     withMeta<ActionOnFirestore>({
       type: "edit-done",
       duration: DEFAULT_DURATION,
