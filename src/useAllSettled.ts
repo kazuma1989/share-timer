@@ -1,6 +1,6 @@
 import { Reducer, useReducer, useSyncExternalStore } from "react"
-import { mapGetOrPut } from "./mapGetOrPut"
 import { Store } from "./Store"
+import { mapGetOrPut } from "./util/mapGetOrPut"
 
 interface Add {
   <T extends PromiseLike<unknown>>(promise: T): T
