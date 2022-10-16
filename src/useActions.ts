@@ -13,11 +13,27 @@ import { mapGetOrPut } from "./mapGetOrPut"
 import { orderBy } from "./orderBy"
 import { Room } from "./roomZod"
 import { Store } from "./Store"
+import { timerReducer } from "./timerReducer"
 import { useFirestore } from "./useFirestore"
 import { where } from "./where"
 import { withMeta } from "./withMeta"
 
-export function useActions(roomId: Room["id"]): Action[] {
+export type TimerState =
+  | {
+      mode: "editing"
+      initialDuration: number
+    }
+  | {
+      mode: "running"
+      startedAt: number
+      duration: number
+    }
+  | {
+      mode: "paused"
+      restDuration: number
+    }
+
+export function useTimerState(roomId: Room["id"]): TimerState {
   const db = useFirestore()
 
   const store = getOrPut(roomId, () =>
@@ -76,7 +92,12 @@ export function useActions(roomId: Room["id"]): Action[] {
               return []
             })
 
-            next(actions)
+            next(
+              actions.reduce(timerReducer, {
+                mode: "paused",
+                restDuration: 0,
+              })
+            )
           }
         )
 
@@ -92,6 +113,8 @@ export function useActions(roomId: Room["id"]): Action[] {
   return useSyncExternalStore(store.subscribe, store.getOrThrow)
 }
 
+const getOrPut = mapGetOrPut(new Map<Room["id"], Store<TimerState>>())
+
 export function useDispatchAction(
   roomId: Room["id"]
 ): (action: ActionOnFirestore) => Promise<unknown> {
@@ -106,5 +129,3 @@ export function useDispatchAction(
     [db, roomId]
   )
 }
-
-const getOrPut = mapGetOrPut(new Map<Room["id"], Store<Action[]>>())

@@ -4,33 +4,13 @@ import { useRef } from "react"
 import { formatDuration } from "./formatDuration"
 import { Room } from "./roomZod"
 import { timeInputZod } from "./timeInputZod"
-import { timerReducer } from "./timerReducer"
 import { TimeViewer } from "./TimeViewer"
-import { useActions, useDispatchAction } from "./useActions"
+import { useDispatchAction, useTimerState } from "./useActions"
 import { useAllSettled } from "./useAllSettled"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 
-export type TimerState =
-  | {
-      mode: "editing"
-      initialDuration: number
-    }
-  | {
-      mode: "running"
-      startedAt: number
-      duration: number
-    }
-  | {
-      mode: "paused"
-      restDuration: number
-    }
-
 export function Timer({ roomId }: { roomId: Room["id"] }) {
-  const actions = useActions(roomId)
-  const state = actions.reduce(timerReducer, {
-    mode: "paused",
-    restDuration: 0,
-  })
+  const state = useTimerState(roomId)
 
   useTitleAsTimeViewer(state)
 

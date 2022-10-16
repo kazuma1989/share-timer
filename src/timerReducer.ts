@@ -1,6 +1,6 @@
 import { Action } from "./actionZod"
 import { now } from "./now"
-import { TimerState } from "./Timer"
+import { TimerState } from "./useActions"
 
 export function timerReducer(state: TimerState, action: Action): TimerState {
   switch (action.type) {
