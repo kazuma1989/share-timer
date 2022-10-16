@@ -18,6 +18,9 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
       typescript: true,
       eslint: {
         lintCommand: scripts["lint"],
+        dev: {
+          logLevel: ["error"],
+        },
       },
     })
   }
