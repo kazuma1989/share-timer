@@ -14,6 +14,7 @@ const firebaseApp = initializeApp(
 const firestore = getFirestore(firebaseApp)
 
 if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
+  console.info("using emulator (localhost:8080)")
   connectFirestoreEmulator(firestore, "localhost", 8080)
 }
 
