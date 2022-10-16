@@ -1,12 +1,13 @@
 import {
+  addDoc,
   getDocs,
   limitToLast,
   onSnapshot,
   query,
   startAt,
 } from "firebase/firestore"
-import { useSyncExternalStore } from "react"
-import { Action, actionZod } from "./actionZod"
+import { useReducer, useSyncExternalStore } from "react"
+import { Action, ActionOnFirestore, actionZod } from "./actionZod"
 import { collection } from "./collection"
 import { mapGetOrPut } from "./mapGetOrPut"
 import { orderBy } from "./orderBy"
@@ -14,8 +15,60 @@ import { Room } from "./roomZod"
 import { Store } from "./Store"
 import { useFirestore } from "./useFirestore"
 import { where } from "./where"
+import { withMeta } from "./withMeta"
 
-export function useActions(roomId: Room["id"]): Action[] {
+export function useActions(
+  roomId: Room["id"]
+): [
+  actions: Action[],
+  dispatch: (action: ActionOnFirestore) => Promise<unknown>
+] {
+  const db = useFirestore()
+
+  const actions = useAsyncActions(roomId)
+
+  const [localActions, dispatchLocal] = useReducer(
+    (
+      actions: Action[],
+      action: ActionOnFirestore | Action[]
+    ): typeof actions => {
+      if (Array.isArray(action)) {
+        return action
+      }
+
+      return [...actions, actionZod.parse(action)]
+    },
+    actions
+  )
+
+  const dispatch = (action: ActionOnFirestore) => {
+    dispatchLocal(action)
+
+    return addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
+  }
+
+  if (isKnown(actions)) {
+    return [localActions, dispatch]
+  }
+
+  dispatchLocal(actions)
+  return [actions, dispatch]
+}
+
+function isKnown<T extends object>(item: T): boolean {
+  const known = _knownObjects.has(item)
+  _knownObjects.add(item)
+
+  return known
+}
+const _knownObjects = new WeakSet()
+
+/**
+ * Firestoreからactionsコレクションの配列を取得する。
+ *
+ * 同期的に解決せずReact的にすこしだけラグがあるかも、ということで"Async"という名前に。
+ */
+function useAsyncActions(roomId: Room["id"]): Action[] {
   const db = useFirestore()
 
   const store = getOrPut(roomId, () =>

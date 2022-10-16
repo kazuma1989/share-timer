@@ -1,8 +1,7 @@
 import { css } from "@emotion/css"
-import { addDoc, serverTimestamp } from "firebase/firestore"
-import { Reducer, useReducer, useRef } from "react"
-import { Action, ActionOnFirestore, actionZod } from "./actionZod"
-import { collection } from "./collection"
+import { serverTimestamp } from "firebase/firestore"
+import { useRef } from "react"
+import { Action } from "./actionZod"
 import { formatDuration } from "./formatDuration"
 import { now } from "./now"
 import { Room } from "./roomZod"
@@ -10,9 +9,7 @@ import { timeInputZod } from "./timeInputZod"
 import { TimeViewer } from "./TimeViewer"
 import { useActions } from "./useActions"
 import { useAllSettled } from "./useAllSettled"
-import { useFirestore } from "./useFirestore"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
-import { withMeta } from "./withMeta"
 
 export type TimerState =
   | {
@@ -29,26 +26,8 @@ export type TimerState =
       restDuration: number
     }
 
-const knownObjects = new WeakSet()
-const isKnown = <T extends object>(item: T): boolean => {
-  const known = knownObjects.has(item)
-  knownObjects.add(item)
-
-  return known
-}
-
 export function Timer({ roomId }: { roomId: Room["id"] }) {
-  const db = useFirestore()
-
-  let actions = useActions(roomId)
-
-  const [localActions, dispatchLocal] = useReducer<
-    Reducer<Action[], ActionOnFirestore>
-  >((actions, action) => [...actions, actionZod.parse(action)], actions)
-  if (isKnown(actions)) {
-    actions = localActions
-  }
-
+  const [actions, _dispatch] = useActions(roomId)
   const state = actions.reduce(reducer, {
     mode: "paused",
     restDuration: 0,
@@ -59,15 +38,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
   const [_allSettled, addPromise] = useAllSettled()
   const pending = !_allSettled
 
-  const dispatch = (action: ActionOnFirestore) => {
-    if (pending) return
-
-    dispatchLocal(action)
-
-    return addPromise(
-      addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
-    )
-  }
+  const dispatch: typeof _dispatch = (action) => addPromise(_dispatch(action))
 
   const timeInput$ = useRef<HTMLInputElement>(null)
 
