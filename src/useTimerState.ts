@@ -1,13 +1,12 @@
 import {
-  addDoc,
   getDocs,
   limitToLast,
   onSnapshot,
   query,
   startAt,
 } from "firebase/firestore"
-import { useCallback, useSyncExternalStore } from "react"
-import { Action, ActionOnFirestore, actionZod } from "./actionZod"
+import { useSyncExternalStore } from "react"
+import { Action, actionZod } from "./actionZod"
 import { collection } from "./collection"
 import { mapGetOrPut } from "./mapGetOrPut"
 import { orderBy } from "./orderBy"
@@ -16,7 +15,6 @@ import { Store } from "./Store"
 import { timerReducer } from "./timerReducer"
 import { useFirestore } from "./useFirestore"
 import { where } from "./where"
-import { withMeta } from "./withMeta"
 
 export type TimerState =
   | {
@@ -126,18 +124,3 @@ export function useTimerState(roomId: Room["id"]): TimerState {
 }
 
 const getOrPut = mapGetOrPut(new Map<Room["id"], Store<TimerState>>())
-
-export function useDispatchAction(
-  roomId: Room["id"]
-): (action: ActionOnFirestore) => Promise<unknown> {
-  const db = useFirestore()
-
-  return useCallback(
-    (action) =>
-      addDoc(
-        collection(db, "rooms", roomId, "actions"),
-        withMeta<ActionOnFirestore>(action)
-      ),
-    [db, roomId]
-  )
-}
