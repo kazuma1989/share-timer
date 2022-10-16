@@ -17,7 +17,7 @@ export class Store<T> {
   private latestValue: T | typeof Store.Empty = Store.Empty
 
   private constructor(getSubscription: GetSubscription<T>) {
-    const subscribe = () => getSubscription(this.next)
+    const subscribe = () => getSubscription.call(this, this.next)
 
     let unsubscribe: Unsubscribe | null
     this.rootSubscription = {
@@ -77,7 +77,7 @@ export class Store<T> {
 }
 
 interface GetSubscription<T> {
-  (next: (value: T) => void): Unsubscribe
+  (this: Store<T>, next: (value: T) => void): Unsubscribe
 }
 
 interface Unsubscribe {

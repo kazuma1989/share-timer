@@ -37,7 +37,7 @@ export function useTimerState(roomId: Room["id"]): TimerState {
   const db = useFirestore()
 
   const store = getOrPut(roomId, () =>
-    Store.from((next) => {
+    Store.from(function (next) {
       console.debug("actions listener attached")
 
       const abort = new AbortController()
@@ -59,6 +59,8 @@ export function useTimerState(roomId: Room["id"]): TimerState {
           ? [startAt(_)]
           : []
 
+        const estimate = new WeakSet<TimerState>()
+
         const unsubscribe = onSnapshot(
           query(
             collection(db, "rooms", roomId, "actions"),
@@ -66,17 +68,7 @@ export function useTimerState(roomId: Room["id"]): TimerState {
             ...startAtLatestEditDone
           ),
           (doc) => {
-            const changes = doc.docChanges()
-
-            // actionsはaddedしか起きないはずなので、modifiedになるのはローカルの変更がサーバーに同期され、
-            // serverTimestamps: "estimate" が解決したとき。
-            // どこかで帳尻が合うはずなので、UIのちらつき低減を優先してみる。
-            const onlyIncludeServerTimestampSettlements = changes.every(
-              (_) => _.type === "modified"
-            )
-            if (onlyIncludeServerTimestampSettlements) return
-
-            console.debug("listen %d docChanges", changes.length)
+            console.debug("listen %d docChanges", doc.docChanges().length)
 
             const actions = doc.docs.flatMap<Action>((doc) => {
               const rawData = doc.data({
@@ -92,12 +84,32 @@ export function useTimerState(roomId: Room["id"]): TimerState {
               return []
             })
 
-            next(
-              actions.reduce(timerReducer, {
-                mode: "paused",
-                restDuration: 0,
-              })
-            )
+            const newState = actions.reduce(timerReducer, {
+              mode: "paused",
+              restDuration: 0,
+            })
+
+            const hasEstimateTimestamp =
+              doc.metadata.fromCache || doc.metadata.hasPendingWrites
+            if (hasEstimateTimestamp) {
+              estimate.add(newState)
+            }
+
+            const currentState = this.getValue()
+            if (
+              currentState !== Store.Empty &&
+              estimate.has(currentState) &&
+              currentState.mode === "running" &&
+              !estimate.has(newState) &&
+              newState.mode === "running"
+            ) {
+              import.meta.env.DEV &&
+                console.debug("skipped an estimate -> settled change")
+
+              return
+            }
+
+            next(newState)
           }
         )
 
