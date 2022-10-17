@@ -18,12 +18,14 @@ import {
 } from "rxjs"
 import { createStore, Store } from "./createStore"
 import { collection } from "./firestore/collection"
+import { hasNoEstimateTimestamp } from "./firestore/hasNoEstimateTimestamp"
 import { orderBy } from "./firestore/orderBy"
 import { where } from "./firestore/where"
+import { safeParseDocsWith } from "./safeParseDocsWith"
 import { timerReducer } from "./timerReducer"
 import { useFirestore } from "./useFirestore"
 import { mapGetOrPut } from "./util/mapGetOrPut"
-import { Action, actionZod } from "./zod/actionZod"
+import { actionZod } from "./zod/actionZod"
 import { Room } from "./zod/roomZod"
 
 export type TimerState =
@@ -45,8 +47,8 @@ export function useTimerState(roomId: Room["id"]): TimerState {
   const db = useFirestore()
 
   const store = getOrPut(roomId, () => {
-    const Empty = Symbol("empty")
-    type Empty = typeof Empty
+    const FirstValue = Symbol("empty")
+    type FirstValue = typeof FirstValue
 
     type StateWithMeta = [state: TimerState, timestamp: "estimate" | "server"]
 
@@ -56,59 +58,42 @@ export function useTimerState(roomId: Room["id"]): TimerState {
 
         const abort = new AbortController()
 
-        getDocs(
-          query(
-            collection(db, "rooms", roomId, "actions"),
-            where("type", "==", "edit-done"),
-            orderBy("createdAt", "asc"),
-            limitToLast(1)
-          )
-        ).then((doc) => {
+        const selectLatestEditDone = query(
+          collection(db, "rooms", roomId, "actions"),
+          where("type", "==", "edit-done"),
+          orderBy("createdAt", "asc"),
+          limitToLast(1)
+        )
+        getDocs(selectLatestEditDone).then(({ docs: [latestEditDone] }) => {
           if (abort.signal.aborted) return
 
-          const _ = doc.docs[0]
-          const serverTimestampCommitted =
-            _ && !_.metadata.fromCache && !_.metadata.hasPendingWrites
-          const startAtLatestEditDone = serverTimestampCommitted
-            ? [startAt(_)]
-            : []
-
-          const unsubscribe = onSnapshot(
-            query(
-              collection(db, "rooms", roomId, "actions"),
-              orderBy("createdAt", "asc"),
-              ...startAtLatestEditDone
-            ),
-            (doc) => {
-              console.debug("listen %d docChanges", doc.docChanges().length)
-
-              const actions = doc.docs.flatMap<Action>((doc) => {
-                const rawData = doc.data({
-                  serverTimestamps: "estimate",
-                })
-
-                const parsed = actionZod.safeParse(rawData)
-                if (parsed.success) {
-                  return [parsed.data]
-                }
-
-                console.debug(rawData, parsed.error)
-                return []
-              })
-
-              const newState = actions.reduce(timerReducer, {
-                mode: "paused",
-                restDuration: 0,
-              })
-
-              subscriber.next([
-                newState,
-                doc.metadata.fromCache || doc.metadata.hasPendingWrites
-                  ? "estimate"
-                  : "server",
-              ])
-            }
+          let selectActions = query(
+            collection(db, "rooms", roomId, "actions"),
+            orderBy("createdAt", "asc")
           )
+          if (
+            latestEditDone &&
+            hasNoEstimateTimestamp(latestEditDone.metadata)
+          ) {
+            selectActions = query(selectActions, startAt(latestEditDone))
+          }
+
+          const parseDocs = safeParseDocsWith(actionZod)
+
+          const unsubscribe = onSnapshot(selectActions, (snapshot) => {
+            console.debug("listen %d docChanges", snapshot.docChanges().length)
+
+            const actions = parseDocs(snapshot.docs)
+            const newState = actions.reduce(timerReducer, {
+              mode: "paused",
+              restDuration: 0,
+            })
+
+            subscriber.next([
+              newState,
+              hasNoEstimateTimestamp(snapshot.metadata) ? "server" : "estimate",
+            ])
+          })
 
           abort.signal.addEventListener("abort", unsubscribe)
         })
@@ -124,15 +109,15 @@ export function useTimerState(roomId: Room["id"]): TimerState {
         }),
 
         // 最新の値と直前の値をペアで流す
-        startWith(Empty),
+        startWith(FirstValue),
         pairwise() as OperatorFunction<
-          StateWithMeta | Empty,
-          [StateWithMeta | Empty, StateWithMeta]
+          StateWithMeta | FirstValue,
+          [StateWithMeta | FirstValue, StateWithMeta]
         >,
 
         // UIが受け取るべき値を選別して流す
         filter(([prev, [newState, newTimestampIs]]) => {
-          if (prev !== Empty) {
+          if (prev !== FirstValue) {
             const [prevState, prevTimestampIs] = prev
 
             if (
@@ -142,7 +127,7 @@ export function useTimerState(roomId: Room["id"]): TimerState {
               newState.mode === "running"
             ) {
               import.meta.env.DEV &&
-                console.debug("skipped an estimate -> settled change")
+                console.debug("skipped an estimate -> server timestamp change")
 
               return false
             }
