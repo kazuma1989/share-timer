@@ -8,8 +8,8 @@ import {
 import { useSyncExternalStore } from "react"
 import {
   filter,
-  fromEventPattern,
   map,
+  Observable,
   OperatorFunction,
   pairwise,
   share,
@@ -51,79 +51,73 @@ export function useTimerState(roomId: Room["id"]): TimerState {
     type StateWithMeta = [state: TimerState, timestamp: "estimate" | "server"]
 
     return createStore(
-      fromEventPattern<StateWithMeta>(
-        (next) => {
-          console.debug("actions listener attached")
+      new Observable<StateWithMeta>((subscriber) => {
+        console.debug("actions listener attached")
 
-          const abort = new AbortController()
+        const abort = new AbortController()
 
-          getDocs(
+        getDocs(
+          query(
+            collection(db, "rooms", roomId, "actions"),
+            where("type", "==", "edit-done"),
+            orderBy("createdAt", "asc"),
+            limitToLast(1)
+          )
+        ).then((doc) => {
+          if (abort.signal.aborted) return
+
+          const _ = doc.docs[0]
+          const serverTimestampCommitted =
+            _ && !_.metadata.fromCache && !_.metadata.hasPendingWrites
+          const startAtLatestEditDone = serverTimestampCommitted
+            ? [startAt(_)]
+            : []
+
+          const unsubscribe = onSnapshot(
             query(
               collection(db, "rooms", roomId, "actions"),
-              where("type", "==", "edit-done"),
               orderBy("createdAt", "asc"),
-              limitToLast(1)
-            )
-          ).then((doc) => {
-            if (abort.signal.aborted) return
+              ...startAtLatestEditDone
+            ),
+            (doc) => {
+              console.debug("listen %d docChanges", doc.docChanges().length)
 
-            const _ = doc.docs[0]
-            const serverTimestampCommitted =
-              _ && !_.metadata.fromCache && !_.metadata.hasPendingWrites
-            const startAtLatestEditDone = serverTimestampCommitted
-              ? [startAt(_)]
-              : []
-
-            const unsubscribe = onSnapshot(
-              query(
-                collection(db, "rooms", roomId, "actions"),
-                orderBy("createdAt", "asc"),
-                ...startAtLatestEditDone
-              ),
-              (doc) => {
-                console.debug("listen %d docChanges", doc.docChanges().length)
-
-                const actions = doc.docs.flatMap<Action>((doc) => {
-                  const rawData = doc.data({
-                    serverTimestamps: "estimate",
-                  })
-
-                  const parsed = actionZod.safeParse(rawData)
-                  if (parsed.success) {
-                    return [parsed.data]
-                  }
-
-                  console.debug(rawData, parsed.error)
-                  return []
+              const actions = doc.docs.flatMap<Action>((doc) => {
+                const rawData = doc.data({
+                  serverTimestamps: "estimate",
                 })
 
-                const newState = actions.reduce(timerReducer, {
-                  mode: "paused",
-                  restDuration: 0,
-                })
+                const parsed = actionZod.safeParse(rawData)
+                if (parsed.success) {
+                  return [parsed.data]
+                }
 
-                const x: StateWithMeta = [
-                  newState,
-                  doc.metadata.fromCache || doc.metadata.hasPendingWrites
-                    ? "estimate"
-                    : "server",
-                ]
-                next(x)
-              }
-            )
+                console.debug(rawData, parsed.error)
+                return []
+              })
 
-            abort.signal.addEventListener("abort", unsubscribe)
-          })
+              const newState = actions.reduce(timerReducer, {
+                mode: "paused",
+                restDuration: 0,
+              })
 
-          return () => {
-            abort.abort()
-          }
-        },
-        (_, abort) => {
-          console.error("aborted!!")
-          abort()
+              subscriber.next([
+                newState,
+                doc.metadata.fromCache || doc.metadata.hasPendingWrites
+                  ? "estimate"
+                  : "server",
+              ])
+            }
+          )
+
+          abort.signal.addEventListener("abort", unsubscribe)
+        })
+
+        return () => {
+          console.debug("aborted!!")
+          abort.abort()
         }
-      ).pipe(
+      }).pipe(
         share({
           // リスナーがいなくなって30秒後に根元の購読も解除する
           resetOnRefCountZero: () => timer(30_000),
