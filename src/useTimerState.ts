@@ -6,10 +6,18 @@ import {
   startAt,
 } from "firebase/firestore"
 import { useSyncExternalStore } from "react"
+import {
+  firstValueFrom,
+  fromEventPattern,
+  OperatorFunction,
+  pairwise,
+  share,
+  startWith,
+  timer,
+} from "rxjs"
 import { collection } from "./firestore/collection"
 import { orderBy } from "./firestore/orderBy"
 import { where } from "./firestore/where"
-import { Store } from "./Store"
 import { timerReducer } from "./timerReducer"
 import { useFirestore } from "./useFirestore"
 import { mapGetOrPut } from "./util/mapGetOrPut"
@@ -34,93 +42,142 @@ export type TimerState =
 export function useTimerState(roomId: Room["id"]): TimerState {
   const db = useFirestore()
 
-  const store = getOrPut(roomId, () =>
-    Store.from((store) => {
-      console.debug("actions listener attached")
+  const [subscribe, getSnapshot] = getOrPut(roomId, () => {
+    const Empty = Symbol("empty")
+    type Empty = typeof Empty
 
-      const abort = new AbortController()
+    type X = [state: TimerState, timestamp: "estimate" | "server"]
 
-      getDocs(
-        query(
-          collection(db, "rooms", roomId, "actions"),
-          where("type", "==", "edit-done"),
-          orderBy("createdAt", "asc"),
-          limitToLast(1)
-        )
-      ).then((doc) => {
-        if (abort.signal.aborted) return
+    const x = fromEventPattern<X>(
+      (next) => {
+        console.debug("actions listener attached")
 
-        const _ = doc.docs[0]
-        const serverTimestampCommitted =
-          _ && !_.metadata.fromCache && !_.metadata.hasPendingWrites
-        const startAtLatestEditDone = serverTimestampCommitted
-          ? [startAt(_)]
-          : []
+        const abort = new AbortController()
 
-        const estimate = new WeakSet<TimerState>()
-
-        const unsubscribe = onSnapshot(
+        getDocs(
           query(
             collection(db, "rooms", roomId, "actions"),
+            where("type", "==", "edit-done"),
             orderBy("createdAt", "asc"),
-            ...startAtLatestEditDone
-          ),
-          (doc) => {
-            console.debug("listen %d docChanges", doc.docChanges().length)
+            limitToLast(1)
+          )
+        ).then((doc) => {
+          if (abort.signal.aborted) return
 
-            const actions = doc.docs.flatMap<Action>((doc) => {
-              const rawData = doc.data({
-                serverTimestamps: "estimate",
+          const _ = doc.docs[0]
+          const serverTimestampCommitted =
+            _ && !_.metadata.fromCache && !_.metadata.hasPendingWrites
+          const startAtLatestEditDone = serverTimestampCommitted
+            ? [startAt(_)]
+            : []
+
+          const unsubscribe = onSnapshot(
+            query(
+              collection(db, "rooms", roomId, "actions"),
+              orderBy("createdAt", "asc"),
+              ...startAtLatestEditDone
+            ),
+            (doc) => {
+              console.debug("listen %d docChanges", doc.docChanges().length)
+
+              const actions = doc.docs.flatMap<Action>((doc) => {
+                const rawData = doc.data({
+                  serverTimestamps: "estimate",
+                })
+
+                const parsed = actionZod.safeParse(rawData)
+                if (parsed.success) {
+                  return [parsed.data]
+                }
+
+                console.debug(rawData, parsed.error)
+                return []
               })
 
-              const parsed = actionZod.safeParse(rawData)
-              if (parsed.success) {
-                return [parsed.data]
-              }
+              const newState = actions.reduce(timerReducer, {
+                mode: "paused",
+                restDuration: 0,
+              })
 
-              console.debug(rawData, parsed.error)
-              return []
-            })
-
-            const newState = actions.reduce(timerReducer, {
-              mode: "paused",
-              restDuration: 0,
-            })
-
-            const hasEstimateTimestamp =
-              doc.metadata.fromCache || doc.metadata.hasPendingWrites
-            if (hasEstimateTimestamp) {
-              estimate.add(newState)
+              const x: X = [
+                newState,
+                doc.metadata.fromCache || doc.metadata.hasPendingWrites
+                  ? "estimate"
+                  : "server",
+              ]
+              next(x)
             }
+          )
 
-            const currentState = store.getValue()
+          abort.signal.addEventListener("abort", unsubscribe)
+        })
+
+        return () => {
+          abort.abort()
+        }
+      },
+      (_, abort) => {
+        console.error("aborted!!")
+        abort()
+      }
+    ).pipe(
+      startWith(Empty),
+      pairwise() as OperatorFunction<X | Empty, [X | Empty, X]>,
+      share({
+        // リスナーがいなくなって30秒後に根元の購読も解除する
+        resetOnRefCountZero: () => timer(30_000),
+      })
+    )
+
+    let currentState: TimerState | Empty = Empty
+
+    return [
+      () => {
+        const s = x.subscribe(([prev, [newState, newTimestampIs]]) => {
+          if (prev !== Empty) {
+            const [prevState, prevTimestampIs] = prev
+
             if (
-              currentState !== Store.Empty &&
-              estimate.has(currentState) &&
-              currentState.mode === "running" &&
-              !estimate.has(newState) &&
+              prevTimestampIs === "estimate" &&
+              prevState.mode === "running" &&
+              newTimestampIs === "server" &&
               newState.mode === "running"
             ) {
               import.meta.env.DEV &&
                 console.debug("skipped an estimate -> settled change")
-
               return
             }
-
-            store.next(newState)
           }
-        )
 
-        abort.signal.addEventListener("abort", unsubscribe)
-      })
+          currentState = newState
+        })
 
-      return () => {
-        abort.abort()
-      }
-    })
-  )
+        return () => {
+          s.unsubscribe()
+        }
+      },
 
-  return useSyncExternalStore(store.subscribe, store.getOrThrow)
+      () => {
+        if (currentState !== Empty) {
+          return currentState
+        }
+
+        throw firstValueFrom(x).then(([, [newState]]) => {
+          currentState = newState
+        })
+      },
+    ]
+  })
+
+  return useSyncExternalStore(subscribe, getSnapshot)
 }
 
-const getOrPut = mapGetOrPut(new Map<Room["id"], Store<TimerState>>())
+const getOrPut = mapGetOrPut(
+  new Map<
+    Room["id"],
+    [
+      subscribe: (onStoreChange: () => void) => () => void,
+      getSnapshot: () => TimerState
+    ]
+  >()
+)
