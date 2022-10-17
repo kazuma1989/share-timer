@@ -1,5 +1,5 @@
 import { Reducer, useReducer, useSyncExternalStore } from "react"
-import { createStore, Store } from "./createStore"
+import { createStore, Store } from "./util/createStore"
 
 interface Add {
   <T extends PromiseLike<unknown>>(promise: T): T
