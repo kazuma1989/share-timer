@@ -1,6 +1,6 @@
 import { doc, Firestore, onSnapshot, writeBatch } from "firebase/firestore"
 import { useSyncExternalStore } from "react"
-import { Observable } from "rxjs"
+import { Observable, share, timer } from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { useFirestore } from "./useFirestore"
@@ -36,6 +36,11 @@ export function useRoom(): Room {
             ...roomZod.parse(roomDoc.data()),
             id: roomId,
           })
+        })
+      ).pipe(
+        share({
+          // リスナーがいなくなって30秒後に根元の購読も解除する
+          resetOnRefCountZero: () => timer(30_000),
         })
       )
     )
