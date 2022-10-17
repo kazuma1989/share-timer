@@ -4,14 +4,49 @@ interface Add {
   <T extends PromiseLike<unknown>>(promise: T): T
 }
 
-interface Store {
+interface Store<T> {
   subscribe(onStoreChange: () => void): () => void
-  getSnapshot(): boolean
+  getSnapshot(): T
+}
+
+function createStore<T>(promise: PromiseLike<T>, initialValue?: T): Store<T> {
+  const Empty = Symbol("empty")
+  type Empty = typeof Empty
+
+  // initialValueにundefinedを指定できないけどまあいいか
+  let currentValue: T | Empty = initialValue ?? Empty
+
+  return {
+    subscribe(onStoreChange) {
+      const abort = new AbortController()
+
+      promise.then((value) => {
+        if (abort.signal.aborted) return
+
+        currentValue = value
+        onStoreChange()
+      })
+
+      return () => {
+        abort.abort()
+      }
+    },
+
+    getSnapshot() {
+      if (currentValue !== Empty) {
+        return currentValue
+      }
+
+      throw promise.then((value) => {
+        currentValue = value
+      })
+    },
+  }
 }
 
 export function useAllSettled(): [allSettled: boolean, add: Add] {
   const [[, store], dispatch] = useReducer<
-    Reducer<[Set<PromiseLike<unknown>>, Store], PromiseLike<unknown>>
+    Reducer<[Set<PromiseLike<unknown>>, Store<boolean>], PromiseLike<unknown>>
   >(
     (state, promise) => {
       const [currentPromises] = state
@@ -19,44 +54,19 @@ export function useAllSettled(): [allSettled: boolean, add: Add] {
         return state
       }
 
-      let settled = false
       const newPromises = new Set(currentPromises.values()).add(promise)
-
       return [
         newPromises,
-        {
-          subscribe(onStoreChange) {
-            const abort = new AbortController()
-
-            Promise.allSettled(newPromises).then(() => {
-              if (abort.signal.aborted) return
-
-              settled = true
-              onStoreChange()
-            })
-
-            return () => {
-              abort.abort()
-            }
-          },
-
-          getSnapshot() {
-            return settled
-          },
-        },
+        createStore(
+          Promise.allSettled(newPromises).then(() => {
+            newPromises.clear()
+            return true
+          }),
+          false
+        ),
       ]
     },
-    [
-      new Set(),
-      {
-        subscribe() {
-          return () => {}
-        },
-        getSnapshot() {
-          return true
-        },
-      },
-    ]
+    [new Set(), createStore(Promise.resolve(true), true)]
   )
 
   const allSettled = useSyncExternalStore(store.subscribe, store.getSnapshot)
