@@ -1,8 +1,8 @@
 import { useEffect } from "react"
 import { formatDuration } from "./formatDuration"
 import { now } from "./now"
-import TimerWorker from "./TimerWorker?worker&inline"
 import { TimerState } from "./useTimerState"
+import IntervalWorker from "./util/interval.worker?worker&inline"
 
 export function useTitleAsTimeViewer(state: TimerState): void {
   const mode = state.mode
@@ -52,17 +52,17 @@ export function useTitleAsTimeViewer(state: TimerState): void {
       }
 
       case "running": {
-        const timer = new TimerWorker()
+        const interval = new IntervalWorker()
         abort.signal.addEventListener("abort", () => {
-          timer.terminate()
+          interval.terminate()
         })
 
         setTitle(duration, startedAt)
-        timer.addEventListener("message", () => {
+        interval.addEventListener("message", () => {
           setTitle(duration, startedAt)
         })
 
-        timer.postMessage(null)
+        interval.postMessage("start")
         break
       }
     }
