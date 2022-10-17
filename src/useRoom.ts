@@ -4,7 +4,7 @@ import { Observable } from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { useFirestore } from "./useFirestore"
-import { setHash, useHash } from "./useHash"
+import { replaceHash, useHash } from "./useHash"
 import { createStore, Store } from "./util/createStore"
 import { mapGetOrPut } from "./util/mapGetOrPut"
 import { ActionOnFirestore } from "./zod/actionZod"
@@ -17,7 +17,7 @@ export function useRoom(): Room {
   if (!_.success) {
     throw Promise.resolve().then(() => {
       const newRoomId = roomIdZod.parse(doc(collection(db, "rooms")).id)
-      setHash(newRoomId)
+      replaceHash(newRoomId)
     })
   }
 
