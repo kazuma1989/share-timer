@@ -1,33 +1,65 @@
 import { Reducer, useReducer, useSyncExternalStore } from "react"
-import { Store } from "./Store"
-import { mapGetOrPut } from "./util/mapGetOrPut"
 
 interface Add {
   <T extends PromiseLike<unknown>>(promise: T): T
 }
 
+interface Store {
+  subscribe(onStoreChange: () => void): () => void
+  getSnapshot(): boolean
+}
+
 export function useAllSettled(): [allSettled: boolean, add: Add] {
-  const [promises, dispatch] = useReducer<
-    Reducer<Set<PromiseLike<unknown>>, PromiseLike<unknown>>
-  >((promises, promise) => {
-    if (promises.has(promise)) {
-      return promises
-    }
+  const [[, store], dispatch] = useReducer<
+    Reducer<[Set<PromiseLike<unknown>>, Store], PromiseLike<unknown>>
+  >(
+    (state, promise) => {
+      const [currentPromises] = state
+      if (currentPromises.has(promise)) {
+        return state
+      }
 
-    return new Set(promises.values()).add(promise)
-  }, new Set())
+      let settled = false
+      const newPromises = new Set(currentPromises.values()).add(promise)
 
-  const store = getOrPut(promises, () =>
-    Store.from(
-      Promise.allSettled(promises).then((): typeof Settled => {
-        promises.clear()
-        return Settled
-      })
-    )
+      return [
+        newPromises,
+        {
+          subscribe(onStoreChange) {
+            const abort = new AbortController()
+
+            Promise.allSettled(newPromises).then(() => {
+              if (abort.signal.aborted) return
+
+              settled = true
+              onStoreChange()
+            })
+
+            return () => {
+              abort.abort()
+            }
+          },
+
+          getSnapshot() {
+            return settled
+          },
+        },
+      ]
+    },
+    [
+      new Set(),
+      {
+        subscribe() {
+          return () => {}
+        },
+        getSnapshot() {
+          return true
+        },
+      },
+    ]
   )
 
-  const allSettled =
-    useSyncExternalStore(store.subscribe, store.getValue) === Settled
+  const allSettled = useSyncExternalStore(store.subscribe, store.getSnapshot)
 
   const add: Add = (promise) => {
     dispatch(promise)
@@ -36,9 +68,3 @@ export function useAllSettled(): [allSettled: boolean, add: Add] {
 
   return [allSettled, add]
 }
-
-const Settled = Symbol("settled")
-
-const getOrPut = mapGetOrPut(
-  new WeakMap<Set<PromiseLike<unknown>>, Store<typeof Settled>>()
-)
