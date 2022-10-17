@@ -46,6 +46,7 @@ import {
   pairwise,
   share,
   startWith,
+  timer,
 } from "rxjs"
 import { collection } from "./firestore/collection"
 import { orderBy } from "./firestore/orderBy"
@@ -102,37 +103,27 @@ const x = fromEventPattern<number>(
     }
   },
   (_, abort) => {
-    console.count("abort")
+    console.error("aborted!!")
     abort()
   }
 ).pipe(
   startWith(Empty),
   pairwise() as OperatorFunction<number | Empty, [number | Empty, number]>,
-  share()
+  share({
+    // リスナーがいなくなって30秒後に根元の購読も解除する
+    resetOnRefCountZero: () => timer(30_000),
+  })
 )
 
 firstValueFrom(x).then((_) => {
   console.log("promise 1", _)
 
-  const s = x.subscribe((_) => {
-    console.log("in promise 1", _)
-  })
+  globalThis.setTimeout(() => {
+    const s = x.subscribe((_) => {
+      console.log("in promise 1", _)
+    })
+
+    // console.time("resetOnRefCountZero")
+    s.unsubscribe()
+  }, 1_000)
 })
-
-// firstValueFrom(x)
-
-{
-  const s = x.subscribe((_) => {
-    // console.log("1", _)
-  })
-  // s.unsubscribe()
-}
-
-// globalThis.setTimeout(() => {
-//   {
-//     const s = x.subscribe((_) => {
-//       console.log("2", _)
-//     })
-//     // s.unsubscribe()
-//   }
-// }, 2_000)
