@@ -1,8 +1,9 @@
 import { doc, Firestore, onSnapshot, writeBatch } from "firebase/firestore"
 import { useSyncExternalStore } from "react"
+import { Observable } from "rxjs"
+import { createStore, Store } from "./createStore"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
-import { Store } from "./Store"
 import { useFirestore } from "./useFirestore"
 import { setHash, useHash } from "./useHash"
 import { mapGetOrPut } from "./util/mapGetOrPut"
@@ -13,33 +14,34 @@ export function useRoom(): Room {
   const db = useFirestore()
 
   const _ = roomIdZod.safeParse(useHash().slice("#".length))
-  const roomId = _.success
-    ? _.data
-    : roomIdZod.parse(doc(collection(db, "rooms")).id)
-
   if (!_.success) {
     throw Promise.resolve().then(() => {
-      setHash(roomId)
+      const newRoomId = roomIdZod.parse(doc(collection(db, "rooms")).id)
+      setHash(newRoomId)
     })
   }
 
-  const store = getOrPut(roomId, () =>
-    Store.from((store) =>
-      onSnapshot(doc(collection(db, "rooms"), roomId), (roomDoc) => {
-        if (!roomDoc.exists() || !roomZod.safeParse(roomDoc.data()).success) {
-          setupRoom(db, roomId)
-          return
-        }
+  const roomId = _.data
 
-        store.next({
-          ...roomZod.parse(roomDoc.data()),
-          id: roomId,
+  const store = getOrPut(roomId, () =>
+    createStore(
+      new Observable<Room>((subscriber) =>
+        onSnapshot(doc(collection(db, "rooms"), roomId), (roomDoc) => {
+          if (!roomDoc.exists() || !roomZod.safeParse(roomDoc.data()).success) {
+            setupRoom(db, roomId)
+            return
+          }
+
+          subscriber.next({
+            ...roomZod.parse(roomDoc.data()),
+            id: roomId,
+          })
         })
-      })
+      )
     )
   )
 
-  return useSyncExternalStore(store.subscribe, store.getOrThrow)
+  return useSyncExternalStore(store.subscribe, store.getSnapshot)
 }
 
 const getOrPut = mapGetOrPut(new Map<Room["id"], Store<Room>>())
