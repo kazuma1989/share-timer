@@ -1,55 +1,25 @@
 import { css } from "@emotion/css"
-import { addDoc, serverTimestamp, Timestamp } from "firebase/firestore"
+import { serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
-import { Action, ActionOnFirestore } from "./actionZod"
-import { collection } from "./collection"
 import { formatDuration } from "./formatDuration"
-import { now } from "./now"
-import { Room } from "./roomZod"
-import { timeInputZod } from "./timeInputZod"
 import { TimeViewer } from "./TimeViewer"
-import { useActions } from "./useActions"
 import { useAllSettled } from "./useAllSettled"
-import { useFirestore } from "./useFirestore"
+import { useDispatchAction } from "./useDispatchAction"
+import { useTimerState } from "./useTimerState"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
-import { withMeta } from "./withMeta"
-
-export type TimerState =
-  | {
-      mode: "editing"
-      initialDuration: number
-    }
-  | {
-      mode: "running"
-      startedAt: number
-      duration: number
-    }
-  | {
-      mode: "paused"
-      restDuration: number
-    }
+import { Room } from "./zod/roomZod"
+import { timeInputZod } from "./zod/timeInputZod"
 
 export function Timer({ roomId }: { roomId: Room["id"] }) {
-  const db = useFirestore()
-
-  const actions = useActions(roomId)
-  const state = actions.reduce(reducer, {
-    mode: "paused",
-    restDuration: 0,
-  })
+  const state = useTimerState(roomId)
 
   useTitleAsTimeViewer(state)
 
   const [_allSettled, addPromise] = useAllSettled()
   const pending = !_allSettled
 
-  const dispatch = (action: ActionOnFirestore) => {
-    if (pending) return
-
-    return addPromise(
-      addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
-    )
-  }
+  const _dispatch = useDispatchAction(roomId)
+  const dispatch: typeof _dispatch = (action) => addPromise(_dispatch(action))
 
   const timeInput$ = useRef<HTMLInputElement>(null)
 
@@ -82,7 +52,6 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
             ref={timeInput$}
             type="text"
             defaultValue={formatDuration(state.initialDuration)}
-            disabled={pending}
             size={5}
             className={css`
               && {
@@ -114,7 +83,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
       </div>
 
       {state.mode === "editing" ? (
-        <button key="done" type="submit" disabled={pending}>
+        <button key="done" type="submit">
           Done
         </button>
       ) : (
@@ -138,7 +107,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
           onClick={() => {
             dispatch({
               type: "pause",
-              at: serverTimestamp() as Timestamp,
+              at: serverTimestamp(),
             })
           }}
         >
@@ -147,11 +116,11 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
       ) : (
         <button
           type="button"
-          disabled={state.mode === "editing"}
+          disabled={pending || state.mode === "editing"}
           onClick={() => {
             dispatch({
               type: "start",
-              at: serverTimestamp() as Timestamp,
+              at: serverTimestamp(),
             })
           }}
         >
@@ -160,171 +129,4 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
       )}
     </form>
   )
-}
-
-function reducer(state: TimerState, action: Action): TimerState {
-  switch (action.type) {
-    case "edit": {
-      if (state.mode !== "paused") {
-        return state
-      }
-
-      return {
-        mode: "editing",
-        initialDuration: state.restDuration,
-      }
-    }
-
-    case "edit-done": {
-      return {
-        mode: "paused",
-        restDuration: action.duration,
-      }
-    }
-
-    case "start": {
-      if (state.mode !== "paused") {
-        return state
-      }
-
-      return {
-        mode: "running",
-        duration: state.restDuration,
-        startedAt: action.at,
-      }
-    }
-
-    case "pause": {
-      if (state.mode !== "running") {
-        return state
-      }
-
-      return {
-        mode: "paused",
-        restDuration: state.duration - (action.at - state.startedAt),
-      }
-    }
-
-    // Do not use "default" here to be exhaustive for the all types.
-  }
-}
-
-if (import.meta.vitest) {
-  const { test, expect } = import.meta.vitest
-
-  test("edit", () => {
-    expect(
-      reducer(
-        {
-          mode: "paused",
-          restDuration: 5 * 60_000,
-        },
-        {
-          type: "edit",
-        }
-      )
-    ).toStrictEqual({
-      mode: "editing",
-      initialDuration: 5 * 60_000,
-    })
-  })
-
-  test("edit-done", () => {
-    expect(
-      reducer(
-        {
-          mode: "editing",
-          initialDuration: 3 * 60_000,
-        },
-        {
-          type: "edit-done",
-          duration: 5 * 60_000,
-        }
-      )
-    ).toStrictEqual({
-      mode: "paused",
-      restDuration: 5 * 60_000,
-    })
-  })
-
-  test("start", () => {
-    const _now = now()
-
-    expect(
-      reducer(
-        {
-          mode: "paused",
-          restDuration: 5 * 60_000,
-        },
-        {
-          type: "start",
-          at: _now,
-        }
-      )
-    ).toStrictEqual({
-      mode: "running",
-      duration: 5 * 60_000,
-      startedAt: _now,
-    })
-  })
-
-  test("pause", () => {
-    const _now = now()
-
-    expect(
-      reducer(
-        {
-          mode: "running",
-          duration: 5 * 60_000,
-          startedAt: _now - 40_000,
-        },
-        {
-          type: "pause",
-          at: _now,
-        }
-      )
-    ).toStrictEqual({
-      mode: "paused",
-      restDuration: 5 * 60_000 - 40_000,
-    })
-  })
-
-  test("multiple actions", () => {
-    const _now = now()
-    const actions: Action[] = [
-      {
-        type: "edit",
-      },
-      {
-        type: "edit-done",
-        duration: 7 * 60_000,
-      },
-      {
-        type: "start",
-        at: _now,
-      },
-      {
-        type: "pause",
-        at: _now + 10_000,
-      },
-      {
-        type: "start",
-        at: _now + 60_000,
-      },
-      {
-        type: "pause",
-        at: _now + 80_000,
-      },
-    ]
-
-    const state = actions.reduce(reducer, {
-      mode: "paused",
-      restDuration: 5 * 60_000,
-    })
-
-    expect(state).toStrictEqual({
-      mode: "paused",
-      restDuration: 6 * 60_000 + 30_000,
-    })
-  })
 }

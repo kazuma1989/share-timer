@@ -29,7 +29,8 @@
     "firebase-target-apply": "firebase target:apply hosting app sharetimer",
     "firebase-indexes-export": "firebase firestore:indexes > firestore.indexes.json",
     "firebase-emulators-init": "firebase init emulators",
-    "firebase-emulators-start": "firebase emulators:start --only firestore"
+    "firebase-emulators-start": "firebase emulators:start --only firestore",
+    "log-build": "npm run build | tee build_$(date +%s).log"
   },
   "dependencies": {
     "@emotion/css": "11.10.x",
@@ -39,6 +40,7 @@
     "firebase-tools": "11.14.x",
     "react": "18.2.x",
     "react-dom": "18.2.x",
+    "rxjs": "7.5.x",
     "vite": "3.1.x",
     "zod": "3.19.x"
   },

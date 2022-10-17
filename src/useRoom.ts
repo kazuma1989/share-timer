@@ -1,42 +1,52 @@
 import { doc, Firestore, onSnapshot, writeBatch } from "firebase/firestore"
 import { useSyncExternalStore } from "react"
-import { ActionOnFirestore } from "./actionZod"
-import { collection } from "./collection"
-import { mapGetOrPut } from "./mapGetOrPut"
-import { Room, roomIdZod, RoomOnFirestore, roomZod } from "./roomZod"
-import { Store } from "./Store"
+import { Observable, share, timer } from "rxjs"
+import { collection } from "./firestore/collection"
+import { withMeta } from "./firestore/withMeta"
 import { useFirestore } from "./useFirestore"
-import { setHash, useHash } from "./useHash"
-import { withMeta } from "./withMeta"
+import { replaceHash, useHash } from "./useHash"
+import { createStore, Store } from "./util/createStore"
+import { mapGetOrPut } from "./util/mapGetOrPut"
+import { ActionOnFirestore } from "./zod/actionZod"
+import { Room, roomIdZod, RoomOnFirestore, roomZod } from "./zod/roomZod"
 
 export function useRoom(): Room {
   const db = useFirestore()
 
   const _ = roomIdZod.safeParse(useHash().slice("#".length))
-  const roomId = _.success
-    ? _.data
-    : roomIdZod.parse(doc(collection(db, "rooms")).id)
   if (!_.success) {
-    setHash(roomId)
+    throw Promise.resolve().then(() => {
+      const newRoomId = roomIdZod.parse(doc(collection(db, "rooms")).id)
+      replaceHash(newRoomId)
+    })
   }
 
-  const store = getOrPut(roomId, () =>
-    Store.from((next) =>
-      onSnapshot(doc(collection(db, "rooms"), roomId), (roomDoc) => {
-        if (!roomDoc.exists() || !roomZod.safeParse(roomDoc.data()).success) {
-          setupRoom(db, roomId)
-          return
-        }
+  const roomId = _.data
 
-        next({
-          ...roomZod.parse(roomDoc.data()),
-          id: roomId,
+  const store = getOrPut(roomId, () =>
+    createStore(
+      new Observable<Room>((subscriber) =>
+        onSnapshot(doc(collection(db, "rooms"), roomId), (roomDoc) => {
+          if (!roomDoc.exists() || !roomZod.safeParse(roomDoc.data()).success) {
+            setupRoom(db, roomId)
+            return
+          }
+
+          subscriber.next({
+            ...roomZod.parse(roomDoc.data()),
+            id: roomId,
+          })
         })
-      })
+      ).pipe(
+        share({
+          // リスナーがいなくなって30秒後に根元の購読も解除する
+          resetOnRefCountZero: () => timer(30_000),
+        })
+      )
     )
   )
 
-  return useSyncExternalStore(store.subscribe, store.getOrThrow)
+  return useSyncExternalStore(store.subscribe, store.getSnapshot)
 }
 
 const getOrPut = mapGetOrPut(new Map<Room["id"], Store<Room>>())
@@ -58,9 +68,8 @@ async function setupRoom(db: Firestore, newRoomId: string): Promise<void> {
   )
 
   const actions = collection(db, "rooms", newRoomId, "actions")
-  const newActionId = doc(actions).id
   batch.set(
-    doc(actions, newActionId),
+    doc(actions),
     withMeta<ActionOnFirestore>({
       type: "edit-done",
       duration: DEFAULT_DURATION,

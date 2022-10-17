@@ -1,6 +1,5 @@
-import { useSyncExternalStore } from "react"
 import { formatDuration } from "./formatDuration"
-import { subscribeTimer } from "./subscribeTimer"
+import { useRequestAnimationFrame } from "./useRequestAnimationFrame"
 
 export function TimeViewer({
   duration,
@@ -11,10 +10,10 @@ export function TimeViewer({
   startedAt?: number
   className?: string
 }) {
-  const restDuration = useSyncExternalStore(subscribeTimer, () => {
+  const restDuration = useRequestAnimationFrame((now) => {
     if (duration === undefined || startedAt === undefined) return
 
-    const rest = duration - (subscribeTimer.now() - startedAt)
+    const rest = duration - (now - startedAt)
     return rest - (rest % 1_000)
   })
 

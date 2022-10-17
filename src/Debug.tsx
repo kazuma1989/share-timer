@@ -10,7 +10,7 @@ import {
   Timestamp,
   updateDoc,
 } from "firebase/firestore"
-import { collection } from "./collection"
+import { collection } from "./firestore/collection"
 import { useAllSettled } from "./useAllSettled"
 import { useFirestore } from "./useFirestore"
 
