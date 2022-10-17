@@ -1,47 +1,8 @@
 import { Reducer, useReducer, useSyncExternalStore } from "react"
+import { createStore, Store } from "./createStore"
 
 interface Add {
   <T extends PromiseLike<unknown>>(promise: T): T
-}
-
-interface Store<T> {
-  subscribe(onStoreChange: () => void): () => void
-  getSnapshot(): T
-}
-
-function createStore<T>(promise: PromiseLike<T>, initialValue?: T): Store<T> {
-  const Empty = Symbol("empty")
-  type Empty = typeof Empty
-
-  // initialValueにundefinedを指定できないけどまあいいか
-  let currentValue: T | Empty = initialValue ?? Empty
-
-  return {
-    subscribe(onStoreChange) {
-      const abort = new AbortController()
-
-      promise.then((value) => {
-        if (abort.signal.aborted) return
-
-        currentValue = value
-        onStoreChange()
-      })
-
-      return () => {
-        abort.abort()
-      }
-    },
-
-    getSnapshot() {
-      if (currentValue !== Empty) {
-        return currentValue
-      }
-
-      throw promise.then((value) => {
-        currentValue = value
-      })
-    },
-  }
 }
 
 export function useAllSettled(): [allSettled: boolean, add: Add] {
