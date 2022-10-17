@@ -1,33 +1,36 @@
 import { Reducer, useReducer, useSyncExternalStore } from "react"
-import { Store } from "./Store"
-import { mapGetOrPut } from "./util/mapGetOrPut"
+import { createStore, Store } from "./util/createStore"
 
 interface Add {
   <T extends PromiseLike<unknown>>(promise: T): T
 }
 
 export function useAllSettled(): [allSettled: boolean, add: Add] {
-  const [promises, dispatch] = useReducer<
-    Reducer<Set<PromiseLike<unknown>>, PromiseLike<unknown>>
-  >((promises, promise) => {
-    if (promises.has(promise)) {
-      return promises
-    }
+  const [[, store], dispatch] = useReducer<
+    Reducer<[Set<PromiseLike<unknown>>, Store<boolean>], PromiseLike<unknown>>
+  >(
+    (state, promise) => {
+      const [currentPromises] = state
+      if (currentPromises.has(promise)) {
+        return state
+      }
 
-    return new Set(promises.values()).add(promise)
-  }, new Set())
-
-  const store = getOrPut(promises, () =>
-    Store.from(
-      Promise.allSettled(promises).then((): typeof Settled => {
-        promises.clear()
-        return Settled
-      })
-    )
+      const newPromises = new Set(currentPromises.values()).add(promise)
+      return [
+        newPromises,
+        createStore(
+          Promise.allSettled(newPromises).then(() => {
+            newPromises.clear()
+            return true
+          }),
+          false
+        ),
+      ]
+    },
+    [new Set(), createStore(Promise.resolve(true), true)]
   )
 
-  const allSettled =
-    useSyncExternalStore(store.subscribe, store.getValue) === Settled
+  const allSettled = useSyncExternalStore(store.subscribe, store.getSnapshot)
 
   const add: Add = (promise) => {
     dispatch(promise)
@@ -36,9 +39,3 @@ export function useAllSettled(): [allSettled: boolean, add: Add] {
 
   return [allSettled, add]
 }
-
-const Settled = Symbol("settled")
-
-const getOrPut = mapGetOrPut(
-  new WeakMap<Set<PromiseLike<unknown>>, Store<typeof Settled>>()
-)

@@ -17,6 +17,6 @@ function subscribe(onStoreChange: () => void): () => void {
   }
 }
 
-export function setHash(hash: string): void {
-  window.location.hash = hash
+export function replaceHash(hash: string): void {
+  window.location.replace("#" + hash)
 }
