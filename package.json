@@ -38,9 +38,11 @@
     "@vitejs/plugin-react": "2.1.x",
     "firebase": "9.12.x",
     "firebase-tools": "11.14.x",
+    "postcss": "8.4.x",
     "react": "18.2.x",
     "react-dom": "18.2.x",
     "rxjs": "7.5.x",
+    "tailwindcss": "3.1.x",
     "vite": "3.1.x",
     "zod": "3.19.x"
   },
