@@ -1,4 +1,4 @@
-import { css } from "@emotion/css"
+import { css, cx } from "@emotion/css"
 import { serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
 import { formatDuration } from "./formatDuration"
@@ -10,7 +10,13 @@ import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { Room } from "./zod/roomZod"
 import { timeInputZod } from "./zod/timeInputZod"
 
-export function Timer({ roomId }: { roomId: Room["id"] }) {
+export function Timer({
+  roomId,
+  className,
+}: {
+  roomId: Room["id"]
+  className?: string
+}) {
   const state = useTimerState(roomId)
 
   useTitleAsTimeViewer(state)
@@ -25,6 +31,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
 
   return (
     <form
+      className={cx("grid grid-rows-[1fr_auto_1fr]", className)}
       onSubmit={(e) => {
         e.preventDefault()
 
@@ -42,11 +49,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
         })
       }}
     >
-      <div
-        className={css`
-          font-size: 30vmin;
-        `}
-      >
+      <div className="grid place-items-center text-8xl text-white sm:text-9xl">
         {state.mode === "editing" ? (
           <input
             ref={timeInput$}
@@ -63,13 +66,7 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
             `}
           />
         ) : (
-          <div
-            className={css`
-              padding: 0.05em;
-              line-height: 1.18;
-              border: 1px solid transparent;
-            `}
-          >
+          <div>
             {state.mode === "running" ? (
               <TimeViewer
                 duration={state.duration}
@@ -82,51 +79,56 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
         )}
       </div>
 
-      {state.mode === "editing" ? (
-        <button key="done" type="submit">
-          Done
-        </button>
-      ) : (
-        <button
-          key="edit"
-          type="button"
-          disabled={state.mode !== "paused"}
-          onClick={() => {
-            dispatch({
-              type: "edit",
-            })
-          }}
-        >
-          Edit
-        </button>
-      )}
+      <div className="flex items-center justify-around">
+        {state.mode === "editing" ? (
+          <button key="done" type="submit">
+            Done
+          </button>
+        ) : (
+          <button
+            key="edit"
+            type="button"
+            disabled={state.mode !== "paused"}
+            className="h-20 w-20 cursor-pointer rounded-full border-4 border-double border-gray-600 bg-gray-700 text-xs text-gray-300 hover:bg-gray-800 active:bg-gray-900"
+            onClick={() => {
+              dispatch({
+                type: "edit",
+              })
+            }}
+          >
+            キャンセル
+          </button>
+        )}
 
-      {state.mode === "running" ? (
-        <button
-          type="button"
-          onClick={() => {
-            dispatch({
-              type: "pause",
-              at: serverTimestamp(),
-            })
-          }}
-        >
-          Pause
-        </button>
-      ) : (
-        <button
-          type="button"
-          disabled={pending || state.mode === "editing"}
-          onClick={() => {
-            dispatch({
-              type: "start",
-              at: serverTimestamp(),
-            })
-          }}
-        >
-          Start
-        </button>
-      )}
+        {state.mode === "running" ? (
+          <button
+            type="button"
+            className="h-20 w-20 cursor-pointer rounded-full border-4 border-double border-green-700 bg-green-900 text-green-300 hover:bg-green-900/75 active:bg-green-900/50"
+            onClick={() => {
+              dispatch({
+                type: "pause",
+                at: serverTimestamp(),
+              })
+            }}
+          >
+            一時停止
+          </button>
+        ) : (
+          <button
+            type="button"
+            disabled={pending || state.mode === "editing"}
+            className="h-20 w-20 cursor-pointer rounded-full border-4 border-double border-green-700 bg-green-900 text-green-300 hover:bg-green-900/75 active:bg-green-900/50"
+            onClick={() => {
+              dispatch({
+                type: "start",
+                at: serverTimestamp(),
+              })
+            }}
+          >
+            開始
+          </button>
+        )}
+      </div>
     </form>
   )
 }
