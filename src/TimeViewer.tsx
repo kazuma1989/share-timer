@@ -1,14 +1,13 @@
-import { formatDuration } from "./formatDuration"
 import { useRequestAnimationFrame } from "./useRequestAnimationFrame"
 
 export function TimeViewer({
   duration,
   startedAt,
-  className,
+  children,
 }: {
   duration?: number
   startedAt?: number
-  className?: string
+  children?: (restDuration: number | undefined) => JSX.Element
 }) {
   const restDuration = useRequestAnimationFrame((now) => {
     if (duration === undefined || startedAt === undefined) return
@@ -17,5 +16,5 @@ export function TimeViewer({
     return rest - (rest % 1_000)
   })
 
-  return <span className={className}>{formatDuration(restDuration ?? 0)}</span>
+  return children?.(restDuration) ?? null
 }

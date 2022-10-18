@@ -68,10 +68,11 @@ export function Timer({
         ) : (
           <div>
             {state.mode === "running" ? (
-              <TimeViewer
-                duration={state.duration}
-                startedAt={state.startedAt}
-              />
+              <TimeViewer duration={state.duration} startedAt={state.startedAt}>
+                {(restDuration) => (
+                  <span>{formatDuration(restDuration ?? 0)}</span>
+                )}
+              </TimeViewer>
             ) : (
               <span>{formatDuration(state.restDuration)}</span>
             )}
