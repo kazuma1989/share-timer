@@ -54,32 +54,30 @@ export function useTimerState(roomId: Room["id"]): TimerState {
 
     return createStore(
       new Observable<StateWithMeta>((subscriber) => {
-        console.debug("actions listener attached")
-
         const abort = new AbortController()
 
-        const selectLatestEditDone = query(
-          collection(db, "rooms", roomId, "actions"),
-          where("type", "==", "edit-done"),
-          orderBy("createdAt", "asc"),
-          limitToLast(1)
-        )
-        getDocs(selectLatestEditDone).then(({ docs: [latestEditDone] }) => {
-          if (abort.signal.aborted) return
-
-          let selectActions = query(
-            collection(db, "rooms", roomId, "actions"),
-            orderBy("createdAt", "asc")
+        const getSmartQuery = () =>
+          getDocs(
+            query(
+              collection(db, "rooms", roomId, "actions"),
+              where("type", "==", "edit-done"),
+              orderBy("createdAt", "asc"),
+              limitToLast(1)
+            )
+          ).then(({ docs: [doc] }) =>
+            query(
+              collection(db, "rooms", roomId, "actions"),
+              orderBy("createdAt", "asc"),
+              ...(hasNoEstimateTimestamp(doc?.metadata) ? [startAt(doc)] : [])
+            )
           )
-          if (
-            latestEditDone &&
-            hasNoEstimateTimestamp(latestEditDone.metadata)
-          ) {
-            selectActions = query(selectActions, startAt(latestEditDone))
-          }
+
+        getSmartQuery().then((selectActions) => {
+          if (abort.signal.aborted) return
 
           const parseDocs = safeParseDocsWith(actionZod)
 
+          console.debug("actions listener attached")
           const unsubscribe = onSnapshot(selectActions, (snapshot) => {
             console.debug("listen %d docChanges", snapshot.docChanges().length)
 
@@ -95,11 +93,13 @@ export function useTimerState(roomId: Room["id"]): TimerState {
             ])
           })
 
-          abort.signal.addEventListener("abort", unsubscribe)
+          abort.signal.addEventListener("abort", () => {
+            console.debug("actions listener detached")
+            unsubscribe()
+          })
         })
 
         return () => {
-          console.debug("aborted!!")
           abort.abort()
         }
       }).pipe(
