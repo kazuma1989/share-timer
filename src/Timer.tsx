@@ -1,4 +1,4 @@
-import { css, cx } from "@emotion/css"
+import { cx } from "@emotion/css"
 import { serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
 import { formatDuration } from "./formatDuration"
@@ -28,11 +28,12 @@ export function Timer({
   const dispatch: typeof _dispatch = (action) => addPromise(_dispatch(action))
 
   const timeInput$ = useRef<HTMLInputElement>(null)
+  const resumeButton$ = useRef<HTMLButtonElement>(null)
 
   return (
     <form
       className={cx("grid grid-rows-[1fr_auto_1fr]", className)}
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault()
 
         const timeInput = timeInput$.current?.value ?? ""
@@ -47,6 +48,9 @@ export function Timer({
           type: "edit-done",
           duration: parsed.data,
         })
+
+        await new Promise((resolve) => globalThis.setTimeout(resolve, 100))
+        resumeButton$.current?.focus()
       }}
     >
       <div className="grid place-items-center text-8xl text-white sm:text-9xl">
@@ -56,14 +60,7 @@ export function Timer({
             type="text"
             defaultValue={formatDuration(state.initialDuration)}
             size={5}
-            className={css`
-              && {
-                height: unset;
-                margin: unset;
-                padding: 0.05em;
-                line-height: 1;
-              }
-            `}
+            className="bg-transparent py-2 text-center"
           />
         ) : (
           <div>
@@ -81,29 +78,33 @@ export function Timer({
       </div>
 
       <div className="flex items-center justify-around">
-        {state.mode === "editing" ? (
-          <button key="done" type="submit">
-            Done
-          </button>
-        ) : (
-          <button
-            key="edit"
-            type="button"
-            disabled={state.mode !== "paused"}
-            className="h-20 w-20 cursor-pointer rounded-full border-4 border-double border-gray-600 bg-gray-700 text-xs text-gray-300 hover:bg-gray-800 active:bg-gray-900"
-            onClick={() => {
-              dispatch({
-                type: "edit",
-              })
-            }}
-          >
-            キャンセル
-          </button>
-        )}
+        <button
+          type="button"
+          disabled={state.mode !== "paused"}
+          // TODO disabled design
+          className="h-20 w-20 cursor-pointer rounded-full border-4 border-double border-gray-600 bg-gray-700 text-xs text-gray-300 hover:bg-gray-800 active:bg-gray-900"
+          onClick={async () => {
+            await dispatch({
+              type: "edit",
+            })
 
-        {state.mode === "running" ? (
+            timeInput$.current!.focus()
+          }}
+        >
+          キャンセル
+        </button>
+
+        {state.mode === "editing" ? (
+          <button
+            type="submit"
+            className="h-20 w-20 cursor-pointer rounded-full border-4 border-double border-green-700 bg-green-900 text-green-300 hover:bg-green-900/75 active:bg-green-900/50"
+          >
+            開始
+          </button>
+        ) : state.mode === "running" ? (
           <button
             type="button"
+            // TODO orange color
             className="h-20 w-20 cursor-pointer rounded-full border-4 border-double border-green-700 bg-green-900 text-green-300 hover:bg-green-900/75 active:bg-green-900/50"
             onClick={() => {
               dispatch({
@@ -116,8 +117,9 @@ export function Timer({
           </button>
         ) : (
           <button
+            ref={resumeButton$}
             type="button"
-            disabled={pending || state.mode === "editing"}
+            disabled={pending}
             className="h-20 w-20 cursor-pointer rounded-full border-4 border-double border-green-700 bg-green-900 text-green-300 hover:bg-green-900/75 active:bg-green-900/50"
             onClick={() => {
               dispatch({
@@ -126,7 +128,7 @@ export function Timer({
               })
             }}
           >
-            開始
+            再開
           </button>
         )}
       </div>
