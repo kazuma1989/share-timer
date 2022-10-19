@@ -4,10 +4,15 @@ import { Action } from "./zod/actionZod"
 export function timerReducer(state: TimerState, action: Action): TimerState {
   switch (action.type) {
     case "start": {
+      if (state.mode === "running") {
+        return state
+      }
+
       return {
-        mode: "paused",
-        initialDuration: 0,
+        mode: "running",
+        initialDuration: action.withDuration,
         restDuration: action.withDuration,
+        startedAt: action.at,
       }
     }
 
@@ -18,8 +23,8 @@ export function timerReducer(state: TimerState, action: Action): TimerState {
 
       return {
         mode: "paused",
-        initialDuration: 0,
-        restDuration: state.initialDuration - (action.at - state.startedAt),
+        initialDuration: state.initialDuration,
+        restDuration: state.restDuration - (action.at - state.startedAt),
       }
     }
 
@@ -30,20 +35,16 @@ export function timerReducer(state: TimerState, action: Action): TimerState {
 
       return {
         mode: "running",
+        initialDuration: state.initialDuration,
         restDuration: state.restDuration,
         startedAt: action.at,
-        initialDuration: 0,
       }
     }
 
     case "cancel": {
-      if (state.mode !== "paused") {
-        return state
-      }
-
       return {
         mode: "editing",
-        initialDuration: state.restDuration,
+        initialDuration: state.initialDuration,
       }
     }
 
@@ -188,8 +189,9 @@ if (import.meta.vitest) {
       initialDuration: 3 * 60_000,
     })
 
-    expect(state).toStrictEqual({
+    expect(state).toStrictEqual<typeof state>({
       mode: "paused",
+      initialDuration: 7 * 60_000,
       restDuration: 6 * 60_000 + 30_000,
     })
   })
