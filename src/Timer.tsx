@@ -99,8 +99,7 @@ export function Timer({
           </CircleButton>
         ) : state.mode === "running" ? (
           <CircleButton
-            // TODO orange color
-            color="green"
+            color="orange"
             onClick={() => {
               dispatch({
                 type: "pause",
