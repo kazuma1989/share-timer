@@ -44,7 +44,7 @@ export function timerReducer(state: TimerState, action: Action): TimerState {
     case "cancel": {
       return {
         mode: "editing",
-        initialDuration: state.initialDuration,
+        initialDuration: action.withDuration ?? state.initialDuration,
       }
     }
 
@@ -62,12 +62,8 @@ if (import.meta.vitest) {
     const durationSetByUser = Math.floor(Math.random() * 10 * 60_000)
     const actions: Action[] = [
       {
-        type: "start",
-        withDuration: durationSetByUser,
-        at: _now,
-      },
-      {
         type: "cancel",
+        withDuration: durationSetByUser,
       },
     ]
 

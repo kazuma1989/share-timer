@@ -32,5 +32,6 @@ export const actionZod = z.union([
 
   z.object({
     type: z.literal("cancel"),
+    withDuration: z.number().optional(),
   }),
 ])

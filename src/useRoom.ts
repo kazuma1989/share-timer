@@ -1,10 +1,4 @@
-import {
-  doc,
-  Firestore,
-  onSnapshot,
-  serverTimestamp,
-  writeBatch,
-} from "firebase/firestore"
+import { doc, Firestore, onSnapshot, writeBatch } from "firebase/firestore"
 import { useSyncExternalStore } from "react"
 import { Observable, share, timer } from "rxjs"
 import { collection } from "./firestore/collection"
@@ -77,15 +71,8 @@ async function setupRoom(db: Firestore, newRoomId: string): Promise<void> {
   batch.set(
     doc(actions),
     withMeta<ActionOnFirestore>({
-      type: "start",
-      withDuration: DEFAULT_DURATION,
-      at: serverTimestamp(),
-    })
-  )
-  batch.set(
-    doc(actions),
-    withMeta<ActionOnFirestore>({
       type: "cancel",
+      withDuration: DEFAULT_DURATION,
     })
   )
 
