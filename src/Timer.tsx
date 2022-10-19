@@ -1,6 +1,7 @@
 import { cx } from "@emotion/css"
 import { serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
+import { CircleButton } from "./CircleButton"
 import { formatDuration } from "./formatDuration"
 import { TimeViewer } from "./TimeViewer"
 import { useAllSettled } from "./useAllSettled"
@@ -95,17 +96,10 @@ export function Timer({
         </button>
 
         {state.mode === "editing" ? (
-          <button
-            type="submit"
-            className="h-20 w-20 cursor-pointer rounded-full border-4 border-double border-green-700 bg-green-900 text-green-300 hover:bg-green-900/75 active:bg-green-900/50"
-          >
-            開始
-          </button>
+          <CircleButton type="submit">開始</CircleButton>
         ) : state.mode === "running" ? (
-          <button
-            type="button"
+          <CircleButton
             // TODO orange color
-            className="h-20 w-20 cursor-pointer rounded-full border-4 border-double border-green-700 bg-green-900 text-green-300 hover:bg-green-900/75 active:bg-green-900/50"
             onClick={() => {
               dispatch({
                 type: "pause",
@@ -114,13 +108,11 @@ export function Timer({
             }}
           >
             一時停止
-          </button>
+          </CircleButton>
         ) : (
-          <button
-            ref={resumeButton$}
-            type="button"
+          <CircleButton
+            innerRef={resumeButton$}
             disabled={pending}
-            className="h-20 w-20 cursor-pointer rounded-full border-4 border-double border-green-700 bg-green-900 text-green-300 hover:bg-green-900/75 active:bg-green-900/50"
             onClick={() => {
               dispatch({
                 type: "start",
@@ -129,7 +121,7 @@ export function Timer({
             }}
           >
             再開
-          </button>
+          </CircleButton>
         )}
       </div>
     </form>
