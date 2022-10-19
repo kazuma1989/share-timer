@@ -29,7 +29,7 @@ export function Timer({
   const dispatch: typeof _dispatch = (action) => addPromise(_dispatch(action))
 
   const timeInput$ = useRef<HTMLInputElement>(null)
-  const resumeButton$ = useRef<HTMLButtonElement>(null)
+  const pauseOrResumeButton$ = useRef<HTMLButtonElement>(null)
 
   return (
     <form
@@ -52,7 +52,7 @@ export function Timer({
         })
 
         await new Promise((resolve) => globalThis.setTimeout(resolve, 100))
-        resumeButton$.current?.focus()
+        pauseOrResumeButton$.current?.focus()
       }}
     >
       <div className="grid place-items-center text-8xl font-thin tabular-nums text-white sm:text-9xl">
@@ -84,7 +84,7 @@ export function Timer({
 
       <div className="flex items-center justify-around">
         <CircleButton
-          disabled={state.mode !== "paused"}
+          disabled={state.mode === "editing"}
           className="text-xs"
           onClick={async () => {
             await dispatch({
@@ -103,6 +103,7 @@ export function Timer({
           </CircleButton>
         ) : state.mode === "running" ? (
           <CircleButton
+            innerRef={pauseOrResumeButton$}
             color="orange"
             onClick={() => {
               dispatch({
@@ -115,10 +116,11 @@ export function Timer({
           </CircleButton>
         ) : (
           <CircleButton
+            innerRef={pauseOrResumeButton$}
             color="green"
-            innerRef={resumeButton$}
-            disabled={pending}
             onClick={() => {
+              if (pending) return
+
               dispatch({
                 type: "resume",
                 at: serverTimestamp(),
