@@ -54,14 +54,14 @@ export function Timer({
         resumeButton$.current?.focus()
       }}
     >
-      <div className="grid place-items-center text-8xl tabular-nums text-white sm:text-9xl">
+      <div className="grid place-items-center text-8xl font-thin tabular-nums text-white sm:text-9xl">
         {state.mode === "editing" ? (
           <input
             ref={timeInput$}
             type="text"
             defaultValue={formatDuration(state.initialDuration)}
-            size={5}
-            className="border border-white bg-transparent py-2 text-center"
+            size={6}
+            className="rounded-lg border border-white bg-transparent py-2 text-center"
           />
         ) : (
           <div>
