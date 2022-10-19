@@ -1,4 +1,4 @@
-import { cx } from "@emotion/css"
+import clsx from "clsx"
 import { serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
 import { CircleButton } from "./CircleButton"
@@ -33,7 +33,7 @@ export function Timer({
 
   return (
     <form
-      className={cx("grid grid-rows-[1fr_auto_1fr]", className)}
+      className={clsx("grid grid-rows-[1fr_auto_1fr]", className)}
       onSubmit={async (e) => {
         e.preventDefault()
 
@@ -54,7 +54,7 @@ export function Timer({
         resumeButton$.current?.focus()
       }}
     >
-      <div className="grid place-items-center text-8xl text-white sm:text-9xl tabular-nums">
+      <div className="grid place-items-center text-8xl tabular-nums text-white sm:text-9xl">
         {state.mode === "editing" ? (
           <input
             ref={timeInput$}
