@@ -61,7 +61,7 @@ export function Timer({
             type="text"
             defaultValue={formatDuration(state.initialDuration)}
             size={5}
-            className="bg-transparent py-2 text-center"
+            className="border border-white bg-transparent py-2 text-center"
           />
         ) : (
           <div>
@@ -79,11 +79,9 @@ export function Timer({
       </div>
 
       <div className="flex items-center justify-around">
-        <button
-          type="button"
+        <CircleButton
           disabled={state.mode !== "paused"}
-          // TODO disabled design
-          className="h-20 w-20 cursor-pointer rounded-full border-4 border-double border-gray-600 bg-gray-700 text-xs text-gray-300 hover:bg-gray-800 active:bg-gray-900"
+          className="text-xs"
           onClick={async () => {
             await dispatch({
               type: "edit",
@@ -93,13 +91,16 @@ export function Timer({
           }}
         >
           キャンセル
-        </button>
+        </CircleButton>
 
         {state.mode === "editing" ? (
-          <CircleButton type="submit">開始</CircleButton>
+          <CircleButton color="green" type="submit">
+            開始
+          </CircleButton>
         ) : state.mode === "running" ? (
           <CircleButton
             // TODO orange color
+            color="green"
             onClick={() => {
               dispatch({
                 type: "pause",
@@ -111,6 +112,7 @@ export function Timer({
           </CircleButton>
         ) : (
           <CircleButton
+            color="green"
             innerRef={resumeButton$}
             disabled={pending}
             onClick={() => {
