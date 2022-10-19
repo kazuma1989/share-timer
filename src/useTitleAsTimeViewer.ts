@@ -21,7 +21,7 @@ export function useTitleAsTimeViewer(state: TimerState): void {
     }
 
     case "running": {
-      duration = state.duration
+      duration = state.restDuration
       startedAt = state.startedAt
       break
     }

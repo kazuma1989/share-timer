@@ -46,8 +46,9 @@ export function Timer({
         }
 
         dispatch({
-          type: "edit-done",
-          duration: parsed.data,
+          type: "start",
+          withDuration: parsed.data,
+          at: serverTimestamp(),
         })
 
         await new Promise((resolve) => globalThis.setTimeout(resolve, 100))
@@ -66,7 +67,10 @@ export function Timer({
         ) : (
           <div>
             {state.mode === "running" ? (
-              <TimeViewer duration={state.duration} startedAt={state.startedAt}>
+              <TimeViewer
+                duration={state.restDuration}
+                startedAt={state.startedAt}
+              >
                 {(restDuration) => (
                   <span>{formatDuration(restDuration ?? 0)}</span>
                 )}
@@ -84,7 +88,7 @@ export function Timer({
           className="text-xs"
           onClick={async () => {
             await dispatch({
-              type: "edit",
+              type: "cancel",
             })
 
             timeInput$.current!.focus()
@@ -116,7 +120,7 @@ export function Timer({
             disabled={pending}
             onClick={() => {
               dispatch({
-                type: "start",
+                type: "resume",
                 at: serverTimestamp(),
               })
             }}

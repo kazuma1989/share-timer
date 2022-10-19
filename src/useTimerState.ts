@@ -35,11 +35,13 @@ export type TimerState =
     }
   | {
       mode: "running"
+      initialDuration: number
+      restDuration: number
       startedAt: number
-      duration: number
     }
   | {
       mode: "paused"
+      initialDuration: number
       restDuration: number
     }
 
@@ -83,8 +85,8 @@ export function useTimerState(roomId: Room["id"]): TimerState {
 
             const actions = parseDocs(snapshot.docs)
             const newState = actions.reduce(timerReducer, {
-              mode: "paused",
-              restDuration: 0,
+              mode: "editing",
+              initialDuration: 0,
             })
 
             subscriber.next([

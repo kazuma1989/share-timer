@@ -1,36 +1,13 @@
-import { now } from "./now"
 import { TimerState } from "./useTimerState"
 import { Action } from "./zod/actionZod"
 
 export function timerReducer(state: TimerState, action: Action): TimerState {
   switch (action.type) {
-    case "edit": {
-      if (state.mode !== "paused") {
-        return state
-      }
-
-      return {
-        mode: "editing",
-        initialDuration: state.restDuration,
-      }
-    }
-
-    case "edit-done": {
+    case "start": {
       return {
         mode: "paused",
-        restDuration: action.duration,
-      }
-    }
-
-    case "start": {
-      if (state.mode !== "paused") {
-        return state
-      }
-
-      return {
-        mode: "running",
-        duration: state.restDuration,
-        startedAt: action.at,
+        initialDuration: 0,
+        restDuration: action.withDuration,
       }
     }
 
@@ -41,7 +18,32 @@ export function timerReducer(state: TimerState, action: Action): TimerState {
 
       return {
         mode: "paused",
-        restDuration: state.duration - (action.at - state.startedAt),
+        initialDuration: 0,
+        restDuration: state.initialDuration - (action.at - state.startedAt),
+      }
+    }
+
+    case "resume": {
+      if (state.mode !== "paused") {
+        return state
+      }
+
+      return {
+        mode: "running",
+        restDuration: state.restDuration,
+        startedAt: action.at,
+        initialDuration: 0,
+      }
+    }
+
+    case "cancel": {
+      if (state.mode !== "paused") {
+        return state
+      }
+
+      return {
+        mode: "editing",
+        initialDuration: state.restDuration,
       }
     }
 
@@ -52,119 +54,143 @@ export function timerReducer(state: TimerState, action: Action): TimerState {
 if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
 
-  test("edit", () => {
-    expect(
-      timerReducer(
-        {
-          mode: "paused",
-          restDuration: 5 * 60000,
-        },
-        {
-          type: "edit",
-        }
-      )
-    ).toStrictEqual({
-      mode: "editing",
-      initialDuration: 5 * 60000,
-    })
-  })
+  // eslint-disable-next-line no-restricted-globals
+  const _now = Date.now()
 
-  test("edit-done", () => {
-    expect(
-      timerReducer(
-        {
-          mode: "editing",
-          initialDuration: 3 * 60000,
-        },
-        {
-          type: "edit-done",
-          duration: 5 * 60000,
-        }
-      )
-    ).toStrictEqual({
-      mode: "paused",
-      restDuration: 5 * 60000,
+  test("set initial state", () => {
+    const durationSetByUser = Math.floor(Math.random() * 10 * 60_000)
+    const actions: Action[] = [
+      {
+        type: "start",
+        withDuration: durationSetByUser,
+        at: _now,
+      },
+      {
+        type: "cancel",
+      },
+    ]
+
+    const state = actions.reduce(timerReducer, {
+      mode: "editing",
+      initialDuration: 0,
+    })
+
+    expect(state).toStrictEqual<typeof state>({
+      mode: "editing",
+      initialDuration: durationSetByUser,
     })
   })
 
   test("start", () => {
-    const _now = now()
+    const state = timerReducer(
+      {
+        mode: "editing",
+        initialDuration: 3 * 60_000,
+      },
+      {
+        type: "start",
+        withDuration: 5 * 60_000,
+        at: _now,
+      }
+    )
 
-    expect(
-      timerReducer(
-        {
-          mode: "paused",
-          restDuration: 5 * 60000,
-        },
-        {
-          type: "start",
-          at: _now,
-        }
-      )
-    ).toStrictEqual({
+    expect(state).toStrictEqual<typeof state>({
       mode: "running",
-      duration: 5 * 60000,
+      initialDuration: 5 * 60_000,
+      restDuration: 5 * 60_000,
       startedAt: _now,
     })
   })
 
   test("pause", () => {
-    const _now = now()
+    const state = timerReducer(
+      {
+        mode: "running",
+        initialDuration: 5 * 60_000,
+        restDuration: 4 * 60_000,
+        startedAt: _now - 40_000,
+      },
+      {
+        type: "pause",
+        at: _now,
+      }
+    )
 
-    expect(
-      timerReducer(
-        {
-          mode: "running",
-          duration: 5 * 60000,
-          startedAt: _now - 40000,
-        },
-        {
-          type: "pause",
-          at: _now,
-        }
-      )
-    ).toStrictEqual({
+    expect(state).toStrictEqual<typeof state>({
       mode: "paused",
-      restDuration: 5 * 60000 - 40000,
+      initialDuration: 5 * 60_000,
+      restDuration: 4 * 60_000 - 40_000,
+    })
+  })
+
+  test("resume", () => {
+    const state = timerReducer(
+      {
+        mode: "paused",
+        initialDuration: 5 * 60_000,
+        restDuration: 4 * 60_000,
+      },
+      {
+        type: "resume",
+        at: _now,
+      }
+    )
+
+    expect(state).toStrictEqual<typeof state>({
+      mode: "running",
+      initialDuration: 5 * 60_000,
+      restDuration: 4 * 60_000,
+      startedAt: _now,
+    })
+  })
+
+  test("cancel", () => {
+    const state = timerReducer(
+      {
+        mode: "paused",
+        initialDuration: 5 * 60_000,
+        restDuration: 4 * 60_000,
+      },
+      {
+        type: "cancel",
+      }
+    )
+
+    expect(state).toStrictEqual<typeof state>({
+      mode: "editing",
+      initialDuration: 5 * 60_000,
     })
   })
 
   test("multiple actions", () => {
-    const _now = now()
     const actions: Action[] = [
       {
-        type: "edit",
-      },
-      {
-        type: "edit-done",
-        duration: 7 * 60000,
-      },
-      {
         type: "start",
+        withDuration: 7 * 60_000,
         at: _now,
       },
       {
         type: "pause",
-        at: _now + 10000,
+        at: _now + 10_000,
       },
       {
-        type: "start",
-        at: _now + 60000,
+        type: "resume",
+        at: _now + 60_000,
       },
       {
         type: "pause",
-        at: _now + 80000,
+        at: _now + 80_000,
       },
     ]
 
     const state = actions.reduce(timerReducer, {
-      mode: "paused",
-      restDuration: 5 * 60000,
+      mode: "editing",
+      initialDuration: 3 * 60_000,
     })
 
     expect(state).toStrictEqual({
       mode: "paused",
-      restDuration: 6 * 60000 + 30000,
+      restDuration: 6 * 60_000 + 30_000,
     })
   })
 }
