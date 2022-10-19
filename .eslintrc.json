@@ -8,6 +8,7 @@
     "plugin:react/recommended",
     "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
+    "plugin:tailwindcss/recommended",
 
     // Prettier の整形と衝突するルールを無効にする。
     // ほかのおすすめルールを上書きできるように最後に置く。
