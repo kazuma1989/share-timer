@@ -6,16 +6,7 @@ import {
   startAt,
 } from "firebase/firestore"
 import { useSyncExternalStore } from "react"
-import {
-  filter,
-  map,
-  Observable,
-  OperatorFunction,
-  pairwise,
-  share,
-  startWith,
-  timer,
-} from "rxjs"
+import { Observable, share, timer } from "rxjs"
 import { collection } from "./firestore/collection"
 import { hasNoEstimateTimestamp } from "./firestore/hasNoEstimateTimestamp"
 import { orderBy } from "./firestore/orderBy"
@@ -48,14 +39,9 @@ export type TimerState =
 export function useTimerState(roomId: Room["id"]): TimerState {
   const db = useFirestore()
 
-  const store = getOrPut(roomId, () => {
-    const FirstValue = Symbol("empty")
-    type FirstValue = typeof FirstValue
-
-    type StateWithMeta = [state: TimerState, timestamp: "estimate" | "server"]
-
-    return createStore(
-      new Observable<StateWithMeta>((subscriber) => {
+  const store = getOrPut(roomId, () =>
+    createStore(
+      new Observable<TimerState>((subscriber) => {
         const abort = new AbortController()
 
         const getSmartQuery = () =>
@@ -89,10 +75,7 @@ export function useTimerState(roomId: Room["id"]): TimerState {
               initialDuration: 0,
             })
 
-            subscriber.next([
-              newState,
-              hasNoEstimateTimestamp(snapshot.metadata) ? "server" : "estimate",
-            ])
+            subscriber.next(newState)
           })
 
           abort.signal.addEventListener("abort", () => {
@@ -107,40 +90,11 @@ export function useTimerState(roomId: Room["id"]): TimerState {
       }).pipe(
         share({
           // リスナーがいなくなって30秒後に根元の購読も解除する
-          resetOnRefCountZero: () => timer(30_000),
-        }),
-
-        // 最新の値と直前の値をペアで流す
-        startWith(FirstValue),
-        pairwise() as OperatorFunction<
-          StateWithMeta | FirstValue,
-          [StateWithMeta | FirstValue, StateWithMeta]
-        >,
-
-        // UIが受け取るべき値を選別して流す
-        filter(([prev, [newState, newTimestampIs]]) => {
-          if (prev !== FirstValue) {
-            const [prevState, prevTimestampIs] = prev
-
-            if (
-              prevTimestampIs === "estimate" &&
-              prevState.mode === "running" &&
-              newTimestampIs === "server" &&
-              newState.mode === "running"
-            ) {
-              import.meta.env.DEV &&
-                console.debug("skipped an estimate -> server timestamp change")
-
-              return false
-            }
-          }
-
-          return true
-        }),
-        map(([, [newState]]) => newState)
+          resetOnRefCountZero: () => timer(30000),
+        })
       )
     )
-  })
+  )
 
   return useSyncExternalStore(store.subscribe, store.getSnapshot)
 }
