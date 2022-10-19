@@ -37,6 +37,7 @@
     "@emotion/css": "11.10.x",
     "@tsconfig/vite-react": "1.0.x",
     "@vitejs/plugin-react": "2.1.x",
+    "clsx": "1.2.x",
     "firebase": "9.12.x",
     "firebase-tools": "11.14.x",
     "postcss": "8.4.x",
