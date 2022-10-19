@@ -54,7 +54,7 @@ export function Timer({
         resumeButton$.current?.focus()
       }}
     >
-      <div className="grid place-items-center text-8xl text-white sm:text-9xl">
+      <div className="grid place-items-center text-8xl text-white sm:text-9xl tabular-nums">
         {state.mode === "editing" ? (
           <input
             ref={timeInput$}
