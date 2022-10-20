@@ -65,7 +65,7 @@ export function Timer({
             className="min-w-[7ex] rounded-lg border border-white bg-transparent py-2 text-center"
           />
         ) : (
-          <div>
+          <div className="select-none">
             {state.mode === "running" ? (
               <TimeViewer
                 duration={state.restDuration}
