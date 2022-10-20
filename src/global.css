@@ -9,3 +9,7 @@ body {
 input {
   font-variant: inherit;
 }
+
+.progress-bar-transparent::-webkit-progress-bar {
+  background-color: transparent;
+}
