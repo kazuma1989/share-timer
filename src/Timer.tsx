@@ -61,8 +61,8 @@ export function Timer({
             ref={timeInput$}
             type="text"
             defaultValue={formatDuration(state.initialDuration)}
-            size={6}
-            className="rounded-lg border border-white bg-transparent py-2 text-center"
+            size={1}
+            className="min-w-[7ex] rounded-lg border border-white bg-transparent py-2 text-center"
           />
         ) : (
           <div>

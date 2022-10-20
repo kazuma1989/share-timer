@@ -1,40 +1,10 @@
-import { css, cx } from "@emotion/css"
+import clsx from "clsx"
 
 export function Progress({ className }: { className?: string }) {
   return (
     <progress
-      className={cx(
-        css`
-          display: inline-block;
-          inline-size: 1em;
-          block-size: 1em;
-          border-radius: 50%;
-          border-style: solid;
-          border-color: transparent;
-          border-block-start-color: currentColor;
-          animation: spin 1s infinite ease-out;
-
-          &,
-          &::-webkit-progress-bar,
-          &::-webkit-progress-value {
-            background-color: transparent;
-          }
-          &::-moz-progress-bar {
-            background-color: transparent;
-          }
-          &::-ms-fill {
-            background-color: transparent;
-          }
-
-          @keyframes spin {
-            from {
-              transform: rotate(0deg);
-            }
-            to {
-              transform: rotate(360deg);
-            }
-          }
-        `,
+      className={clsx(
+        "progress-bar-transparent inline-block h-[1em] w-[1em] animate-[spin_1s_ease-out_infinite] rounded-full border border-solid border-transparent border-t-current bg-transparent",
         className
       )}
     />
