@@ -58,10 +58,8 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
               case id.includes("/node_modules/firebase"):
                 return "firebase"
 
-              case id.includes("/node_modules/@emotion"):
-              case id.includes("/node_modules/emotion"):
               case id.includes("/node_modules/react"):
-                return "react-emotion"
+                return "react"
 
               case id.includes("/node_modules/zod"):
                 return "zod"
