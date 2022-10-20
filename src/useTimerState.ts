@@ -48,7 +48,7 @@ export function useTimerState(roomId: Room["id"]): TimerState {
           getDocs(
             query(
               collection(db, "rooms", roomId, "actions"),
-              where("type", "==", "cancel"),
+              where("type", "==", "start"),
               orderBy("createdAt", "asc"),
               limitToLast(1)
             )
