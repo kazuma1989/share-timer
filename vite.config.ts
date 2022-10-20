@@ -8,7 +8,7 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
   const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env
 
   let checkerPlugin: Plugin | undefined
-  if (command === "serve" && mode !== "production") {
+  if (command === "serve" && mode === "development") {
     const [checker, scripts] = await Promise.all([
       import("vite-plugin-checker").then((_) => _.default),
       import("./package.json").then((_) => _.scripts),
