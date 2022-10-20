@@ -10,6 +10,9 @@ input {
   font-variant: inherit;
 }
 
+.progress-bar-transparent::-moz-progress-bar {
+  background-color: transparent;
+}
 .progress-bar-transparent::-webkit-progress-bar {
   background-color: transparent;
 }
