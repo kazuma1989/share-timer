@@ -1,6 +1,7 @@
-import { css } from "@emotion/css"
+import clsx from "clsx"
 import { serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
+import { CircleButton } from "./CircleButton"
 import { formatDuration } from "./formatDuration"
 import { TimeViewer } from "./TimeViewer"
 import { useAllSettled } from "./useAllSettled"
@@ -10,7 +11,13 @@ import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { Room } from "./zod/roomZod"
 import { timeInputZod } from "./zod/timeInputZod"
 
-export function Timer({ roomId }: { roomId: Room["id"] }) {
+export function Timer({
+  roomId,
+  className,
+}: {
+  roomId: Room["id"]
+  className?: string
+}) {
   const state = useTimerState(roomId)
 
   useTitleAsTimeViewer(state)
@@ -22,10 +29,12 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
   const dispatch: typeof _dispatch = (action) => addPromise(_dispatch(action))
 
   const timeInput$ = useRef<HTMLInputElement>(null)
+  const pauseOrResumeButton$ = useRef<HTMLButtonElement>(null)
 
   return (
     <form
-      onSubmit={(e) => {
+      className={clsx("grid grid-rows-[1fr_auto_1fr]", className)}
+      onSubmit={async (e) => {
         e.preventDefault()
 
         const timeInput = timeInput$.current?.value ?? ""
@@ -37,44 +46,35 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
         }
 
         dispatch({
-          type: "edit-done",
-          duration: parsed.data,
+          type: "start",
+          withDuration: parsed.data,
+          at: serverTimestamp(),
         })
+
+        await new Promise((resolve) => globalThis.setTimeout(resolve, 100))
+        pauseOrResumeButton$.current?.focus()
       }}
     >
-      <div
-        className={css`
-          font-size: 30vmin;
-        `}
-      >
+      <div className="grid min-h-[12rem] place-items-center text-8xl font-thin tabular-nums text-white sm:text-9xl">
         {state.mode === "editing" ? (
           <input
             ref={timeInput$}
             type="text"
             defaultValue={formatDuration(state.initialDuration)}
-            size={5}
-            className={css`
-              && {
-                height: unset;
-                margin: unset;
-                padding: 0.05em;
-                line-height: 1;
-              }
-            `}
+            size={6}
+            className="rounded-lg border border-white bg-transparent py-2 text-center"
           />
         ) : (
-          <div
-            className={css`
-              padding: 0.05em;
-              line-height: 1.18;
-              border: 1px solid transparent;
-            `}
-          >
+          <div>
             {state.mode === "running" ? (
               <TimeViewer
-                duration={state.duration}
+                duration={state.restDuration}
                 startedAt={state.startedAt}
-              />
+              >
+                {(restDuration) => (
+                  <span>{formatDuration(restDuration ?? 0)}</span>
+                )}
+              </TimeViewer>
             ) : (
               <span>{formatDuration(state.restDuration)}</span>
             )}
@@ -82,51 +82,55 @@ export function Timer({ roomId }: { roomId: Room["id"] }) {
         )}
       </div>
 
-      {state.mode === "editing" ? (
-        <button key="done" type="submit">
-          Done
-        </button>
-      ) : (
-        <button
-          key="edit"
-          type="button"
-          disabled={state.mode !== "paused"}
-          onClick={() => {
-            dispatch({
-              type: "edit",
+      <div className="flex items-center justify-around">
+        <CircleButton
+          disabled={state.mode === "editing"}
+          className="text-xs"
+          onClick={async () => {
+            await dispatch({
+              type: "cancel",
             })
-          }}
-        >
-          Edit
-        </button>
-      )}
 
-      {state.mode === "running" ? (
-        <button
-          type="button"
-          onClick={() => {
-            dispatch({
-              type: "pause",
-              at: serverTimestamp(),
-            })
+            timeInput$.current!.focus()
           }}
         >
-          Pause
-        </button>
-      ) : (
-        <button
-          type="button"
-          disabled={pending || state.mode === "editing"}
-          onClick={() => {
-            dispatch({
-              type: "start",
-              at: serverTimestamp(),
-            })
-          }}
-        >
-          Start
-        </button>
-      )}
+          キャンセル
+        </CircleButton>
+
+        {state.mode === "editing" ? (
+          <CircleButton color="green" type="submit">
+            開始
+          </CircleButton>
+        ) : state.mode === "running" ? (
+          <CircleButton
+            innerRef={pauseOrResumeButton$}
+            color="orange"
+            onClick={() => {
+              dispatch({
+                type: "pause",
+                at: serverTimestamp(),
+              })
+            }}
+          >
+            一時停止
+          </CircleButton>
+        ) : (
+          <CircleButton
+            innerRef={pauseOrResumeButton$}
+            color="green"
+            onClick={() => {
+              if (pending) return
+
+              dispatch({
+                type: "resume",
+                at: serverTimestamp(),
+              })
+            }}
+          >
+            再開
+          </CircleButton>
+        )}
+      </div>
     </form>
   )
 }

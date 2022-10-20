@@ -15,21 +15,23 @@ const timestampToMillis = timestamp.transform((t) =>
 
 export const actionZod = z.union([
   z.object({
-    type: z.literal("edit"),
-  }),
-
-  z.object({
-    type: z.literal("edit-done"),
-    duration: z.number(),
-  }),
-
-  z.object({
     type: z.literal("start"),
+    withDuration: z.number(),
     at: timestampToMillis,
   }),
 
   z.object({
     type: z.literal("pause"),
     at: timestampToMillis,
+  }),
+
+  z.object({
+    type: z.literal("resume"),
+    at: timestampToMillis,
+  }),
+
+  z.object({
+    type: z.literal("cancel"),
+    withDuration: z.number().optional(),
   }),
 ])

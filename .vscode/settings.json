@@ -11,6 +11,12 @@
   // TS, TSXファイルのみ対象とする。
   "eslint.probe": ["typescript", "typescriptreact"],
 
+  // Tailwind記法を受け入れる
+  "css.validate": false,
+  "tailwindCSS.experimental.classRegex": [
+    ["clsx\\(([^)]*)\\)", "\"([^\"]*)\""]
+  ],
+
   // TypeScriptバージョンをリポジトリのものに揃える。
   "typescript.tsdk": "node_modules/typescript/lib"
 }

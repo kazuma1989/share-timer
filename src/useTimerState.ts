@@ -6,16 +6,7 @@ import {
   startAt,
 } from "firebase/firestore"
 import { useSyncExternalStore } from "react"
-import {
-  filter,
-  map,
-  Observable,
-  OperatorFunction,
-  pairwise,
-  share,
-  startWith,
-  timer,
-} from "rxjs"
+import { Observable, share, timer } from "rxjs"
 import { collection } from "./firestore/collection"
 import { hasNoEstimateTimestamp } from "./firestore/hasNoEstimateTimestamp"
 import { orderBy } from "./firestore/orderBy"
@@ -35,110 +26,75 @@ export type TimerState =
     }
   | {
       mode: "running"
+      initialDuration: number
+      restDuration: number
       startedAt: number
-      duration: number
     }
   | {
       mode: "paused"
+      initialDuration: number
       restDuration: number
     }
 
 export function useTimerState(roomId: Room["id"]): TimerState {
   const db = useFirestore()
 
-  const store = getOrPut(roomId, () => {
-    const FirstValue = Symbol("empty")
-    type FirstValue = typeof FirstValue
-
-    type StateWithMeta = [state: TimerState, timestamp: "estimate" | "server"]
-
-    return createStore(
-      new Observable<StateWithMeta>((subscriber) => {
-        console.debug("actions listener attached")
-
+  const store = getOrPut(roomId, () =>
+    createStore(
+      new Observable<TimerState>((subscriber) => {
         const abort = new AbortController()
 
-        const selectLatestEditDone = query(
-          collection(db, "rooms", roomId, "actions"),
-          where("type", "==", "edit-done"),
-          orderBy("createdAt", "asc"),
-          limitToLast(1)
-        )
-        getDocs(selectLatestEditDone).then(({ docs: [latestEditDone] }) => {
-          if (abort.signal.aborted) return
-
-          let selectActions = query(
-            collection(db, "rooms", roomId, "actions"),
-            orderBy("createdAt", "asc")
+        const getSmartQuery = () =>
+          getDocs(
+            query(
+              collection(db, "rooms", roomId, "actions"),
+              where("type", "==", "edit-done"),
+              orderBy("createdAt", "asc"),
+              limitToLast(1)
+            )
+          ).then(({ docs: [doc] }) =>
+            query(
+              collection(db, "rooms", roomId, "actions"),
+              orderBy("createdAt", "asc"),
+              ...(hasNoEstimateTimestamp(doc?.metadata) ? [startAt(doc)] : [])
+            )
           )
-          if (
-            latestEditDone &&
-            hasNoEstimateTimestamp(latestEditDone.metadata)
-          ) {
-            selectActions = query(selectActions, startAt(latestEditDone))
-          }
+
+        getSmartQuery().then((selectActions) => {
+          if (abort.signal.aborted) return
 
           const parseDocs = safeParseDocsWith(actionZod)
 
+          console.debug("actions listener attached")
           const unsubscribe = onSnapshot(selectActions, (snapshot) => {
             console.debug("listen %d docChanges", snapshot.docChanges().length)
 
             const actions = parseDocs(snapshot.docs)
             const newState = actions.reduce(timerReducer, {
-              mode: "paused",
-              restDuration: 0,
+              mode: "editing",
+              initialDuration: 0,
             })
 
-            subscriber.next([
-              newState,
-              hasNoEstimateTimestamp(snapshot.metadata) ? "server" : "estimate",
-            ])
+            subscriber.next(newState)
           })
 
-          abort.signal.addEventListener("abort", unsubscribe)
+          abort.signal.addEventListener("abort", () => {
+            console.debug("actions listener detached")
+            unsubscribe()
+          })
         })
 
         return () => {
-          console.debug("aborted!!")
           abort.abort()
         }
       }).pipe(
         share({
           // リスナーがいなくなって30秒後に根元の購読も解除する
-          resetOnRefCountZero: () => timer(30_000),
-        }),
-
-        // 最新の値と直前の値をペアで流す
-        startWith(FirstValue),
-        pairwise() as OperatorFunction<
-          StateWithMeta | FirstValue,
-          [StateWithMeta | FirstValue, StateWithMeta]
-        >,
-
-        // UIが受け取るべき値を選別して流す
-        filter(([prev, [newState, newTimestampIs]]) => {
-          if (prev !== FirstValue) {
-            const [prevState, prevTimestampIs] = prev
-
-            if (
-              prevTimestampIs === "estimate" &&
-              prevState.mode === "running" &&
-              newTimestampIs === "server" &&
-              newState.mode === "running"
-            ) {
-              import.meta.env.DEV &&
-                console.debug("skipped an estimate -> server timestamp change")
-
-              return false
-            }
-          }
-
-          return true
-        }),
-        map(([, [newState]]) => newState)
+          resetOnRefCountZero: () => timer(30000),
+        })
       )
     )
-  })
+  )
 
   return useSyncExternalStore(store.subscribe, store.getSnapshot)
 }

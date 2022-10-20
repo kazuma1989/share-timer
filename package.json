@@ -30,17 +30,21 @@
     "firebase-indexes-export": "firebase firestore:indexes > firestore.indexes.json",
     "firebase-emulators-init": "firebase init emulators",
     "firebase-emulators-start": "firebase emulators:start --only firestore",
-    "log-build": "npm run build | tee build_$(date +%s).log"
+    "log-build": "npm run build | tee build_$(date +%s).log",
+    "tailwind-init": "tailwindcss init -p"
   },
   "dependencies": {
     "@emotion/css": "11.10.x",
     "@tsconfig/vite-react": "1.0.x",
     "@vitejs/plugin-react": "2.1.x",
+    "clsx": "1.2.x",
     "firebase": "9.12.x",
     "firebase-tools": "11.14.x",
+    "postcss": "8.4.x",
     "react": "18.2.x",
     "react-dom": "18.2.x",
     "rxjs": "7.5.x",
+    "tailwindcss": "3.1.x",
     "vite": "3.1.x",
     "zod": "3.19.x"
   },
@@ -54,6 +58,7 @@
     "eslint-config-prettier": "8.5.x",
     "eslint-plugin-react": "7.31.x",
     "eslint-plugin-react-hooks": "4.6.x",
+    "eslint-plugin-tailwindcss": "3.6.x",
     "prettier": "2.7.x",
     "prettier-plugin-organize-imports": "3.1.x",
     "typescript": "4.8.x",
