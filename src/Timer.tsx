@@ -37,6 +37,8 @@ export function Timer({
       onSubmit={async (e) => {
         e.preventDefault()
 
+        if (state.mode !== "editing") return
+
         dispatch({
           type: "start",
           withDuration: duration$.current,
