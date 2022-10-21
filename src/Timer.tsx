@@ -2,6 +2,7 @@ import clsx from "clsx"
 import { serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
 import { CircleButton } from "./CircleButton"
+import { DurationSelect } from "./DurationSelect"
 import { formatDuration } from "./formatDuration"
 import { TimeViewer } from "./TimeViewer"
 import { useAllSettled } from "./useAllSettled"
@@ -9,7 +10,6 @@ import { useDispatchAction } from "./useDispatchAction"
 import { useTimerState } from "./useTimerState"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { Room } from "./zod/roomZod"
-import { timeInputZod } from "./zod/timeInputZod"
 
 export function Timer({
   roomId,
@@ -28,8 +28,8 @@ export function Timer({
   const _dispatch = useDispatchAction(roomId)
   const dispatch: typeof _dispatch = (action) => addPromise(_dispatch(action))
 
-  const timeInput$ = useRef<HTMLInputElement>(null)
-  const pauseOrResumeButton$ = useRef<HTMLButtonElement>(null)
+  const duration$ = useRef(0)
+  const primaryButton$ = useRef<HTMLButtonElement>(null)
 
   return (
     <form
@@ -37,35 +37,28 @@ export function Timer({
       onSubmit={async (e) => {
         e.preventDefault()
 
-        const timeInput = timeInput$.current?.value ?? ""
-
-        const parsed = timeInputZod.safeParse(timeInput)
-        if (!parsed.success) {
-          alert(`invalid format ${timeInput}`)
-          return
-        }
+        if (state.mode !== "editing") return
 
         dispatch({
           type: "start",
-          withDuration: parsed.data,
+          withDuration: duration$.current,
           at: serverTimestamp(),
         })
 
-        await new Promise((resolve) => globalThis.setTimeout(resolve, 100))
-        pauseOrResumeButton$.current?.focus()
+        primaryButton$.current?.focus()
       }}
     >
-      <div className="grid min-h-[12rem] place-items-center text-8xl font-thin tabular-nums text-white sm:text-9xl">
+      <div className="grid min-h-[12rem] place-items-center tabular-nums">
         {state.mode === "editing" ? (
-          <input
-            ref={timeInput$}
-            type="text"
-            defaultValue={formatDuration(state.initialDuration)}
-            size={1}
-            className="min-w-[7ex] rounded-lg border border-white bg-transparent py-2 text-center"
+          <DurationSelect
+            key={state.initialDuration}
+            defaultValue={state.initialDuration}
+            onChange={(duration) => {
+              duration$.current = duration
+            }}
           />
         ) : (
-          <div>
+          <div className="text-8xl font-thin sm:text-9xl">
             {state.mode === "running" ? (
               <TimeViewer
                 duration={state.restDuration}
@@ -91,19 +84,20 @@ export function Timer({
               type: "cancel",
             })
 
-            timeInput$.current!.focus()
+            // FIXME 編集にすぐ移りたい
+            // duration$.current!.focus()
           }}
         >
           キャンセル
         </CircleButton>
 
         {state.mode === "editing" ? (
-          <CircleButton color="green" type="submit">
+          <CircleButton innerRef={primaryButton$} color="green" type="submit">
             開始
           </CircleButton>
         ) : state.mode === "running" ? (
           <CircleButton
-            innerRef={pauseOrResumeButton$}
+            innerRef={primaryButton$}
             color="orange"
             onClick={() => {
               dispatch({
@@ -116,7 +110,7 @@ export function Timer({
           </CircleButton>
         ) : (
           <CircleButton
-            innerRef={pauseOrResumeButton$}
+            innerRef={primaryButton$}
             color="green"
             onClick={() => {
               if (pending) return

@@ -13,7 +13,7 @@ export function formatDuration(durationMs: number): string {
   // seconds = 21
   const seconds = durationSec % 60
 
-  // minutes = 3
+  // minutes = 5
   const minutes = (durationSec - seconds) / 60
 
   return [

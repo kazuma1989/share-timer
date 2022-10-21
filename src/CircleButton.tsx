@@ -15,9 +15,8 @@ export function CircleButton({
   let colorStyle: string
   switch (color) {
     case "gray": {
-      // FIXME grayのhover, activeの変化をgreen, orangeと同じくらいに揃えておきたい
       colorStyle = clsx(
-        "border-gray-600 bg-gray-700 text-gray-300 active:bg-gray-900 enabled:hover:bg-gray-800 disabled:text-gray-500"
+        "border-gray-600 bg-gray-800 text-gray-300 enabled:hover:bg-gray-800/75 enabled:active:bg-gray-900/30 disabled:text-gray-500 disabled:active:bg-gray-800/75"
       )
 
       break
@@ -46,7 +45,7 @@ export function CircleButton({
       ref={innerRef}
       type={type}
       className={clsx(
-        "h-20 w-20 cursor-pointer rounded-full border-4 border-double",
+        "h-20 w-20 cursor-pointer select-none rounded-full border-4 border-double",
         colorStyle,
         className
       )}
