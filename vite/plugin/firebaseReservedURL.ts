@@ -1,15 +1,22 @@
 import * as fs from "node:fs/promises"
+import * as path from "node:path"
 import { Plugin } from "vite"
 
-export function firebaseReservedURL(): Plugin {
-  interface Firebaserc {
-    projects: {
-      default: string
-    }
+interface Firebaserc {
+  projects: {
+    default: string
   }
+}
+
+/**
+ * 本物の Firebase Hosting サイトから `/__` で始まる予約済み URL の中身を取得するプロキシーを設定
+ */
+export function firebaseReservedURL(): Plugin {
   const getFirebaserc = () =>
     fs
-      .readFile("./.firebaserc", { encoding: "utf-8" })
+      .readFile(path.join(__dirname, "../../.firebaserc"), {
+        encoding: "utf-8",
+      })
       .then<Firebaserc>(JSON.parse)
       .catch(() => null)
 

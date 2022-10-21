@@ -2,9 +2,9 @@
 {
   "include": [
     "./vite.config.ts",
-    "./vite-*.ts",
-    "./package.json",
-    "./firebase.json"
+    "./vite/**/*",
+    "./firebase.json",
+    "./package.json"
   ],
 
   "compilerOptions": {

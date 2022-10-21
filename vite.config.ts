@@ -1,29 +1,9 @@
 /// <reference types="vitest" />
 import react from "@vitejs/plugin-react"
 import { defineConfig, Plugin, UserConfig } from "vite"
-import { bundleBuddy } from "./vite-bundleBuddy"
-import { firebaseReservedURL } from "./vite-firebaseReservedURL"
-
-function firestoreEmulatorProxy(): Plugin {
-  return {
-    name: "firestoreEmulatorProxy",
-
-    async config() {
-      const { emulators } = await import("./firebase.json")
-
-      return {
-        server: {
-          proxy: {
-            "^/google\\..+": {
-              target: `http://127.0.0.1:${emulators.firestore.port}`,
-              changeOrigin: true,
-            },
-          },
-        },
-      }
-    },
-  }
-}
+import { bundleBuddy } from "./vite/plugin/bundleBuddy"
+import { firebaseReservedURL } from "./vite/plugin/firebaseReservedURL"
+import { firestoreEmulatorProxy } from "./vite/plugin/firestoreEmulatorProxy"
 
 export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
   const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env
