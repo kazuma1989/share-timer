@@ -29,7 +29,7 @@ export function Timer({
   const dispatch: typeof _dispatch = (action) => addPromise(_dispatch(action))
 
   const duration$ = useRef(0)
-  const pauseOrResumeButton$ = useRef<HTMLButtonElement>(null)
+  const primaryButton$ = useRef<HTMLButtonElement>(null)
 
   return (
     <form
@@ -45,9 +45,7 @@ export function Timer({
           at: serverTimestamp(),
         })
 
-        // FIXME ここなんとかならんのか
-        await new Promise((resolve) => globalThis.setTimeout(resolve, 100))
-        pauseOrResumeButton$.current?.focus()
+        primaryButton$.current?.focus()
       }}
     >
       <div className="grid min-h-[12rem] place-items-center tabular-nums">
@@ -94,12 +92,12 @@ export function Timer({
         </CircleButton>
 
         {state.mode === "editing" ? (
-          <CircleButton color="green" type="submit">
+          <CircleButton innerRef={primaryButton$} color="green" type="submit">
             開始
           </CircleButton>
         ) : state.mode === "running" ? (
           <CircleButton
-            innerRef={pauseOrResumeButton$}
+            innerRef={primaryButton$}
             color="orange"
             onClick={() => {
               dispatch({
@@ -112,7 +110,7 @@ export function Timer({
           </CircleButton>
         ) : (
           <CircleButton
-            innerRef={pauseOrResumeButton$}
+            innerRef={primaryButton$}
             color="green"
             onClick={() => {
               if (pending) return
