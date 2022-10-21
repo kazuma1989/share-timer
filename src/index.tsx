@@ -14,8 +14,11 @@ const firebaseApp = initializeApp(
 const firestore = getFirestore(firebaseApp)
 
 if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
-  console.info("using emulator (localhost:8080)")
-  connectFirestoreEmulator(firestore, "localhost", 8080)
+  const host = location.hostname
+  const port = Number(location.port)
+  console.info(`using emulator (${host}:${port})`)
+
+  connectFirestoreEmulator(firestore, host, port)
 }
 
 calibrateClock(firestore).catch((reason) => {

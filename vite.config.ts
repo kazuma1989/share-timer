@@ -37,6 +37,13 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
       // もしくは CLI オプションで `--no-open` を渡す。
       // (e.g.) $ npm start -- --no-open
       open: BROWSER || true,
+
+      proxy: {
+        "^/google\\..+": {
+          target: "http://127.0.0.1:8080",
+          changeOrigin: true,
+        },
+      },
     },
 
     build: {
