@@ -50,7 +50,7 @@ export function Timer({
         primaryButton$.current?.focus()
       }}
     >
-      <div className="grid min-h-[12rem] place-items-center tabular-nums">
+      <div className="relative top-5 grid min-h-fit place-items-center tabular-nums">
         {state.mode === "editing" ? (
           <DurationSelect
             key={state.mode + state.initialDuration}
@@ -75,7 +75,7 @@ export function Timer({
         )}
       </div>
 
-      <div className="flex items-center justify-around">
+      <div className="relative top-10 flex items-center justify-around">
         <CircleButton
           disabled={state.mode === "editing"}
           className="text-xs"
