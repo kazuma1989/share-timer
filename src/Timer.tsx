@@ -10,7 +10,6 @@ import { useDispatchAction } from "./useDispatchAction"
 import { useTimerState } from "./useTimerState"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { Room } from "./zod/roomZod"
-import { timeInputZod } from "./zod/timeInputZod"
 
 export function Timer({
   roomId,
@@ -29,7 +28,7 @@ export function Timer({
   const _dispatch = useDispatchAction(roomId)
   const dispatch: typeof _dispatch = (action) => addPromise(_dispatch(action))
 
-  const timeInput$ = useRef<HTMLInputElement>(null)
+  const duration$ = useRef(0)
   const pauseOrResumeButton$ = useRef<HTMLButtonElement>(null)
 
   return (
@@ -38,34 +37,26 @@ export function Timer({
       onSubmit={async (e) => {
         e.preventDefault()
 
-        const timeInput = timeInput$.current?.value ?? ""
-
-        const parsed = timeInputZod.safeParse(timeInput)
-        if (!parsed.success) {
-          alert(`invalid format ${timeInput}`)
-          return
-        }
-
         dispatch({
           type: "start",
-          withDuration: parsed.data,
+          withDuration: duration$.current,
           at: serverTimestamp(),
         })
 
+        // FIXME ここなんとかならんのか
         await new Promise((resolve) => globalThis.setTimeout(resolve, 100))
         pauseOrResumeButton$.current?.focus()
       }}
     >
       <div className="grid min-h-[12rem] place-items-center tabular-nums">
         {state.mode === "editing" ? (
-          // <input
-          //   ref={timeInput$}
-          //   type="text"
-          //   defaultValue={formatDuration(state.initialDuration)}
-          //   size={1}
-          //   className="min-w-[7ex] rounded-lg border border-white bg-transparent py-2 text-center"
-          // />
-          <DurationSelect />
+          <DurationSelect
+            key={state.initialDuration}
+            defaultValue={state.initialDuration}
+            onChange={(duration) => {
+              duration$.current = duration
+            }}
+          />
         ) : (
           <div className="text-8xl font-thin sm:text-9xl">
             {state.mode === "running" ? (
@@ -93,7 +84,8 @@ export function Timer({
               type: "cancel",
             })
 
-            timeInput$.current!.focus()
+            // FIXME 編集にすぐ移りたい
+            // duration$.current!.focus()
           }}
         >
           キャンセル
