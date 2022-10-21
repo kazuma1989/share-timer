@@ -28,7 +28,9 @@ export function Timer({
   const _dispatch = useDispatchAction(roomId)
   const dispatch: typeof _dispatch = (action) => addPromise(_dispatch(action))
 
-  const duration$ = useRef(0)
+  const durationSelect$ = useRef({
+    value: state.initialDuration,
+  })
   const primaryButton$ = useRef<HTMLButtonElement>(null)
 
   return (
@@ -41,7 +43,7 @@ export function Timer({
 
         dispatch({
           type: "start",
-          withDuration: duration$.current,
+          withDuration: durationSelect$.current.value,
           at: serverTimestamp(),
         })
 
@@ -51,11 +53,9 @@ export function Timer({
       <div className="grid min-h-[12rem] place-items-center tabular-nums">
         {state.mode === "editing" ? (
           <DurationSelect
-            key={state.initialDuration}
+            key={state.mode + state.initialDuration}
+            innerRef={durationSelect$}
             defaultValue={state.initialDuration}
-            onChange={(duration) => {
-              duration$.current = duration
-            }}
           />
         ) : (
           <div className="text-8xl font-thin sm:text-9xl">

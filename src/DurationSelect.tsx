@@ -1,23 +1,29 @@
 import clsx from "clsx"
-import { useRef } from "react"
+import { Ref, useImperativeHandle, useRef } from "react"
 import { parseDuration } from "./parseDuration"
 
 export function DurationSelect({
+  innerRef,
   defaultValue = 0,
-  onChange,
   className,
 }: {
+  innerRef?: Ref<{ value: number }>
   defaultValue?: number
-  onChange?(value: number): void
   className?: string
 }) {
   const defaultDuration = parseDuration(defaultValue)
   const duration$ = useRef(defaultDuration)
 
-  const notifyChange = () => {
-    const { hours, minutes, seconds } = duration$.current
-    onChange?.(hours * 3600_000 + minutes * 60_000 + seconds * 1_000)
-  }
+  useImperativeHandle(
+    innerRef,
+    () => ({
+      get value() {
+        const { hours, minutes, seconds } = duration$.current
+        return hours * 3600_000 + minutes * 60_000 + seconds * 1_000
+      },
+    }),
+    []
+  )
 
   const selectStyle = clsx(
     "appearance-none rounded-none border-b border-white bg-transparent px-2"
@@ -31,7 +37,6 @@ export function DurationSelect({
           className={selectStyle}
           onChange={(e) => {
             duration$.current.hours = Number(e.currentTarget.value)
-            notifyChange()
           }}
         >
           {Array.from(Array(24).keys()).map((i) => (
@@ -49,7 +54,6 @@ export function DurationSelect({
           className={selectStyle}
           onChange={(e) => {
             duration$.current.minutes = Number(e.currentTarget.value)
-            notifyChange()
           }}
         >
           {Array.from(Array(60).keys()).map((i) => (
@@ -67,7 +71,6 @@ export function DurationSelect({
           className={selectStyle}
           onChange={(e) => {
             duration$.current.seconds = Number(e.currentTarget.value)
-            notifyChange()
           }}
         >
           {Array.from(Array(60).keys()).map((i) => (
