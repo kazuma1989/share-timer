@@ -4,6 +4,27 @@ import { defineConfig, Plugin, UserConfig } from "vite"
 import { bundleBuddy } from "./vite-bundleBuddy"
 import { firebaseReservedURL } from "./vite-firebaseReservedURL"
 
+function firestoreEmulatorProxy(): Plugin {
+  return {
+    name: "firestoreEmulatorProxy",
+
+    async config() {
+      const { emulators } = await import("./firebase.json")
+
+      return {
+        server: {
+          proxy: {
+            "^/google\\..+": {
+              target: `http://127.0.0.1:${emulators.firestore.port}`,
+              changeOrigin: true,
+            },
+          },
+        },
+      }
+    },
+  }
+}
+
 export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
   const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env
 
@@ -37,13 +58,6 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
       // もしくは CLI オプションで `--no-open` を渡す。
       // (e.g.) $ npm start -- --no-open
       open: BROWSER || true,
-
-      proxy: {
-        "^/google\\..+": {
-          target: "http://127.0.0.1:8080",
-          changeOrigin: true,
-        },
-      },
     },
 
     build: {
@@ -90,11 +104,12 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
       // The all-in-one Vite plugin for React projects.
       react(),
 
-      // type-check
-      checkerPlugin,
-
       // Firebase
       firebaseReservedURL(),
+      firestoreEmulatorProxy(),
+
+      // type-check
+      checkerPlugin,
 
       // bundle analyze
       bundleBuddy(),
