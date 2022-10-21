@@ -6,6 +6,7 @@ body {
   @apply bg-black text-white;
 }
 
+select,
 input {
   font-variant: inherit;
 }

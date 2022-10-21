@@ -2,6 +2,7 @@ import clsx from "clsx"
 import { serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
 import { CircleButton } from "./CircleButton"
+import { DurationSelect } from "./DurationSelect"
 import { formatDuration } from "./formatDuration"
 import { TimeViewer } from "./TimeViewer"
 import { useAllSettled } from "./useAllSettled"
@@ -55,17 +56,18 @@ export function Timer({
         pauseOrResumeButton$.current?.focus()
       }}
     >
-      <div className="grid min-h-[12rem] place-items-center text-8xl font-thin tabular-nums sm:text-9xl">
+      <div className="grid min-h-[12rem] place-items-center tabular-nums">
         {state.mode === "editing" ? (
-          <input
-            ref={timeInput$}
-            type="text"
-            defaultValue={formatDuration(state.initialDuration)}
-            size={1}
-            className="min-w-[7ex] rounded-lg border border-white bg-transparent py-2 text-center"
-          />
+          // <input
+          //   ref={timeInput$}
+          //   type="text"
+          //   defaultValue={formatDuration(state.initialDuration)}
+          //   size={1}
+          //   className="min-w-[7ex] rounded-lg border border-white bg-transparent py-2 text-center"
+          // />
+          <DurationSelect />
         ) : (
-          <div className="select-none">
+          <div className="text-8xl font-thin sm:text-9xl">
             {state.mode === "running" ? (
               <TimeViewer
                 duration={state.restDuration}
