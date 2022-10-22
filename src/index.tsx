@@ -6,6 +6,8 @@ import { App } from "./App"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { calibrateClock } from "./now"
+import smallAlert from "./sound/small-alert.mp3"
+import { AlertAudioProvider } from "./useAlertAudio"
 import { FirestoreProvider } from "./useFirestore"
 
 const firebaseApp = initializeApp(
@@ -28,9 +30,11 @@ calibrateClock(firestore).catch((reason) => {
 createRoot(globalThis.document.getElementById("root")!).render(
   <StrictMode>
     <FirestoreProvider value={firestore}>
-      <Suspense fallback={<FullViewportProgress />}>
-        <App />
-      </Suspense>
+      <AlertAudioProvider value={new Audio(smallAlert)}>
+        <Suspense fallback={<FullViewportProgress />}>
+          <App />
+        </Suspense>
+      </AlertAudioProvider>
     </FirestoreProvider>
   </StrictMode>
 )

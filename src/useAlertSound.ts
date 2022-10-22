@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { now } from "./now"
-import smallAlert from "./sound/small-alert.mp3"
+import { useAlertAudio } from "./useAlertAudio"
 import { TimerState } from "./useTimerState"
 import IntervalWorker from "./util/interval.worker?worker&inline"
 
@@ -9,6 +9,8 @@ export function useAlertSound({
   restDuration,
   startedAt,
 }: TimerState): void {
+  const audio = useAlertAudio()
+
   useEffect(() => {
     if (mode !== "running") return
 
@@ -19,7 +21,16 @@ export function useAlertSound({
       interval.terminate()
     })
 
-    const audio = new Audio(smallAlert)
+    audio.addEventListener(
+      "ended",
+      () => {
+        audio.currentTime = 0
+      },
+      {
+        passive: true,
+        signal: abort.signal,
+      }
+    )
 
     let played: Promise<void> | undefined
     const playSoundOnceDurationReachedZero = () => {
@@ -39,5 +50,5 @@ export function useAlertSound({
     return () => {
       abort.abort()
     }
-  }, [mode, restDuration, startedAt])
+  }, [audio, mode, restDuration, startedAt])
 }

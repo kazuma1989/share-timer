@@ -1,13 +1,13 @@
 import { useState, useSyncExternalStore } from "react"
 import { CircleButton } from "./CircleButton"
-import smallAlert from "./sound/small-alert.mp3"
+import { useAlertAudio } from "./useAlertAudio"
 import { checkAudioPermission } from "./util/checkAudioPermission"
 import { createStore } from "./util/createStore"
 import { setTimeout } from "./util/setTimeout"
 
-const audio = new Audio(smallAlert)
-
 export function CheckAudioButton() {
+  const audio = useAlertAudio()
+
   const getStore = () => createStore(checkAudioPermission(audio), "denied")
 
   const [store, setStore] = useState(getStore)
