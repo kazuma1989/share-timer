@@ -129,9 +129,11 @@ export function Timer({
         )}
       </div>
 
-      <div className="grid place-items-center">
-        <CheckAudioButton />
-      </div>
+      {import.meta.env.DEV && (
+        <div className="grid place-items-center">
+          <CheckAudioButton />
+        </div>
+      )}
     </form>
   )
 }
