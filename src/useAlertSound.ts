@@ -32,9 +32,7 @@ export function useAlertSound({
     }
 
     playSoundOnceDurationReachedZero()
-    interval.addEventListener("message", () => {
-      playSoundOnceDurationReachedZero()
-    })
+    interval.addEventListener("message", playSoundOnceDurationReachedZero)
 
     interval.postMessage(["start", 100])
 

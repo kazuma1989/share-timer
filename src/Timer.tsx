@@ -1,6 +1,7 @@
 import clsx from "clsx"
 import { serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
+import { CheckAudioButton } from "./CheckAudioButton"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
 import { formatDuration } from "./formatDuration"
@@ -126,6 +127,10 @@ export function Timer({
             再開
           </CircleButton>
         )}
+      </div>
+
+      <div className="grid place-items-center">
+        <CheckAudioButton />
       </div>
     </form>
   )
