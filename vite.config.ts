@@ -1,10 +1,10 @@
-/// <reference types="vitest" />
 import react from "@vitejs/plugin-react"
 import { defineConfig, UserConfig } from "vite"
 import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
 import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
 import firestoreEmulatorProxy from "./vite/plugin/firestoreEmulatorProxy"
+import vitest from "./vite/plugin/vitest"
 
 export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
   const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env
@@ -58,11 +58,6 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
       port: (PREVIEW_PORT && parseInt(PREVIEW_PORT)) || 3000,
     },
 
-    define: {
-      // https://vitest.dev/guide/in-source.html#production-build
-      "import.meta.vitest": "undefined",
-    },
-
     plugins: [
       // The all-in-one Vite plugin for React projects.
       react(),
@@ -70,6 +65,9 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
       // Firebase
       firebaseReservedURL(),
       firestoreEmulatorProxy(),
+
+      // Test config
+      vitest(),
 
       // type-check
       command === "serve" && mode === "development"
@@ -79,11 +77,5 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
       // bundle analyze
       bundleBuddy(),
     ],
-
-    // Vitest
-    test: {
-      setupFiles: ["./src/test.setup.ts"],
-      includeSource: ["./src/**/*.{ts,tsx}"],
-    },
   }
 })
