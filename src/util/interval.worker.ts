@@ -3,12 +3,14 @@ export {}
 
 declare const self: DedicatedWorkerGlobalScope
 
-interface Data {}
+type Data = [type: "start", interval: number]
 
-onMessage<Data>(() => {
+onMessage<Data>((e) => {
+  const [, interval] = Array.isArray(e.data) ? e.data : []
+
   const timer = self.setInterval(() => {
     self.postMessage(null)
-  }, 100)
+  }, interval ?? 1_000)
 
   return () => {
     self.clearInterval(timer)
@@ -16,7 +18,7 @@ onMessage<Data>(() => {
 })
 
 function onMessage<T>(
-  listener: (e: MessageEvent<T>) => (() => void) | void
+  listener: (e: MessageEvent<T | undefined>) => (() => void) | void
 ): void {
   let unsubscribe: ReturnType<typeof listener>
 

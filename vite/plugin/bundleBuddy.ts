@@ -3,7 +3,7 @@ import { Plugin } from "vite"
 /**
  * https://bundle-buddy.com で分析するための graph.json を生成する
  */
-export function bundleBuddy(): Plugin {
+export default function bundleBuddy(): Plugin {
   return {
     name: "bundleBuddy",
 

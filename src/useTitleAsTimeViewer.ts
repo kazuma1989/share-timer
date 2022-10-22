@@ -1,32 +1,15 @@
 import { useEffect } from "react"
-import { formatDuration } from "./formatDuration"
 import { now } from "./now"
 import { TimerState } from "./useTimerState"
+import { formatDuration } from "./util/formatDuration"
 import IntervalWorker from "./util/interval.worker?worker&inline"
 
-export function useTitleAsTimeViewer(state: TimerState): void {
-  const mode = state.mode
-
-  let duration = NaN
-  let startedAt = NaN
-  switch (state.mode) {
-    case "paused": {
-      duration = state.restDuration
-      break
-    }
-
-    case "editing": {
-      duration = state.initialDuration
-      break
-    }
-
-    case "running": {
-      duration = state.restDuration
-      startedAt = state.startedAt
-      break
-    }
-  }
-
+export function useTitleAsTimeViewer({
+  mode,
+  initialDuration,
+  restDuration,
+  startedAt,
+}: TimerState): void {
   useEffect(() => {
     const abort = new AbortController()
 
@@ -45,9 +28,8 @@ export function useTitleAsTimeViewer(state: TimerState): void {
     }
 
     switch (mode) {
-      case "paused":
       case "editing": {
-        setTitle(duration)
+        setTitle(initialDuration)
         break
       }
 
@@ -57,12 +39,17 @@ export function useTitleAsTimeViewer(state: TimerState): void {
           interval.terminate()
         })
 
-        setTitle(duration, startedAt)
+        setTitle(restDuration, startedAt)
         interval.addEventListener("message", () => {
-          setTitle(duration, startedAt)
+          setTitle(restDuration, startedAt)
         })
 
-        interval.postMessage("start")
+        interval.postMessage(["start", 500])
+        break
+      }
+
+      case "paused": {
+        setTitle(restDuration)
         break
       }
     }
@@ -70,5 +57,5 @@ export function useTitleAsTimeViewer(state: TimerState): void {
     return () => {
       abort.abort()
     }
-  }, [duration, mode, startedAt])
+  }, [initialDuration, mode, restDuration, startedAt])
 }

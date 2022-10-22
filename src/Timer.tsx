@@ -1,14 +1,16 @@
 import clsx from "clsx"
 import { serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
+import { CheckAudioButton } from "./CheckAudioButton"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
-import { formatDuration } from "./formatDuration"
 import { TimeViewer } from "./TimeViewer"
+import { useAlertSound } from "./useAlertSound"
 import { useAllSettled } from "./useAllSettled"
 import { useDispatchAction } from "./useDispatchAction"
 import { useTimerState } from "./useTimerState"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
+import { formatDuration } from "./util/formatDuration"
 import { Room } from "./zod/roomZod"
 
 export function Timer({
@@ -21,6 +23,7 @@ export function Timer({
   const state = useTimerState(roomId)
 
   useTitleAsTimeViewer(state)
+  useAlertSound(state)
 
   const [_allSettled, addPromise] = useAllSettled()
   const pending = !_allSettled
@@ -28,7 +31,9 @@ export function Timer({
   const _dispatch = useDispatchAction(roomId)
   const dispatch: typeof _dispatch = (action) => addPromise(_dispatch(action))
 
-  const duration$ = useRef(0)
+  const durationSelect$ = useRef({
+    value: state.initialDuration,
+  })
   const primaryButton$ = useRef<HTMLButtonElement>(null)
 
   return (
@@ -41,21 +46,19 @@ export function Timer({
 
         dispatch({
           type: "start",
-          withDuration: duration$.current,
+          withDuration: durationSelect$.current.value,
           at: serverTimestamp(),
         })
 
         primaryButton$.current?.focus()
       }}
     >
-      <div className="grid min-h-[12rem] place-items-center tabular-nums">
+      <div className="relative top-5 grid min-h-fit place-items-center tabular-nums">
         {state.mode === "editing" ? (
           <DurationSelect
-            key={state.initialDuration}
+            key={state.mode + state.initialDuration}
+            innerRef={durationSelect$}
             defaultValue={state.initialDuration}
-            onChange={(duration) => {
-              duration$.current = duration
-            }}
           />
         ) : (
           <div className="text-8xl font-thin sm:text-9xl">
@@ -75,7 +78,7 @@ export function Timer({
         )}
       </div>
 
-      <div className="flex items-center justify-around">
+      <div className="relative top-10 flex items-center justify-around">
         <CircleButton
           disabled={state.mode === "editing"}
           className="text-xs"
@@ -125,6 +128,12 @@ export function Timer({
           </CircleButton>
         )}
       </div>
+
+      {import.meta.env.DEV && (
+        <div className="grid place-items-center">
+          <CheckAudioButton />
+        </div>
+      )}
     </form>
   )
 }

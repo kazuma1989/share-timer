@@ -1,102 +1,73 @@
-/// <reference types="vitest" />
 import react from "@vitejs/plugin-react"
-import { defineConfig, Plugin, UserConfig } from "vite"
-import { bundleBuddy } from "./vite-bundleBuddy"
-import { firebaseReservedURL } from "./vite-firebaseReservedURL"
+import { defineConfig, UserConfig } from "vite"
+import { hosting } from "./firebase.json"
+import { getChecker } from "./vite/getChecker"
+import bundleBuddy from "./vite/plugin/bundleBuddy"
+import enableTopLevelAwait from "./vite/plugin/enableTopLevelAwait"
+import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
+import firestoreEmulatorProxy from "./vite/plugin/firestoreEmulatorProxy"
+import vendorChunks from "./vite/plugin/vendorChunks"
+import vitest from "./vite/plugin/vitest"
+
+declare const process: {
+  env: {
+    /**
+     * 自動でブラウザーを開きたくないときは BROWSER=none を指定する。
+     * もしくは CLI オプションで `--no-open` を渡す。
+     * (e.g.) $ BROWSER=none npm start
+     * (e.g.) $ npm start -- --no-open
+     */
+    BROWSER?: string
+
+    BUILD_PATH?: string
+    HOST?: string
+    PORT?: string
+    PREVIEW_PORT?: string
+  }
+}
 
 export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
   const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env
 
-  let checkerPlugin: Plugin | undefined
-  if (command === "serve" && mode === "development") {
-    const [checker, scripts] = await Promise.all([
-      import("vite-plugin-checker").then((_) => _.default),
-      import("./package.json").then((_) => _.scripts),
-    ])
-
-    checkerPlugin = checker({
-      typescript: true,
-      eslint: {
-        lintCommand: scripts["lint"],
-        dev: {
-          logLevel: ["error"],
-        },
-      },
-    })
-  }
-
   return {
     server: {
-      // localhost 以外で起動したい場合は指定する。
       host: HOST || "localhost",
-
-      // Create React App のデフォルトのポートと同じにする。
-      port: (PORT && parseInt(PORT)) || 3000,
-
-      // 自動でブラウザーを開きたくないときは open=false を指定する。
-      // もしくは CLI オプションで `--no-open` を渡す。
-      // (e.g.) $ npm start -- --no-open
+      port: (PORT && Number.parseInt(PORT)) || 3000,
       open: BROWSER || true,
     },
 
     build: {
-      // Support top-level await
-      // https://caniuse.com/mdn-javascript_operators_await_top_level
-      target: ["chrome89", "edge89", "safari15", "firefox89", "opera75"],
-
-      // Create React App のデフォルトの出力先と同じにする。
-      outDir: BUILD_PATH || "./build/",
-
-      // デバッグのためソースマップを有効にしておく。
+      outDir: BUILD_PATH || hosting.find((_) => _.target === "app")?.public,
       sourcemap: true,
-
-      rollupOptions: {
-        output: {
-          manualChunks(id) {
-            switch (true) {
-              case id.includes("/node_modules/@firebase"):
-              case id.includes("/node_modules/firebase"):
-                return "firebase"
-
-              case id.includes("/node_modules/react"):
-                return "react"
-
-              case id.includes("/node_modules/zod"):
-                return "zod"
-            }
-          },
-        },
-      },
     },
 
     preview: {
-      // ポートが衝突したら自動でインクリメントしてくれるので問題ない。
+      // ポートが衝突したら自動でインクリメントしてくれる
       port: (PREVIEW_PORT && parseInt(PREVIEW_PORT)) || 3000,
-    },
-
-    define: {
-      // https://vitest.dev/guide/in-source.html#production-build
-      "import.meta.vitest": "undefined",
     },
 
     plugins: [
       // The all-in-one Vite plugin for React projects.
       react(),
 
-      // type-check
-      checkerPlugin,
-
       // Firebase
       firebaseReservedURL(),
+      firestoreEmulatorProxy(),
+
+      // Build config
+      vendorChunks(),
+      enableTopLevelAwait(),
+
+      // Test config
+      vitest(),
+
+      // type-check
+      command === "serve" && mode === "development"
+        ? await getChecker()
+        : undefined,
 
       // bundle analyze
       bundleBuddy(),
     ],
-
-    // Vitest
-    test: {
-      setupFiles: ["./src/test.setup.ts"],
-      includeSource: ["./src/**/*.{ts,tsx}"],
-    },
   }
 })

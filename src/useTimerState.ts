@@ -11,11 +11,11 @@ import { collection } from "./firestore/collection"
 import { hasNoEstimateTimestamp } from "./firestore/hasNoEstimateTimestamp"
 import { orderBy } from "./firestore/orderBy"
 import { where } from "./firestore/where"
-import { safeParseDocsWith } from "./safeParseDocsWith"
 import { timerReducer } from "./timerReducer"
 import { useFirestore } from "./useFirestore"
 import { createStore, Store } from "./util/createStore"
 import { mapGetOrPut } from "./util/mapGetOrPut"
+import { safeParseDocsWith } from "./util/safeParseDocsWith"
 import { actionZod } from "./zod/actionZod"
 import { Room } from "./zod/roomZod"
 
@@ -23,6 +23,8 @@ export type TimerState =
   | {
       mode: "editing"
       initialDuration: number
+      restDuration?: undefined
+      startedAt?: undefined
     }
   | {
       mode: "running"
@@ -34,6 +36,7 @@ export type TimerState =
       mode: "paused"
       initialDuration: number
       restDuration: number
+      startedAt?: undefined
     }
 
 export function useTimerState(roomId: Room["id"]): TimerState {
