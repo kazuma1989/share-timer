@@ -1,13 +1,12 @@
 export async function checkAudioPermission(
-  src: string
+  audio: HTMLMediaElement
 ): Promise<"canplay" | "denied"> {
-  const audio = new Audio(src)
-
   const canPlay$ = audio.play().then(
     () => true,
     (reason) => reason?.name === "AbortError"
   )
   audio.pause()
+  audio.currentTime = 0
 
   return (await canPlay$) ? "canplay" : "denied"
 }

@@ -5,8 +5,10 @@ import { checkAudioPermission } from "./util/checkAudioPermission"
 import { createStore } from "./util/createStore"
 import { setTimeout } from "./util/setTimeout"
 
+const audio = new Audio(smallAlert)
+
 export function CheckAudioButton() {
-  const getStore = () => createStore(checkAudioPermission(smallAlert), "denied")
+  const getStore = () => createStore(checkAudioPermission(audio), "denied")
 
   const [store, setStore] = useState(getStore)
   const permission = useSyncExternalStore(store.subscribe, store.getSnapshot)
@@ -21,7 +23,6 @@ export function CheckAudioButton() {
         osc.start()
         osc.stop(1)
 
-        const audio = new Audio(smallAlert)
         audio.play()
 
         await setTimeout(1_000)
