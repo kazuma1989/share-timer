@@ -1,7 +1,7 @@
 import { useEffect } from "react"
-import { formatDuration } from "./formatDuration"
 import { now } from "./now"
 import { TimerState } from "./useTimerState"
+import { formatDuration } from "./util/formatDuration"
 import IntervalWorker from "./util/interval.worker?worker&inline"
 
 export function useTitleAsTimeViewer({

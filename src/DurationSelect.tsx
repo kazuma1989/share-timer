@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import { Ref, useImperativeHandle, useRef } from "react"
-import { parseDuration } from "./parseDuration"
+import { parseDuration } from "./util/parseDuration"
 
 export function DurationSelect({
   innerRef,
