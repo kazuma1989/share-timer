@@ -4,6 +4,7 @@ import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
 import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
 import firestoreEmulatorProxy from "./vite/plugin/firestoreEmulatorProxy"
+import vendorChunks from "./vite/plugin/vendorChunks"
 import vitest from "./vite/plugin/vitest"
 
 export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
@@ -33,24 +34,6 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
 
       // デバッグのためソースマップを有効にしておく。
       sourcemap: true,
-
-      rollupOptions: {
-        output: {
-          manualChunks(id) {
-            switch (true) {
-              case id.includes("/node_modules/@firebase"):
-              case id.includes("/node_modules/firebase"):
-                return "firebase"
-
-              case id.includes("/node_modules/react"):
-                return "react"
-
-              case id.includes("/node_modules/zod"):
-                return "zod"
-            }
-          },
-        },
-      },
     },
 
     preview: {
@@ -65,6 +48,9 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
       // Firebase
       firebaseReservedURL(),
       firestoreEmulatorProxy(),
+
+      // Chunks
+      vendorChunks(),
 
       // Test config
       vitest(),
