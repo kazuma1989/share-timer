@@ -44,7 +44,7 @@ export function useTitleAsTimeViewer({
           setTitle(restDuration, startedAt)
         })
 
-        interval.postMessage("start")
+        interval.postMessage(["start", 500])
         break
       }
 

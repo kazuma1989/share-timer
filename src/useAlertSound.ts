@@ -36,7 +36,7 @@ export function useAlertSound({
       playSoundOnceDurationReachedZero()
     })
 
-    interval.postMessage("start")
+    interval.postMessage(["start", 100])
 
     return () => {
       abort.abort()
