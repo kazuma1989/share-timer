@@ -1,5 +1,6 @@
 import react from "@vitejs/plugin-react"
 import { defineConfig, UserConfig } from "vite"
+import { hosting } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
 import enableTopLevelAwait from "./vite/plugin/enableTopLevelAwait"
@@ -8,33 +9,40 @@ import firestoreEmulatorProxy from "./vite/plugin/firestoreEmulatorProxy"
 import vendorChunks from "./vite/plugin/vendorChunks"
 import vitest from "./vite/plugin/vitest"
 
+declare const process: {
+  env: {
+    /**
+     * 自動でブラウザーを開きたくないときは BROWSER=none を指定する。
+     * もしくは CLI オプションで `--no-open` を渡す。
+     * (e.g.) $ BROWSER=none npm start
+     * (e.g.) $ npm start -- --no-open
+     */
+    BROWSER?: string
+
+    BUILD_PATH?: string
+    HOST?: string
+    PORT?: string
+    PREVIEW_PORT?: string
+  }
+}
+
 export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
   const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env
 
   return {
     server: {
-      // localhost 以外で起動したい場合は指定する。
       host: HOST || "localhost",
-
-      // Create React App のデフォルトのポートと同じにする。
-      port: (PORT && parseInt(PORT)) || 3000,
-
-      // 自動でブラウザーを開きたくないときは open=false を指定する。
-      // もしくは CLI オプションで `--no-open` を渡す。
-      // (e.g.) $ npm start -- --no-open
+      port: (PORT && Number.parseInt(PORT)) || 3000,
       open: BROWSER || true,
     },
 
     build: {
-      // Create React App のデフォルトの出力先と同じにする。
-      outDir: BUILD_PATH || "./build/",
-
-      // デバッグのためソースマップを有効にしておく。
+      outDir: BUILD_PATH || hosting.find((_) => _.target === "app")?.public,
       sourcemap: true,
     },
 
     preview: {
-      // ポートが衝突したら自動でインクリメントしてくれるので問題ない。
+      // ポートが衝突したら自動でインクリメントしてくれる
       port: (PREVIEW_PORT && parseInt(PREVIEW_PORT)) || 3000,
     },
 
