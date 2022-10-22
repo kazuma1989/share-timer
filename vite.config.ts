@@ -1,30 +1,13 @@
 /// <reference types="vitest" />
 import react from "@vitejs/plugin-react"
-import { defineConfig, Plugin, UserConfig } from "vite"
+import { defineConfig, UserConfig } from "vite"
+import { getChecker } from "./vite/getChecker"
 import { bundleBuddy } from "./vite/plugin/bundleBuddy"
 import { firebaseReservedURL } from "./vite/plugin/firebaseReservedURL"
 import { firestoreEmulatorProxy } from "./vite/plugin/firestoreEmulatorProxy"
 
 export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
   const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env
-
-  let checkerPlugin: Plugin | undefined
-  if (command === "serve" && mode === "development") {
-    const [checker, scripts] = await Promise.all([
-      import("vite-plugin-checker").then((_) => _.default),
-      import("./package.json").then((_) => _.scripts),
-    ])
-
-    checkerPlugin = checker({
-      typescript: true,
-      eslint: {
-        lintCommand: scripts["lint"],
-        dev: {
-          logLevel: ["error"],
-        },
-      },
-    })
-  }
 
   return {
     server: {
@@ -89,7 +72,9 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
       firestoreEmulatorProxy(),
 
       // type-check
-      checkerPlugin,
+      command === "serve" && mode === "development"
+        ? await getChecker()
+        : undefined,
 
       // bundle analyze
       bundleBuddy(),
