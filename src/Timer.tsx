@@ -5,6 +5,7 @@ import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
 import { formatDuration } from "./formatDuration"
 import { TimeViewer } from "./TimeViewer"
+import { useAlertSound } from "./useAlertSound"
 import { useAllSettled } from "./useAllSettled"
 import { useDispatchAction } from "./useDispatchAction"
 import { useTimerState } from "./useTimerState"
@@ -21,6 +22,7 @@ export function Timer({
   const state = useTimerState(roomId)
 
   useTitleAsTimeViewer(state)
+  useAlertSound(state)
 
   const [_allSettled, addPromise] = useAllSettled()
   const pending = !_allSettled
