@@ -21,16 +21,10 @@ export function useAlertSound({
       interval.terminate()
     })
 
-    audio.addEventListener(
-      "ended",
-      () => {
-        audio.currentTime = 0
-      },
-      {
-        passive: true,
-        signal: abort.signal,
-      }
-    )
+    abort.signal.addEventListener("abort", () => {
+      audio.pause()
+      audio.currentTime = 0
+    })
 
     let played: Promise<void> | undefined
     const playSoundOnceDurationReachedZero = () => {
@@ -38,6 +32,7 @@ export function useAlertSound({
 
       const duration = restDuration - (now() - startedAt)
       if (-150 < duration && duration <= 50) {
+        audio.currentTime = 0
         played = audio.play()
       }
     }
