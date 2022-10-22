@@ -1,6 +1,9 @@
 /// <reference types="vitest" />
 import { Plugin } from "vite"
 
+/**
+ * Vitest を使えるようにする
+ */
 export default function vitest(): Plugin {
   return {
     name: "vitest",
