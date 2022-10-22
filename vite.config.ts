@@ -2,6 +2,7 @@ import react from "@vitejs/plugin-react"
 import { defineConfig, UserConfig } from "vite"
 import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
+import enableTopLevelAwait from "./vite/plugin/enableTopLevelAwait"
 import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
 import firestoreEmulatorProxy from "./vite/plugin/firestoreEmulatorProxy"
 import vendorChunks from "./vite/plugin/vendorChunks"
@@ -25,10 +26,6 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
     },
 
     build: {
-      // Support top-level await
-      // https://caniuse.com/mdn-javascript_operators_await_top_level
-      target: ["chrome89", "edge89", "safari15", "firefox89", "opera75"],
-
       // Create React App のデフォルトの出力先と同じにする。
       outDir: BUILD_PATH || "./build/",
 
@@ -49,8 +46,9 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
       firebaseReservedURL(),
       firestoreEmulatorProxy(),
 
-      // Chunks
+      // Build config
       vendorChunks(),
+      enableTopLevelAwait(),
 
       // Test config
       vitest(),
