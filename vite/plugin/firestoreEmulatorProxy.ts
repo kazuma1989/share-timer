@@ -3,7 +3,7 @@ import { Plugin } from "vite"
 /**
  * Vite server の host が localhost 以外でも Firestore emulator に接続できるようなプロキシーを設定
  */
-export function firestoreEmulatorProxy(): Plugin {
+export default function firestoreEmulatorProxy(): Plugin {
   return {
     name: "firestoreEmulatorProxy",
 

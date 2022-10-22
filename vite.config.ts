@@ -2,9 +2,9 @@
 import react from "@vitejs/plugin-react"
 import { defineConfig, UserConfig } from "vite"
 import { getChecker } from "./vite/getChecker"
-import { bundleBuddy } from "./vite/plugin/bundleBuddy"
-import { firebaseReservedURL } from "./vite/plugin/firebaseReservedURL"
-import { firestoreEmulatorProxy } from "./vite/plugin/firestoreEmulatorProxy"
+import bundleBuddy from "./vite/plugin/bundleBuddy"
+import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
+import firestoreEmulatorProxy from "./vite/plugin/firestoreEmulatorProxy"
 
 export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
   const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env

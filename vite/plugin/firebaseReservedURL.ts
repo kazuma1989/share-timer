@@ -11,7 +11,7 @@ interface Firebaserc {
 /**
  * 本物の Firebase Hosting サイトから `/__` で始まる予約済み URL の中身を取得するプロキシーを設定
  */
-export function firebaseReservedURL(): Plugin {
+export default function firebaseReservedURL(): Plugin {
   const getFirebaserc = () =>
     fs
       .readFile(path.join(__dirname, "../../.firebaserc"), {
