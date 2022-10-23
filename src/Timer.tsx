@@ -61,9 +61,7 @@ export function Timer({ className }: { className?: string }) {
           <div className="text-8xl font-thin sm:text-9xl">
             {state.mode === "running" ? (
               <TimeViewer>
-                {(restDuration) => (
-                  <span>{formatDuration(restDuration ?? 0)}</span>
-                )}
+                {(duration) => <span>{formatDuration(duration)}</span>}
               </TimeViewer>
             ) : (
               <span>{formatDuration(state.restDuration)}</span>
@@ -132,9 +130,9 @@ export function Timer({ className }: { className?: string }) {
 function TimeViewer({
   children,
 }: {
-  children?: (restDuration: number | undefined) => JSX.Element
+  children?: (restDuration: number) => JSX.Element
 }) {
-  const duration = useObservable(useCurrentDurationUI())
+  const duration = useObservable(useCurrentDurationUI(), 0)
 
   return children?.(duration) ?? null
 }
