@@ -22,6 +22,7 @@ import { FirestoreProvider } from "./useFirestore"
 import { replaceHash } from "./useHash"
 import { setupRoom } from "./useRoom"
 import { checkAudioPermission } from "./util/checkAudioPermission"
+import { useObservable } from "./util/createStore"
 import { snapshotOf } from "./util/snapshotOf"
 import { sparse } from "./util/sparse"
 import { Room, roomIdZod, roomZod } from "./zod/roomZod"
@@ -52,11 +53,23 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <FirestoreProvider value={firestore}>
       <AlertAudioProvider value={audio}>
-        <Suspense fallback={<FullViewportProgress />}>{/* <App /> */}</Suspense>
+        <Suspense fallback={<FullViewportProgress />}>
+          <App />
+        </Suspense>
       </AlertAudioProvider>
     </FirestoreProvider>
   </StrictMode>
 )
+
+function App() {
+  const room = useObservable(room$)
+
+  return (
+    <div>
+      <pre>{JSON.stringify(room, null, 2)}</pre>
+    </div>
+  )
+}
 
 const db = firestore
 
