@@ -1,4 +1,11 @@
-import { distinctUntilChanged, map, Observable, of, switchMap } from "rxjs"
+import {
+  distinctUntilChanged,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+} from "rxjs"
 import { now } from "./now"
 import { TimerState } from "./timerReducer"
 import { secondPrecisionEqual } from "./util/interval"
@@ -25,6 +32,11 @@ export function observeCurrentDuration(
         }
       }
     }),
-    distinctUntilChanged(secondPrecisionEqual)
+    distinctUntilChanged(secondPrecisionEqual),
+
+    shareReplay({
+      bufferSize: 1,
+      refCount: true,
+    })
   )
 }

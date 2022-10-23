@@ -1,6 +1,6 @@
 import { Observable, share } from "rxjs"
+import IntervalWorker from "./interval.worker?worker&inline"
 import { subscribeAnimationFrame } from "./subscribeAnimationFrame"
-import IntervalWorker from "./util/interval.worker?worker&inline"
 
 export function interval(
   type: "ui" | "worker",

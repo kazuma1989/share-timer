@@ -1,40 +1,48 @@
 import clsx from "clsx"
 import { useEffect, useState } from "react"
-import { now } from "./now"
+import { skipWhile, take, takeWhile } from "rxjs"
+import { useCurrentDurationUI } from "./useCurrentDuration"
 import { useTimerState } from "./useTimerState"
 import { useObservable } from "./util/createStore"
-import { subscribeAnimationFrame } from "./util/subscribeAnimationFrame"
 
 export function FlashCover({ className }: { className?: string }) {
-  const { mode, restDuration, startedAt } = useObservable(useTimerState())
+  const { mode } = useObservable(useTimerState())
 
-  const [shouldFlash, setShouldFlash] = useState(false)
+  const state = mode === "editing" ? "asleep" : "awake"
+
+  return <FlashCoverInner key={state} className={className} />
+}
+
+function FlashCoverInner({ className }: { className?: string }) {
+  const duration$ = useCurrentDurationUI()
+
+  const [flashing, setFlashing] = useState(false)
+
   useEffect(() => {
-    if (mode !== "running") return
+    const sub = duration$
+      .pipe(
+        takeWhile((_) => _ >= -150),
+        skipWhile((_) => _ > 50),
+        take(1)
+      )
+      .subscribe(() => {
+        setFlashing(true)
+      })
 
-    let flashed = false
-
-    return subscribeAnimationFrame(() => {
-      if (flashed) return
-
-      const duration = restDuration - (now() - startedAt)
-      if (-150 < duration && duration <= 50) {
-        setShouldFlash(true)
-
-        flashed = true
-      }
-    })
-  }, [mode, restDuration, startedAt])
+    return () => {
+      sub.unsubscribe()
+    }
+  }, [duration$])
 
   return (
     <div
       className={clsx(
         "pointer-events-none absolute inset-0 transition-colors",
-        shouldFlash && "bg-white/75",
+        flashing && "bg-white/75",
         className
       )}
       onTransitionEnd={() => {
-        setShouldFlash(false)
+        setFlashing(false)
       }}
     />
   )

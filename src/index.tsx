@@ -6,15 +6,21 @@ import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
 import { initializeRoom } from "./initializeRoom"
 import { calibrateClock } from "./now"
+import { observeCurrentDuration } from "./observeCurrentDuration"
 import { observeHash } from "./observeHash"
 import { observeRoom } from "./observeRoom"
 import { observeTimerState } from "./observeTimerState"
 import smallAlert from "./sound/small-alert.mp3"
 import { AlertAudioProvider } from "./useAlertAudio"
+import {
+  CurrentDurationUIProvider,
+  CurrentDurationWorkerProvider,
+} from "./useCurrentDuration"
 import { FirestoreProvider } from "./useFirestore"
 import { RoomProvider } from "./useRoom"
 import { TimerStateProvider } from "./useTimerState"
 import { checkAudioPermission } from "./util/checkAudioPermission"
+import { interval } from "./util/interval"
 
 const firestore = await initializeFirestore()
 
@@ -41,6 +47,9 @@ document.body.addEventListener(
 const [room$, invalid$] = observeRoom(firestore, observeHash())
 const timerState$ = observeTimerState(firestore, room$)
 
+const ui$ = observeCurrentDuration(timerState$, interval("ui"))
+const worker$ = observeCurrentDuration(timerState$, interval("worker", 100))
+
 initializeRoom(firestore, room$, invalid$)
 
 createRoot(document.getElementById("root")!).render(
@@ -49,9 +58,13 @@ createRoot(document.getElementById("root")!).render(
       <AlertAudioProvider value={audio}>
         <RoomProvider value={room$}>
           <TimerStateProvider value={timerState$}>
-            <Suspense fallback={<FullViewportProgress />}>
-              <App />
-            </Suspense>
+            <CurrentDurationUIProvider value={ui$}>
+              <CurrentDurationWorkerProvider value={worker$}>
+                <Suspense fallback={<FullViewportProgress />}>
+                  <App />
+                </Suspense>
+              </CurrentDurationWorkerProvider>
+            </CurrentDurationUIProvider>
           </TimerStateProvider>
         </RoomProvider>
       </AlertAudioProvider>
