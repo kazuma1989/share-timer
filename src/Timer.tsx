@@ -1,35 +1,32 @@
 import clsx from "clsx"
-import { serverTimestamp } from "firebase/firestore"
+import { addDoc, serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
 import { CheckAudioButton } from "./CheckAudioButton"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
-import { TimeViewer } from "./TimeViewer"
-import { useAlertSound } from "./useAlertSound"
+import { collection } from "./firestore/collection"
+import { withMeta } from "./firestore/withMeta"
 import { useAllSettled } from "./useAllSettled"
-import { useDispatchAction } from "./useDispatchAction"
+import { useCurrentDurationUI } from "./useCurrentDuration"
+import { useFirestore } from "./useFirestore"
+import { useObservable } from "./useObservable"
+import { useRoom } from "./useRoom"
 import { useTimerState } from "./useTimerState"
-import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { formatDuration } from "./util/formatDuration"
-import { Room } from "./zod/roomZod"
+import { ActionOnFirestore } from "./zod/actionZod"
 
-export function Timer({
-  roomId,
-  className,
-}: {
-  roomId: Room["id"]
-  className?: string
-}) {
-  const state = useTimerState(roomId)
-
-  useTitleAsTimeViewer(state)
-  useAlertSound(state)
+export function Timer({ className }: { className?: string }) {
+  const state = useObservable(useTimerState())
 
   const [_allSettled, addPromise] = useAllSettled()
   const pending = !_allSettled
 
-  const _dispatch = useDispatchAction(roomId)
-  const dispatch: typeof _dispatch = (action) => addPromise(_dispatch(action))
+  const db = useFirestore()
+  const { id: roomId } = useObservable(useRoom())
+  const dispatch = (action: ActionOnFirestore) =>
+    addPromise(
+      addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
+    )
 
   const durationSelect$ = useRef({
     value: state.initialDuration,
@@ -63,13 +60,8 @@ export function Timer({
         ) : (
           <div className="text-8xl font-thin sm:text-9xl">
             {state.mode === "running" ? (
-              <TimeViewer
-                duration={state.restDuration}
-                startedAt={state.startedAt}
-              >
-                {(restDuration) => (
-                  <span>{formatDuration(restDuration ?? 0)}</span>
-                )}
+              <TimeViewer>
+                {(duration) => <span>{formatDuration(duration)}</span>}
               </TimeViewer>
             ) : (
               <span>{formatDuration(state.restDuration)}</span>
@@ -82,13 +74,10 @@ export function Timer({
         <CircleButton
           disabled={state.mode === "editing"}
           className="text-xs"
-          onClick={async () => {
-            await dispatch({
+          onClick={() => {
+            dispatch({
               type: "cancel",
             })
-
-            // FIXME 編集にすぐ移りたい
-            // duration$.current!.focus()
           }}
         >
           キャンセル
@@ -136,4 +125,14 @@ export function Timer({
       )}
     </form>
   )
+}
+
+function TimeViewer({
+  children,
+}: {
+  children?: (restDuration: number) => JSX.Element
+}) {
+  const duration = useObservable(useCurrentDurationUI(), 0)
+
+  return children?.(duration) ?? null
 }

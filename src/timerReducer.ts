@@ -1,5 +1,24 @@
-import { TimerState } from "./useTimerState"
 import { Action } from "./zod/actionZod"
+
+export type TimerState =
+  | {
+      mode: "editing"
+      initialDuration: number
+      restDuration?: undefined
+      startedAt?: undefined
+    }
+  | {
+      mode: "running"
+      initialDuration: number
+      restDuration: number
+      startedAt: number
+    }
+  | {
+      mode: "paused"
+      initialDuration: number
+      restDuration: number
+      startedAt?: undefined
+    }
 
 export function timerReducer(state: TimerState, action: Action): TimerState {
   switch (action.type) {

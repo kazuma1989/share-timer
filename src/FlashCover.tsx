@@ -1,47 +1,68 @@
 import clsx from "clsx"
 import { useEffect, useState } from "react"
-import { now } from "./now"
+import { map } from "rxjs"
+import {
+  useCurrentDurationUI,
+  useCurrentDurationWorker,
+} from "./useCurrentDuration"
+import { useMedia } from "./useMedia"
+import { useObservable } from "./useObservable"
 import { useTimerState } from "./useTimerState"
-import { subscribeAnimationFrame } from "./util/subscribeAnimationFrame"
-import { Room } from "./zod/roomZod"
+import { takeFirstZero } from "./util/takeFirstZero"
 
-export function FlashCover({
-  roomId,
-  className,
-}: {
-  roomId: Room["id"]
-  className?: string
-}) {
-  const { mode, restDuration, startedAt } = useTimerState(roomId)
+export function FlashCover({ className }: { className?: string }) {
+  const { mode } = useObservable(useTimerState())
 
-  const [shouldFlash, setShouldFlash] = useState(false)
-  useEffect(() => {
-    if (mode !== "running") return
+  const state = mode === "editing" ? "asleep" : "awake"
 
-    let flashed = false
+  return (
+    <FlashCoverInner
+      key={state}
+      className={clsx(state === "asleep" && "hidden", className)}
+    />
+  )
+}
 
-    return subscribeAnimationFrame(() => {
-      if (flashed) return
+function FlashCoverInner({ className }: { className?: string }) {
+  useAlertSound()
 
-      const duration = restDuration - (now() - startedAt)
-      if (-150 < duration && duration <= 50) {
-        setShouldFlash(true)
+  const duration$ = useCurrentDurationUI()
 
-        flashed = true
-      }
-    })
-  }, [mode, restDuration, startedAt])
+  const [flashing$] = useState(() =>
+    duration$.pipe(
+      takeFirstZero(),
+      map(() => true)
+    )
+  )
+
+  const flashing = useObservable(flashing$, false)
 
   return (
     <div
       className={clsx(
-        "pointer-events-none absolute inset-0 transition-colors",
-        shouldFlash && "bg-white/75",
+        "pointer-events-none absolute inset-0",
+        flashing && "animate-[flash_1s_ease-out]",
         className
       )}
-      onTransitionEnd={() => {
-        setShouldFlash(false)
-      }}
     />
   )
+}
+
+function useAlertSound(): void {
+  const [audio] = useObservable(useMedia(), [new Audio(), "denied" as const])
+  const duration$ = useCurrentDurationWorker()
+
+  useEffect(() => {
+    const sub = duration$.pipe(takeFirstZero()).subscribe(() => {
+      audio.currentTime = 0
+      audio.play()
+    })
+
+    return () => {
+      sub.unsubscribe()
+
+      audio.pause()
+      audio.currentTime = 0
+    }
+  }, [audio, duration$])
 }

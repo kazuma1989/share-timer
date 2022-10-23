@@ -1,61 +1,19 @@
 import { useEffect } from "react"
-import { now } from "./now"
-import { TimerState } from "./useTimerState"
+import { useCurrentDurationWorker } from "./useCurrentDuration"
 import { formatDuration } from "./util/formatDuration"
-import IntervalWorker from "./util/interval.worker?worker&inline"
 
-export function useTitleAsTimeViewer({
-  mode,
-  initialDuration,
-  restDuration,
-  startedAt,
-}: TimerState): void {
+export function useTitleAsTimeViewer(): void {
+  const duration$ = useCurrentDurationWorker()
+
   useEffect(() => {
-    const abort = new AbortController()
-
     const previousTitle = document.title
-    abort.signal.addEventListener("abort", () => {
-      document.title = previousTitle
+    const sub = duration$.subscribe((duration) => {
+      document.title = formatDuration(duration)
     })
 
-    let previousRestDuration: number
-    const setTitle = (duration: number, startedAt?: number) => {
-      const restDuration = startedAt ? duration - (now() - startedAt) : duration
-      if (restDuration === previousRestDuration) return
-
-      previousRestDuration = restDuration
-      document.title = formatDuration(restDuration)
-    }
-
-    switch (mode) {
-      case "editing": {
-        setTitle(initialDuration)
-        break
-      }
-
-      case "running": {
-        const interval = new IntervalWorker()
-        abort.signal.addEventListener("abort", () => {
-          interval.terminate()
-        })
-
-        setTitle(restDuration, startedAt)
-        interval.addEventListener("message", () => {
-          setTitle(restDuration, startedAt)
-        })
-
-        interval.postMessage(["start", 500])
-        break
-      }
-
-      case "paused": {
-        setTitle(restDuration)
-        break
-      }
-    }
-
     return () => {
-      abort.abort()
+      sub.unsubscribe()
+      document.title = previousTitle
     }
-  }, [initialDuration, mode, restDuration, startedAt])
+  }, [duration$])
 }

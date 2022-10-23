@@ -1,12 +1,30 @@
+import { useSyncExternalStore } from "react"
 import { firstValueFrom, from, ObservableInput } from "rxjs"
+import { mapGetOrPut } from "./util/mapGetOrPut"
 
-export interface Store<T> {
+export function useObservable<T>(
+  source: ObservableInput<T>,
+  initialValue?: T
+): T {
+  // Map の値を作るのが createStore(source) しかないため、戻り値は Store<T> で OK
+  const store = getOrPut(source, () =>
+    createStore(source, initialValue)
+  ) as Store<T>
+
+  return useSyncExternalStore(store.subscribe, store.getSnapshot)
+}
+
+const getOrPut = mapGetOrPut(
+  new WeakMap<ObservableInput<unknown>, Store<unknown>>()
+)
+
+interface Store<T> {
   subscribe(onStoreChange: () => void): () => void
   getSnapshot(): T
 }
 
-export function createStore<T>(
-  input: ObservableInput<T>,
+function createStore<T>(
+  source: ObservableInput<T>,
   initialValue?: T
 ): Store<T> {
   const Empty = Symbol("empty")
@@ -16,7 +34,7 @@ export function createStore<T>(
   let currentValue: T | Empty =
     initialValue !== undefined ? initialValue : Empty
 
-  const observable = from(input)
+  const observable = from(source)
 
   return {
     subscribe(onStoreChange) {

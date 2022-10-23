@@ -1,15 +1,5 @@
 import { Firestore } from "firebase/firestore"
-import { createContext, useContext } from "react"
+import { createContext } from "./createContext"
 
-const firestoreContext = createContext<Firestore | null>(null)
-
-export const FirestoreProvider = firestoreContext.Provider
-
-export function useFirestore(): Firestore {
-  const firestore = useContext(firestoreContext)
-  if (!firestore) {
-    throw new Error("FirestoreProviderで囲んでいないかvalueがnullです")
-  }
-
-  return firestore
-}
+export const [FirestoreProvider, useFirestore] =
+  createContext<Firestore>("FirestoreProvider")

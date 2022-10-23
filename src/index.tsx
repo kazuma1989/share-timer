@@ -4,11 +4,23 @@ import { App } from "./App"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
+import { initializeRoom } from "./initializeRoom"
 import { calibrateClock } from "./now"
+import { observeCurrentDuration } from "./observeCurrentDuration"
+import { observeHash } from "./observeHash"
+import { observeMedia } from "./observeMedia"
+import { observeRoom } from "./observeRoom"
+import { observeTimerState } from "./observeTimerState"
 import smallAlert from "./sound/small-alert.mp3"
-import { AlertAudioProvider } from "./useAlertAudio"
+import {
+  CurrentDurationUIProvider,
+  CurrentDurationWorkerProvider,
+} from "./useCurrentDuration"
 import { FirestoreProvider } from "./useFirestore"
-import { checkAudioPermission } from "./util/checkAudioPermission"
+import { MediaProvider } from "./useMedia"
+import { RoomProvider } from "./useRoom"
+import { TimerStateProvider } from "./useTimerState"
+import { interval } from "./util/interval"
 
 const firestore = await initializeFirestore()
 
@@ -16,30 +28,32 @@ calibrateClock(firestore).catch((reason) => {
   console.warn("calibration failed", reason)
 })
 
-const audio = new Audio(smallAlert)
+const media$ = observeMedia(new Audio(smallAlert))
 
-document.body.addEventListener(
-  "click",
-  async () => {
-    const permission = await checkAudioPermission(audio)
-    if (permission === "denied") {
-      console.warn("Cannot play audio")
-    }
-  },
-  {
-    passive: true,
-    once: true,
-  }
-)
+const [room$, invalid$] = observeRoom(firestore, observeHash())
+const timerState$ = observeTimerState(firestore, room$)
+
+const ui$ = observeCurrentDuration(timerState$, interval("ui"))
+const worker$ = observeCurrentDuration(timerState$, interval("worker", 100))
+
+initializeRoom(firestore, room$, invalid$)
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <FirestoreProvider value={firestore}>
-      <AlertAudioProvider value={audio}>
-        <Suspense fallback={<FullViewportProgress />}>
-          <App />
-        </Suspense>
-      </AlertAudioProvider>
+      <MediaProvider value={media$}>
+        <RoomProvider value={room$}>
+          <TimerStateProvider value={timerState$}>
+            <CurrentDurationUIProvider value={ui$}>
+              <CurrentDurationWorkerProvider value={worker$}>
+                <Suspense fallback={<FullViewportProgress />}>
+                  <App />
+                </Suspense>
+              </CurrentDurationWorkerProvider>
+            </CurrentDurationUIProvider>
+          </TimerStateProvider>
+        </RoomProvider>
+      </MediaProvider>
     </FirestoreProvider>
   </StrictMode>
 )

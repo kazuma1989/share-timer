@@ -1,4 +1,5 @@
 /// <reference types="vitest" />
+import * as path from "node:path"
 import { Plugin } from "vite"
 
 /**
@@ -8,16 +9,20 @@ export default function vitest(): Plugin {
   return {
     name: "vitest",
 
-    config() {
+    config(_, { mode }) {
       return {
         test: {
-          setupFiles: ["./src/test.setup.ts"],
-          includeSource: ["./src/**/*.{ts,tsx}"],
+          setupFiles: [path.join(__dirname, "../../src/test.setup.ts")],
+          includeSource: [path.join(__dirname, "../../src/**/*.{ts,tsx}")],
         },
 
         define: {
-          // https://vitest.dev/guide/in-source.html#production-build
-          "import.meta.vitest": "undefined",
+          ...(mode !== "test"
+            ? {
+                // https://vitest.dev/guide/in-source.html#production-build
+                "import.meta.vitest": "undefined",
+              }
+            : {}),
         },
       }
     },
