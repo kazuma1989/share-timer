@@ -10,7 +10,6 @@ import {
   share,
   startWith,
   switchMap,
-  take,
 } from "rxjs"
 import { collection } from "./firestore/collection"
 import { FullViewportProgress } from "./FullViewportProgress"
@@ -24,6 +23,7 @@ import { replaceHash } from "./useHash"
 import { setupRoom } from "./useRoom"
 import { checkAudioPermission } from "./util/checkAudioPermission"
 import { snapshotOf } from "./util/snapshotOf"
+import { sparse } from "./util/sparse"
 import { Room, roomIdZod, roomZod } from "./zod/roomZod"
 
 const firestore = await initializeFirestore()
@@ -98,8 +98,14 @@ const [room$, invalidRoom$] = partition(
     !Array.isArray(_) || (_[0] !== "invalid-id" && _[0] !== "invalid-doc")
 )
 
-// 無限ループを防ぐため再試行は5回まで
-invalidRoom$.pipe(take(5)).subscribe((reason) => {
+let invalidCount = 0
+
+invalidRoom$.pipe(sparse(200)).subscribe((reason) => {
+  invalidCount += 1
+  if (invalidCount >= 10) {
+    throw new Error("Detect hash change loop. Something went wrong")
+  }
+
   const [type] = reason
   switch (type) {
     case "invalid-id": {
@@ -117,5 +123,6 @@ invalidRoom$.pipe(take(5)).subscribe((reason) => {
 })
 
 room$.subscribe((room) => {
+  invalidCount = 0
   console.log(room)
 })
