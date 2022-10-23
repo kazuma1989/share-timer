@@ -37,13 +37,10 @@ function FlashCoverInner({ className }: { className?: string }) {
   return (
     <div
       className={clsx(
-        "pointer-events-none absolute inset-0 transition-colors",
-        flashing && "bg-white/75",
+        "pointer-events-none absolute inset-0",
+        flashing && "animate-[flash_1s_ease-out]",
         className
       )}
-      onTransitionEnd={() => {
-        setFlashing(false)
-      }}
     />
   )
 }
