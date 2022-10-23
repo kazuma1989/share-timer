@@ -10,6 +10,7 @@ import { useAllSettled } from "./useAllSettled"
 import { useDispatchAction } from "./useDispatchAction"
 import { useTimerState } from "./useTimerState"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
+import { useObservable } from "./util/createStore"
 import { formatDuration } from "./util/formatDuration"
 import { Room } from "./zod/roomZod"
 
@@ -20,7 +21,7 @@ export function Timer({
   roomId: Room["id"]
   className?: string
 }) {
-  const state = useTimerState(roomId)
+  const state = useObservable(useTimerState())
 
   useTitleAsTimeViewer(state)
   useAlertSound(state)

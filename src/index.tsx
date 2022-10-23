@@ -11,7 +11,7 @@ import smallAlert from "./sound/small-alert.mp3"
 import { AlertAudioProvider } from "./useAlertAudio"
 import { FirestoreProvider } from "./useFirestore"
 import { RoomProvider } from "./useRoom"
-import { TimerStateProvider } from "./useTimerStateV2"
+import { TimerStateProvider } from "./useTimerState"
 import { checkAudioPermission } from "./util/checkAudioPermission"
 
 const firestore = await initializeFirestore()

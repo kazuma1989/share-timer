@@ -2,17 +2,11 @@ import clsx from "clsx"
 import { useEffect, useState } from "react"
 import { now } from "./now"
 import { useTimerState } from "./useTimerState"
+import { useObservable } from "./util/createStore"
 import { subscribeAnimationFrame } from "./util/subscribeAnimationFrame"
-import { Room } from "./zod/roomZod"
 
-export function FlashCover({
-  roomId,
-  className,
-}: {
-  roomId: Room["id"]
-  className?: string
-}) {
-  const { mode, restDuration, startedAt } = useTimerState(roomId)
+export function FlashCover({ className }: { className?: string }) {
+  const { mode, restDuration, startedAt } = useObservable(useTimerState())
 
   const [shouldFlash, setShouldFlash] = useState(false)
   useEffect(() => {
