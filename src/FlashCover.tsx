@@ -1,6 +1,6 @@
 import clsx from "clsx"
-import { useEffect, useState } from "react"
-import { skipWhile, take, takeWhile } from "rxjs"
+import { useState } from "react"
+import { map, skipWhile, take, takeWhile } from "rxjs"
 import { useCurrentDurationUI } from "./useCurrentDuration"
 import { useTimerState } from "./useTimerState"
 import { useObservable } from "./util/createStore"
@@ -10,29 +10,27 @@ export function FlashCover({ className }: { className?: string }) {
 
   const state = mode === "editing" ? "asleep" : "awake"
 
-  return <FlashCoverInner key={state} className={className} />
+  return (
+    <FlashCoverInner
+      key={state}
+      className={clsx(state === "asleep" && "hidden", className)}
+    />
+  )
 }
 
 function FlashCoverInner({ className }: { className?: string }) {
   const duration$ = useCurrentDurationUI()
 
-  const [flashing, setFlashing] = useState(false)
+  const [flashing$] = useState(() =>
+    duration$.pipe(
+      takeWhile((_) => _ >= -150),
+      skipWhile((_) => _ > 50),
+      take(1),
+      map(() => true)
+    )
+  )
 
-  useEffect(() => {
-    const sub = duration$
-      .pipe(
-        takeWhile((_) => _ >= -150),
-        skipWhile((_) => _ > 50),
-        take(1)
-      )
-      .subscribe(() => {
-        setFlashing(true)
-      })
-
-    return () => {
-      sub.unsubscribe()
-    }
-  }, [duration$])
+  const flashing = useObservable(flashing$, false)
 
   return (
     <div
