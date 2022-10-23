@@ -25,7 +25,6 @@ import { calibrateClock } from "./now"
 import smallAlert from "./sound/small-alert.mp3"
 import { AlertAudioProvider } from "./useAlertAudio"
 import { FirestoreProvider } from "./useFirestore"
-import { replaceHash } from "./useHash"
 import { RoomProvider } from "./useRoom"
 import { checkAudioPermission } from "./util/checkAudioPermission"
 import { snapshotOf } from "./util/snapshotOf"
@@ -120,7 +119,7 @@ invalidRoom$.pipe(takeUntil(loopDetected$)).subscribe(async (reason) => {
   switch (type) {
     case "invalid-id": {
       const newRoomId = roomIdZod.parse(doc(collection(db, "rooms")).id)
-      replaceHash(newRoomId)
+      window.location.replace("#" + newRoomId)
       break
     }
 
