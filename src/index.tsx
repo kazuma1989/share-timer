@@ -100,7 +100,7 @@ const [room$, invalidRoom$] = partition(
 
 let invalidCount = 0
 
-invalidRoom$.pipe(sparse(200)).subscribe((reason) => {
+invalidRoom$.pipe(sparse(200)).subscribe(async (reason) => {
   invalidCount += 1
   if (invalidCount >= 10) {
     throw new Error("Detect hash change loop. Something went wrong")
@@ -116,7 +116,7 @@ invalidRoom$.pipe(sparse(200)).subscribe((reason) => {
 
     case "invalid-doc": {
       const [, roomId] = reason
-      setupRoom(db, roomId)
+      await setupRoom(db, roomId)
       break
     }
   }
