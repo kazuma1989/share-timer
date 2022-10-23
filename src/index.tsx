@@ -3,8 +3,8 @@ import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
 import {
   distinctUntilChanged,
+  fromEvent,
   map,
-  Observable,
   of,
   partition,
   share,
@@ -60,21 +60,13 @@ createRoot(document.getElementById("root")!).render(
 
 const db = firestore
 
-const hash$ = new Observable<string>((subscriber) => {
-  const abort = new AbortController()
-
-  window.addEventListener(
-    "hashchange",
-    () => {
-      subscriber.next(window.location.hash)
-    },
-    { passive: true, signal: abort.signal }
-  )
-
-  return () => {
-    abort.abort()
-  }
-}).pipe(startWith(window.location.hash), distinctUntilChanged())
+const hash$ = fromEvent(window, "hashchange" as keyof WindowEventMap, {
+  passive: true,
+}).pipe(
+  startWith(null),
+  map(() => window.location.hash),
+  distinctUntilChanged()
+)
 
 const [room$, invalidRoom$] = partition(
   hash$.pipe(
