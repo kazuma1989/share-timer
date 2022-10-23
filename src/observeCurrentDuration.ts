@@ -9,7 +9,7 @@ import {
 } from "rxjs"
 import { now } from "./now"
 import { TimerState } from "./timerReducer"
-import { secondPrecisionEqual } from "./util/interval"
+import { secondsPrecisionEqual } from "./util/interval"
 
 export function observeCurrentDuration(
   timerState$: Observable<TimerState>,
@@ -34,7 +34,7 @@ export function observeCurrentDuration(
         }
       }
     }),
-    distinctUntilChanged(secondPrecisionEqual),
+    distinctUntilChanged(secondsPrecisionEqual),
 
     shareReplay({
       bufferSize: 1,

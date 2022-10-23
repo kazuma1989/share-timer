@@ -33,7 +33,7 @@ export function interval(
   )
 }
 
-export function secondPrecisionEqual(left: number, right: number): boolean {
+export function secondsPrecisionEqual(left: number, right: number): boolean {
   return floor(left) === floor(right)
 }
 
