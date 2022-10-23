@@ -8,18 +8,18 @@ import { initializeRoom } from "./initializeRoom"
 import { calibrateClock } from "./now"
 import { observeCurrentDuration } from "./observeCurrentDuration"
 import { observeHash } from "./observeHash"
+import { observeMedia } from "./observeMedia"
 import { observeRoom } from "./observeRoom"
 import { observeTimerState } from "./observeTimerState"
 import smallAlert from "./sound/small-alert.mp3"
-import { AlertAudioProvider } from "./useAlertAudio"
 import {
   CurrentDurationUIProvider,
   CurrentDurationWorkerProvider,
 } from "./useCurrentDuration"
 import { FirestoreProvider } from "./useFirestore"
+import { MediaProvider } from "./useMedia"
 import { RoomProvider } from "./useRoom"
 import { TimerStateProvider } from "./useTimerState"
-import { checkAudioPermission } from "./util/checkAudioPermission"
 import { interval } from "./util/interval"
 
 const firestore = await initializeFirestore()
@@ -28,21 +28,7 @@ calibrateClock(firestore).catch((reason) => {
   console.warn("calibration failed", reason)
 })
 
-const audio = new Audio(smallAlert)
-
-document.body.addEventListener(
-  "click",
-  async () => {
-    const permission = await checkAudioPermission(audio)
-    if (permission === "denied") {
-      console.warn("Cannot play audio")
-    }
-  },
-  {
-    passive: true,
-    once: true,
-  }
-)
+const media$ = observeMedia(new Audio(smallAlert))
 
 const [room$, invalid$] = observeRoom(firestore, observeHash())
 const timerState$ = observeTimerState(firestore, room$)
@@ -55,7 +41,7 @@ initializeRoom(firestore, room$, invalid$)
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <FirestoreProvider value={firestore}>
-      <AlertAudioProvider value={audio}>
+      <MediaProvider value={media$}>
         <RoomProvider value={room$}>
           <TimerStateProvider value={timerState$}>
             <CurrentDurationUIProvider value={ui$}>
@@ -67,7 +53,7 @@ createRoot(document.getElementById("root")!).render(
             </CurrentDurationUIProvider>
           </TimerStateProvider>
         </RoomProvider>
-      </AlertAudioProvider>
+      </MediaProvider>
     </FirestoreProvider>
   </StrictMode>
 )

@@ -1,17 +1,13 @@
-import { useState, useSyncExternalStore } from "react"
 import { CircleButton } from "./CircleButton"
-import { useAlertAudio } from "./useAlertAudio"
-import { checkAudioPermission } from "./util/checkAudioPermission"
-import { createStore } from "./util/createStore"
+import { useMedia } from "./useMedia"
+import { useObservable } from "./useObservable"
 import { setTimeout } from "./util/setTimeout"
 
 export function CheckAudioButton() {
-  const audio = useAlertAudio()
-
-  const getStore = () => createStore(checkAudioPermission(audio), "denied")
-
-  const [store, setStore] = useState(getStore)
-  const permission = useSyncExternalStore(store.subscribe, store.getSnapshot)
+  const [audio, permission] = useObservable(useMedia(), [
+    new Audio(),
+    "denied" as const,
+  ])
 
   return permission === "canplay" ? (
     <CircleButton
@@ -35,12 +31,6 @@ export function CheckAudioButton() {
       なる
     </CircleButton>
   ) : (
-    <CircleButton
-      onClick={() => {
-        setStore(getStore())
-      }}
-    >
-      ならない
-    </CircleButton>
+    <CircleButton>ならない</CircleButton>
   )
 }
