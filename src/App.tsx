@@ -1,7 +1,7 @@
 import { FlashCover } from "./FlashCover"
 import { Timer } from "./Timer"
+import { useObservable } from "./useObservable"
 import { useRoom } from "./useRoom"
-import { useObservable } from "./util/createStore"
 
 export function App() {
   const room = useObservable(useRoom())

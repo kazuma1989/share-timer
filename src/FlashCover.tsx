@@ -2,8 +2,8 @@ import clsx from "clsx"
 import { useState } from "react"
 import { map, skipWhile, take, takeWhile } from "rxjs"
 import { useCurrentDurationUI } from "./useCurrentDuration"
+import { useObservable } from "./useObservable"
 import { useTimerState } from "./useTimerState"
-import { useObservable } from "./util/createStore"
 
 export function FlashCover({ className }: { className?: string }) {
   const { mode } = useObservable(useTimerState())
