@@ -1,6 +1,6 @@
 import { FlashCover } from "./FlashCover"
 import { Timer } from "./Timer"
-import { useRoom } from "./useRoomV2"
+import { useRoom } from "./useRoom"
 import { useObservable } from "./util/createStore"
 
 export function App() {
