@@ -4,6 +4,7 @@ import {
   Observable,
   of,
   shareReplay,
+  startWith,
   switchMap,
 } from "rxjs"
 import { now } from "./now"
@@ -23,6 +24,7 @@ export function observeCurrentDuration(
 
         case "running": {
           return interval$.pipe(
+            startWith(null),
             map(() => state.restDuration - (now() - state.startedAt))
           )
         }

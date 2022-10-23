@@ -10,7 +10,6 @@ import { useAllSettled } from "./useAllSettled"
 import { useDispatchAction } from "./useDispatchAction"
 import { useObservable } from "./useObservable"
 import { useTimerState } from "./useTimerState"
-import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { formatDuration } from "./util/formatDuration"
 import { Room } from "./zod/roomZod"
 
@@ -23,7 +22,6 @@ export function Timer({
 }) {
   const state = useObservable(useTimerState())
 
-  useTitleAsTimeViewer(state)
   useAlertSound(state)
 
   const [_allSettled, addPromise] = useAllSettled()
