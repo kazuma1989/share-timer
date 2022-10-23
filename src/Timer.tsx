@@ -6,8 +6,8 @@ import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
-import { TimeViewer } from "./TimeViewer"
 import { useAllSettled } from "./useAllSettled"
+import { useCurrentDurationUI } from "./useCurrentDuration"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
 import { useTimerState } from "./useTimerState"
@@ -65,10 +65,7 @@ export function Timer({
         ) : (
           <div className="text-8xl font-thin sm:text-9xl">
             {state.mode === "running" ? (
-              <TimeViewer
-                duration={state.restDuration}
-                startedAt={state.startedAt}
-              >
+              <TimeViewer>
                 {(restDuration) => (
                   <span>{formatDuration(restDuration ?? 0)}</span>
                 )}
@@ -84,13 +81,10 @@ export function Timer({
         <CircleButton
           disabled={state.mode === "editing"}
           className="text-xs"
-          onClick={async () => {
-            await dispatch({
+          onClick={() => {
+            dispatch({
               type: "cancel",
             })
-
-            // FIXME 編集にすぐ移りたい
-            // duration$.current!.focus()
           }}
         >
           キャンセル
@@ -138,4 +132,14 @@ export function Timer({
       )}
     </form>
   )
+}
+
+function TimeViewer({
+  children,
+}: {
+  children?: (restDuration: number | undefined) => JSX.Element
+}) {
+  const duration = useObservable(useCurrentDurationUI())
+
+  return children?.(duration) ?? null
 }
