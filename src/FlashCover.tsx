@@ -1,9 +1,14 @@
 import clsx from "clsx"
-import { useState } from "react"
-import { map, skipWhile, take, takeWhile } from "rxjs"
-import { useCurrentDurationUI } from "./useCurrentDuration"
+import { useEffect, useState } from "react"
+import { map } from "rxjs"
+import { useAlertAudio } from "./useAlertAudio"
+import {
+  useCurrentDurationUI,
+  useCurrentDurationWorker,
+} from "./useCurrentDuration"
 import { useObservable } from "./useObservable"
 import { useTimerState } from "./useTimerState"
+import { takeFirstZero } from "./util/takeFirstZero"
 
 export function FlashCover({ className }: { className?: string }) {
   const { mode } = useObservable(useTimerState())
@@ -19,13 +24,13 @@ export function FlashCover({ className }: { className?: string }) {
 }
 
 function FlashCoverInner({ className }: { className?: string }) {
+  useAlertSound()
+
   const duration$ = useCurrentDurationUI()
 
   const [flashing$] = useState(() =>
     duration$.pipe(
-      takeWhile((_) => _ >= -150),
-      skipWhile((_) => _ > 50),
-      take(1),
+      takeFirstZero(),
       map(() => true)
     )
   )
@@ -41,4 +46,23 @@ function FlashCoverInner({ className }: { className?: string }) {
       )}
     />
   )
+}
+
+function useAlertSound(): void {
+  const audio = useAlertAudio()
+  const duration$ = useCurrentDurationWorker()
+
+  useEffect(() => {
+    const sub = duration$.pipe(takeFirstZero()).subscribe(() => {
+      audio.currentTime = 0
+      audio.play()
+    })
+
+    return () => {
+      sub.unsubscribe()
+
+      audio.pause()
+      audio.currentTime = 0
+    }
+  }, [audio, duration$])
 }

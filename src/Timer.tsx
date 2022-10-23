@@ -5,7 +5,6 @@ import { CheckAudioButton } from "./CheckAudioButton"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
 import { TimeViewer } from "./TimeViewer"
-import { useAlertSound } from "./useAlertSound"
 import { useAllSettled } from "./useAllSettled"
 import { useDispatchAction } from "./useDispatchAction"
 import { useObservable } from "./useObservable"
@@ -21,8 +20,6 @@ export function Timer({
   className?: string
 }) {
   const state = useObservable(useTimerState())
-
-  useAlertSound(state)
 
   const [_allSettled, addPromise] = useAllSettled()
   const pending = !_allSettled
