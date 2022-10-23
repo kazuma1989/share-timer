@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { now } from "./now"
-import { TimerState } from "./useTimerState"
+import { TimerState } from "./timerReducer"
 import { formatDuration } from "./util/formatDuration"
 import IntervalWorker from "./util/interval.worker?worker&inline"
 

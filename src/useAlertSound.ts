@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { now } from "./now"
+import { TimerState } from "./timerReducer"
 import { useAlertAudio } from "./useAlertAudio"
-import { TimerState } from "./useTimerState"
 import IntervalWorker from "./util/interval.worker?worker&inline"
 
 export function useAlertSound({
