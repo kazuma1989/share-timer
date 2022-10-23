@@ -1,14 +1,6 @@
-import { createContext, useContext } from "react"
+import { createContext } from "./createContext"
 
-const alertAudioContext = createContext<HTMLAudioElement | null>(null)
+const [AlertAudioProvider, useAlertAudio] =
+  createContext<HTMLAudioElement>("AlertAudioProvider")
 
-export const AlertAudioProvider = alertAudioContext.Provider
-
-export function useAlertAudio(): HTMLAudioElement {
-  const audio = useContext(alertAudioContext)
-  if (!audio) {
-    throw new Error("AlertAudioProviderで囲んでいないかvalueがnullです")
-  }
-
-  return audio
-}
+export { AlertAudioProvider, useAlertAudio }
