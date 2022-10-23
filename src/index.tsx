@@ -1,6 +1,17 @@
+import { doc } from "firebase/firestore"
 import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
-import { App } from "./App"
+import {
+  distinctUntilChanged,
+  map,
+  Observable,
+  of,
+  partition,
+  startWith,
+  switchMap,
+  take,
+} from "rxjs"
+import { collection } from "./firestore/collection"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
@@ -8,7 +19,11 @@ import { calibrateClock } from "./now"
 import smallAlert from "./sound/small-alert.mp3"
 import { AlertAudioProvider } from "./useAlertAudio"
 import { FirestoreProvider } from "./useFirestore"
+import { replaceHash } from "./useHash"
+import { setupRoom } from "./useRoom"
 import { checkAudioPermission } from "./util/checkAudioPermission"
+import { snapshotOf } from "./util/snapshotOf"
+import { Room, roomIdZod, roomZod } from "./zod/roomZod"
 
 const firestore = await initializeFirestore()
 
@@ -36,10 +51,77 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <FirestoreProvider value={firestore}>
       <AlertAudioProvider value={audio}>
-        <Suspense fallback={<FullViewportProgress />}>
-          <App />
-        </Suspense>
+        <Suspense fallback={<FullViewportProgress />}>{/* <App /> */}</Suspense>
       </AlertAudioProvider>
     </FirestoreProvider>
   </StrictMode>
 )
+
+const db = firestore
+
+const hash$ = new Observable<string>((subscriber) => {
+  const abort = new AbortController()
+
+  window.addEventListener(
+    "hashchange",
+    () => {
+      subscriber.next(window.location.hash)
+    },
+    { passive: true, signal: abort.signal }
+  )
+
+  return () => {
+    abort.abort()
+  }
+}).pipe(startWith(window.location.hash), distinctUntilChanged())
+
+const [room$, invalidRoom$] = partition(
+  hash$.pipe(
+    map((hash) => roomIdZod.safeParse(hash.slice("#".length))),
+    switchMap((_) => {
+      if (!_.success) {
+        return of<["invalid-id"]>(["invalid-id"])
+      }
+
+      const roomId = _.data
+
+      return snapshotOf(doc(collection(db, "rooms"), roomId)).pipe(
+        map((doc): Room | ["invalid-doc", Room["id"]] => {
+          const _ = roomZod.safeParse(doc.data())
+          if (!_.success) {
+            return ["invalid-doc", roomId]
+          }
+
+          return {
+            ..._.data,
+            id: roomId,
+          }
+        })
+      )
+    })
+  ),
+  (_): _ is Room =>
+    !Array.isArray(_) || (_[0] !== "invalid-id" && _[0] !== "invalid-doc")
+)
+
+// 無限ループを防ぐため再試行は5回まで
+invalidRoom$.pipe(take(5)).subscribe((reason) => {
+  const [type] = reason
+  switch (type) {
+    case "invalid-id": {
+      const newRoomId = roomIdZod.parse(doc(collection(db, "rooms")).id)
+      replaceHash(newRoomId)
+      break
+    }
+
+    case "invalid-doc": {
+      const [, roomId] = reason
+      setupRoom(db, roomId)
+      break
+    }
+  }
+})
+
+room$.subscribe((room) => {
+  console.log(room)
+})
