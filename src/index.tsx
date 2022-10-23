@@ -3,13 +3,17 @@ import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
 import {
   distinctUntilChanged,
+  filter,
   fromEvent,
   map,
+  merge,
   of,
   partition,
-  share,
+  scan,
+  shareReplay,
   startWith,
   switchMap,
+  takeUntil,
 } from "rxjs"
 import { App } from "./App"
 import { collection } from "./firestore/collection"
@@ -61,7 +65,7 @@ const hash$ = fromEvent(window, "hashchange" as keyof WindowEventMap, {
   distinctUntilChanged()
 )
 
-const [room$, invalidRoom$] = partition(
+const [room$, _invalidRoom$] = partition(
   hash$.pipe(
     map((hash) => roomIdZod.safeParse(hash.slice("#".length))),
     switchMap((_) => {
@@ -85,20 +89,33 @@ const [room$, invalidRoom$] = partition(
         })
       )
     }),
-    share()
+    shareReplay()
   ),
   (_): _ is Room =>
     !Array.isArray(_) || (_[0] !== "invalid-id" && _[0] !== "invalid-doc")
 )
 
-let invalidCount = 0
+const invalidRoom$ = _invalidRoom$.pipe(sparse(200))
 
-invalidRoom$.pipe(sparse(200)).subscribe(async (reason) => {
-  invalidCount += 1
-  if (invalidCount >= 10) {
-    throw new Error("Detect hash change loop. Something went wrong")
-  }
+const loopDetected$ = merge(
+  room$.pipe(map(() => "reset" as const)),
+  invalidRoom$.pipe(map(() => 1))
+).pipe(
+  scan((acc, current) => {
+    if (current === "reset") {
+      return 0
+    }
 
+    return acc + current
+  }, 0),
+  filter((count) => count >= 10)
+)
+
+loopDetected$.subscribe(() => {
+  throw new Error("Detect hash change loop. Something went wrong")
+})
+
+invalidRoom$.pipe(takeUntil(loopDetected$)).subscribe(async (reason) => {
   const [type] = reason
   switch (type) {
     case "invalid-id": {
@@ -113,11 +130,6 @@ invalidRoom$.pipe(sparse(200)).subscribe(async (reason) => {
       break
     }
   }
-})
-
-room$.subscribe((room) => {
-  invalidCount = 0
-  console.log(room)
 })
 
 createRoot(document.getElementById("root")!).render(
