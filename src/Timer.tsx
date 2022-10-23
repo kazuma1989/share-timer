@@ -1,15 +1,18 @@
 import clsx from "clsx"
-import { serverTimestamp } from "firebase/firestore"
+import { addDoc, serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
 import { CheckAudioButton } from "./CheckAudioButton"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
+import { collection } from "./firestore/collection"
+import { withMeta } from "./firestore/withMeta"
 import { TimeViewer } from "./TimeViewer"
 import { useAllSettled } from "./useAllSettled"
-import { useDispatchAction } from "./useDispatchAction"
+import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
 import { useTimerState } from "./useTimerState"
 import { formatDuration } from "./util/formatDuration"
+import { ActionOnFirestore } from "./zod/actionZod"
 import { Room } from "./zod/roomZod"
 
 export function Timer({
@@ -24,8 +27,11 @@ export function Timer({
   const [_allSettled, addPromise] = useAllSettled()
   const pending = !_allSettled
 
-  const _dispatch = useDispatchAction(roomId)
-  const dispatch: typeof _dispatch = (action) => addPromise(_dispatch(action))
+  const db = useFirestore()
+  const dispatch = (action: ActionOnFirestore) =>
+    addPromise(
+      addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
+    )
 
   const durationSelect$ = useRef({
     value: state.initialDuration,
