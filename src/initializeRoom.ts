@@ -1,77 +1,22 @@
 import { doc, Firestore, writeBatch } from "firebase/firestore"
-import {
-  distinctUntilChanged,
-  filter,
-  fromEvent,
-  map,
-  merge,
-  Observable,
-  of,
-  partition,
-  scan,
-  shareReplay,
-  startWith,
-  switchMap,
-  takeUntil,
-} from "rxjs"
+import { filter, map, merge, Observable, scan, takeUntil } from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
-import { snapshotOf } from "./util/snapshotOf"
+import { replaceHash } from "./observeHash"
 import { sparse } from "./util/sparse"
 import { ActionOnFirestore } from "./zod/actionZod"
-import { Room, roomIdZod, RoomOnFirestore, roomZod } from "./zod/roomZod"
+import { Room, roomIdZod, RoomOnFirestore } from "./zod/roomZod"
 
-export function initializeRoom(db: Firestore): Observable<Room> {
-  const hash$ = fromEvent(window, "hashchange" as keyof WindowEventMap, {
-    passive: true,
-  }).pipe(
-    startWith(null),
-    map(() => window.location.hash),
-    distinctUntilChanged(),
-    shareReplay({
-      bufferSize: 1,
-      refCount: true,
-    })
-  )
-
-  const _ = partition(
-    hash$.pipe(
-      map((hash) => roomIdZod.safeParse(hash.slice("#".length))),
-      switchMap((_) => {
-        if (!_.success) {
-          return of<["invalid-id"]>(["invalid-id"])
-        }
-
-        const roomId = _.data
-
-        return snapshotOf(doc(collection(db, "rooms"), roomId)).pipe(
-          map((doc): Room | ["invalid-doc", Room["id"]] => {
-            const _ = roomZod.safeParse(doc.data())
-            if (!_.success) {
-              return ["invalid-doc", roomId]
-            }
-
-            return {
-              ..._.data,
-              id: roomId,
-            }
-          })
-        )
-      }),
-      shareReplay({
-        bufferSize: 1,
-        refCount: true,
-      })
-    ),
-    (_): _ is Room =>
-      !Array.isArray(_) || (_[0] !== "invalid-id" && _[0] !== "invalid-doc")
-  )
-
-  const [room$, invalidRoom$] = [_[0], _[1].pipe(sparse(200))]
+export function initializeRoom(
+  db: Firestore,
+  room$: Observable<Room>,
+  invalid$: Observable<["invalid-id"] | ["invalid-doc", Room["id"]]>
+): void {
+  const invalidEvent$ = invalid$.pipe(sparse(200))
 
   const loopDetected$ = merge(
     room$.pipe(map(() => "reset" as const)),
-    invalidRoom$.pipe(map(() => 1))
+    invalidEvent$.pipe(map(() => 1))
   ).pipe(
     scan((acc, current) => {
       if (current === "reset") {
@@ -87,12 +32,12 @@ export function initializeRoom(db: Firestore): Observable<Room> {
     throw new Error("Detect hash change loop. Something went wrong")
   })
 
-  invalidRoom$.pipe(takeUntil(loopDetected$)).subscribe(async (reason) => {
+  invalidEvent$.pipe(takeUntil(loopDetected$)).subscribe(async (reason) => {
     const [type] = reason
     switch (type) {
       case "invalid-id": {
         const newRoomId = roomIdZod.parse(doc(collection(db, "rooms")).id)
-        window.location.replace("#" + newRoomId)
+        replaceHash(newRoomId)
         break
       }
 
@@ -103,8 +48,6 @@ export function initializeRoom(db: Firestore): Observable<Room> {
       }
     }
   })
-
-  return room$
 }
 
 async function setupRoom(db: Firestore, newRoomId: string): Promise<void> {

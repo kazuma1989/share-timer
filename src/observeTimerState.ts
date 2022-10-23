@@ -23,7 +23,7 @@ import { snapshotOf } from "./util/snapshotOf"
 import { actionZod } from "./zod/actionZod"
 import { Room } from "./zod/roomZod"
 
-export function initializeTimerState(
+export function observeTimerState(
   db: Firestore,
   room$: Observable<Room>
 ): Observable<TimerState> {

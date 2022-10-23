@@ -5,8 +5,10 @@ import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
 import { initializeRoom } from "./initializeRoom"
-import { initializeTimerState } from "./initializeTimerState"
 import { calibrateClock } from "./now"
+import { observeHash } from "./observeHash"
+import { observeRoom } from "./observeRoom"
+import { observeTimerState } from "./observeTimerState"
 import smallAlert from "./sound/small-alert.mp3"
 import { AlertAudioProvider } from "./useAlertAudio"
 import { FirestoreProvider } from "./useFirestore"
@@ -36,9 +38,10 @@ document.body.addEventListener(
   }
 )
 
-const room$ = initializeRoom(firestore)
+const [room$, invalid$] = observeRoom(firestore, observeHash())
+const timerState$ = observeTimerState(firestore, room$)
 
-const timerState$ = initializeTimerState(firestore, room$)
+initializeRoom(firestore, room$, invalid$)
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
