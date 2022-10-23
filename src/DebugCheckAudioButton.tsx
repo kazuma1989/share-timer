@@ -3,7 +3,7 @@ import { useMedia } from "./useMedia"
 import { useObservable } from "./useObservable"
 import { setTimeout } from "./util/setTimeout"
 
-export function CheckAudioButton() {
+export function DebugCheckAudioButton() {
   const [audio, permission] = useObservable(useMedia(), [
     new Audio(),
     "denied" as const,

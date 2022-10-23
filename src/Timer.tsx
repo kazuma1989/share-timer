@@ -1,8 +1,8 @@
 import clsx from "clsx"
 import { addDoc, serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
-import { CheckAudioButton } from "./CheckAudioButton"
 import { CircleButton } from "./CircleButton"
+import { DebugCheckAudioButton } from "./DebugCheckAudioButton"
 import { DurationSelect } from "./DurationSelect"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
@@ -120,7 +120,7 @@ export function Timer({ className }: { className?: string }) {
 
       {import.meta.env.DEV && (
         <div className="grid place-items-center">
-          <CheckAudioButton />
+          <DebugCheckAudioButton />
         </div>
       )}
     </form>
