@@ -64,7 +64,7 @@ const hash$ = fromEvent(window, "hashchange" as keyof WindowEventMap, {
   distinctUntilChanged()
 )
 
-const [room$, _invalidRoom$] = partition(
+const _ = partition(
   hash$.pipe(
     map((hash) => roomIdZod.safeParse(hash.slice("#".length))),
     switchMap((_) => {
@@ -94,7 +94,7 @@ const [room$, _invalidRoom$] = partition(
     !Array.isArray(_) || (_[0] !== "invalid-id" && _[0] !== "invalid-doc")
 )
 
-const invalidRoom$ = _invalidRoom$.pipe(sparse(200))
+const [room$, invalidRoom$] = [_[0], _[1].pipe(sparse(200))]
 
 const loopDetected$ = merge(
   room$.pipe(map(() => "reset" as const)),
