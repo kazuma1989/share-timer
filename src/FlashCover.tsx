@@ -1,11 +1,11 @@
 import clsx from "clsx"
 import { useEffect, useState } from "react"
 import { map } from "rxjs"
+import { useAudio } from "./useAudio"
 import {
   useCurrentDurationUI,
   useCurrentDurationWorker,
 } from "./useCurrentDuration"
-import { useMedia } from "./useMedia"
 import { useObservable } from "./useObservable"
 import { useTimerState } from "./useTimerState"
 import { takeFirstZero } from "./util/takeFirstZero"
@@ -49,7 +49,7 @@ function FlashCoverInner({ className }: { className?: string }) {
 }
 
 function useAlertSound(): void {
-  const [audio] = useObservable(useMedia(), [new Audio(), "denied" as const])
+  const audio = useAudio()
   const duration$ = useCurrentDurationWorker()
 
   useEffect(() => {

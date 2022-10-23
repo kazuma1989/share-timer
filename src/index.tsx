@@ -8,16 +8,16 @@ import { initializeRoom } from "./initializeRoom"
 import { calibrateClock } from "./now"
 import { observeCurrentDuration } from "./observeCurrentDuration"
 import { observeHash } from "./observeHash"
-import { observeMedia } from "./observeMedia"
+import { observeMediaPermission } from "./observeMediaPermission"
 import { observeRoom } from "./observeRoom"
 import { observeTimerState } from "./observeTimerState"
 import smallAlert from "./sound/small-alert.mp3"
+import { AudioProvider, MediaPermissionProvider } from "./useAudio"
 import {
   CurrentDurationUIProvider,
   CurrentDurationWorkerProvider,
 } from "./useCurrentDuration"
 import { FirestoreProvider } from "./useFirestore"
-import { MediaProvider } from "./useMedia"
 import { RoomProvider } from "./useRoom"
 import { TimerStateProvider } from "./useTimerState"
 import { interval } from "./util/interval"
@@ -28,7 +28,8 @@ calibrateClock(firestore).catch((reason) => {
   console.warn("calibration failed", reason)
 })
 
-const media$ = observeMedia(new Audio(smallAlert))
+const audio = new Audio(smallAlert)
+const permission$ = observeMediaPermission(audio)
 
 const [room$, invalid$] = observeRoom(firestore, observeHash())
 const timerState$ = observeTimerState(firestore, room$)
@@ -41,19 +42,21 @@ initializeRoom(firestore, room$, invalid$)
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <FirestoreProvider value={firestore}>
-      <MediaProvider value={media$}>
-        <RoomProvider value={room$}>
-          <TimerStateProvider value={timerState$}>
-            <CurrentDurationUIProvider value={ui$}>
-              <CurrentDurationWorkerProvider value={worker$}>
-                <Suspense fallback={<FullViewportProgress />}>
-                  <App />
-                </Suspense>
-              </CurrentDurationWorkerProvider>
-            </CurrentDurationUIProvider>
-          </TimerStateProvider>
-        </RoomProvider>
-      </MediaProvider>
+      <AudioProvider value={audio}>
+        <MediaPermissionProvider value={permission$}>
+          <RoomProvider value={room$}>
+            <TimerStateProvider value={timerState$}>
+              <CurrentDurationUIProvider value={ui$}>
+                <CurrentDurationWorkerProvider value={worker$}>
+                  <Suspense fallback={<FullViewportProgress />}>
+                    <App />
+                  </Suspense>
+                </CurrentDurationWorkerProvider>
+              </CurrentDurationUIProvider>
+            </TimerStateProvider>
+          </RoomProvider>
+        </MediaPermissionProvider>
+      </AudioProvider>
     </FirestoreProvider>
   </StrictMode>
 )
