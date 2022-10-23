@@ -1,6 +1,4 @@
 import { createContext } from "./createContext"
 
-const [AlertAudioProvider, useAlertAudio] =
+export const [AlertAudioProvider, useAlertAudio] =
   createContext<HTMLAudioElement>("AlertAudioProvider")
-
-export { AlertAudioProvider, useAlertAudio }
