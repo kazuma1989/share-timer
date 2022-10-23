@@ -11,6 +11,7 @@ import {
   startWith,
   switchMap,
 } from "rxjs"
+import { App } from "./App"
 import { collection } from "./firestore/collection"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
@@ -21,8 +22,8 @@ import { AlertAudioProvider } from "./useAlertAudio"
 import { FirestoreProvider } from "./useFirestore"
 import { replaceHash } from "./useHash"
 import { setupRoom } from "./useRoom"
+import { RoomProvider } from "./useRoomV2"
 import { checkAudioPermission } from "./util/checkAudioPermission"
-import { useObservable } from "./util/createStore"
 import { snapshotOf } from "./util/snapshotOf"
 import { sparse } from "./util/sparse"
 import { Room, roomIdZod, roomZod } from "./zod/roomZod"
@@ -48,28 +49,6 @@ document.body.addEventListener(
     once: true,
   }
 )
-
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <FirestoreProvider value={firestore}>
-      <AlertAudioProvider value={audio}>
-        <Suspense fallback={<FullViewportProgress />}>
-          <App />
-        </Suspense>
-      </AlertAudioProvider>
-    </FirestoreProvider>
-  </StrictMode>
-)
-
-function App() {
-  const room = useObservable(room$)
-
-  return (
-    <div>
-      <pre>{JSON.stringify(room, null, 2)}</pre>
-    </div>
-  )
-}
 
 const db = firestore
 
@@ -139,3 +118,17 @@ room$.subscribe((room) => {
   invalidCount = 0
   console.log(room)
 })
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <FirestoreProvider value={firestore}>
+      <AlertAudioProvider value={audio}>
+        <RoomProvider value={room$}>
+          <Suspense fallback={<FullViewportProgress />}>
+            <App />
+          </Suspense>
+        </RoomProvider>
+      </AlertAudioProvider>
+    </FirestoreProvider>
+  </StrictMode>
+)

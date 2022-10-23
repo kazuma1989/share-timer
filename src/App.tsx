@@ -1,9 +1,18 @@
 import { FlashCover } from "./FlashCover"
 import { Timer } from "./Timer"
-import { useRoom } from "./useRoom"
+import { useRoom } from "./useRoomV2"
+import { useObservable } from "./util/createStore"
 
 export function App() {
-  const room = useRoom()
+  const room = useObservable(useRoom())
+
+  if (import.meta.env.DEV) {
+    return (
+      <div>
+        <pre>{JSON.stringify(room, null, 2)}</pre>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto h-screen">
