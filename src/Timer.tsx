@@ -10,24 +10,19 @@ import { useAllSettled } from "./useAllSettled"
 import { useCurrentDurationUI } from "./useCurrentDuration"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
+import { useRoom } from "./useRoom"
 import { useTimerState } from "./useTimerState"
 import { formatDuration } from "./util/formatDuration"
 import { ActionOnFirestore } from "./zod/actionZod"
-import { Room } from "./zod/roomZod"
 
-export function Timer({
-  roomId,
-  className,
-}: {
-  roomId: Room["id"]
-  className?: string
-}) {
+export function Timer({ className }: { className?: string }) {
   const state = useObservable(useTimerState())
 
   const [_allSettled, addPromise] = useAllSettled()
   const pending = !_allSettled
 
   const db = useFirestore()
+  const { id: roomId } = useObservable(useRoom())
   const dispatch = (action: ActionOnFirestore) =>
     addPromise(
       addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
