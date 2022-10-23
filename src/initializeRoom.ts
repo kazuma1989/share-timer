@@ -1,4 +1,4 @@
-import { doc, Firestore } from "firebase/firestore"
+import { doc, Firestore, writeBatch } from "firebase/firestore"
 import {
   distinctUntilChanged,
   filter,
@@ -15,10 +15,11 @@ import {
   takeUntil,
 } from "rxjs"
 import { collection } from "./firestore/collection"
-import { setupRoom } from "./setupRoom"
+import { withMeta } from "./firestore/withMeta"
 import { snapshotOf } from "./util/snapshotOf"
 import { sparse } from "./util/sparse"
-import { Room, roomIdZod, roomZod } from "./zod/roomZod"
+import { ActionOnFirestore } from "./zod/actionZod"
+import { Room, roomIdZod, RoomOnFirestore, roomZod } from "./zod/roomZod"
 
 export function initializeRoom(db: Firestore): Observable<Room> {
   const hash$ = fromEvent(window, "hashchange" as keyof WindowEventMap, {
@@ -98,3 +99,33 @@ export function initializeRoom(db: Firestore): Observable<Room> {
 
   return room$
 }
+
+async function setupRoom(db: Firestore, newRoomId: string): Promise<void> {
+  const batch = writeBatch(db)
+
+  const emoji = await import("./emoji/Animals & Nature.json").then(
+    (_) => _.default
+  )
+  const e = emoji[(Math.random() * emoji.length) | 0]!
+
+  const rooms = collection(db, "rooms")
+  batch.set(
+    doc(rooms, newRoomId),
+    withMeta<RoomOnFirestore>({
+      name: e.value + " " + e.name,
+    })
+  )
+
+  const actions = collection(db, "rooms", newRoomId, "actions")
+  batch.set(
+    doc(actions),
+    withMeta<ActionOnFirestore>({
+      type: "cancel",
+      withDuration: DEFAULT_DURATION,
+    })
+  )
+
+  await batch.commit()
+}
+
+const DEFAULT_DURATION = 3 * 60_000
