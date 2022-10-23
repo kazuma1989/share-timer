@@ -5,11 +5,13 @@ import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
 import { initializeRoom } from "./initializeRoom"
+import { initializeTimerState } from "./initializeTimerState"
 import { calibrateClock } from "./now"
 import smallAlert from "./sound/small-alert.mp3"
 import { AlertAudioProvider } from "./useAlertAudio"
 import { FirestoreProvider } from "./useFirestore"
 import { RoomProvider } from "./useRoom"
+import { TimerStateProvider } from "./useTimerStateV2"
 import { checkAudioPermission } from "./util/checkAudioPermission"
 
 const firestore = await initializeFirestore()
@@ -36,14 +38,18 @@ document.body.addEventListener(
 
 const room$ = initializeRoom(firestore)
 
+const timerState$ = initializeTimerState(firestore, room$)
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <FirestoreProvider value={firestore}>
       <AlertAudioProvider value={audio}>
         <RoomProvider value={room$}>
-          <Suspense fallback={<FullViewportProgress />}>
-            <App />
-          </Suspense>
+          <TimerStateProvider value={timerState$}>
+            <Suspense fallback={<FullViewportProgress />}>
+              <App />
+            </Suspense>
+          </TimerStateProvider>
         </RoomProvider>
       </AlertAudioProvider>
     </FirestoreProvider>
