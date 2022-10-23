@@ -27,7 +27,11 @@ export function initializeRoom(db: Firestore): Observable<Room> {
   }).pipe(
     startWith(null),
     map(() => window.location.hash),
-    distinctUntilChanged()
+    distinctUntilChanged(),
+    shareReplay({
+      bufferSize: 1,
+      refCount: true,
+    })
   )
 
   const _ = partition(
@@ -54,7 +58,10 @@ export function initializeRoom(db: Firestore): Observable<Room> {
           })
         )
       }),
-      shareReplay()
+      shareReplay({
+        bufferSize: 1,
+        refCount: true,
+      })
     ),
     (_): _ is Room =>
       !Array.isArray(_) || (_[0] !== "invalid-id" && _[0] !== "invalid-doc")

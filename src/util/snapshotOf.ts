@@ -5,7 +5,7 @@ import {
   Query,
   QuerySnapshot,
 } from "firebase/firestore"
-import { Observable, share, timer } from "rxjs"
+import { Observable, shareReplay, timer } from "rxjs"
 
 export function snapshotOf(
   reference: DocumentReference
@@ -21,9 +21,11 @@ export function snapshotOf(
       subscriber.next(doc)
     })
   ).pipe(
-    share({
+    shareReplay({
+      bufferSize: 1,
       // リスナーがいなくなって30秒後に根元の購読も解除する
-      resetOnRefCountZero: () => timer(30000),
+      // @ts-expect-error shareのresetOnRefCountZeroへのバイパスだから実態としてはOKのはず
+      refCount: (() => timer(30_000)) as boolean,
     })
   )
 }

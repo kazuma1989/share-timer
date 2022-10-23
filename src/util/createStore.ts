@@ -8,7 +8,7 @@ export interface Store<T> {
 }
 
 export function createStore<T>(
-  input: ObservableInput<T>,
+  source: ObservableInput<T>,
   initialValue?: T
 ): Store<T> {
   const Empty = Symbol("empty")
@@ -18,7 +18,7 @@ export function createStore<T>(
   let currentValue: T | Empty =
     initialValue !== undefined ? initialValue : Empty
 
-  const observable = from(input)
+  const observable = from(source)
 
   return {
     subscribe(onStoreChange) {

@@ -3,9 +3,16 @@ import {
   getDocs,
   limitToLast,
   query,
+  queryEqual,
   startAt,
 } from "firebase/firestore"
-import { distinctUntilChanged, map, Observable, share, switchMap } from "rxjs"
+import {
+  distinctUntilChanged,
+  map,
+  Observable,
+  shareReplay,
+  switchMap,
+} from "rxjs"
 import { collection } from "./firestore/collection"
 import { hasNoEstimateTimestamp } from "./firestore/hasNoEstimateTimestamp"
 import { orderBy } from "./firestore/orderBy"
@@ -21,9 +28,8 @@ export function initializeTimerState(
   room$: Observable<Room>
 ): Observable<TimerState> {
   return room$.pipe(
-    map((room) => room.id),
-    distinctUntilChanged(),
-    switchMap((roomId) =>
+    distinctUntilChanged((_1, _2) => _1.id === _2.id),
+    switchMap(({ id: roomId }) =>
       getDocs(
         query(
           collection(db, "rooms", roomId, "actions"),
@@ -40,6 +46,7 @@ export function initializeTimerState(
       )
     ),
 
+    distinctUntilChanged(queryEqual),
     switchMap((selectActions) => {
       const parseDocs = safeParseDocsWith(actionZod)
 
@@ -58,6 +65,7 @@ export function initializeTimerState(
         })
       )
     }),
-    share()
+
+    shareReplay(1)
   )
 }
