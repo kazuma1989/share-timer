@@ -7,6 +7,7 @@ import {
   Observable,
   of,
   partition,
+  share,
   startWith,
   switchMap,
   take,
@@ -98,7 +99,8 @@ const [room$, invalidRoom$] = partition(
           }
         })
       )
-    })
+    }),
+    share()
   ),
   (_): _ is Room =>
     !Array.isArray(_) || (_[0] !== "invalid-id" && _[0] !== "invalid-doc")
