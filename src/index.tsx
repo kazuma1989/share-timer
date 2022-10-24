@@ -31,7 +31,56 @@ calibrateClock(firestore).catch((reason) => {
 const audio = new Audio(smallAlert)
 const permission$ = observeMediaPermission(audio)
 
-const [room$, invalid$] = observeRoom(firestore, observeHash())
+const hash$ = observeHash()
+
+// const known = new Set()
+
+// const roomObjects$ = from([
+//   "#Fu7tO8tmAnDS4KG1yBZp",
+//   "#Fu7tO8tmAnDS4KG1yBZp/______invalid_______",
+//   "#Fu7tO8tmAnDS4KG1yBZp/______invalid_______/Heik2XqX0kg9AfhPY7AS",
+// ]).pipe(
+//   map((hash) => hash.slice("#".length).split("/")),
+//   roomIdsToRooms(firestore)
+// )
+
+// interface RoomObject {
+//   roomId: string
+//   value: Observable<
+//     | Room
+//     | [reason: "invalid-doc", payload: Room["id"]]
+//     | [reason: "invalid-id", payload: string]
+//   >
+// }
+
+// function roomIdsToRooms(
+//   db: Firestore
+// ): OperatorFunction<string[], RoomObject[]> {
+//   return scan(
+//     (acc: RoomObject[], ids) =>
+//       ids.map(
+//         (roomId) =>
+//           acc.find((_) => _.roomId === roomId) ?? {
+//             roomId,
+//             value: observeRoom2(db, roomId),
+//           }
+//       ),
+//     []
+//   )
+// }
+
+// roomObjects$.subscribe((_) => {
+//   _.forEach((_) => {
+//     known.add(_)
+//   })
+//   console.assert(
+//     known.size <= _.length,
+//     `known.size (${known.size}) > _.length (${_.length})`
+//   )
+//   console.table(_)
+// })
+
+const [room$, invalid$] = observeRoom(firestore, hash$)
 const timerState$ = observeTimerState(firestore, room$)
 
 const ui$ = observeCurrentDuration(timerState$, interval("ui"))

@@ -46,3 +46,33 @@ export function observeRoom(
 
   return _
 }
+
+export function observeRoom2(
+  db: Firestore,
+  id: string
+): Observable<
+  | Room
+  | [reason: "invalid-doc", payload: Room["id"]]
+  | [reason: "invalid-id", payload: string]
+> {
+  const _ = roomIdZod.safeParse(id)
+  if (!_.success) {
+    return of(["invalid-id", id])
+  }
+
+  const roomId = _.data
+
+  return snapshotOf(doc(collection(db, "rooms"), roomId)).pipe(
+    map((doc) => {
+      const _ = roomZod.safeParse(doc.data())
+      if (!_.success) {
+        return ["invalid-doc", roomId]
+      }
+
+      return {
+        ..._.data,
+        id: roomId,
+      }
+    })
+  )
+}
