@@ -10,10 +10,10 @@ import {
   scan,
   shareReplay,
   switchMap,
-  tap,
 } from "rxjs"
 import { FlashCover } from "./FlashCover"
 import { observeRoom2 } from "./observeRoom"
+import { Progress } from "./Progress"
 import { Timer } from "./Timer"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
@@ -32,12 +32,11 @@ export function App() {
 
   firestore$.next(useFirestore())
   const roomObjects = useObservable(roomObjects$, [])
-  console.log(roomObjects)
 
   return (
     <div className="container mx-auto h-screen">
       {roomObjects.map(({ roomId, value: room$ }) => (
-        <Suspense key={roomId}>
+        <Suspense key={roomId} fallback={<Progress className="h-20 w-20" />}>
           <X room$={room$} />
         </Suspense>
       ))}
@@ -75,9 +74,6 @@ const firestore$ = new ReplaySubject<Firestore>(1)
 
 const roomObjects$ = firestore$.pipe(
   distinctUntilChanged(),
-  tap((_) => {
-    console.log(_)
-  }),
   switchMap((db) =>
     hash$.pipe(
       map((hash) => hash.slice("#".length).split("/")),
