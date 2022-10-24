@@ -1,22 +1,29 @@
 import clsx from "clsx"
 import { addDoc, serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
+import { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DebugCheckAudioButton } from "./DebugCheckAudioButton"
 import { DurationSelect } from "./DurationSelect"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
+import { TimerState } from "./timerReducer"
 import { useAllSettled } from "./useAllSettled"
 import { useCurrentDurationUI } from "./useCurrentDuration"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
 import { useRoom } from "./useRoom"
-import { useTimerState } from "./useTimerState"
 import { formatDuration } from "./util/formatDuration"
 import { ActionOnFirestore } from "./zod/actionZod"
 
-export function Timer({ className }: { className?: string }) {
-  const state = useObservable(useTimerState())
+export function Timer({
+  timerState$,
+  className,
+}: {
+  timerState$: Observable<TimerState>
+  className?: string
+}) {
+  const state = useObservable(timerState$)
 
   const [_allSettled, addPromise] = useAllSettled()
   const pending = !_allSettled

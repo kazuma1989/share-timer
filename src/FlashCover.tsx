@@ -1,17 +1,23 @@
 import clsx from "clsx"
 import { useEffect, useState } from "react"
-import { map } from "rxjs"
+import { map, Observable } from "rxjs"
+import { TimerState } from "./timerReducer"
 import { useAudio } from "./useAudio"
 import {
   useCurrentDurationUI,
   useCurrentDurationWorker,
 } from "./useCurrentDuration"
 import { useObservable } from "./useObservable"
-import { useTimerState } from "./useTimerState"
 import { takeFirstZero } from "./util/takeFirstZero"
 
-export function FlashCover({ className }: { className?: string }) {
-  const { mode } = useObservable(useTimerState())
+export function FlashCover({
+  timerState$,
+  className,
+}: {
+  timerState$: Observable<TimerState>
+  className?: string
+}) {
+  const { mode } = useObservable(timerState$)
 
   const state = mode === "editing" ? "asleep" : "awake"
 
