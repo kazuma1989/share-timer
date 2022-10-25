@@ -1,5 +1,6 @@
 import { Firestore } from "firebase/firestore"
 import {
+  distinctUntilChanged,
   filter,
   firstValueFrom,
   from,
@@ -46,7 +47,11 @@ if (roomObject) {
 
   const _room$ = room$.pipe(filter((_): _ is Room => !Array.isArray(_)))
 
-  const timerState$ = _room$.pipe(toTimerState(db))
+  const timerState$ = _room$.pipe(
+    map((_) => _.id),
+    distinctUntilChanged(),
+    toTimerState(db)
+  )
 
   timerState$.subscribe((timerState) => {
     console.log(timerState)

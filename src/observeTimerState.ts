@@ -74,10 +74,9 @@ export function observeTimerState(
 
 export function toTimerState(
   db: Firestore
-): OperatorFunction<Room, TimerState> {
+): OperatorFunction<Room["id"], TimerState> {
   return pipe(
-    distinctUntilChanged((_1, _2) => _1.id === _2.id),
-    switchMap(({ id: roomId }) =>
+    switchMap((roomId) =>
       getDocs(
         query(
           collection(db, "rooms", roomId, "actions"),
