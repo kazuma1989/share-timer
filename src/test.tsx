@@ -1,8 +1,19 @@
 import { Firestore } from "firebase/firestore"
-import { from, map, Observable, OperatorFunction, scan } from "rxjs"
+import {
+  filter,
+  firstValueFrom,
+  from,
+  map,
+  Observable,
+  OperatorFunction,
+  scan,
+} from "rxjs"
 import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
+import { toCurrentDuration } from "./observeCurrentDuration"
 import { observeRoom2 } from "./observeRoom"
+import { toTimerState } from "./observeTimerState"
+import { interval } from "./util/interval"
 import { sparse } from "./util/sparse"
 import { Room } from "./zod/roomZod"
 
@@ -16,17 +27,37 @@ const firestore = await initializeFirestore()
 const db = firestore
 
 const mockHash$ = from([
-  "#Fu7tO8tmAnDS4KG1yBZp",
-  "#Fu7tO8tmAnDS4KG1yBZp/______invalid_______",
-  "#Fu7tO8tmAnDS4KG1yBZp/______invalid_______/Heik2XqX0kg9AfhPY7AS",
+  "#gD1zUX9TwX0axH0lWUEi",
+  // "#Fu7tO8tmAnDS4KG1yBZp/______invalid_______",
+  // "#Fu7tO8tmAnDS4KG1yBZp/______invalid_______/Heik2XqX0kg9AfhPY7AS",
 ]).pipe(sparse(500))
 
 const hash$ = mockHash$
 
-hash$.pipe(
+const roomObjects$ = hash$.pipe(
   map((hash) => hash.slice("#".length).split("/")),
   roomIdsToRooms(db)
 )
+
+const [roomObject] = await firstValueFrom(roomObjects$)
+
+if (roomObject) {
+  const { room$ } = roomObject
+
+  const _room$ = room$.pipe(filter((_): _ is Room => !Array.isArray(_)))
+
+  const timerState$ = _room$.pipe(toTimerState(db))
+
+  timerState$.subscribe((timerState) => {
+    console.log(timerState)
+  })
+
+  const duration$ = timerState$.pipe(toCurrentDuration(interval("ui")))
+
+  duration$.subscribe((duration) => {
+    console.log(duration)
+  })
+}
 
 interface RoomObject {
   roomId: string
