@@ -1,5 +1,7 @@
+import { Firestore } from "firebase/firestore"
 import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
+import { from, map, Observable, OperatorFunction, scan } from "rxjs"
 import { App } from "./App"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
@@ -9,7 +11,7 @@ import { calibrateClock } from "./now"
 import { observeCurrentDuration } from "./observeCurrentDuration"
 import { observeHash } from "./observeHash"
 import { observeMediaPermission } from "./observeMediaPermission"
-import { observeRoom } from "./observeRoom"
+import { observeRoom, observeRoom2 } from "./observeRoom"
 import { observeTimerState } from "./observeTimerState"
 import smallAlert from "./sound/small-alert.mp3"
 import { AudioProvider, MediaPermissionProvider } from "./useAudio"
@@ -21,6 +23,8 @@ import { FirestoreProvider } from "./useFirestore"
 import { RoomProvider } from "./useRoom"
 import { TimerStateProvider } from "./useTimerState"
 import { interval } from "./util/interval"
+import { sparse } from "./util/sparse"
+import { Room } from "./zod/roomZod"
 
 const firestore = await initializeFirestore()
 
@@ -33,52 +37,49 @@ const permission$ = observeMediaPermission(audio)
 
 const hash$ = observeHash()
 
-// const known = new Set()
+// hash -> roomIds
+// roomIds -> rooms
+// room -> timerState
+// timerState + interval -> currentDuration
 
-// const roomObjects$ = from([
-//   "#Fu7tO8tmAnDS4KG1yBZp",
-//   "#Fu7tO8tmAnDS4KG1yBZp/______invalid_______",
-//   "#Fu7tO8tmAnDS4KG1yBZp/______invalid_______/Heik2XqX0kg9AfhPY7AS",
-// ]).pipe(
-//   map((hash) => hash.slice("#".length).split("/")),
-//   roomIdsToRooms(firestore)
-// )
+const db = firestore
 
-// interface RoomObject {
-//   roomId: string
-//   value: Observable<
-//     | Room
-//     | [reason: "invalid-doc", payload: Room["id"]]
-//     | [reason: "invalid-id", payload: string]
-//   >
-// }
+const mockHash$ = from([
+  "#Fu7tO8tmAnDS4KG1yBZp",
+  "#Fu7tO8tmAnDS4KG1yBZp/______invalid_______",
+  "#Fu7tO8tmAnDS4KG1yBZp/______invalid_______/Heik2XqX0kg9AfhPY7AS",
+]).pipe(sparse(500))
 
-// function roomIdsToRooms(
-//   db: Firestore
-// ): OperatorFunction<string[], RoomObject[]> {
-//   return scan(
-//     (acc: RoomObject[], ids) =>
-//       ids.map(
-//         (roomId) =>
-//           acc.find((_) => _.roomId === roomId) ?? {
-//             roomId,
-//             value: observeRoom2(db, roomId),
-//           }
-//       ),
-//     []
-//   )
-// }
+mockHash$.pipe(
+  map((hash) => hash.slice("#".length).split("/")),
+  roomIdsToRooms(db)
+)
 
-// roomObjects$.subscribe((_) => {
-//   _.forEach((_) => {
-//     known.add(_)
-//   })
-//   console.assert(
-//     known.size <= _.length,
-//     `known.size (${known.size}) > _.length (${_.length})`
-//   )
-//   console.table(_)
-// })
+interface RoomObject {
+  roomId: string
+  room$: Observable<
+    | Room
+    | [reason: "invalid-doc", payload: Room["id"]]
+    | [reason: "invalid-id", payload: string]
+  >
+  // firestore: Firestore
+}
+
+function roomIdsToRooms(
+  db: Firestore
+): OperatorFunction<string[], RoomObject[]> {
+  return scan(
+    (acc: RoomObject[], ids) =>
+      ids.map(
+        (roomId) =>
+          acc.find((_) => _.roomId === roomId) ?? {
+            roomId,
+            room$: observeRoom2(db, roomId),
+          }
+      ),
+    []
+  )
+}
 
 const [room$, invalid$] = observeRoom(firestore, hash$)
 const timerState$ = observeTimerState(firestore, room$)
