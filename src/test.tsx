@@ -14,7 +14,7 @@ import { initializeFirestore } from "./initializeFirestore"
 import { toCurrentDuration } from "./observeCurrentDuration"
 import { observeRoom2 } from "./observeRoom"
 import { toTimerState } from "./observeTimerState"
-import { interval } from "./util/interval"
+import { floor, interval } from "./util/interval"
 import { sparse } from "./util/sparse"
 import { Room } from "./zod/roomZod"
 
@@ -57,10 +57,20 @@ if (roomObject) {
     console.log(timerState)
   })
 
-  const duration$ = timerState$.pipe(toCurrentDuration(interval("ui")))
+  const duration$ = timerState$.pipe(
+    toCurrentDuration(interval("ui")),
+    map((_) => ({
+      ..._,
+      duration: floor(_.duration),
+    })),
+    distinctUntilChanged(
+      (left, right) =>
+        left.mode === right.mode && left.duration === right.duration
+    )
+  )
 
-  duration$.subscribe((duration) => {
-    console.log(duration)
+  duration$.subscribe((_) => {
+    console.log(_)
   })
 }
 

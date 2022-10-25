@@ -53,27 +53,41 @@ export function observeCurrentDuration(
 
 export function toCurrentDuration(
   interval$: Observable<void>
-): OperatorFunction<TimerState, number> {
+): OperatorFunction<
+  TimerState,
+  {
+    mode: TimerState["mode"]
+    duration: number
+  }
+> {
   return pipe(
     switchMap((state) => {
       switch (state.mode) {
         case "editing": {
-          return of(state.initialDuration)
+          return of({
+            mode: state.mode,
+            duration: state.initialDuration,
+          })
         }
 
         case "running": {
           return interval$.pipe(
             startWith(null),
-            map(() => state.restDuration - (now() - state.startedAt))
+            map(() => ({
+              mode: state.mode,
+              duration: state.restDuration - (now() - state.startedAt),
+            }))
           )
         }
 
         case "paused": {
-          return of(state.restDuration)
+          return of({
+            mode: state.mode,
+            duration: state.restDuration,
+          })
         }
       }
     }),
-    distinctUntilChanged(secondsPrecisionEqual),
 
     shareReplay({
       bufferSize: 1,
