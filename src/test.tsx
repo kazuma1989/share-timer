@@ -24,7 +24,7 @@ const firestore = await initializeFirestore()
 // room -> timerState
 // timerState + interval -> currentDuration
 
-const db = firestore
+// const db = firestore
 
 const mockHash$ = from([
   "#gD1zUX9TwX0axH0lWUEi",
@@ -34,15 +34,15 @@ const mockHash$ = from([
 
 const hash$ = mockHash$
 
-const roomObjects$ = hash$.pipe(
-  map((hash) => hash.slice("#".length).split("/")),
-  roomIdsToRooms(db)
-)
+const roomIds$ = hash$.pipe(map((hash) => hash.slice("#".length).split("/")))
+
+const db = firestore
+const roomObjects$ = roomIds$.pipe(roomIdsToRooms(db))
 
 const [roomObject] = await firstValueFrom(roomObjects$)
 
 if (roomObject) {
-  const { room$ } = roomObject
+  const { room$, firestore: db } = roomObject
 
   const _room$ = room$.pipe(filter((_): _ is Room => !Array.isArray(_)))
 
@@ -66,7 +66,7 @@ interface RoomObject {
     | [reason: "invalid-doc", payload: Room["id"]]
     | [reason: "invalid-id", payload: string]
   >
-  // firestore: Firestore
+  firestore: Firestore
 }
 
 function roomIdsToRooms(
@@ -75,10 +75,11 @@ function roomIdsToRooms(
   return scan(
     (acc: RoomObject[], ids) =>
       ids.map(
-        (roomId) =>
+        (roomId): RoomObject =>
           acc.find((_) => _.roomId === roomId) ?? {
             roomId,
             room$: observeRoom2(db, roomId),
+            firestore: db,
           }
       ),
     []
