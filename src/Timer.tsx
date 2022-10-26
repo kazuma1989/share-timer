@@ -1,21 +1,17 @@
 import clsx from "clsx"
 import { addDoc, serverTimestamp } from "firebase/firestore"
-import { Suspense, useRef } from "react"
-import { distinctUntilChanged, map, Observable } from "rxjs"
+import { useRef } from "react"
+import { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DebugCheckAudioButton } from "./DebugCheckAudioButton"
 import { DurationSelect } from "./DurationSelect"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
-import { toCurrentDuration } from "./observeCurrentDuration"
 import { TimerState } from "./timerReducer"
+import { TimeViewer } from "./TimeViewer"
 import { useAllSettled } from "./useAllSettled"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
-import { formatDuration } from "./util/formatDuration"
-import { floor, interval } from "./util/interval"
-import { mapGetOrPut } from "./util/mapGetOrPut"
-import { shallowEqual } from "./util/shallowEqual"
 import { ActionOnFirestore } from "./zod/actionZod"
 import { Room } from "./zod/roomZod"
 
@@ -31,27 +27,7 @@ export function Timer({
   console.count("Timer")
   const state = useObservable(timerState$)
 
-  const duration$ = getOrPut(timerState$, () =>
-    timerState$.pipe(
-      toCurrentDuration(interval("ui")),
-      map((_) => ({
-        mode: _.mode,
-        duration: floor(_.duration),
-      })),
-      distinctUntilChanged(shallowEqual),
-      map((_) => _.duration)
-    )
-  )
-
-  const [_allSettled, addPromise] = useAllSettled()
-  const pending = !_allSettled
-
-  const db = useFirestore()
-  const { id: roomId } = useObservable(room$)
-  const dispatch = (action: ActionOnFirestore) =>
-    addPromise(
-      addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
-    )
+  const [pending, dispatch] = useDispatch(room$)
 
   const durationSelect$ = useRef({
     value: state.initialDuration,
@@ -84,11 +60,7 @@ export function Timer({
           />
         ) : (
           <div className="text-8xl font-thin sm:text-9xl">
-            <Suspense>
-              <TimeViewer duration$={duration$}>
-                {(duration) => <span>{formatDuration(duration)}</span>}
-              </TimeViewer>
-            </Suspense>
+            <TimeViewer timerState$={timerState$} />
           </div>
         )}
       </div>
@@ -150,19 +122,23 @@ export function Timer({
   )
 }
 
-function TimeViewer({
-  duration$,
-  children,
-}: {
-  duration$: Observable<number>
-  children?: (restDuration: number) => JSX.Element
-}) {
-  const duration = useObservable(duration$)
-  console.count("TimeViewer")
+function useDispatch(
+  room$: Observable<Room>
+): [
+  pending: boolean,
+  dispatch: (action: ActionOnFirestore) => Promise<unknown>
+] {
+  const [_allSettled, addPromise] = useAllSettled()
+  const pending = !_allSettled
 
-  return children?.(duration) ?? null
+  const db = useFirestore()
+  const { id: roomId } = useObservable(room$)
+
+  return [
+    pending,
+    (action) =>
+      addPromise(
+        addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
+      ),
+  ]
 }
-
-const getOrPut = mapGetOrPut(
-  new WeakMap<Observable<TimerState>, Observable<number>>()
-)
