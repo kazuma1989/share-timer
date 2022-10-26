@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import { addDoc, serverTimestamp } from "firebase/firestore"
-import { Suspense, useMemo, useRef } from "react"
+import { Suspense, useRef } from "react"
 import { distinctUntilChanged, map, Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DebugCheckAudioButton } from "./DebugCheckAudioButton"
@@ -14,6 +14,8 @@ import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
 import { formatDuration } from "./util/formatDuration"
 import { floor, interval } from "./util/interval"
+import { mapGetOrPut } from "./util/mapGetOrPut"
+import { shallowEqual } from "./util/shallowEqual"
 import { ActionOnFirestore } from "./zod/actionZod"
 import { Room } from "./zod/roomZod"
 
@@ -29,21 +31,16 @@ export function Timer({
   console.count("Timer")
   const state = useObservable(timerState$)
 
-  const duration$ = useMemo(
-    () =>
-      timerState$.pipe(
-        toCurrentDuration(interval("ui")),
-        map((_) => ({
-          ..._,
-          duration: floor(_.duration),
-        })),
-        distinctUntilChanged(
-          (left, right) =>
-            left.mode === right.mode && left.duration === right.duration
-        ),
-        map((_) => _.duration)
-      ),
-    [timerState$]
+  const duration$ = getOrPut(timerState$, () =>
+    timerState$.pipe(
+      toCurrentDuration(interval("ui")),
+      map((_) => ({
+        mode: _.mode,
+        duration: floor(_.duration),
+      })),
+      distinctUntilChanged(shallowEqual),
+      map((_) => _.duration)
+    )
   )
 
   const [_allSettled, addPromise] = useAllSettled()
@@ -165,3 +162,7 @@ function TimeViewer({
 
   return children?.(duration) ?? null
 }
+
+const getOrPut = mapGetOrPut(
+  new WeakMap<Observable<TimerState>, Observable<number>>()
+)
