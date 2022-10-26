@@ -45,21 +45,14 @@ export function observeCurrentDuration(
   )
 }
 
-// of<TimerState>(null as any)
-//   .pipe(toCurrentDuration(of()))
-//   .subscribe((_) => {
-//     _
-//   })
+export interface CurrentDuration {
+  mode: TimerState["mode"]
+  duration: number
+}
 
 export function toCurrentDuration(
   interval$: Observable<void>
-): OperatorFunction<
-  TimerState,
-  {
-    mode: TimerState["mode"]
-    duration: number
-  }
-> {
+): OperatorFunction<TimerState, CurrentDuration> {
   return pipe(
     switchMap((state) => {
       switch (state.mode) {

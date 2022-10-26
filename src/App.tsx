@@ -1,4 +1,5 @@
 import { distinctUntilChanged, map, Observable } from "rxjs"
+import { ErrorBoundary } from "./ErrorBoundary"
 import { FlashCover } from "./FlashCover"
 import { toTimerState } from "./observeTimerState"
 import { Timer } from "./Timer"
@@ -12,19 +13,22 @@ export function App({ room$ }: { room$: Observable<Room> }) {
 
   const db = useFirestore()
 
-  const timerState$ = getOrPut(room$, () =>
-    room$.pipe(
+  const timerState$ = getOrPut(room$, () => {
+    console.count("timerState$")
+    return room$.pipe(
       map((_) => _.id),
       distinctUntilChanged(),
       toTimerState(db)
     )
-  )
+  })
 
   return (
     <div className="container mx-auto h-screen">
-      <Timer timerState$={timerState$} className="h-full" />
+      <Timer room$={room$} timerState$={timerState$} className="h-full" />
 
-      <FlashCover timerState$={timerState$} />
+      <ErrorBoundary>
+        <FlashCover timerState$={timerState$} />
+      </ErrorBoundary>
     </div>
   )
 }

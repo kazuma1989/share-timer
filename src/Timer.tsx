@@ -1,35 +1,56 @@
 import clsx from "clsx"
 import { addDoc, serverTimestamp } from "firebase/firestore"
-import { useRef } from "react"
-import { Observable } from "rxjs"
+import { Suspense, useMemo, useRef } from "react"
+import { distinctUntilChanged, map, Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DebugCheckAudioButton } from "./DebugCheckAudioButton"
 import { DurationSelect } from "./DurationSelect"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
+import { toCurrentDuration } from "./observeCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { useAllSettled } from "./useAllSettled"
-import { useCurrentDurationUI } from "./useCurrentDuration"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
-import { useRoom } from "./useRoom"
 import { formatDuration } from "./util/formatDuration"
+import { floor, interval } from "./util/interval"
 import { ActionOnFirestore } from "./zod/actionZod"
+import { Room } from "./zod/roomZod"
 
 export function Timer({
+  room$,
   timerState$,
   className,
 }: {
+  room$: Observable<Room>
   timerState$: Observable<TimerState>
   className?: string
 }) {
+  console.count("Timer")
   const state = useObservable(timerState$)
+
+  const duration$ = useMemo(
+    () =>
+      timerState$.pipe(
+        toCurrentDuration(interval("ui")),
+        map((_) => ({
+          ..._,
+          duration: floor(_.duration),
+        })),
+        distinctUntilChanged(
+          (left, right) =>
+            left.mode === right.mode && left.duration === right.duration
+        ),
+        map((_) => _.duration)
+      ),
+    [timerState$]
+  )
 
   const [_allSettled, addPromise] = useAllSettled()
   const pending = !_allSettled
 
   const db = useFirestore()
-  const { id: roomId } = useObservable(useRoom())
+  const { id: roomId } = useObservable(room$)
   const dispatch = (action: ActionOnFirestore) =>
     addPromise(
       addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
@@ -66,13 +87,11 @@ export function Timer({
           />
         ) : (
           <div className="text-8xl font-thin sm:text-9xl">
-            {state.mode === "running" ? (
-              <TimeViewer>
+            <Suspense>
+              <TimeViewer duration$={duration$}>
                 {(duration) => <span>{formatDuration(duration)}</span>}
               </TimeViewer>
-            ) : (
-              <span>{formatDuration(state.restDuration)}</span>
-            )}
+            </Suspense>
           </div>
         )}
       </div>
@@ -135,11 +154,14 @@ export function Timer({
 }
 
 function TimeViewer({
+  duration$,
   children,
 }: {
+  duration$: Observable<number>
   children?: (restDuration: number) => JSX.Element
 }) {
-  const duration = useObservable(useCurrentDurationUI(), 0)
+  const duration = useObservable(duration$)
+  console.count("TimeViewer")
 
   return children?.(duration) ?? null
 }
