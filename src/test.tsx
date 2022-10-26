@@ -1,19 +1,9 @@
-import { Firestore } from "firebase/firestore"
-import {
-  distinctUntilChanged,
-  filter,
-  firstValueFrom,
-  from,
-  map,
-  Observable,
-  OperatorFunction,
-  scan,
-} from "rxjs"
+import { distinctUntilChanged, filter, firstValueFrom, from, map } from "rxjs"
 import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
 import { toCurrentDuration } from "./observeCurrentDuration"
-import { observeRoom2 } from "./observeRoom"
 import { toTimerState } from "./observeTimerState"
+import { roomIdsToRooms } from "./roomIdsToRooms"
 import { floor, interval } from "./util/interval"
 import { sparse } from "./util/sparse"
 import { Room } from "./zod/roomZod"
@@ -37,8 +27,7 @@ const hash$ = mockHash$
 
 const roomIds$ = hash$.pipe(map((hash) => hash.slice("#".length).split("/")))
 
-const db = firestore
-const roomObjects$ = roomIds$.pipe(roomIdsToRooms(db))
+const roomObjects$ = roomIds$.pipe(roomIdsToRooms(firestore))
 
 const [roomObject] = await firstValueFrom(roomObjects$)
 
@@ -72,31 +61,4 @@ if (roomObject) {
   duration$.subscribe((_) => {
     console.log(_)
   })
-}
-
-interface RoomObject {
-  roomId: string
-  room$: Observable<
-    | Room
-    | [reason: "invalid-doc", payload: Room["id"]]
-    | [reason: "invalid-id", payload: string]
-  >
-  firestore: Firestore
-}
-
-function roomIdsToRooms(
-  db: Firestore
-): OperatorFunction<string[], RoomObject[]> {
-  return scan(
-    (acc: RoomObject[], ids) =>
-      ids.map(
-        (roomId): RoomObject =>
-          acc.find((_) => _.roomId === roomId) ?? {
-            roomId,
-            room$: observeRoom2(db, roomId),
-            firestore: db,
-          }
-      ),
-    []
-  )
 }
