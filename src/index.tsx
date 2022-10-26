@@ -20,15 +20,17 @@ calibrateClock(firestore).catch((reason) => {
   console.warn("calibration failed", reason)
 })
 
+const root = document.getElementById("root")!
+
 const audio = new Audio(smallAlert)
-const permission$ = observeMediaPermission(audio)
+const permission$ = observeMediaPermission(audio, root)
 
 const roomId$ = observeHash().pipe(map((hash) => hash.slice("#".length)))
 const [room$, invalid$] = partition(roomId$.pipe(toRoom(firestore)), isRoom)
 
 initializeRoom(firestore, room$, invalid$)
 
-createRoot(document.getElementById("root")!).render(
+createRoot(root).render(
   <StrictMode>
     <FirestoreProvider value={firestore}>
       <AudioProvider value={audio}>
