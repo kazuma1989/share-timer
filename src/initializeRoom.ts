@@ -3,6 +3,7 @@ import { filter, map, merge, Observable, scan, takeUntil } from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { replaceHash } from "./observeHash"
+import { InvalidDoc, InvalidId } from "./observeRoom"
 import { sparse } from "./util/sparse"
 import { ActionOnFirestore } from "./zod/actionZod"
 import { Room, roomIdZod, RoomOnFirestore } from "./zod/roomZod"
@@ -10,7 +11,7 @@ import { Room, roomIdZod, RoomOnFirestore } from "./zod/roomZod"
 export function initializeRoom(
   db: Firestore,
   room$: Observable<Room>,
-  invalid$: Observable<["invalid-id"] | ["invalid-doc", Room["id"]]>
+  invalid$: Observable<InvalidDoc | InvalidId>
 ): void {
   const invalidEvent$ = invalid$.pipe(sparse(200))
 

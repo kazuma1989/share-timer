@@ -1,61 +1,34 @@
-import { Firestore } from "firebase/firestore"
-import { Suspense, useState } from "react"
-import { distinctUntilChanged, filter, map, Observable } from "rxjs"
+import { distinctUntilChanged, map, Observable } from "rxjs"
+import { FlashCover } from "./FlashCover"
 import { toTimerState } from "./observeTimerState"
-import { RoomObject } from "./roomIdsToRooms"
+import { Timer } from "./Timer"
 import { TimerState } from "./timerReducer"
-import { useObservable } from "./useObservable"
+import { useFirestore } from "./useFirestore"
+import { mapGetOrPut } from "./util/mapGetOrPut"
 import { Room } from "./zod/roomZod"
 
-export function App({
-  roomObjects$,
-}: {
-  roomObjects$: Observable<RoomObject[]>
-}) {
+export function App({ room$ }: { room$: Observable<Room> }) {
   // useTitleAsTimeViewer()
 
-  const roomObjects = useObservable(roomObjects$, [])
+  const db = useFirestore()
 
-  return (
-    <div className="container mx-auto h-screen">
-      {roomObjects.map(({ roomId, room$, firestore }) => (
-        <RoomElm key={roomId} room$={room$} firestore={firestore} />
-      ))}
-    </div>
-  )
-}
-
-function RoomElm({
-  room$,
-  firestore,
-}: {
-  room$: RoomObject["room$"]
-  firestore: Firestore
-}) {
-  // ほんとうに "state" だろうか？memoizeではないか？
-  const [timerState$] = useState(() =>
-    room$.pipe(filter((_): _ is Room => !Array.isArray(_))).pipe(
+  const timerState$ = getOrPut(room$, () =>
+    room$.pipe(
       map((_) => _.id),
       distinctUntilChanged(),
-      toTimerState(firestore)
+      toTimerState(db)
     )
   )
 
   return (
-    <Suspense>
-      <X timerState$={timerState$} />
-      {/* <Timer timerState$={timerState$} className="h-full" /> */}
-      {/* <FlashCover timerState$={timerState$} /> */}
-    </Suspense>
-  )
-}
+    <div className="container mx-auto h-screen">
+      <Timer timerState$={timerState$} className="h-full" />
 
-function X({ timerState$ }: { timerState$: Observable<TimerState> }) {
-  const timerState = useObservable(timerState$)
-
-  return (
-    <div>
-      <pre>{JSON.stringify(timerState)}</pre>
+      <FlashCover timerState$={timerState$} />
     </div>
   )
 }
+
+const getOrPut = mapGetOrPut(
+  new WeakMap<Observable<Room>, Observable<TimerState>>()
+)
