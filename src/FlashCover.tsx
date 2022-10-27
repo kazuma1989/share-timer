@@ -1,13 +1,12 @@
 import clsx from "clsx"
 import { useEffect, useState } from "react"
 import { map, Observable } from "rxjs"
+import { toCurrentDuration } from "./observeCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { useAudio } from "./useAudio"
-import {
-  useCurrentDurationUI,
-  useCurrentDurationWorker,
-} from "./useCurrentDuration"
 import { useObservable } from "./useObservable"
+import { interval } from "./util/interval"
+import { mapGetOrPut } from "./util/mapGetOrPut"
 import { takeFirstZero } from "./util/takeFirstZero"
 
 export function FlashCover({
@@ -24,15 +23,27 @@ export function FlashCover({
   return (
     <FlashCoverInner
       key={state}
+      timerState$={timerState$}
       className={clsx(state === "asleep" && "hidden", className)}
     />
   )
 }
 
-function FlashCoverInner({ className }: { className?: string }) {
-  useAlertSound()
+function FlashCoverInner({
+  timerState$,
+  className,
+}: {
+  timerState$: Observable<TimerState>
+  className?: string
+}) {
+  useAlertSound(timerState$)
 
-  const duration$ = useCurrentDurationUI()
+  const duration$ = getOrPut(timerState$, () =>
+    timerState$.pipe(
+      toCurrentDuration(interval("ui")),
+      map((_) => _.duration)
+    )
+  )
 
   const [flashing$] = useState(() =>
     duration$.pipe(
@@ -54,9 +65,14 @@ function FlashCoverInner({ className }: { className?: string }) {
   )
 }
 
-function useAlertSound(): void {
+function useAlertSound(timerState$: Observable<TimerState>): void {
   const audio = useAudio()
-  const duration$ = useCurrentDurationWorker()
+  const duration$ = getOrPut(timerState$, () =>
+    timerState$.pipe(
+      toCurrentDuration(interval("worker", 100)),
+      map((_) => _.duration)
+    )
+  )
 
   useEffect(() => {
     const sub = duration$.pipe(takeFirstZero()).subscribe(() => {
@@ -72,3 +88,7 @@ function useAlertSound(): void {
     }
   }, [audio, duration$])
 }
+
+const getOrPut = mapGetOrPut(
+  new WeakMap<Observable<TimerState>, Observable<number>>()
+)
