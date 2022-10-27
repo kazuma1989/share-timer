@@ -29,6 +29,4 @@ export function useTitleAsTimeViewer(
   }, [duration$])
 }
 
-const getOrPut = mapGetOrPut(
-  new WeakMap<Observable<TimerState>, Observable<number>>()
-)
+const getOrPut = mapGetOrPut()

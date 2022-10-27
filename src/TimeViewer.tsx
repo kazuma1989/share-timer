@@ -31,6 +31,4 @@ export function TimeViewer({
   return <span className={className}>{formatDuration(duration)}</span>
 }
 
-const getOrPut = mapGetOrPut(
-  new WeakMap<Observable<TimerState>, Observable<number>>()
-)
+const getOrPut = mapGetOrPut()

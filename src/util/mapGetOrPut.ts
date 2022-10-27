@@ -1,18 +1,16 @@
-interface IMap<K, V> {
-  get(key: K): V | undefined
-  set(key: K, value: V): this
-}
+export function mapGetOrPut(): <K extends object, U>(
+  key: K,
+  getDefaultValue: () => U
+) => U {
+  const map = new WeakMap<object, unknown>()
 
-export function mapGetOrPut<K, V>(
-  map: IMap<K, V>
-): (key: K, defaultValue: () => V) => V {
-  return (key, defaultValue) => {
+  return (key, getDefaultValue) => {
     const value = map.get(key)
     if (value) {
-      return value
+      return value as ReturnType<typeof getDefaultValue>
     }
 
-    const newValue = defaultValue()
+    const newValue = getDefaultValue()
     map.set(key, newValue)
 
     return newValue

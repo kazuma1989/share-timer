@@ -3,7 +3,6 @@ import { ErrorBoundary } from "./ErrorBoundary"
 import { FlashCover } from "./FlashCover"
 import { mapToTimerState } from "./mapToTimerState"
 import { Timer } from "./Timer"
-import { TimerState } from "./timerReducer"
 import { useFirestore } from "./useFirestore"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { mapGetOrPut } from "./util/mapGetOrPut"
@@ -33,6 +32,4 @@ export function App({ room$ }: { room$: Observable<Room> }) {
   )
 }
 
-const getOrPut = mapGetOrPut(
-  new WeakMap<Observable<Room>, Observable<TimerState>>()
-)
+const getOrPut = mapGetOrPut()

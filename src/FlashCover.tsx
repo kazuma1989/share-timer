@@ -38,7 +38,7 @@ function FlashCoverInner({
 }) {
   useAlertSound(timerState$)
 
-  const duration$ = getOrPut(timerState$, () =>
+  const duration$ = getOrPut2(timerState$, () =>
     timerState$.pipe(
       mapToCurrentDuration(interval("ui")),
       map((_) => _.duration)
@@ -65,6 +65,8 @@ function FlashCoverInner({
   )
 }
 
+const getOrPut2 = mapGetOrPut()
+
 function useAlertSound(timerState$: Observable<TimerState>): void {
   const audio = useAudio()
   const duration$ = getOrPut(timerState$, () =>
@@ -89,6 +91,4 @@ function useAlertSound(timerState$: Observable<TimerState>): void {
   }, [audio, duration$])
 }
 
-const getOrPut = mapGetOrPut(
-  new WeakMap<Observable<TimerState>, Observable<number>>()
-)
+const getOrPut = mapGetOrPut()
