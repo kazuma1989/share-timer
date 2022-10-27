@@ -5,13 +5,13 @@ import { mapToTimerState } from "./mapToTimerState"
 import { Timer } from "./Timer"
 import { useFirestore } from "./useFirestore"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
-import { mapGetOrPut } from "./util/mapGetOrPut"
+import { createCache } from "./util/createCache"
 import { Room } from "./zod/roomZod"
 
 export function App({ room$ }: { room$: Observable<Room> }) {
   const db = useFirestore()
 
-  const timerState$ = getOrPut(room$, () =>
+  const timerState$ = cache(room$, () =>
     room$.pipe(
       map((_) => _.id),
       distinctUntilChanged(),
@@ -32,4 +32,4 @@ export function App({ room$ }: { room$: Observable<Room> }) {
   )
 }
 
-const getOrPut = mapGetOrPut()
+const cache = createCache()

@@ -2,14 +2,14 @@ import { useEffect } from "react"
 import { map, Observable } from "rxjs"
 import { mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
+import { createCache } from "./util/createCache"
 import { formatDuration } from "./util/formatDuration"
 import { interval } from "./util/interval"
-import { mapGetOrPut } from "./util/mapGetOrPut"
 
 export function useTitleAsTimeViewer(
   timerState$: Observable<TimerState>
 ): void {
-  const duration$ = getOrPut(timerState$, () =>
+  const duration$ = cache(timerState$, () =>
     timerState$.pipe(
       mapToCurrentDuration(interval("worker", 500)),
       map((_) => _.duration)
@@ -29,4 +29,4 @@ export function useTitleAsTimeViewer(
   }, [duration$])
 }
 
-const getOrPut = mapGetOrPut()
+const cache = createCache()

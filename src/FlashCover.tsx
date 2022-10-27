@@ -5,8 +5,8 @@ import { mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { useAudio } from "./useAudio"
 import { useObservable } from "./useObservable"
+import { createCache } from "./util/createCache"
 import { interval } from "./util/interval"
-import { mapGetOrPut } from "./util/mapGetOrPut"
 import { takeFirstZero } from "./util/takeFirstZero"
 
 export function FlashCover({
@@ -38,7 +38,7 @@ function FlashCoverInner({
 }) {
   useAlertSound(timerState$)
 
-  const duration$ = getOrPut2(timerState$, () =>
+  const duration$ = cache1(timerState$, () =>
     timerState$.pipe(
       mapToCurrentDuration(interval("ui")),
       map((_) => _.duration)
@@ -65,11 +65,11 @@ function FlashCoverInner({
   )
 }
 
-const getOrPut2 = mapGetOrPut()
+const cache1 = createCache()
 
 function useAlertSound(timerState$: Observable<TimerState>): void {
   const audio = useAudio()
-  const duration$ = getOrPut(timerState$, () =>
+  const duration$ = cache2(timerState$, () =>
     timerState$.pipe(
       mapToCurrentDuration(interval("worker", 100)),
       map((_) => _.duration)
@@ -91,4 +91,4 @@ function useAlertSound(timerState$: Observable<TimerState>): void {
   }, [audio, duration$])
 }
 
-const getOrPut = mapGetOrPut()
+const cache2 = createCache()

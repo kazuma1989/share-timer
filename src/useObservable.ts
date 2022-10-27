@@ -1,17 +1,17 @@
 import { useSyncExternalStore } from "react"
 import { firstValueFrom, from, ObservableInput } from "rxjs"
-import { mapGetOrPut } from "./util/mapGetOrPut"
+import { createCache } from "./util/createCache"
 
 export function useObservable<T>(
   source: ObservableInput<T>,
   initialValue?: T
 ): T {
-  const store = getOrPut(source, () => createStore(source, initialValue))
+  const store = cache(source, () => createStore(source, initialValue))
 
   return useSyncExternalStore(store.subscribe, store.getSnapshot)
 }
 
-const getOrPut = mapGetOrPut()
+const cache = createCache()
 
 interface Store<T> {
   subscribe(onStoreChange: () => void): () => void

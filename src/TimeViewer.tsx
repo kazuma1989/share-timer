@@ -2,9 +2,9 @@ import { distinctUntilChanged, map, Observable } from "rxjs"
 import { mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { useObservable } from "./useObservable"
+import { createCache } from "./util/createCache"
 import { formatDuration } from "./util/formatDuration"
 import { floor, interval } from "./util/interval"
-import { mapGetOrPut } from "./util/mapGetOrPut"
 import { shallowEqual } from "./util/shallowEqual"
 
 export function TimeViewer({
@@ -14,7 +14,7 @@ export function TimeViewer({
   timerState$: Observable<TimerState>
   className?: string
 }) {
-  const duration$ = getOrPut(timerState$, () =>
+  const duration$ = cache(timerState$, () =>
     timerState$.pipe(
       mapToCurrentDuration(interval("ui")),
       map((_) => ({
@@ -31,4 +31,4 @@ export function TimeViewer({
   return <span className={className}>{formatDuration(duration)}</span>
 }
 
-const getOrPut = mapGetOrPut()
+const cache = createCache()
