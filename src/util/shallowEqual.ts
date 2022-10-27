@@ -1,7 +1,7 @@
 /**
  * https://github.com/reduxjs/react-redux/blob/v8.0.4/src/utils/shallowEqual.ts
  */
-export function shallowEqual(objA: any, objB: any): boolean {
+export function shallowEqual<T>(objA: T, objB: T): boolean {
   if (is(objA, objB)) return true
 
   if (
@@ -13,8 +13,8 @@ export function shallowEqual(objA: any, objB: any): boolean {
     return false
   }
 
-  const keysA = Object.keys(objA)
-  const keysB = Object.keys(objB)
+  const keysA = Object.keys(objA) as (keyof T)[]
+  const keysB = Object.keys(objB) as (keyof T)[]
 
   if (keysA.length !== keysB.length) return false
 
