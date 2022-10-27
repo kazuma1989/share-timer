@@ -5,12 +5,11 @@ import { toTimerState } from "./observeTimerState"
 import { Timer } from "./Timer"
 import { TimerState } from "./timerReducer"
 import { useFirestore } from "./useFirestore"
+import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { mapGetOrPut } from "./util/mapGetOrPut"
 import { Room } from "./zod/roomZod"
 
 export function App({ room$ }: { room$: Observable<Room> }) {
-  // useTitleAsTimeViewer()
-
   const db = useFirestore()
 
   const timerState$ = getOrPut(room$, () => {
@@ -21,6 +20,8 @@ export function App({ room$ }: { room$: Observable<Room> }) {
       toTimerState(db)
     )
   })
+
+  useTitleAsTimeViewer(timerState$)
 
   return (
     <div className="container mx-auto h-screen">

@@ -1,9 +1,20 @@
 import { useEffect } from "react"
-import { useCurrentDurationWorker } from "./useCurrentDuration"
+import { map, Observable } from "rxjs"
+import { toCurrentDuration } from "./observeCurrentDuration"
+import { TimerState } from "./timerReducer"
 import { formatDuration } from "./util/formatDuration"
+import { interval } from "./util/interval"
+import { mapGetOrPut } from "./util/mapGetOrPut"
 
-export function useTitleAsTimeViewer(): void {
-  const duration$ = useCurrentDurationWorker()
+export function useTitleAsTimeViewer(
+  timerState$: Observable<TimerState>
+): void {
+  const duration$ = getOrPut(timerState$, () =>
+    timerState$.pipe(
+      toCurrentDuration(interval("worker", 500)),
+      map((_) => _.duration)
+    )
+  )
 
   useEffect(() => {
     const previousTitle = document.title
@@ -17,3 +28,7 @@ export function useTitleAsTimeViewer(): void {
     }
   }, [duration$])
 }
+
+const getOrPut = mapGetOrPut(
+  new WeakMap<Observable<TimerState>, Observable<number>>()
+)
