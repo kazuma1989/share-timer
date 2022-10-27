@@ -24,7 +24,7 @@ import { snapshotOf } from "./util/snapshotOf"
 import { actionZod } from "./zod/actionZod"
 import { Room } from "./zod/roomZod"
 
-export function toTimerState(
+export function mapToTimerState(
   db: Firestore
 ): OperatorFunction<Room["id"], TimerState> {
   return pipe(

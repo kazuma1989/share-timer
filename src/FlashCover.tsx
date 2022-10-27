@@ -1,7 +1,7 @@
 import clsx from "clsx"
 import { useEffect, useState } from "react"
 import { map, Observable } from "rxjs"
-import { toCurrentDuration } from "./observeCurrentDuration"
+import { mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { useAudio } from "./useAudio"
 import { useObservable } from "./useObservable"
@@ -40,7 +40,7 @@ function FlashCoverInner({
 
   const duration$ = getOrPut(timerState$, () =>
     timerState$.pipe(
-      toCurrentDuration(interval("ui")),
+      mapToCurrentDuration(interval("ui")),
       map((_) => _.duration)
     )
   )
@@ -69,7 +69,7 @@ function useAlertSound(timerState$: Observable<TimerState>): void {
   const audio = useAudio()
   const duration$ = getOrPut(timerState$, () =>
     timerState$.pipe(
-      toCurrentDuration(interval("worker", 100)),
+      mapToCurrentDuration(interval("worker", 100)),
       map((_) => _.duration)
     )
   )

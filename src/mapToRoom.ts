@@ -11,7 +11,7 @@ export function isRoom(value: Room | InvalidDoc | InvalidId): value is Room {
 export type InvalidDoc = [reason: "invalid-doc", payload: Room["id"]]
 export type InvalidId = [reason: "invalid-id", payload: string]
 
-export function toRoom(
+export function mapToRoom(
   db: Firestore
 ): OperatorFunction<string, Room | InvalidDoc | InvalidId> {
   return switchMap((id) => {

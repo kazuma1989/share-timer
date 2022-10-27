@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { map, Observable } from "rxjs"
-import { toCurrentDuration } from "./observeCurrentDuration"
+import { mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { formatDuration } from "./util/formatDuration"
 import { interval } from "./util/interval"
@@ -11,7 +11,7 @@ export function useTitleAsTimeViewer(
 ): void {
   const duration$ = getOrPut(timerState$, () =>
     timerState$.pipe(
-      toCurrentDuration(interval("worker", 500)),
+      mapToCurrentDuration(interval("worker", 500)),
       map((_) => _.duration)
     )
   )

@@ -6,10 +6,10 @@ import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
 import { initializeRoom } from "./initializeRoom"
+import { isRoom, mapToRoom } from "./mapToRoom"
 import { calibrateClock } from "./now"
 import { observeHash } from "./observeHash"
 import { observeMediaPermission } from "./observeMediaPermission"
-import { isRoom, toRoom } from "./observeRoom"
 import smallAlert from "./sound/small-alert.mp3"
 import { AudioProvider, MediaPermissionProvider } from "./useAudio"
 import { FirestoreProvider } from "./useFirestore"
@@ -26,7 +26,7 @@ const audio = new Audio(smallAlert)
 const permission$ = observeMediaPermission(audio, root)
 
 const roomId$ = observeHash().pipe(map((hash) => hash.slice("#".length)))
-const [room$, invalid$] = partition(roomId$.pipe(toRoom(firestore)), isRoom)
+const [room$, invalid$] = partition(roomId$.pipe(mapToRoom(firestore)), isRoom)
 
 initializeRoom(firestore, room$, invalid$)
 

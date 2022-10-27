@@ -1,7 +1,7 @@
 import { distinctUntilChanged, map, Observable } from "rxjs"
 import { ErrorBoundary } from "./ErrorBoundary"
 import { FlashCover } from "./FlashCover"
-import { toTimerState } from "./observeTimerState"
+import { mapToTimerState } from "./mapToTimerState"
 import { Timer } from "./Timer"
 import { TimerState } from "./timerReducer"
 import { useFirestore } from "./useFirestore"
@@ -16,7 +16,7 @@ export function App({ room$ }: { room$: Observable<Room> }) {
     room$.pipe(
       map((_) => _.id),
       distinctUntilChanged(),
-      toTimerState(db)
+      mapToTimerState(db)
     )
   )
 

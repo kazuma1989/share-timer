@@ -16,7 +16,7 @@ interface CurrentDuration {
   duration: number
 }
 
-export function toCurrentDuration(
+export function mapToCurrentDuration(
   interval$: Observable<void>
 ): OperatorFunction<TimerState, CurrentDuration> {
   return pipe(

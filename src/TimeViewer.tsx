@@ -1,5 +1,5 @@
 import { distinctUntilChanged, map, Observable } from "rxjs"
-import { toCurrentDuration } from "./observeCurrentDuration"
+import { mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { useObservable } from "./useObservable"
 import { formatDuration } from "./util/formatDuration"
@@ -16,7 +16,7 @@ export function TimeViewer({
 }) {
   const duration$ = getOrPut(timerState$, () =>
     timerState$.pipe(
-      toCurrentDuration(interval("ui")),
+      mapToCurrentDuration(interval("ui")),
       map((_) => ({
         mode: _.mode,
         duration: floor(_.duration),
