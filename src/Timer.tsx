@@ -24,7 +24,6 @@ export function Timer({
   timerState$: Observable<TimerState>
   className?: string
 }) {
-  console.count("Timer")
   const state = useObservable(timerState$)
 
   const [pending, dispatch] = useDispatch(room$)

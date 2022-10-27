@@ -14,8 +14,6 @@ export function TimeViewer({
   timerState$: Observable<TimerState>
   className?: string
 }) {
-  console.count("TimeViewer")
-
   const duration$ = getOrPut(timerState$, () =>
     timerState$.pipe(
       toCurrentDuration(interval("ui")),

@@ -12,14 +12,13 @@ import { Room } from "./zod/roomZod"
 export function App({ room$ }: { room$: Observable<Room> }) {
   const db = useFirestore()
 
-  const timerState$ = getOrPut(room$, () => {
-    console.count("timerState$")
-    return room$.pipe(
+  const timerState$ = getOrPut(room$, () =>
+    room$.pipe(
       map((_) => _.id),
       distinctUntilChanged(),
       toTimerState(db)
     )
-  })
+  )
 
   useTitleAsTimeViewer(timerState$)
 
