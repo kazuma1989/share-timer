@@ -37,10 +37,6 @@ export function interval(
   )
 }
 
-export function secondsPrecisionEqual(left: number, right: number): boolean {
-  return floor(left) === floor(right)
-}
-
 export function floor(v: number): number {
   return v - (v % 1000) + (v >= 0 ? 0 : -1000)
 }

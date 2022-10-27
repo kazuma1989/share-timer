@@ -9,7 +9,6 @@ import {
 import {
   distinctUntilChanged,
   map,
-  Observable,
   OperatorFunction,
   pipe,
   shareReplay,
@@ -24,53 +23,6 @@ import { safeParseDocsWith } from "./util/safeParseDocsWith"
 import { snapshotOf } from "./util/snapshotOf"
 import { actionZod } from "./zod/actionZod"
 import { Room } from "./zod/roomZod"
-
-export function observeTimerState(
-  db: Firestore,
-  room$: Observable<Room>
-): Observable<TimerState> {
-  return room$.pipe(
-    distinctUntilChanged((_1, _2) => _1.id === _2.id),
-    switchMap(({ id: roomId }) =>
-      getDocs(
-        query(
-          collection(db, "rooms", roomId, "actions"),
-          where("type", "==", "start"),
-          orderBy("createdAt", "asc"),
-          limitToLast(1)
-        )
-      ).then(({ docs: [doc] }) =>
-        query(
-          collection(db, "rooms", roomId, "actions"),
-          orderBy("createdAt", "asc"),
-          ...(hasNoEstimateTimestamp(doc?.metadata) ? [startAt(doc)] : [])
-        )
-      )
-    ),
-
-    distinctUntilChanged(queryEqual),
-    switchMap((selectActions) => {
-      const parseDocs = safeParseDocsWith(actionZod)
-
-      console.debug("actions listener attached")
-
-      return snapshotOf(selectActions).pipe(
-        map((snapshot) => {
-          console.debug("listen %d docChanges", snapshot.docChanges().length)
-
-          const actions = parseDocs(snapshot.docs)
-
-          return actions.reduce(timerReducer, {
-            mode: "editing",
-            initialDuration: 0,
-          })
-        })
-      )
-    }),
-
-    shareReplay(1)
-  )
-}
 
 export function toTimerState(
   db: Firestore
