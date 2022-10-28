@@ -2,12 +2,10 @@ import clsx from "clsx"
 import { useEffect } from "react"
 import {
   distinctUntilChanged,
-  filter,
   Observable,
   OperatorFunction,
   pipe,
   scan,
-  take,
 } from "rxjs"
 import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
@@ -23,15 +21,20 @@ export function FlashCover({
   timerState$: Observable<TimerState>
   className?: string
 }) {
-  const { mode } = useObservable(timerState$)
+  const flashing$ = cache1(timerState$, () =>
+    timerState$.pipe(mapToCurrentDuration(interval("ui")), mapToRunningZero())
+  )
 
-  const state = mode === "editing" ? "asleep" : "awake"
+  const flashing = useObservable(flashing$, false)
+  console.log({ flashing })
 
   return (
-    <FlashCoverInner
-      key={state}
-      timerState$={timerState$}
-      className={clsx(state === "asleep" && "hidden", className)}
+    <div
+      className={clsx(
+        "pointer-events-none absolute inset-0",
+        flashing && "animate-[flash_1s_ease-out]",
+        className
+      )}
     />
   )
 }
@@ -76,7 +79,8 @@ function useAlertSound(timerState$: Observable<TimerState>): void {
   )
 
   useEffect(() => {
-    const sub = flashing$.pipe(filter(Boolean), take(1)).subscribe(() => {
+    const sub = flashing$.subscribe((_) => {
+      if (!_) return
       console.log("audio.play()")
 
       audio.currentTime = 0
@@ -105,7 +109,7 @@ function mapToRunningZero(): OperatorFunction<CurrentDuration, boolean> {
         case "paused":
         case "running": {
           // 一度 true に変わったら editing にならない限りずっと true.
-          return acc || duration < 50
+          return acc || (-150 <= duration && duration < 50)
         }
       }
     }, false),
