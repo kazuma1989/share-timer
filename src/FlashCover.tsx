@@ -3,10 +3,10 @@ import { useEffect } from "react"
 import {
   distinctUntilChanged,
   filter,
-  map,
   Observable,
   OperatorFunction,
   pipe,
+  scan,
   take,
 } from "rxjs"
 import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
@@ -96,7 +96,18 @@ const cache2 = createCache()
 
 function mapToRunningZero(): OperatorFunction<CurrentDuration, boolean> {
   return pipe(
-    map((_) => _.mode !== "editing" && _.duration <= 50),
+    scan((acc, { mode, duration }) => {
+      switch (mode) {
+        case "editing": {
+          return false
+        }
+
+        case "paused":
+        case "running": {
+          return acc || duration === 0
+        }
+      }
+    }, false),
     distinctUntilChanged()
   )
 }
@@ -133,19 +144,19 @@ if (import.meta.vitest) {
         },
         5: {
           mode: "running",
+          duration: 0,
+        },
+        6: {
+          mode: "running",
           duration: -1_000,
         },
       })
 
-      const actual$ = base$.pipe(
-        filter((_) => _.mode !== "editing" && _.duration === 0)
-      )
+      const actual$ = base$.pipe(mapToRunningZero())
 
-      expectObservable(actual$).toBe("------4--|", {
-        4: {
-          mode: "running",
-          duration: 0,
-        },
+      expectObservable(actual$).toBe("0-----4--|", {
+        0: false,
+        4: true,
       })
     })
   })
