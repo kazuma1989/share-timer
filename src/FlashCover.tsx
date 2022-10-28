@@ -21,11 +21,32 @@ export function FlashCover({
   timerState$: Observable<TimerState>
   className?: string
 }) {
-  useAlertSound(timerState$)
+  const [flashing$, sounding$] = cache(timerState$, () => [
+    timerState$.pipe(mapToCurrentDuration(interval("ui")), mapToRunningZero()),
+    timerState$.pipe(
+      mapToCurrentDuration(interval("worker", 100)),
+      mapToRunningZero()
+    ),
+  ])
 
-  const flashing$ = cache1(timerState$, () =>
-    timerState$.pipe(mapToCurrentDuration(interval("ui")), mapToRunningZero())
-  )
+  const audio = useAudio()
+  useEffect(() => {
+    const sub = sounding$.subscribe((_) => {
+      if (!_) return
+      console.log("audio.play()")
+
+      audio.pause()
+      audio.currentTime = 0
+      audio.play()
+    })
+
+    return () => {
+      sub.unsubscribe()
+
+      audio.pause()
+      audio.currentTime = 0
+    }
+  }, [audio, sounding$])
 
   const flashing = useObservable(flashing$, false)
   console.log({ flashing })
@@ -41,38 +62,7 @@ export function FlashCover({
   )
 }
 
-const cache1 = createCache()
-
-function useAlertSound(timerState$: Observable<TimerState>): void {
-  const audio = useAudio()
-
-  const flashing$ = cache2(timerState$, () =>
-    timerState$.pipe(
-      mapToCurrentDuration(interval("worker", 100)),
-      mapToRunningZero()
-    )
-  )
-
-  useEffect(() => {
-    const sub = flashing$.subscribe((_) => {
-      if (!_) return
-      console.log("audio.play()")
-
-      audio.pause()
-      audio.currentTime = 0
-      audio.play()
-    })
-
-    return () => {
-      sub.unsubscribe()
-
-      audio.pause()
-      audio.currentTime = 0
-    }
-  }, [audio, flashing$])
-}
-
-const cache2 = createCache()
+const cache = createCache()
 
 function mapToRunningZero(): OperatorFunction<CurrentDuration, boolean> {
   return pipe(
