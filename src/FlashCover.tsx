@@ -102,24 +102,51 @@ function mapToRunningZero(): OperatorFunction<CurrentDuration, boolean> {
 }
 
 if (import.meta.vitest) {
-  const { test, expect } = import.meta.vitest
+  const { test, expect, beforeEach } = import.meta.vitest
   const { TestScheduler } = await import("rxjs/testing")
 
-  const addDrama = (x: number | string) => x + "!"
-
-  test("", () => {
-    const s = new TestScheduler((actual, expected) => {
+  let scheduler: InstanceType<typeof TestScheduler>
+  beforeEach(() => {
+    scheduler = new TestScheduler((actual, expected) => {
       expect(actual).toStrictEqual(expected)
     })
+  })
 
-    s.run(({ expectObservable, cold }) => {
-      const a = cold("  --1--2--3--|") // もとのObservable
-      const expected = "--x--y--z--|" // 期待するObservable
+  test("basic", () => {
+    scheduler.run(({ expectObservable, hot }) => {
+      const base$ = hot<CurrentDuration>("1-2-3-4-5|", {
+        1: {
+          mode: "editing",
+          duration: 2_000,
+        },
+        2: {
+          mode: "running",
+          duration: 2_000,
+        },
+        3: {
+          mode: "running",
+          duration: 1_000,
+        },
+        4: {
+          mode: "running",
+          duration: 0,
+        },
+        5: {
+          mode: "running",
+          duration: -1_000,
+        },
+      })
 
-      const r = a.pipe(map(addDrama))
+      const actual$ = base$.pipe(
+        filter((_) => _.mode !== "editing" && _.duration === 0)
+      )
 
-      // '1!'がx、'2!'がy、'3!'がzのタイミングで流れてくるかをチェック
-      expectObservable(r).toBe(expected, { x: "1!", y: "2!", z: "3!" })
+      expectObservable(actual$).toBe("------4--|", {
+        4: {
+          mode: "running",
+          duration: 0,
+        },
+      })
     })
   })
 }
