@@ -1,13 +1,20 @@
 import clsx from "clsx"
-import { useEffect, useState } from "react"
-import { map, Observable } from "rxjs"
-import { mapToCurrentDuration } from "./mapToCurrentDuration"
+import { useEffect } from "react"
+import {
+  distinctUntilChanged,
+  filter,
+  map,
+  Observable,
+  OperatorFunction,
+  pipe,
+  take,
+} from "rxjs"
+import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { useAudio } from "./useAudio"
 import { useObservable } from "./useObservable"
 import { createCache } from "./util/createCache"
 import { interval } from "./util/interval"
-import { takeFirstZero } from "./util/takeFirstZero"
 
 export function FlashCover({
   timerState$,
@@ -38,21 +45,12 @@ function FlashCoverInner({
 }) {
   useAlertSound(timerState$)
 
-  const duration$ = cache1(timerState$, () =>
-    timerState$.pipe(
-      mapToCurrentDuration(interval("ui")),
-      map((_) => _.duration)
-    )
-  )
-
-  const [flashing$] = useState(() =>
-    duration$.pipe(
-      takeFirstZero(),
-      map(() => true)
-    )
+  const flashing$ = cache1(timerState$, () =>
+    timerState$.pipe(mapToCurrentDuration(interval("ui")), mapToRunningZero())
   )
 
   const flashing = useObservable(flashing$, false)
+  console.log({ flashing })
 
   return (
     <div
@@ -69,15 +67,18 @@ const cache1 = createCache()
 
 function useAlertSound(timerState$: Observable<TimerState>): void {
   const audio = useAudio()
-  const duration$ = cache2(timerState$, () =>
+
+  const flashing$ = cache2(timerState$, () =>
     timerState$.pipe(
       mapToCurrentDuration(interval("worker", 100)),
-      map((_) => _.duration)
+      mapToRunningZero()
     )
   )
 
   useEffect(() => {
-    const sub = duration$.pipe(takeFirstZero()).subscribe(() => {
+    const sub = flashing$.pipe(filter(Boolean), take(1)).subscribe(() => {
+      console.log("audio.play()")
+
       audio.currentTime = 0
       audio.play()
     })
@@ -88,7 +89,14 @@ function useAlertSound(timerState$: Observable<TimerState>): void {
       audio.pause()
       audio.currentTime = 0
     }
-  }, [audio, duration$])
+  }, [audio, flashing$])
 }
 
 const cache2 = createCache()
+
+function mapToRunningZero(): OperatorFunction<CurrentDuration, boolean> {
+  return pipe(
+    map((_) => _.mode !== "editing" && _.duration <= 50),
+    distinctUntilChanged()
+  )
+}

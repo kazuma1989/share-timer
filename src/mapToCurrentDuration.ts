@@ -11,7 +11,7 @@ import {
 import { now } from "./now"
 import { TimerState } from "./timerReducer"
 
-interface CurrentDuration {
+export interface CurrentDuration {
   mode: TimerState["mode"]
   duration: number
 }
