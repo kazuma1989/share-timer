@@ -21,31 +21,6 @@ export function FlashCover({
   timerState$: Observable<TimerState>
   className?: string
 }) {
-  const flashing$ = cache1(timerState$, () =>
-    timerState$.pipe(mapToCurrentDuration(interval("ui")), mapToRunningZero())
-  )
-
-  const flashing = useObservable(flashing$, false)
-  console.log({ flashing })
-
-  return (
-    <div
-      className={clsx(
-        "pointer-events-none absolute inset-0",
-        flashing && "animate-[flash_1s_ease-out]",
-        className
-      )}
-    />
-  )
-}
-
-function FlashCoverInner({
-  timerState$,
-  className,
-}: {
-  timerState$: Observable<TimerState>
-  className?: string
-}) {
   useAlertSound(timerState$)
 
   const flashing$ = cache1(timerState$, () =>
@@ -83,6 +58,7 @@ function useAlertSound(timerState$: Observable<TimerState>): void {
       if (!_) return
       console.log("audio.play()")
 
+      audio.pause()
       audio.currentTime = 0
       audio.play()
     })
