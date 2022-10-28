@@ -104,7 +104,8 @@ function mapToRunningZero(): OperatorFunction<CurrentDuration, boolean> {
 
         case "paused":
         case "running": {
-          return acc || duration === 0
+          // 一度 true に変わったら editing にならない限りずっと true.
+          return acc || duration < 50
         }
       }
     }, false),
@@ -125,7 +126,7 @@ if (import.meta.vitest) {
 
   test("basic", () => {
     scheduler.run(({ expectObservable, hot }) => {
-      const base$ = hot<CurrentDuration>("1-2-3-4-5|", {
+      const base$ = hot<CurrentDuration>("1-2-3-4-5-6|", {
         1: {
           mode: "editing",
           duration: 2_000,
@@ -154,9 +155,79 @@ if (import.meta.vitest) {
 
       const actual$ = base$.pipe(mapToRunningZero())
 
-      expectObservable(actual$).toBe("0-----4--|", {
-        0: false,
+      expectObservable(actual$).toBe("1-----4----|", {
+        1: false,
         4: true,
+      })
+    })
+  })
+
+  test("start from zero", () => {
+    scheduler.run(({ expectObservable, hot }) => {
+      const base$ = hot<CurrentDuration>("1-2-3-4|", {
+        1: {
+          mode: "editing",
+          duration: 0,
+        },
+        2: {
+          mode: "running",
+          duration: 0,
+        },
+        3: {
+          mode: "running",
+          duration: 0,
+        },
+        4: {
+          mode: "running",
+          duration: -1_000,
+        },
+      })
+
+      const actual$ = base$.pipe(mapToRunningZero())
+
+      expectObservable(actual$).toBe("1-2----|", {
+        1: false,
+        2: true,
+      })
+    })
+  })
+
+  test("reset on editing", () => {
+    scheduler.run(({ expectObservable, hot }) => {
+      const base$ = hot<CurrentDuration>("1-2-3-4-5-6|", {
+        1: {
+          mode: "editing",
+          duration: 1_000,
+        },
+        2: {
+          mode: "running",
+          duration: 1_000,
+        },
+        3: {
+          mode: "running",
+          duration: 0,
+        },
+        4: {
+          mode: "editing",
+          duration: 1_000,
+        },
+        5: {
+          mode: "running",
+          duration: 1_000,
+        },
+        6: {
+          mode: "running",
+          duration: 0,
+        },
+      })
+
+      const actual$ = base$.pipe(mapToRunningZero())
+
+      expectObservable(actual$).toBe("1---3-4---6|", {
+        1: false,
+        3: true,
+        4: false,
+        6: true,
       })
     })
   })
