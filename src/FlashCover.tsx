@@ -100,3 +100,26 @@ function mapToRunningZero(): OperatorFunction<CurrentDuration, boolean> {
     distinctUntilChanged()
   )
 }
+
+if (import.meta.vitest) {
+  const { test, expect } = import.meta.vitest
+  const { TestScheduler } = await import("rxjs/testing")
+
+  const addDrama = (x: number | string) => x + "!"
+
+  test("", () => {
+    const s = new TestScheduler((actual, expected) => {
+      expect(actual).toStrictEqual(expected)
+    })
+
+    s.run(({ expectObservable, cold }) => {
+      const a = cold("  --1--2--3--|") // もとのObservable
+      const expected = "--x--y--z--|" // 期待するObservable
+
+      const r = a.pipe(map(addDrama))
+
+      // '1!'がx、'2!'がy、'3!'がzのタイミングで流れてくるかをチェック
+      expectObservable(r).toBe(expected, { x: "1!", y: "2!", z: "3!" })
+    })
+  })
+}
