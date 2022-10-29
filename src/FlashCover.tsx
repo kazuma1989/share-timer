@@ -2,6 +2,7 @@ import clsx from "clsx"
 import { useEffect } from "react"
 import {
   distinctUntilChanged,
+  filter,
   Observable,
   OperatorFunction,
   pipe,
@@ -22,18 +23,18 @@ export function FlashCover({
   className?: string
 }) {
   const [flashing$, sounding$] = cache(timerState$, () => [
-    timerState$.pipe(mapToCurrentDuration(interval("ui")), mapToRunningZero()),
+    timerState$.pipe(mapToCurrentDuration(interval("ui")), notifyFirstZero()),
     timerState$.pipe(
       mapToCurrentDuration(interval("worker", 100)),
-      mapToRunningZero()
+      notifyFirstZero(),
+      filter(Boolean)
     ),
   ])
 
   const audio = useAudio()
   useEffect(() => {
-    const sub = sounding$.subscribe((_) => {
-      if (!_) return
-      console.log("audio.play()")
+    const sub = sounding$.subscribe(() => {
+      console.debug("audio.play()")
 
       audio.pause()
       audio.currentTime = 0
@@ -49,7 +50,6 @@ export function FlashCover({
   }, [audio, sounding$])
 
   const flashing = useObservable(flashing$, false)
-  console.log({ flashing })
 
   return (
     <div
@@ -64,7 +64,7 @@ export function FlashCover({
 
 const cache = createCache()
 
-function mapToRunningZero(): OperatorFunction<CurrentDuration, boolean> {
+function notifyFirstZero(): OperatorFunction<CurrentDuration, boolean> {
   return pipe(
     scan((acc, { mode, duration }) => {
       switch (mode) {
@@ -123,7 +123,7 @@ if (import.meta.vitest) {
         },
       })
 
-      const actual$ = base$.pipe(mapToRunningZero())
+      const actual$ = base$.pipe(notifyFirstZero())
 
       expectObservable(actual$).toBe("1-----4----|", {
         1: false,
@@ -153,7 +153,7 @@ if (import.meta.vitest) {
         },
       })
 
-      const actual$ = base$.pipe(mapToRunningZero())
+      const actual$ = base$.pipe(notifyFirstZero())
 
       expectObservable(actual$).toBe("1-2----|", {
         1: false,
@@ -191,7 +191,7 @@ if (import.meta.vitest) {
         },
       })
 
-      const actual$ = base$.pipe(mapToRunningZero())
+      const actual$ = base$.pipe(notifyFirstZero())
 
       expectObservable(actual$).toBe("1---3-4---6|", {
         1: false,
