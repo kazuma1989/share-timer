@@ -3,8 +3,9 @@ import { distinctUntilChanged, map, Observable } from "rxjs"
 import { mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { createCache } from "./util/createCache"
+import { floor } from "./util/floor"
 import { formatDuration } from "./util/formatDuration"
-import { floor, interval } from "./util/interval"
+import { interval } from "./util/interval"
 
 export function useTitleAsTimeViewer(
   timerState$: Observable<TimerState>
