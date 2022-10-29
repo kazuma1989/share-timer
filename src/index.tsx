@@ -1,26 +1,18 @@
 import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
+import { map, partition } from "rxjs"
 import { App } from "./App"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
 import { initializeRoom } from "./initializeRoom"
+import { isRoom, mapToRoom } from "./mapToRoom"
 import { calibrateClock } from "./now"
-import { observeCurrentDuration } from "./observeCurrentDuration"
 import { observeHash } from "./observeHash"
-import { observeMedia } from "./observeMedia"
-import { observeRoom } from "./observeRoom"
-import { observeTimerState } from "./observeTimerState"
+import { observeMediaPermission } from "./observeMediaPermission"
 import smallAlert from "./sound/small-alert.mp3"
-import {
-  CurrentDurationUIProvider,
-  CurrentDurationWorkerProvider,
-} from "./useCurrentDuration"
+import { AudioProvider, MediaPermissionProvider } from "./useAudio"
 import { FirestoreProvider } from "./useFirestore"
-import { MediaProvider } from "./useMedia"
-import { RoomProvider } from "./useRoom"
-import { TimerStateProvider } from "./useTimerState"
-import { interval } from "./util/interval"
 
 const firestore = await initializeFirestore()
 
@@ -28,32 +20,26 @@ calibrateClock(firestore).catch((reason) => {
   console.warn("calibration failed", reason)
 })
 
-const media$ = observeMedia(new Audio(smallAlert))
+const root = document.getElementById("root")!
 
-const [room$, invalid$] = observeRoom(firestore, observeHash())
-const timerState$ = observeTimerState(firestore, room$)
+const audio = new Audio(smallAlert)
+const permission$ = observeMediaPermission(audio, root)
 
-const ui$ = observeCurrentDuration(timerState$, interval("ui"))
-const worker$ = observeCurrentDuration(timerState$, interval("worker", 100))
+const roomId$ = observeHash().pipe(map((hash) => hash.slice("#".length)))
+const [room$, invalid$] = partition(roomId$.pipe(mapToRoom(firestore)), isRoom)
 
 initializeRoom(firestore, room$, invalid$)
 
-createRoot(document.getElementById("root")!).render(
+createRoot(root).render(
   <StrictMode>
     <FirestoreProvider value={firestore}>
-      <MediaProvider value={media$}>
-        <RoomProvider value={room$}>
-          <TimerStateProvider value={timerState$}>
-            <CurrentDurationUIProvider value={ui$}>
-              <CurrentDurationWorkerProvider value={worker$}>
-                <Suspense fallback={<FullViewportProgress />}>
-                  <App />
-                </Suspense>
-              </CurrentDurationWorkerProvider>
-            </CurrentDurationUIProvider>
-          </TimerStateProvider>
-        </RoomProvider>
-      </MediaProvider>
+      <AudioProvider value={audio}>
+        <MediaPermissionProvider value={permission$}>
+          <Suspense fallback={<FullViewportProgress />}>
+            <App room$={room$} />
+          </Suspense>
+        </MediaPermissionProvider>
+      </AudioProvider>
     </FirestoreProvider>
   </StrictMode>
 )

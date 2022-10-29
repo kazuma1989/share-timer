@@ -1,13 +1,11 @@
 import { CircleButton } from "./CircleButton"
-import { useMedia } from "./useMedia"
+import { useAudio, useMediaPermission } from "./useAudio"
 import { useObservable } from "./useObservable"
 import { setTimeout } from "./util/setTimeout"
 
-export function CheckAudioButton() {
-  const [audio, permission] = useObservable(useMedia(), [
-    new Audio(),
-    "denied" as const,
-  ])
+export function DebugCheckAudioButton() {
+  const audio = useAudio()
+  const permission = useObservable(useMediaPermission(), "denied")
 
   return permission === "canplay" ? (
     <CircleButton

@@ -2,6 +2,10 @@ import { Observable, share } from "rxjs"
 import IntervalWorker from "./interval.worker?worker&inline"
 import { subscribeAnimationFrame } from "./subscribeAnimationFrame"
 
+export function interval(type: "ui"): Observable<void>
+
+export function interval(type: "worker", timeout: number): Observable<void>
+
 export function interval(
   type: "ui" | "worker",
   timeout?: number
@@ -31,12 +35,4 @@ export function interval(
       resetOnRefCountZero: true,
     })
   )
-}
-
-export function secondsPrecisionEqual(left: number, right: number): boolean {
-  return floor(left) === floor(right)
-}
-
-function floor(v: number): number {
-  return v - (v % 1000) + (v >= 0 ? 0 : -1000)
 }

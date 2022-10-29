@@ -4,8 +4,6 @@ export type TimerState =
   | {
       mode: "editing"
       initialDuration: number
-      restDuration?: undefined
-      startedAt?: undefined
     }
   | {
       mode: "running"
@@ -17,7 +15,6 @@ export type TimerState =
       mode: "paused"
       initialDuration: number
       restDuration: number
-      startedAt?: undefined
     }
 
 export function timerReducer(state: TimerState, action: Action): TimerState {

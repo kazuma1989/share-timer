@@ -1,22 +1,17 @@
 import { useSyncExternalStore } from "react"
 import { firstValueFrom, from, ObservableInput } from "rxjs"
-import { mapGetOrPut } from "./util/mapGetOrPut"
+import { createCache } from "./util/createCache"
 
 export function useObservable<T>(
   source: ObservableInput<T>,
   initialValue?: T
 ): T {
-  // Map の値を作るのが createStore(source) しかないため、戻り値は Store<T> で OK
-  const store = getOrPut(source, () =>
-    createStore(source, initialValue)
-  ) as Store<T>
+  const store = cache(source, () => createStore(source, initialValue))
 
   return useSyncExternalStore(store.subscribe, store.getSnapshot)
 }
 
-const getOrPut = mapGetOrPut(
-  new WeakMap<ObservableInput<unknown>, Store<unknown>>()
-)
+const cache = createCache()
 
 interface Store<T> {
   subscribe(onStoreChange: () => void): () => void

@@ -1,9 +1,22 @@
 import { useEffect } from "react"
-import { useCurrentDurationWorker } from "./useCurrentDuration"
+import { distinctUntilChanged, map, Observable } from "rxjs"
+import { mapToCurrentDuration } from "./mapToCurrentDuration"
+import { TimerState } from "./timerReducer"
+import { createCache } from "./util/createCache"
+import { floor } from "./util/floor"
 import { formatDuration } from "./util/formatDuration"
+import { interval } from "./util/interval"
 
-export function useTitleAsTimeViewer(): void {
-  const duration$ = useCurrentDurationWorker()
+export function useTitleAsTimeViewer(
+  timerState$: Observable<TimerState>
+): void {
+  const duration$ = cache(timerState$, () =>
+    timerState$.pipe(
+      mapToCurrentDuration(interval("worker", 500)),
+      map((_) => floor(_.duration)),
+      distinctUntilChanged()
+    )
+  )
 
   useEffect(() => {
     const previousTitle = document.title
@@ -17,3 +30,5 @@ export function useTitleAsTimeViewer(): void {
     }
   }, [duration$])
 }
+
+const cache = createCache()
