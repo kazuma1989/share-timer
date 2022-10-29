@@ -1,6 +1,5 @@
 import { Observable, share } from "rxjs"
 import IntervalWorker from "./interval.worker?worker&inline"
-import { subscribeAnimationFrame } from "./subscribeAnimationFrame"
 
 export function interval(type: "ui"): Observable<void>
 
@@ -35,4 +34,21 @@ export function interval(
       resetOnRefCountZero: true,
     })
   )
+}
+
+function subscribeAnimationFrame(next: () => void): () => void {
+  const abort = new AbortController()
+
+  const tick = () => {
+    if (abort.signal.aborted) return
+
+    next()
+    requestAnimationFrame(tick)
+  }
+
+  tick()
+
+  return () => {
+    abort.abort()
+  }
 }
