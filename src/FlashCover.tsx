@@ -1,14 +1,19 @@
 import clsx from "clsx"
-import { useEffect, useState } from "react"
-import { map, Observable } from "rxjs"
+import { useEffect } from "react"
+import {
+  distinctUntilChanged,
+  filter,
+  Observable,
+  OperatorFunction,
+  pipe,
+  scan,
+} from "rxjs"
+import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { useAudio } from "./useAudio"
-import {
-  useCurrentDurationUI,
-  useCurrentDurationWorker,
-} from "./useCurrentDuration"
 import { useObservable } from "./useObservable"
-import { takeFirstZero } from "./util/takeFirstZero"
+import { createCache } from "./util/createCache"
+import { interval } from "./util/interval"
 
 export function FlashCover({
   timerState$,
@@ -17,29 +22,32 @@ export function FlashCover({
   timerState$: Observable<TimerState>
   className?: string
 }) {
-  const { mode } = useObservable(timerState$)
+  const [flashing$, sounding$] = cache(timerState$, () => [
+    timerState$.pipe(mapToCurrentDuration(interval("ui")), notifyFirstZero()),
+    timerState$.pipe(
+      mapToCurrentDuration(interval("worker", 100)),
+      notifyFirstZero(),
+      filter(Boolean)
+    ),
+  ])
 
-  const state = mode === "editing" ? "asleep" : "awake"
+  const audio = useAudio()
+  useEffect(() => {
+    const sub = sounding$.subscribe(() => {
+      console.debug("audio.play()")
 
-  return (
-    <FlashCoverInner
-      key={state}
-      className={clsx(state === "asleep" && "hidden", className)}
-    />
-  )
-}
+      audio.pause()
+      audio.currentTime = 0
+      audio.play()
+    })
 
-function FlashCoverInner({ className }: { className?: string }) {
-  useAlertSound()
+    return () => {
+      sub.unsubscribe()
 
-  const duration$ = useCurrentDurationUI()
-
-  const [flashing$] = useState(() =>
-    duration$.pipe(
-      takeFirstZero(),
-      map(() => true)
-    )
-  )
+      audio.pause()
+      audio.currentTime = 0
+    }
+  }, [audio, sounding$])
 
   const flashing = useObservable(flashing$, false)
 
@@ -54,21 +62,143 @@ function FlashCoverInner({ className }: { className?: string }) {
   )
 }
 
-function useAlertSound(): void {
-  const audio = useAudio()
-  const duration$ = useCurrentDurationWorker()
+const cache = createCache()
 
-  useEffect(() => {
-    const sub = duration$.pipe(takeFirstZero()).subscribe(() => {
-      audio.currentTime = 0
-      audio.play()
+function notifyFirstZero(): OperatorFunction<CurrentDuration, boolean> {
+  return pipe(
+    scan((acc, { mode, duration }) => {
+      switch (mode) {
+        case "editing": {
+          return false
+        }
+
+        case "paused":
+        case "running": {
+          // 一度 true に変わったら editing にならない限りずっと true.
+          return acc || (-150 <= duration && duration < 50)
+        }
+      }
+    }, false),
+    distinctUntilChanged()
+  )
+}
+
+if (import.meta.vitest) {
+  const { test, expect, beforeEach } = import.meta.vitest
+  const { TestScheduler } = await import("rxjs/testing")
+
+  let scheduler: InstanceType<typeof TestScheduler>
+  beforeEach(() => {
+    scheduler = new TestScheduler((actual, expected) => {
+      expect(actual).toStrictEqual(expected)
     })
+  })
 
-    return () => {
-      sub.unsubscribe()
+  test("basic", () => {
+    scheduler.run(({ expectObservable, hot }) => {
+      const base$ = hot<CurrentDuration>("1-2-3-4-5-6|", {
+        1: {
+          mode: "editing",
+          duration: 2_000,
+        },
+        2: {
+          mode: "running",
+          duration: 2_000,
+        },
+        3: {
+          mode: "running",
+          duration: 1_000,
+        },
+        4: {
+          mode: "running",
+          duration: 0,
+        },
+        5: {
+          mode: "running",
+          duration: 0,
+        },
+        6: {
+          mode: "running",
+          duration: -1_000,
+        },
+      })
 
-      audio.pause()
-      audio.currentTime = 0
-    }
-  }, [audio, duration$])
+      const actual$ = base$.pipe(notifyFirstZero())
+
+      expectObservable(actual$).toBe("1-----4----|", {
+        1: false,
+        4: true,
+      })
+    })
+  })
+
+  test("start from zero", () => {
+    scheduler.run(({ expectObservable, hot }) => {
+      const base$ = hot<CurrentDuration>("1-2-3-4|", {
+        1: {
+          mode: "editing",
+          duration: 0,
+        },
+        2: {
+          mode: "running",
+          duration: 0,
+        },
+        3: {
+          mode: "running",
+          duration: 0,
+        },
+        4: {
+          mode: "running",
+          duration: -1_000,
+        },
+      })
+
+      const actual$ = base$.pipe(notifyFirstZero())
+
+      expectObservable(actual$).toBe("1-2----|", {
+        1: false,
+        2: true,
+      })
+    })
+  })
+
+  test("reset on editing", () => {
+    scheduler.run(({ expectObservable, hot }) => {
+      const base$ = hot<CurrentDuration>("1-2-3-4-5-6|", {
+        1: {
+          mode: "editing",
+          duration: 1_000,
+        },
+        2: {
+          mode: "running",
+          duration: 1_000,
+        },
+        3: {
+          mode: "running",
+          duration: 0,
+        },
+        4: {
+          mode: "editing",
+          duration: 1_000,
+        },
+        5: {
+          mode: "running",
+          duration: 1_000,
+        },
+        6: {
+          mode: "running",
+          duration: 0,
+        },
+      })
+
+      const actual$ = base$.pipe(notifyFirstZero())
+
+      expectObservable(actual$).toBe("1---3-4---6|", {
+        1: false,
+        3: true,
+        4: false,
+        6: true,
+      })
+    })
+  })
 }

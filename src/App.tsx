@@ -1,26 +1,35 @@
+import { distinctUntilChanged, map, Observable } from "rxjs"
+import { ErrorBoundary } from "./ErrorBoundary"
 import { FlashCover } from "./FlashCover"
+import { mapToTimerState } from "./mapToTimerState"
 import { Timer } from "./Timer"
-import { useObservable } from "./useObservable"
-import { useRoom } from "./useRoom"
-import { useTimerState } from "./useTimerState"
+import { useFirestore } from "./useFirestore"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
+import { createCache } from "./util/createCache"
+import { Room } from "./zod/roomZod"
 
-export function App() {
-  const room = useObservable(useRoom())
+export function App({ room$ }: { room$: Observable<Room> }) {
+  const db = useFirestore()
 
-  useTitleAsTimeViewer()
+  const timerState$ = cache(room$, () =>
+    room$.pipe(
+      map((_) => _.id),
+      distinctUntilChanged(),
+      mapToTimerState(db)
+    )
+  )
 
-  const timerState$ = useTimerState()
+  useTitleAsTimeViewer(timerState$)
 
   return (
     <div className="container mx-auto h-screen">
-      <Timer
-        key={"timer" + room.id}
-        timerState$={timerState$}
-        className="h-full"
-      />
+      <Timer room$={room$} timerState$={timerState$} className="h-full" />
 
-      <FlashCover key={"cover" + room.id} timerState$={timerState$} />
+      <ErrorBoundary>
+        <FlashCover timerState$={timerState$} />
+      </ErrorBoundary>
     </div>
   )
 }
+
+const cache = createCache()

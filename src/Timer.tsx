@@ -8,32 +8,25 @@ import { DurationSelect } from "./DurationSelect"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { TimerState } from "./timerReducer"
+import { TimeViewer } from "./TimeViewer"
 import { useAllSettled } from "./useAllSettled"
-import { useCurrentDurationUI } from "./useCurrentDuration"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
-import { useRoom } from "./useRoom"
-import { formatDuration } from "./util/formatDuration"
 import { ActionOnFirestore } from "./zod/actionZod"
+import { Room } from "./zod/roomZod"
 
 export function Timer({
+  room$,
   timerState$,
   className,
 }: {
+  room$: Observable<Room>
   timerState$: Observable<TimerState>
   className?: string
 }) {
   const state = useObservable(timerState$)
 
-  const [_allSettled, addPromise] = useAllSettled()
-  const pending = !_allSettled
-
-  const db = useFirestore()
-  const { id: roomId } = useObservable(useRoom())
-  const dispatch = (action: ActionOnFirestore) =>
-    addPromise(
-      addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
-    )
+  const [pending, dispatch] = useDispatch(room$)
 
   const durationSelect$ = useRef({
     value: state.initialDuration,
@@ -66,13 +59,7 @@ export function Timer({
           />
         ) : (
           <div className="text-8xl font-thin sm:text-9xl">
-            {state.mode === "running" ? (
-              <TimeViewer>
-                {(duration) => <span>{formatDuration(duration)}</span>}
-              </TimeViewer>
-            ) : (
-              <span>{formatDuration(state.restDuration)}</span>
-            )}
+            <TimeViewer timerState$={timerState$} />
           </div>
         )}
       </div>
@@ -134,12 +121,23 @@ export function Timer({
   )
 }
 
-function TimeViewer({
-  children,
-}: {
-  children?: (restDuration: number) => JSX.Element
-}) {
-  const duration = useObservable(useCurrentDurationUI(), 0)
+function useDispatch(
+  room$: Observable<Room>
+): [
+  pending: boolean,
+  dispatch: (action: ActionOnFirestore) => Promise<unknown>
+] {
+  const [_allSettled, addPromise] = useAllSettled()
+  const pending = !_allSettled
 
-  return children?.(duration) ?? null
+  const db = useFirestore()
+  const { id: roomId } = useObservable(room$)
+
+  return [
+    pending,
+    (action) =>
+      addPromise(
+        addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
+      ),
+  ]
 }

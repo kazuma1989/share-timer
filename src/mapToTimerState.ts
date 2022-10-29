@@ -9,7 +9,8 @@ import {
 import {
   distinctUntilChanged,
   map,
-  Observable,
+  OperatorFunction,
+  pipe,
   shareReplay,
   switchMap,
 } from "rxjs"
@@ -23,13 +24,11 @@ import { snapshotOf } from "./util/snapshotOf"
 import { actionZod } from "./zod/actionZod"
 import { Room } from "./zod/roomZod"
 
-export function observeTimerState(
-  db: Firestore,
-  room$: Observable<Room>
-): Observable<TimerState> {
-  return room$.pipe(
-    distinctUntilChanged((_1, _2) => _1.id === _2.id),
-    switchMap(({ id: roomId }) =>
+export function mapToTimerState(
+  db: Firestore
+): OperatorFunction<Room["id"], TimerState> {
+  return pipe(
+    switchMap((roomId) =>
       getDocs(
         query(
           collection(db, "rooms", roomId, "actions"),
