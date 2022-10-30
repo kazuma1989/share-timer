@@ -24,9 +24,10 @@ export function Timer({
   timerState$: Observable<TimerState>
   className?: string
 }) {
+  const { id: roomId, name: roomName } = useObservable(room$)
   const state = useObservable(timerState$)
 
-  const [pending, dispatch] = useDispatch(room$)
+  const [pending, dispatch] = useDispatch(roomId)
 
   const durationSelect$ = useRef({
     value: state.initialDuration,
@@ -34,7 +35,15 @@ export function Timer({
   const primaryButton$ = useRef<HTMLButtonElement>(null)
 
   return (
-    <div className={clsx("grid grid-rows-[1fr_auto_1fr]", className)}>
+    <div className={clsx("grid grid-rows-[auto_1fr_auto_1fr]", className)}>
+      <div className="pt-2 text-center">
+        <h1>{roomName}</h1>
+
+        <p className="select-all text-sm text-gray-400">
+          {`sharetimer.web.app/#${roomId}`}
+        </p>
+      </div>
+
       <form
         className="contents"
         onSubmit={async (e) => {
@@ -124,7 +133,7 @@ export function Timer({
 }
 
 function useDispatch(
-  room$: Observable<Room>
+  roomId: Room["id"]
 ): [
   pending: boolean,
   dispatch: (action: ActionOnFirestore) => Promise<unknown>
@@ -133,7 +142,6 @@ function useDispatch(
   const pending = !_allSettled
 
   const db = useFirestore()
-  const { id: roomId } = useObservable(room$)
 
   return [
     pending,
