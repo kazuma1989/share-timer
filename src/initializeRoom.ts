@@ -1,9 +1,10 @@
 import { doc, Firestore, writeBatch } from "firebase/firestore"
-import { filter, map, merge, Observable, scan, takeUntil } from "rxjs"
+import { filter, map, merge, Observable, scan, take, takeUntil } from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { InvalidDoc, InvalidId } from "./mapToRoom"
 import { replaceHash } from "./observeHash"
+import { getItem, setItem } from "./storage"
 import { sparse } from "./util/sparse"
 import { ActionOnFirestore } from "./zod/actionZod"
 import { Room, roomIdZod, RoomOnFirestore } from "./zod/roomZod"
@@ -13,6 +14,10 @@ export function initializeRoom(
   room$: Observable<Room>,
   invalid$: Observable<InvalidDoc | InvalidId>
 ): void {
+  room$.pipe(take(1)).subscribe(({ id: roomId }) => {
+    setItem("recent-room-id", roomId)
+  })
+
   const invalidEvent$ = invalid$.pipe(sparse(200))
 
   const loopDetected$ = merge(
@@ -37,14 +42,29 @@ export function initializeRoom(
     const [type] = reason
     switch (type) {
       case "invalid-id": {
-        const newRoomId = roomIdZod.parse(doc(collection(db, "rooms")).id)
+        let newRoomId: Room["id"] | undefined
+
+        const recentRoomId = getItem("recent-room-id")
+        if (recentRoomId) {
+          const _ = roomIdZod.safeParse(recentRoomId)
+          if (_.success) {
+            newRoomId = _.data
+          }
+        }
+
+        if (!newRoomId) {
+          newRoomId = roomIdZod.parse(doc(collection(db, "rooms")).id)
+        }
+
         replaceHash(newRoomId)
         break
       }
 
       case "invalid-doc": {
         const [, roomId] = reason
+
         await setupRoom(db, roomId)
+
         break
       }
     }
