@@ -15,6 +15,11 @@
     "prettier"
   ],
 
+  // https://typescript-eslint.io/docs/linting/typed-linting/
+  "parserOptions": {
+    "project": ["./tsconfig.json", "./tsconfig.node.json"]
+  },
+
   "settings": {
     // eslint-plugin-react からワーニングが出ないように明示的に指定。
     "react": {
@@ -27,6 +32,9 @@
     // 代わりに @typescript-eslint/no-unused-vars を有効にする。
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": "warn",
+
+    // https://typescript-eslint.io/rules/switch-exhaustiveness-check/
+    "@typescript-eslint/switch-exhaustiveness-check": "error",
 
     // console.log() の消し忘れに気づけるようにする。
     "no-console": ["warn", { "allow": ["debug", "info", "warn", "error"] }],
