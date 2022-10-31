@@ -83,3 +83,31 @@ async function setupRoom(db: Firestore, newRoomId: string): Promise<void> {
 }
 
 const DEFAULT_DURATION = 3 * 60_000
+
+if (import.meta.vitest) {
+  const { test, expect, beforeEach } = import.meta.vitest
+  const { TestScheduler } = await import("rxjs/testing")
+
+  let scheduler: InstanceType<typeof TestScheduler>
+  beforeEach(() => {
+    scheduler = new TestScheduler((actual, expected) => {
+      expect(actual).toStrictEqual(expected)
+    })
+  })
+
+  test("basic", () => {
+    scheduler.run(({ expectObservable, hot }) => {
+      const base$ = hot("123456789|")
+
+      const actual$ = base$.pipe(
+        map(() => 1),
+        scan((acc, current) => acc + current, 0),
+        filter((count) => count >= 3)
+      )
+
+      expectObservable(actual$).toEqual(
+        hot("--3456789|").pipe(map((_) => Number(_)))
+      )
+    })
+  })
+}
