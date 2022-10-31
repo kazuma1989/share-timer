@@ -1,5 +1,13 @@
 import { doc, Firestore, writeBatch } from "firebase/firestore"
-import { filter, map, merge, Observable, scan, takeUntil } from "rxjs"
+import {
+  debounceTime,
+  filter,
+  map,
+  merge,
+  Observable,
+  scan,
+  takeUntil,
+} from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { InvalidDoc, InvalidId } from "./mapToRoom"
@@ -96,17 +104,31 @@ if (import.meta.vitest) {
   })
 
   test("basic", () => {
-    scheduler.run(({ expectObservable, hot }) => {
-      const base$ = hot("123456789|")
+    scheduler.run(({ expectObservable, hot, time }) => {
+      const base$ = hot("12345---6789|")
 
-      const actual$ = base$.pipe(
-        map(() => 1),
-        scan((acc, current) => acc + current, 0),
-        filter((count) => count >= 3)
+      const due = time("---|")
+      const limit = 3
+
+      const actual$ = merge(
+        base$.pipe(map(() => 1)),
+        base$.pipe(
+          debounceTime(due),
+          map(() => "reset" as const)
+        )
+      ).pipe(
+        scan((acc, current) => {
+          if (current === "reset") {
+            return 0
+          }
+
+          return acc + current
+        }, 0),
+        filter((count) => count >= limit)
       )
 
       expectObservable(actual$).toEqual(
-        hot("--3456789|").pipe(map((_) => Number(_)))
+        hot("--345-----34|").pipe(map((_) => Number(_)))
       )
     })
   })
