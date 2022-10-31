@@ -23,19 +23,7 @@ export function initializeRoom(
 ): void {
   const invalidEvent$ = invalid$.pipe(sparse(200))
 
-  const loopDetected$ = merge(
-    room$.pipe(map(() => "reset" as const)),
-    invalidEvent$.pipe(map(() => 1))
-  ).pipe(
-    scan((acc, current) => {
-      if (current === "reset") {
-        return 0
-      }
-
-      return acc + current
-    }, 0),
-    filter((count) => count >= 10)
-  )
+  const loopDetected$ = detectLoop(invalidEvent$, 2_000, 10)
 
   loopDetected$.subscribe(() => {
     throw new Error("Detect hash change loop. Something went wrong")
@@ -92,6 +80,29 @@ async function setupRoom(db: Firestore, newRoomId: string): Promise<void> {
 
 const DEFAULT_DURATION = 3 * 60_000
 
+function detectLoop(
+  target$: Observable<unknown>,
+  debounce: number,
+  criteria: number
+): Observable<number> {
+  return merge(
+    target$.pipe(map(() => 1)),
+    target$.pipe(
+      debounceTime(debounce),
+      map(() => "reset" as const)
+    )
+  ).pipe(
+    scan((acc, current) => {
+      if (current === "reset") {
+        return 0
+      }
+
+      return acc + current
+    }, 0),
+    filter((count) => count >= criteria)
+  )
+}
+
 if (import.meta.vitest) {
   const { test, expect, beforeEach } = import.meta.vitest
   const { TestScheduler } = await import("rxjs/testing")
@@ -103,29 +114,11 @@ if (import.meta.vitest) {
     })
   })
 
-  test("basic", () => {
+  test("detectLoop", () => {
     scheduler.run(({ expectObservable, hot, time }) => {
       const base$ = hot("12345---6789|")
 
-      const due = time("---|")
-      const limit = 3
-
-      const actual$ = merge(
-        base$.pipe(map(() => 1)),
-        base$.pipe(
-          debounceTime(due),
-          map(() => "reset" as const)
-        )
-      ).pipe(
-        scan((acc, current) => {
-          if (current === "reset") {
-            return 0
-          }
-
-          return acc + current
-        }, 0),
-        filter((count) => count >= limit)
-      )
+      const actual$ = detectLoop(base$, time("---|"), 3)
 
       expectObservable(actual$).toEqual(
         hot("--345-----34|").pipe(map((_) => Number(_)))
