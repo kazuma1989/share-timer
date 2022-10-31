@@ -22,7 +22,7 @@ export function initializeRoom(
 ): void {
   const invalidEvent$ = invalid$.pipe(sparse(200))
 
-  const loopDetected$ = detectLoop(invalidEvent$, 2_000, 10)
+  const loopDetected$ = detectLoop(invalidEvent$, 10, 2_000)
 
   loopDetected$.subscribe(() => {
     throw new Error("Detect room initialization loop. Something went wrong")
@@ -103,8 +103,8 @@ const DEFAULT_DURATION = 3 * 60_000
 
 function detectLoop(
   target$: Observable<unknown>,
-  debounce: number,
-  criteria: number
+  criteria: number,
+  debounce: number
 ): Observable<number> {
   return merge(
     target$.pipe(map(() => 1)),
@@ -136,13 +136,13 @@ if (import.meta.vitest) {
   })
 
   test("detectLoop", () => {
-    scheduler.run(({ expectObservable, hot, time }) => {
-      const base$ = hot("12345---6789|")
+    scheduler.run(({ expectObservable, hot }) => {
+      const base$ = hot("1234---5-----6789|")
 
-      const actual$ = detectLoop(base$, time("---|"), 3)
+      const actual$ = detectLoop(base$, 3, 5)
 
       expectObservable(actual$).toEqual(
-        hot("--345-----34|").pipe(map((_) => Number(_)))
+        hot("--34---5-------34|").pipe(map((_) => Number(_)))
       )
     })
   })
