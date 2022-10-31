@@ -25,7 +25,7 @@ export function initializeRoom(
   const loopDetected$ = detectLoop(invalidEvent$, 2_000, 10)
 
   loopDetected$.subscribe(() => {
-    throw new Error("Detect hash change loop. Something went wrong")
+    throw new Error("Detect room initialization loop. Something went wrong")
   })
 
   invalidEvent$.pipe(takeUntil(loopDetected$)).subscribe(async (reason) => {
