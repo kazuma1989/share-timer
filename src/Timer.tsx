@@ -38,10 +38,6 @@ export function Timer({
     <div className={clsx("grid grid-rows-[auto_1fr_auto_1fr]", className)}>
       <div className="pt-2 text-center">
         <h1>{roomName}</h1>
-
-        <p className="select-all text-sm text-gray-400">
-          {`sharetimer.web.app/#${roomId}`}
-        </p>
       </div>
 
       <form
