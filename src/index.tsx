@@ -28,7 +28,7 @@ const permission$ = observeMediaPermission(audio, root)
 const roomId$ = observeHash().pipe(map((hash) => hash.slice("#".length)))
 const [room$, invalid$] = partition(roomId$.pipe(mapToRoom(firestore)), isRoom)
 
-initializeRoom(firestore, room$, invalid$)
+initializeRoom(firestore, invalid$)
 
 createRoot(root).render(
   <StrictMode>

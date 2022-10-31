@@ -14,11 +14,10 @@ import { InvalidDoc, InvalidId } from "./mapToRoom"
 import { replaceHash } from "./observeHash"
 import { sparse } from "./util/sparse"
 import { ActionOnFirestore } from "./zod/actionZod"
-import { Room, roomIdZod, RoomOnFirestore } from "./zod/roomZod"
+import { roomIdZod, RoomOnFirestore } from "./zod/roomZod"
 
 export function initializeRoom(
   db: Firestore,
-  room$: Observable<Room>,
   invalid$: Observable<InvalidDoc | InvalidId>
 ): void {
   const invalidEvent$ = invalid$.pipe(sparse(200))
