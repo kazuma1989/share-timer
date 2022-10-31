@@ -14,7 +14,8 @@
   "type": "module",
   "scripts": {
     "start": "vite serve",
-    "build": "vite build",
+    "build": "vite build --mode=production",
+    "build:preview": "vite build --mode=preview",
     "preview": "vite preview",
     "test": "vitest",
     "format": "prettier --write \"./{public,src}/**/*.{css,html,js,ts,tsx}\"",

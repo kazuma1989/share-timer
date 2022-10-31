@@ -24,9 +24,10 @@ export function Timer({
   timerState$: Observable<TimerState>
   className?: string
 }) {
+  const { id: roomId, name: roomName } = useObservable(room$)
   const state = useObservable(timerState$)
 
-  const [pending, dispatch] = useDispatch(room$)
+  const [pending, dispatch] = useDispatch(roomId)
 
   const durationSelect$ = useRef({
     value: state.initialDuration,
@@ -34,95 +35,101 @@ export function Timer({
   const primaryButton$ = useRef<HTMLButtonElement>(null)
 
   return (
-    <form
-      className={clsx("grid grid-rows-[1fr_auto_1fr]", className)}
-      onSubmit={async (e) => {
-        e.preventDefault()
-
-        if (state.mode !== "editing") return
-
-        dispatch({
-          type: "start",
-          withDuration: durationSelect$.current.value,
-          at: serverTimestamp(),
-        })
-
-        primaryButton$.current?.focus()
-      }}
-    >
-      <div className="relative top-5 grid min-h-fit place-items-center tabular-nums">
-        {state.mode === "editing" ? (
-          <DurationSelect
-            key={state.mode + state.initialDuration}
-            innerRef={durationSelect$}
-            defaultValue={state.initialDuration}
-          />
-        ) : (
-          <div className="text-8xl font-thin sm:text-9xl">
-            <TimeViewer timerState$={timerState$} />
-          </div>
-        )}
+    <div className={clsx("grid grid-rows-[auto_1fr_auto_1fr]", className)}>
+      <div className="pt-2 text-center">
+        <h1>{roomName}</h1>
       </div>
 
-      <div className="relative top-10 flex items-center justify-around">
-        <CircleButton
-          disabled={state.mode === "editing"}
-          className="text-xs"
-          onClick={() => {
-            dispatch({
-              type: "cancel",
-            })
-          }}
-        >
-          キャンセル
-        </CircleButton>
+      <form
+        className="contents"
+        onSubmit={async (e) => {
+          e.preventDefault()
 
-        {state.mode === "editing" ? (
-          <CircleButton innerRef={primaryButton$} color="green" type="submit">
-            開始
-          </CircleButton>
-        ) : state.mode === "running" ? (
+          if (state.mode !== "editing") return
+
+          dispatch({
+            type: "start",
+            withDuration: durationSelect$.current.value,
+            at: serverTimestamp(),
+          })
+
+          primaryButton$.current?.focus()
+        }}
+      >
+        <div className="relative top-5 grid min-h-fit place-items-center tabular-nums">
+          {state.mode === "editing" ? (
+            <DurationSelect
+              key={state.mode + state.initialDuration}
+              innerRef={durationSelect$}
+              defaultValue={state.initialDuration}
+            />
+          ) : (
+            <div className="text-8xl font-thin sm:text-9xl">
+              <TimeViewer timerState$={timerState$} />
+            </div>
+          )}
+        </div>
+
+        <div className="relative top-10 flex items-center justify-around">
           <CircleButton
-            innerRef={primaryButton$}
-            color="orange"
+            disabled={state.mode === "editing"}
+            className="text-xs"
             onClick={() => {
               dispatch({
-                type: "pause",
-                at: serverTimestamp(),
+                type: "cancel",
               })
             }}
           >
-            一時停止
+            キャンセル
           </CircleButton>
-        ) : (
-          <CircleButton
-            innerRef={primaryButton$}
-            color="green"
-            onClick={() => {
-              if (pending) return
 
-              dispatch({
-                type: "resume",
-                at: serverTimestamp(),
-              })
-            }}
-          >
-            再開
-          </CircleButton>
-        )}
-      </div>
+          {state.mode === "editing" ? (
+            <CircleButton innerRef={primaryButton$} color="green" type="submit">
+              開始
+            </CircleButton>
+          ) : state.mode === "running" ? (
+            <CircleButton
+              innerRef={primaryButton$}
+              color="orange"
+              onClick={() => {
+                dispatch({
+                  type: "pause",
+                  at: serverTimestamp(),
+                })
+              }}
+            >
+              一時停止
+            </CircleButton>
+          ) : (
+            <CircleButton
+              innerRef={primaryButton$}
+              color="green"
+              onClick={() => {
+                if (pending) return
+
+                dispatch({
+                  type: "resume",
+                  at: serverTimestamp(),
+                })
+              }}
+            >
+              再開
+            </CircleButton>
+          )}
+        </div>
+      </form>
 
       {import.meta.env.DEV && (
         <div className="grid place-items-center">
           <DebugCheckAudioButton />
         </div>
       )}
-    </form>
+    </div>
   )
 }
 
 function useDispatch(
-  room$: Observable<Room>
+  roomId: Room["id"]
 ): [
   pending: boolean,
   dispatch: (action: ActionOnFirestore) => Promise<unknown>
@@ -131,7 +138,6 @@ function useDispatch(
   const pending = !_allSettled
 
   const db = useFirestore()
-  const { id: roomId } = useObservable(room$)
 
   return [
     pending,
