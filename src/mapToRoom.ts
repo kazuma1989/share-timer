@@ -31,8 +31,11 @@ export function mapToRoom(
           return ["no-doc-exists", roomId]
         }
 
-        const _ = roomZod.safeParse(doc.data())
+        const rawData = doc.data()
+        const _ = roomZod.safeParse(rawData)
         if (!_.success) {
+          console.debug(rawData, _.error)
+
           return ["invalid-doc", roomId]
         }
 
