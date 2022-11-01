@@ -49,6 +49,6 @@ export function mapToRoom(
       )
     }),
 
-    shareRecent()
+    shareRecent(30_000)
   )
 }

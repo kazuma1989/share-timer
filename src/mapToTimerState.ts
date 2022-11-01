@@ -65,6 +65,6 @@ export function mapToTimerState(
       )
     }),
 
-    shareRecent()
+    shareRecent(30_000)
   )
 }
