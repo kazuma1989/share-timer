@@ -11,9 +11,7 @@ import {
   map,
   OperatorFunction,
   pipe,
-  shareReplay,
   switchMap,
-  timer,
 } from "rxjs"
 import { collection } from "./firestore/collection"
 import { hasNoEstimateTimestamp } from "./firestore/hasNoEstimateTimestamp"
@@ -21,6 +19,7 @@ import { orderBy } from "./firestore/orderBy"
 import { where } from "./firestore/where"
 import { timerReducer, TimerState } from "./timerReducer"
 import { safeParseDocsWith } from "./util/safeParseDocsWith"
+import { shareRecent } from "./util/shareRecent"
 import { snapshotOf } from "./util/snapshotOf"
 import { actionZod } from "./zod/actionZod"
 import { Room } from "./zod/roomZod"
@@ -28,9 +27,6 @@ import { Room } from "./zod/roomZod"
 export function mapToTimerState(
   db: Firestore
 ): OperatorFunction<Room["id"], TimerState> {
-  // リスナーがいなくなって30秒後に根元の購読も解除する
-  const resetOnRefCountZero = () => timer(30_000)
-
   return pipe(
     switchMap((roomId) =>
       getDocs(
@@ -69,10 +65,6 @@ export function mapToTimerState(
       )
     }),
 
-    shareReplay({
-      bufferSize: 1,
-      // @ts-expect-error shareのresetOnRefCountZeroへのバイパスだから実態としてはOKのはず
-      refCount: resetOnRefCountZero as boolean,
-    })
+    shareRecent()
   )
 }
