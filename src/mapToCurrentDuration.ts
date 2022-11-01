@@ -4,12 +4,12 @@ import {
   of,
   OperatorFunction,
   pipe,
-  shareReplay,
   startWith,
   switchMap,
 } from "rxjs"
 import { now } from "./now"
 import { TimerState } from "./timerReducer"
+import { shareRecent } from "./util/shareRecent"
 
 export interface CurrentDuration {
   mode: TimerState["mode"]
@@ -49,10 +49,7 @@ export function mapToCurrentDuration(
       }
     }),
 
-    shareReplay({
-      bufferSize: 1,
-      refCount: true,
-    })
+    shareRecent()
   )
 }
 

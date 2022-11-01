@@ -3,9 +3,9 @@ import {
   fromEvent,
   map,
   Observable,
-  shareReplay,
   startWith,
 } from "rxjs"
+import { shareRecent } from "./util/shareRecent"
 
 export function observeHash(): Observable<string> {
   return fromEvent(window, "hashchange" as keyof WindowEventMap, {
@@ -14,10 +14,7 @@ export function observeHash(): Observable<string> {
     startWith(null),
     map(() => window.location.hash),
     distinctUntilChanged(),
-    shareReplay({
-      bufferSize: 1,
-      refCount: true,
-    })
+    shareRecent()
   )
 }
 
