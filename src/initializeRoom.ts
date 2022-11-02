@@ -1,9 +1,10 @@
 import { doc, Firestore, writeBatch } from "firebase/firestore"
-import { distinctUntilChanged, Observable, tap } from "rxjs"
+import { distinctUntilChanged, Observable } from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { InvalidDoc, InvalidId, NoDocExists } from "./mapToRoom"
 import { replaceHash } from "./observeHash"
+import { pauseWhileLoop } from "./util/pauseWhileLoop"
 import { shallowEqual } from "./util/shallowEqual"
 import { sparse } from "./util/sparse"
 import { ActionOnFirestore } from "./zod/actionZod"
@@ -16,19 +17,16 @@ export function initializeRoom(
   invalid$
     .pipe(
       distinctUntilChanged(shallowEqual),
-      tap((_) => {
-        console.log("tap invalid$", _)
-      }),
-      sparse(200)
-      // pauseWhileLoop({
-      //   criteria: 10,
-      //   debounce: 2_000,
-      //   onLoopDetected() {
-      //     throw new Error(
-      //       "Detect room initialization loop. Something went wrong"
-      //     )
-      //   },
-      // }),
+      sparse(200),
+      pauseWhileLoop({
+        criteria: 10,
+        debounce: 2_000,
+        onLoopDetected() {
+          throw new Error(
+            "Detect room initialization loop. Something went wrong"
+          )
+        },
+      })
     )
     .subscribe(async (reason) => {
       const [type] = reason

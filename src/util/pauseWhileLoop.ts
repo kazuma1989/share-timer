@@ -20,20 +20,20 @@ export function pauseWhileLoop<T>({
   debounce: number
   onLoopDetected?(): void
 }): MonoTypeOperatorFunction<T> {
-  return (source$) => {
-    const shared$ = source$.pipe(
+  return (_$) => {
+    const source$ = _$.pipe(
       share({
         resetOnRefCountZero: true,
       })
     )
 
-    const settled$ = shared$.pipe(
+    const settled$ = source$.pipe(
       debounceTime(debounce),
       startWith(null),
       map(() => "settled" as const)
     )
 
-    const counting$ = shared$.pipe(map(() => 1))
+    const counting$ = source$.pipe(map(() => 1))
 
     const looping$ = merge(counting$, settled$).pipe(
       scan((acc, current) => (current === "settled" ? 0 : acc + current), 0),
@@ -73,7 +73,7 @@ if (import.meta.vitest) {
         })
       )
 
-      expectObservable(actual$).toEqual(hot("12-------12---|"))
+      expectObservable(actual$).toEqual(hot("12-------123--|"))
     })
   })
 }
