@@ -13,7 +13,7 @@ export default function firestoreEmulatorProxy(): Plugin {
       return {
         server: {
           proxy: {
-            "^/google\\..+": {
+            "^/google\\.firestore\\.v1\\.Firestore/|^/v1/projects/": {
               target: `http://127.0.0.1:${emulators.firestore.port}`,
               changeOrigin: true,
             },
