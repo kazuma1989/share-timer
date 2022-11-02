@@ -1,11 +1,10 @@
 import { doc, Firestore, runTransaction } from "firebase/firestore"
-import { distinctUntilChanged, Observable } from "rxjs"
+import { Observable } from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { InvalidDoc, InvalidId } from "./mapToRoom"
 import { replaceHash } from "./observeHash"
 import { pauseWhileLoop } from "./util/pauseWhileLoop"
-import { shallowEqual } from "./util/shallowEqual"
 import { sparse } from "./util/sparse"
 import { ActionOnFirestore } from "./zod/actionZod"
 import { roomIdZod, RoomOnFirestore } from "./zod/roomZod"
@@ -18,7 +17,6 @@ export function initializeRoom(
 
   invalid$
     .pipe(
-      distinctUntilChanged(shallowEqual),
       sparse(200),
       pauseWhileLoop({
         criteria: 10,
