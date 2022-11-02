@@ -1,4 +1,4 @@
-import { doc, Firestore, writeBatch } from "firebase/firestore"
+import { doc, Firestore, runTransaction } from "firebase/firestore"
 import { distinctUntilChanged, Observable } from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
@@ -14,6 +14,8 @@ export function initializeRoom(
   db: Firestore,
   invalid$: Observable<InvalidDoc | NoDocExists | InvalidId>
 ): void {
+  let abort = new AbortController()
+
   invalid$
     .pipe(
       distinctUntilChanged(shallowEqual),
@@ -29,6 +31,9 @@ export function initializeRoom(
       })
     )
     .subscribe(async (reason) => {
+      abort.abort()
+      abort = new AbortController()
+
       const [type] = reason
       switch (type) {
         case "invalid-id": {
@@ -38,17 +43,11 @@ export function initializeRoom(
           break
         }
 
-        case "no-doc-exists": {
-          const [, roomId] = reason
-
-          await setupRoom(db, roomId, "create")
-          break
-        }
-
+        case "no-doc-exists":
         case "invalid-doc": {
           const [, roomId] = reason
 
-          await setupRoom(db, roomId, "update")
+          await setupRoom(db, roomId, abort.signal)
           break
         }
       }
@@ -58,45 +57,41 @@ export function initializeRoom(
 async function setupRoom(
   db: Firestore,
   roomId: string,
-  type: "create" | "update"
+  signal: AbortSignal
 ): Promise<void> {
-  const batch = writeBatch(db)
-
   const emoji = await import("./emoji/Animals & Nature.json").then(
     (_) => _.default
   )
   const e = emoji[(Math.random() * emoji.length) | 0]!
 
-  const rooms = collection(db, "rooms")
-  switch (type) {
-    case "create": {
-      batch.set(
-        doc(rooms, roomId),
+  if (signal.aborted) throw "aborted 1"
+
+  await runTransaction(db, async (transaction) => {
+    const roomDoc = await transaction.get(doc(collection(db, "rooms"), roomId))
+
+    if (signal.aborted) throw "aborted 2"
+
+    if (roomDoc.exists()) {
+      transaction.update<RoomOnFirestore>(roomDoc.ref, {
+        name: e.value + " " + e.name,
+      })
+    } else {
+      transaction.set(
+        roomDoc.ref,
         withMeta<RoomOnFirestore>({
           name: e.value + " " + e.name,
         })
       )
-      break
     }
 
-    case "update": {
-      batch.update<RoomOnFirestore>(doc(rooms, roomId), {
-        name: e.value + " " + e.name,
+    transaction.set(
+      doc(collection(db, "rooms", roomId, "actions")),
+      withMeta<ActionOnFirestore>({
+        type: "cancel",
+        withDuration: DEFAULT_DURATION,
       })
-      break
-    }
-  }
-
-  const actions = collection(db, "rooms", roomId, "actions")
-  batch.set(
-    doc(actions),
-    withMeta<ActionOnFirestore>({
-      type: "cancel",
-      withDuration: DEFAULT_DURATION,
-    })
-  )
-
-  await batch.commit()
+    )
+  })
 }
 
 const DEFAULT_DURATION = 3 * 60_000
