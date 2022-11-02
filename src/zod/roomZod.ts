@@ -12,18 +12,18 @@ export const roomZod = z.object({
 
 export const roomIdZod = z
   .string()
-  .regex(/^[A-Za-z0-9]{20}$/)
+  .regex(/^[a-z]{3}-[a-z]{4}-[a-z]{3}$/)
   .brand()
 
 if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
 
   test("room id", () => {
-    expect(roomIdZod.parse("XrhNE6G6m44uJFg6wL3p")).toBe("XrhNE6G6m44uJFg6wL3p")
+    expect(roomIdZod.parse("cnz-some-fmy")).toBe("cnz-some-fmy")
   })
 
   test("invalid room id", () => {
-    expect(() => roomIdZod.parse("_rhNE6G6m44uJFg6wL3p")).toThrow(z.ZodError)
+    expect(() => roomIdZod.parse("-cnz-some-fmy")).toThrow(z.ZodError)
   })
 
   test("room name", () => {
