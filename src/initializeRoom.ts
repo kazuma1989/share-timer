@@ -7,7 +7,6 @@ import {
   mergeMap,
   MonoTypeOperatorFunction,
   Observable,
-  pipe,
   scan,
   share,
   startWith,
@@ -25,12 +24,17 @@ export function initializeRoom(
   db: Firestore,
   invalid$: Observable<InvalidDoc | NoDocExists | InvalidId>
 ): void {
-  const invalidEvent$ = invalid$.pipe(sparse(200))
-
-  invalidEvent$
+  invalid$
     .pipe(
-      pauseWhileLoop(invalidEvent$, () => {
-        throw new Error("Detect room initialization loop. Something went wrong")
+      sparse(200),
+      pauseWhileLoop({
+        criteria: 10,
+        debounce: 2_000,
+        onLoopDetected() {
+          throw new Error(
+            "Detect room initialization loop. Something went wrong"
+          )
+        },
       })
     )
     .subscribe(async (reason) => {
@@ -106,20 +110,27 @@ async function setupRoom(
 
 const DEFAULT_DURATION = 3 * 60_000
 
-function pauseWhileLoop<T>(
-  target$: Observable<unknown>,
-  onLoopDetected?: () => void
-): MonoTypeOperatorFunction<T> {
-  const [looping$, settled$] = detectLoop(target$, 10, 2_000)
+function pauseWhileLoop<T>({
+  criteria,
+  debounce,
+  onLoopDetected,
+}: {
+  criteria: number
+  debounce: number
+  onLoopDetected?(): void
+}): MonoTypeOperatorFunction<T> {
+  return (source$) => {
+    const [looping$, settled$] = detectLoop(source$, criteria, debounce)
 
-  if (onLoopDetected) {
-    looping$.subscribe(onLoopDetected)
+    if (onLoopDetected) {
+      looping$.subscribe(onLoopDetected)
+    }
+
+    return source$.pipe(
+      windowToggle(settled$, () => looping$),
+      mergeMap((_) => _)
+    )
   }
-
-  return pipe(
-    windowToggle(settled$, () => looping$),
-    mergeMap((_) => _)
-  )
 }
 
 function detectLoop(
