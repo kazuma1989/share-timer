@@ -137,7 +137,7 @@ if (import.meta.vitest) {
 
   test("detectLoop", () => {
     scheduler.run(({ expectObservable, hot }) => {
-      const base$ = hot("1234---5-----6789|")
+      const base$ = hot("1234---5-----1234|")
 
       const actual$ = detectLoop(base$, 3, 5)
 
