@@ -38,3 +38,42 @@ function is(x: unknown, y: unknown): boolean {
     return x !== x && y !== y
   }
 }
+
+if (import.meta.vitest) {
+  const { test, expect } = import.meta.vitest
+
+  test("equal", () => {
+    expect(
+      shallowEqual(
+        {
+          name: "John",
+          age: 30,
+        },
+        {
+          name: "John",
+          age: 30,
+        }
+      )
+    ).toBeTruthy()
+  })
+
+  test("not equal", () => {
+    expect(
+      shallowEqual(
+        {
+          name: "John",
+          age: 30,
+        },
+        {
+          name: "Jane",
+          age: 30,
+        }
+      )
+    ).toBeFalsy()
+  })
+
+  test("array", () => {
+    expect(shallowEqual(["John", "Jane"], ["John", "Jane"])).toBeTruthy()
+    expect(shallowEqual(["John", "Jane"], ["Jane", "John"])).toBeFalsy()
+  })
+}
