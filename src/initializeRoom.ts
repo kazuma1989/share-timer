@@ -2,7 +2,7 @@ import { doc, Firestore, runTransaction } from "firebase/firestore"
 import { distinctUntilChanged, Observable } from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
-import { InvalidDoc, InvalidId, NoDocExists } from "./mapToRoom"
+import { InvalidDoc, InvalidId } from "./mapToRoom"
 import { replaceHash } from "./observeHash"
 import { pauseWhileLoop } from "./util/pauseWhileLoop"
 import { shallowEqual } from "./util/shallowEqual"
@@ -12,7 +12,7 @@ import { roomIdZod, RoomOnFirestore } from "./zod/roomZod"
 
 export function initializeRoom(
   db: Firestore,
-  invalid$: Observable<InvalidDoc | NoDocExists | InvalidId>
+  invalid$: Observable<InvalidDoc | InvalidId>
 ): void {
   let abort = new AbortController()
 
@@ -43,7 +43,6 @@ export function initializeRoom(
           break
         }
 
-        case "no-doc-exists":
         case "invalid-doc": {
           const [, roomId] = reason
 
