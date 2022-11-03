@@ -1,4 +1,5 @@
 import * as z from "zod"
+import { nanoid } from "../util/nanoid"
 
 export interface Room extends z.output<typeof roomZod> {
   id: z.infer<typeof roomIdZod>
@@ -15,11 +16,21 @@ export const roomIdZod = z
   .regex(/^[a-z]{3}-[a-z]{4}-[a-z]{3}$/)
   .brand()
 
+export function newRoomId(): Room["id"] {
+  return nanoid(10).replace(/^(.{3})(.{4})(.+)$/, "$1-$2-$3") as Room["id"]
+}
+
 if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
 
   test("room id", () => {
     expect(roomIdZod.parse("cnz-some-fmy")).toBe("cnz-some-fmy")
+  })
+
+  test("generate valid room id", () => {
+    const id = newRoomId()
+
+    expect(roomIdZod.parse(id)).toBe(id)
   })
 
   test("invalid room id", () => {

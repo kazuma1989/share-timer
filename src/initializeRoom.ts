@@ -4,11 +4,10 @@ import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { InvalidDoc, InvalidId } from "./mapToRoom"
 import { replaceHash } from "./observeHash"
-import { nanoid } from "./util/nanoid"
 import { pauseWhileLoop } from "./util/pauseWhileLoop"
 import { sparse } from "./util/sparse"
 import { ActionOnFirestore } from "./zod/actionZod"
-import { roomIdZod, RoomOnFirestore } from "./zod/roomZod"
+import { newRoomId, RoomOnFirestore } from "./zod/roomZod"
 
 export function initializeRoom(
   db: Firestore,
@@ -36,10 +35,7 @@ export function initializeRoom(
       const [type] = reason
       switch (type) {
         case "invalid-id": {
-          const raw = [nanoid(3), nanoid(4), nanoid(3)].join("-")
-          const newRoomId = import.meta.env.DEV ? roomIdZod.parse(raw) : raw
-
-          replaceHash(newRoomId)
+          replaceHash(newRoomId())
           break
         }
 
