@@ -9,6 +9,7 @@ module.exports = {
       },
 
       animation: {
+        spin: "spin 1s ease-out infinite",
         flash: "flash 1s ease-out",
       },
     },
