@@ -42,8 +42,8 @@ export function initializeRoom(
         case "invalid-doc": {
           const [, roomId] = reason
 
-          await setupRoom(db, roomId, abort.signal).catch(() => {
-            console.debug("aborted setup room")
+          await setupRoom(db, roomId, abort.signal).catch((_: unknown) => {
+            console.debug("aborted setup room", _)
           })
           break
         }
@@ -59,36 +59,44 @@ async function setupRoom(
   const emoji = await import("./emoji/Animals & Nature.json").then(
     (_) => _.default
   )
-  const e = emoji[(Math.random() * emoji.length) | 0]!
-
   if (signal.aborted) throw "aborted 1"
 
-  await runTransaction(db, async (transaction) => {
-    const roomDoc = await transaction.get(doc(collection(db, "rooms"), roomId))
+  const e = emoji[(Math.random() * emoji.length) | 0]!
+  const roomName = `${e.value} ${e.name}`
 
-    if (signal.aborted) throw "aborted 2"
+  await runTransaction(
+    db,
+    async (transaction) => {
+      const roomDoc = await transaction.get(
+        doc(collection(db, "rooms"), roomId)
+      )
+      if (signal.aborted) throw "aborted 2"
 
-    if (roomDoc.exists()) {
-      transaction.update<RoomOnFirestore>(roomDoc.ref, {
-        name: e.value + " " + e.name,
-      })
-    } else {
+      if (roomDoc.exists()) {
+        transaction.update<RoomOnFirestore>(roomDoc.ref, {
+          name: roomName,
+        })
+      } else {
+        transaction.set(
+          roomDoc.ref,
+          withMeta<RoomOnFirestore>({
+            name: roomName,
+          })
+        )
+      }
+
       transaction.set(
-        roomDoc.ref,
-        withMeta<RoomOnFirestore>({
-          name: e.value + " " + e.name,
+        doc(collection(db, "rooms", roomId, "actions")),
+        withMeta<ActionOnFirestore>({
+          type: "cancel",
+          withDuration: DEFAULT_DURATION,
         })
       )
+    },
+    {
+      maxAttempts: 1,
     }
-
-    transaction.set(
-      doc(collection(db, "rooms", roomId, "actions")),
-      withMeta<ActionOnFirestore>({
-        type: "cancel",
-        withDuration: DEFAULT_DURATION,
-      })
-    )
-  })
+  )
 }
 
 const DEFAULT_DURATION = 3 * 60_000
