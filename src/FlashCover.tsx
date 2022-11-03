@@ -55,7 +55,7 @@ export function FlashCover({
     <div
       className={clsx(
         "pointer-events-none absolute inset-0",
-        flashing && "animate-[flash_1s_ease-out]",
+        flashing && "animate-flash",
         className
       )}
     />
