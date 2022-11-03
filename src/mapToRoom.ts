@@ -29,7 +29,9 @@ export function mapToRoom(
           const rawData = doc.data()
           const _ = roomZod.safeParse(rawData)
           if (!_.success) {
-            console.debug(rawData, _.error)
+            if (rawData) {
+              console.debug(rawData, _.error)
+            }
 
             return ["invalid-doc", roomId]
           }

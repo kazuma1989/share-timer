@@ -42,7 +42,9 @@ export function initializeRoom(
         case "invalid-doc": {
           const [, roomId] = reason
 
-          await setupRoom(db, roomId, abort.signal)
+          await setupRoom(db, roomId, abort.signal).catch(() => {
+            console.debug("aborted setup room")
+          })
           break
         }
       }
