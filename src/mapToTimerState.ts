@@ -11,7 +11,6 @@ import {
   map,
   OperatorFunction,
   pipe,
-  shareReplay,
   switchMap,
 } from "rxjs"
 import { collection } from "./firestore/collection"
@@ -20,6 +19,7 @@ import { orderBy } from "./firestore/orderBy"
 import { where } from "./firestore/where"
 import { timerReducer, TimerState } from "./timerReducer"
 import { safeParseDocsWith } from "./util/safeParseDocsWith"
+import { shareRecent } from "./util/shareRecent"
 import { snapshotOf } from "./util/snapshotOf"
 import { actionZod } from "./zod/actionZod"
 import { Room } from "./zod/roomZod"
@@ -65,6 +65,6 @@ export function mapToTimerState(
       )
     }),
 
-    shareReplay(1)
+    shareRecent(30_000)
   )
 }
