@@ -24,6 +24,11 @@
     // eslint-plugin-react からワーニングが出ないように明示的に指定。
     "react": {
       "version": "detect"
+    },
+
+    "tailwindcss": {
+      "callees": ["clsx"],
+      "config": "./tailwind.config.cjs"
     }
   },
 
