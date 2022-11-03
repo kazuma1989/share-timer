@@ -26,7 +26,7 @@ export function DurationSelect({
   )
 
   const selectStyle = clsx(
-    "appearance-none rounded-none border-b border-white bg-black px-2"
+    "appearance-none rounded-none border-b border-foreground bg-background px-2"
   )
 
   return (

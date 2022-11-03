@@ -4,16 +4,26 @@ const colors = require("tailwindcss/colors")
  * @returns {import("tailwindcss").Config}
  */
 function config() {
+  const basicColors = {
+    transparent: colors.transparent,
+    current: colors.current,
+    black: colors.black,
+    white: colors.white,
+  }
+
+  const colorAliases = {
+    background: ibmPalette.gray[900],
+    foreground: colors.white,
+  }
+
   return {
     content: ["./src/**/*.{ts,tsx}"],
 
     theme: {
       colors: {
-        transparent: colors.transparent,
-        current: colors.current,
-        black: colors.black,
-        white: colors.white,
+        ...basicColors,
         ...ibmPalette,
+        ...colorAliases,
       },
 
       extend: {

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  @apply bg-black text-white;
+  @apply bg-background text-foreground;
 }
 
 select,
@@ -20,6 +20,6 @@ input {
 
 @keyframes flash {
   from {
-    @apply bg-white/75;
+    @apply bg-foreground/75;
   }
 }
