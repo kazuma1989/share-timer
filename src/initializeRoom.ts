@@ -19,7 +19,7 @@ export function initializeRoom(
     .pipe(
       sparse(200),
       pauseWhileLoop({
-        criteria: 10,
+        criteria: import.meta.env.PROD ? 20 : 5,
         debounce: 2_000,
         onLoopDetected() {
           throw new Error(
