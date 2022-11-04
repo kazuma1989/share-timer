@@ -9,11 +9,12 @@ function config() {
     current: colors.current,
     black: colors.black,
     white: colors.white,
+    neutral: colors.neutral,
   }
 
   const colorAliases = {
-    background: tailwindNewRevisedPalette.gray[900],
-    foreground: tailwindNewRevisedPalette.gray[50],
+    background: colors.black,
+    foreground: colors.white,
   }
 
   return {

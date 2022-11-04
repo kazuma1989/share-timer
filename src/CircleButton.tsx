@@ -16,24 +16,30 @@ export function CircleButton({
   switch (color) {
     case "gray": {
       colorStyle = clsx(
-        "border-gray-600 bg-gray-800 text-gray-300 enabled:hover:bg-gray-800/75 enabled:active:bg-gray-900/30 disabled:text-gray-500 disabled:active:bg-gray-800/75"
+        "border-gray-500 bg-gray-900 text-gray-300",
+        "hover:border-gray-400 hover:bg-gray-800 hover:text-gray-200",
+        "active:border-gray-300",
+        "disabled:bg-gray-900"
       )
-
       break
     }
 
     case "green": {
-      // FIXME add disabled style
       colorStyle = clsx(
-        "border-green-700 bg-green-900/60 text-green-300 hover:bg-green-900/50 active:bg-green-900/30"
+        "border-green-500 bg-green-900 text-green-300",
+        "hover:border-green-400 hover:bg-green-800 hover:text-green-200",
+        "active:border-green-300",
+        "disabled:bg-green-900"
       )
       break
     }
 
     case "orange": {
-      // FIXME add disabled style
       colorStyle = clsx(
-        "border-orange-700 bg-orange-900/60 text-orange-300 hover:bg-orange-900/50 active:bg-orange-900/30"
+        "border-orange-500 bg-orange-900 text-orange-300",
+        "hover:border-orange-400 hover:bg-orange-800 hover:text-orange-200",
+        "active:border-orange-300",
+        "disabled:bg-orange-900"
       )
       break
     }
@@ -47,6 +53,7 @@ export function CircleButton({
       className={clsx(
         "h-20 w-20 cursor-pointer select-none rounded-full border-4 border-double",
         colorStyle,
+        "disabled:cursor-auto disabled:border-neutral-700 disabled:text-neutral-400",
         className
       )}
     />
