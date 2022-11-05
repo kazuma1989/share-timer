@@ -37,6 +37,14 @@ function config() {
           spin: "spin 1s ease-out infinite",
           flash: "flash 1s ease-out",
         },
+
+        keyframes: {
+          flash: {
+            from: {
+              backgroundColor: colors.current,
+            },
+          },
+        },
       },
     },
 

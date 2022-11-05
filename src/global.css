@@ -17,17 +17,3 @@ input {
 .progress-bar-transparent::-webkit-progress-bar {
   background-color: transparent;
 }
-
-@keyframes flash {
-  from {
-    @apply bg-dark/75;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  @keyframes flash {
-    from {
-      @apply bg-light/75;
-    }
-  }
-}
