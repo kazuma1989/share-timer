@@ -25,7 +25,11 @@ export function App({ room$ }: { room$: Observable<Room> }) {
     <div className="container mx-auto h-screen">
       <Timer room$={room$} timerState$={timerState$} className="h-full" />
 
-      <ErrorBoundary>
+      <ErrorBoundary
+        fallback={
+          <div className="absolute inset-0 text-9xl">Something went wrong.</div>
+        }
+      >
         <FlashCover timerState$={timerState$} />
       </ErrorBoundary>
     </div>
