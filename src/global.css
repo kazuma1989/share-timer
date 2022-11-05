@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  @apply bg-black text-white;
+  @apply bg-light text-dark dark:bg-dark dark:text-light;
 }
 
 select,
@@ -16,10 +16,4 @@ input {
 }
 .progress-bar-transparent::-webkit-progress-bar {
   background-color: transparent;
-}
-
-@keyframes flash {
-  from {
-    @apply bg-white/75;
-  }
 }
