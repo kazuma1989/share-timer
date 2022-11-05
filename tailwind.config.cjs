@@ -5,16 +5,17 @@ const colors = require("tailwindcss/colors")
  */
 function config() {
   const basicColors = {
-    transparent: colors.transparent,
+    inherit: colors.inherit,
     current: colors.current,
+    transparent: colors.transparent,
     black: colors.black,
     white: colors.white,
     neutral: colors.neutral,
   }
 
   const colorAliases = {
-    background: colors.black,
-    foreground: colors.white,
+    light: colors.white,
+    dark: colors.black,
   }
 
   return {
