@@ -3,12 +3,13 @@ import { addDoc, serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
 import { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
-import { DebugCheckAudioButton } from "./DebugCheckAudioButton"
 import { DurationSelect } from "./DurationSelect"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
+import { icon } from "./icon"
 import { TimerState } from "./timerReducer"
 import { TimeViewer } from "./TimeViewer"
+import { TransparentButton } from "./TransparentButton"
 import { useAllSettled } from "./useAllSettled"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
@@ -119,11 +120,19 @@ export function Timer({
         </div>
       </form>
 
-      {import.meta.env.DEV && (
-        <div className="grid place-items-center">
-          <DebugCheckAudioButton />
-        </div>
-      )}
+      <div className="flex items-center justify-evenly px-6">
+        <TransparentButton className="h-12 w-12 text-2xl" onClick={() => {}}>
+          {icon("flash")}
+        </TransparentButton>
+
+        <TransparentButton className="h-12 w-12 text-2xl" onClick={() => {}}>
+          {icon("volume-high")}
+        </TransparentButton>
+
+        <TransparentButton className="h-12 w-12 text-2xl" onClick={() => {}}>
+          {icon("cog")}
+        </TransparentButton>
+      </div>
     </div>
   )
 }
