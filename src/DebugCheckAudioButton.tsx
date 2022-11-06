@@ -1,4 +1,5 @@
 import { CircleButton } from "./CircleButton"
+import { icon } from "./icon"
 import { useAudio, useMediaPermission } from "./useAudio"
 import { useObservable } from "./useObservable"
 import { setTimeout } from "./util/setTimeout"
@@ -26,9 +27,9 @@ export function DebugCheckAudioButton() {
         audio.play()
       }}
     >
-      なる
+      {icon("volume-high")}
     </CircleButton>
   ) : (
-    <CircleButton>ならない</CircleButton>
+    <CircleButton>{icon("volume-off")}</CircleButton>
   )
 }
