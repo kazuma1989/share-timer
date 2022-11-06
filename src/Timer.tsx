@@ -36,6 +36,8 @@ export function Timer({
   })
   const primaryButton$ = useRef<HTMLButtonElement>(null)
 
+  const dialog$ = useRef<HTMLDialogElement>(null)
+
   return (
     <div className={clsx("grid grid-rows-[auto_5fr_auto_4fr]", className)}>
       <div className="pt-2 text-center">
@@ -143,16 +145,29 @@ export function Timer({
         <TransparentButton
           title="設定を開く"
           className="h-12 w-12 text-2xl"
-          // TODO open config
-          onClick={() => {}}
+          onClick={() => {
+            dialog$.current?.showModal()
+          }}
         >
           {icon("cog")}
         </TransparentButton>
 
         <dialog
-          open={true}
-          className="inset-0 h-full w-full overflow-auto overscroll-contain bg-light/50 p-0 backdrop-blur"
-        ></dialog>
+          ref={dialog$}
+          className="h-1/2 w-1/2 overflow-auto overscroll-contain rounded border border-neutral-300 bg-light p-0 text-inherit backdrop:backdrop-blur dark:border-neutral-700 dark:bg-dark"
+          onClick={() => {
+            dialog$.current?.close()
+          }}
+        >
+          <div
+            className="h-full w-full"
+            onClick={(e) => {
+              e.stopPropagation()
+            }}
+          >
+            この中身はどうなる
+          </div>
+        </dialog>
       </div>
     </div>
   )
