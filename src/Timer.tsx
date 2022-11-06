@@ -156,8 +156,9 @@ export function Timer({
           ref={dialog$}
           className={clsx(
             "h-full w-full overscroll-contain rounded border border-neutral-300 bg-light p-0 text-inherit backdrop:backdrop-blur dark:border-neutral-700 dark:bg-dark",
-            "[&:not([open])]:invisible [&:not([open])]:block [&:not([open])]:translate-y-full [&:not([open])]:scale-y-0",
-            "top-[1.5rem] max-h-[calc(100%-1.5rem)] max-w-none open:visible",
+            "[&:not([open])]:invisible [&:not([open])]:block",
+            "translate-y-full scale-y-0 open:visible open:translate-y-0 open:scale-y-100",
+            "top-[1.5rem] max-h-[calc(100%-1.5rem)] max-w-none",
             "transition-all duration-300"
           )}
           onClick={() => {
