@@ -155,11 +155,12 @@ export function Timer({
         <dialog
           ref={dialog$}
           className={clsx(
-            "h-full w-full overscroll-contain rounded border border-neutral-300 bg-light p-0 text-inherit backdrop:backdrop-blur dark:border-neutral-700 dark:bg-dark",
-            "[&:not([open])]:invisible [&:not([open])]:block",
-            "fixed translate-y-full open:visible open:translate-y-0",
-            "top-[1.5rem] max-h-[calc(100%-1.5rem)] max-w-none",
-            "transition-[visibility_transform] duration-300"
+            "h-full w-full overscroll-contain rounded-t-lg border",
+            "border-neutral-300 bg-light text-inherit dark:border-neutral-700 dark:bg-dark",
+            // override default dialog style
+            "fixed max-w-none p-0 backdrop:backdrop-blur open:visible [&:not([open])]:invisible [&:not([open])]:block",
+            "top-[1.5rem] max-h-[calc(100%-1.5rem)]",
+            "translate-y-full transition-[visibility_transform] duration-300 open:translate-y-0"
           )}
           onClick={() => {
             dialog$.current?.close()
