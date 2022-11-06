@@ -154,7 +154,7 @@ export function Timer({
 
         <dialog
           ref={dialog$}
-          className="h-1/2 w-1/2 overflow-auto overscroll-contain rounded border border-neutral-300 bg-light p-0 text-inherit backdrop:backdrop-blur dark:border-neutral-700 dark:bg-dark"
+          className="h-full w-full overscroll-contain rounded border border-neutral-300 bg-light p-0 text-inherit backdrop:backdrop-blur dark:border-neutral-700 dark:bg-dark"
           onClick={() => {
             dialog$.current?.close()
           }}
