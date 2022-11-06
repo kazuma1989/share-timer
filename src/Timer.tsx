@@ -35,7 +35,7 @@ export function Timer({
   const primaryButton$ = useRef<HTMLButtonElement>(null)
 
   return (
-    <div className={clsx("grid grid-rows-[auto_1fr_auto_1fr]", className)}>
+    <div className={clsx("grid grid-rows-[auto_5fr_auto_4fr]", className)}>
       <div className="pt-2 text-center">
         <h1>{roomName}</h1>
       </div>
@@ -56,7 +56,7 @@ export function Timer({
           primaryButton$.current?.focus()
         }}
       >
-        <div className="relative top-5 grid min-h-fit place-items-center tabular-nums">
+        <div className="grid min-h-[8rem] place-items-center tabular-nums">
           {state.mode === "editing" ? (
             <DurationSelect
               key={state.mode + state.initialDuration}
@@ -70,7 +70,7 @@ export function Timer({
           )}
         </div>
 
-        <div className="relative top-10 flex items-center justify-around">
+        <div className="flex items-center justify-around">
           <CircleButton
             disabled={state.mode === "editing"}
             className="text-xs"
