@@ -12,15 +12,6 @@ input {
   font-variant: inherit;
 }
 
-dialog {
-  @apply max-w-none max-h-[calc(100%-1.5rem)] top-[1.5rem] open:visible;
-  @apply transition-all duration-300;
-}
-
-dialog:not([open]) {
-  @apply block invisible translate-y-full scale-y-0;
-}
-
 .progress-bar-transparent::-moz-progress-bar {
   background-color: transparent;
 }
