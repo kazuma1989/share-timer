@@ -66,7 +66,7 @@ export function CircleButton({
       ref={innerRef}
       type={type}
       className={clsx(
-        "h-20 w-20 cursor-pointer select-none rounded-full border-4 border-double",
+        "h-20 w-20 cursor-pointer select-none rounded-full border-4 border-double transition-colors",
         colorStyle,
         "disabled:cursor-auto disabled:border-neutral-400 disabled:text-neutral-700",
         "dark:disabled:cursor-auto dark:disabled:border-neutral-700 dark:disabled:text-neutral-400",

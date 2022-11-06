@@ -26,7 +26,7 @@ export function DurationSelect({
   )
 
   const selectStyle = clsx(
-    "cursor-pointer appearance-none rounded px-2 py-3",
+    "cursor-pointer appearance-none rounded-md p-2 transition-colors",
     "bg-light hover:bg-dark/10 dark:bg-dark dark:hover:bg-light/20"
   )
 
