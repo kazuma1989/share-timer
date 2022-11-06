@@ -148,6 +148,11 @@ export function Timer({
         >
           {icon("cog")}
         </TransparentButton>
+
+        <dialog
+          open={true}
+          className="inset-0 h-full w-full overflow-auto overscroll-contain bg-light/50 p-0 backdrop-blur"
+        ></dialog>
       </div>
     </div>
   )
