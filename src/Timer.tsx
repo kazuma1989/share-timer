@@ -122,9 +122,8 @@ export function Timer({
       </form>
 
       <div className="flex items-center justify-evenly px-6">
-        {/* <dialog open>hello</dialog> */}
-
         <TransparentButton
+          title="フラッシュを切り替える"
           className="h-12 w-12 text-2xl"
           // TODO toggle flash
           onClick={() => {}}
@@ -133,6 +132,7 @@ export function Timer({
         </TransparentButton>
 
         <TransparentButton
+          title="音を切り替える"
           className="h-12 w-12 text-2xl"
           // TODO toggle volume
           onClick={() => {}}
@@ -141,6 +141,7 @@ export function Timer({
         </TransparentButton>
 
         <TransparentButton
+          title="設定を開く"
           className="h-12 w-12 text-2xl"
           // TODO open config
           onClick={() => {}}
