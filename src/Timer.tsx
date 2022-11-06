@@ -11,6 +11,7 @@ import { TimerState } from "./timerReducer"
 import { TimeViewer } from "./TimeViewer"
 import { TransparentButton } from "./TransparentButton"
 import { useAllSettled } from "./useAllSettled"
+import { useMediaPermission } from "./useAudio"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
 import { ActionOnFirestore } from "./zod/actionZod"
@@ -121,20 +122,40 @@ export function Timer({
       </form>
 
       <div className="flex items-center justify-evenly px-6">
-        <TransparentButton className="h-12 w-12 text-2xl" onClick={() => {}}>
+        {/* <dialog open>hello</dialog> */}
+
+        <TransparentButton
+          className="h-12 w-12 text-2xl"
+          // TODO toggle flash
+          onClick={() => {}}
+        >
           {icon("flash")}
         </TransparentButton>
 
-        <TransparentButton className="h-12 w-12 text-2xl" onClick={() => {}}>
-          {icon("volume-high")}
+        <TransparentButton
+          className="h-12 w-12 text-2xl"
+          // TODO toggle volume
+          onClick={() => {}}
+        >
+          <VolumeIcon />
         </TransparentButton>
 
-        <TransparentButton className="h-12 w-12 text-2xl" onClick={() => {}}>
+        <TransparentButton
+          className="h-12 w-12 text-2xl"
+          // TODO open config
+          onClick={() => {}}
+        >
           {icon("cog")}
         </TransparentButton>
       </div>
     </div>
   )
+}
+
+function VolumeIcon() {
+  const permission = useObservable(useMediaPermission(), "denied")
+
+  return permission === "canplay" ? icon("volume-high") : icon("volume-off")
 }
 
 function useDispatch(
