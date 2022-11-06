@@ -12,6 +12,16 @@ input {
   font-variant: inherit;
 }
 
+dialog {
+  @apply fixed inset-0;
+  @apply transition-all;
+  @apply open:block open:visible open:opacity-100;
+}
+
+dialog:not([open]) {
+  @apply block invisible opacity-0;
+}
+
 .progress-bar-transparent::-moz-progress-bar {
   background-color: transparent;
 }
