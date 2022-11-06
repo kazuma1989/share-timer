@@ -2,6 +2,8 @@ import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
 import { map, partition } from "rxjs"
 import { App } from "./App"
+import { ErrorBoundary } from "./ErrorBoundary"
+import { FullViewportOops } from "./FullViewportOops"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
@@ -32,14 +34,16 @@ initializeRoom(firestore, invalid$)
 
 createRoot(root).render(
   <StrictMode>
-    <FirestoreProvider value={firestore}>
-      <AudioProvider value={audio}>
-        <MediaPermissionProvider value={permission$}>
-          <Suspense fallback={<FullViewportProgress />}>
-            <App room$={room$} />
-          </Suspense>
-        </MediaPermissionProvider>
-      </AudioProvider>
-    </FirestoreProvider>
+    <ErrorBoundary fallback={<FullViewportOops />}>
+      <FirestoreProvider value={firestore}>
+        <AudioProvider value={audio}>
+          <MediaPermissionProvider value={permission$}>
+            <Suspense fallback={<FullViewportProgress />}>
+              <App room$={room$} />
+            </Suspense>
+          </MediaPermissionProvider>
+        </AudioProvider>
+      </FirestoreProvider>
+    </ErrorBoundary>
   </StrictMode>
 )
