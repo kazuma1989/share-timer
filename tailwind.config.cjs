@@ -52,7 +52,7 @@ function config() {
       },
     },
 
-    plugins: [],
+    plugins: [require("@tailwindcss/typography")],
   }
 }
 

@@ -35,6 +35,7 @@
     "tailwind-init": "tailwindcss init -p"
   },
   "dependencies": {
+    "@tailwindcss/typography": "0.5.x",
     "@tsconfig/vite-react": "1.0.x",
     "@vitejs/plugin-react": "2.2.x",
     "autoprefixer": "10.4.x",

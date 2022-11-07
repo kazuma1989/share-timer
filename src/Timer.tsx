@@ -166,14 +166,14 @@ export function Timer({
             dialog$.current?.close()
           }}
         >
-          <div
-            className="h-full w-full p-3"
+          <article
+            className="h-full w-full py-8 px-3 sm:px-8 prose prose-neutral dark:prose-invert"
             onClick={(e) => {
               e.stopPropagation()
             }}
           >
             {contents}
-          </div>
+          </article>
         </dialog>
       </div>
     </div>
