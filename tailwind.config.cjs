@@ -33,6 +33,10 @@ function config() {
           screen: ["100vh", "100dvh"],
         },
 
+        boxShadow: {
+          screen: "0 0 0 100vmax rgb(0 0 0 / 0.1)",
+        },
+
         animation: {
           spin: "spin 1s ease-out infinite",
           flash: "flash 1s ease-out",
