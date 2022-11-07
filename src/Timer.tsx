@@ -168,30 +168,51 @@ export function Timer({
         >
           <article
             className={clsx(
-              "min-h-full min-w-full py-12 px-6",
-              "prose prose-headings:text-dark/70 prose-p:text-dark/90 prose-a:text-azure-700 prose-headings:dark:text-light/70 prose-p:dark:text-light/90 prose-a:dark:text-azure-300"
+              "min-h-full min-w-full",
+              "text-dark/90 dark:text-light/90 prose prose-headings:text-dark/70 prose-a:text-azure-700 dark:prose-headings:text-light/70 dark:prose-a:text-azure-300",
+              "grid grid-rows-[1fr_auto]",
+              "pt-12 px-6"
             )}
             onClick={(e) => {
               e.stopPropagation()
             }}
           >
-            <h1>
-              <ruby>
-                Share Timer <rp>(</rp>
-                <rt className="text-xs">シェア タイマー</rt>
-                <rp>)</rp>
-              </ruby>
-            </h1>
+            <div>
+              <h1>
+                <ruby>
+                  Share Timer <rp>(</rp>
+                  <rt className="text-xs">シェア タイマー</rt>
+                  <rp>)</rp>
+                </ruby>
+              </h1>
 
-            <p>URL でタイマーを簡単共有！</p>
+              <p>URL でタイマーを簡単共有！</p>
 
-            <p>
-              このタイマーの URL
-              <br />
-              <a href={location.href}>{location.href}</a>
-            </p>
+              <p>
+                このタイマーの URL
+                <br />
+                <a href={location.href} className="break-words">
+                  {location.href}
+                </a>
+              </p>
 
-            <p>※ タイマーは誰でも開始／一時停止／キャンセルができます</p>
+              <p>※ タイマーは誰でも開始／一時停止／キャンセルできます</p>
+            </div>
+
+            <footer>
+              <p className="text-center">
+                <small>
+                  Crafted by{" "}
+                  <a
+                    href="https://github.com/kazuma1989"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    @kazuma1989
+                  </a>
+                </small>
+              </p>
+            </footer>
           </article>
         </dialog>
       </div>
