@@ -214,6 +214,13 @@ export function Timer({
               </p>
             </footer>
           </article>
+
+          <TransparentButton
+            title="閉じる"
+            className="h-12 w-12 text-2xl absolute right-2 top-2"
+          >
+            {icon("close")}
+          </TransparentButton>
         </dialog>
       </div>
     </div>
