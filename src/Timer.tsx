@@ -143,19 +143,19 @@ export function Timer({
         </TransparentButton>
 
         <TransparentButton
-          title="設定を開く"
+          title="情報を開く"
           className="h-12 w-12 text-2xl"
           onClick={() => {
             dialog$.current?.showModal()
           }}
         >
-          {icon("cog")}
+          {icon("information")}
         </TransparentButton>
 
         <dialog
           ref={dialog$}
           className={clsx(
-            "h-full container top-[3vh] max-h-[calc(100%-3vh)] overscroll-contain rounded-t-lg border border-b-0 max-sm:max-w-full",
+            "h-full container top-[3vh] max-h-[calc(100%-3vh)] overscroll-contain rounded-t-lg border border-b-0 max-w-prose",
             "border-neutral-300 bg-light text-inherit dark:border-neutral-700 dark:bg-dark",
             "open:shadow-screen open:shadow-dark/10 dark:open:shadow-light/20",
             "transition-[box-shadow,transform,visibility] duration-300 translate-y-full open:translate-y-0",
