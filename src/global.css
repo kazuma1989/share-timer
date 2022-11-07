@@ -2,19 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-light text-dark;
-  @apply dark:bg-dark dark:text-light;
+@layer base {
+  body {
+    @apply bg-light text-dark;
+    @apply dark:bg-dark dark:text-light;
+  }
+
+  select,
+  input {
+    font-variant: inherit;
+  }
 }
 
-select,
-input {
-  font-variant: inherit;
-}
-
-.progress-bar-transparent::-moz-progress-bar {
-  background-color: transparent;
-}
-.progress-bar-transparent::-webkit-progress-bar {
-  background-color: transparent;
+@layer utilities {
+  .progress-bar-transparent::-moz-progress-bar {
+    background-color: transparent;
+  }
+  .progress-bar-transparent::-webkit-progress-bar {
+    background-color: transparent;
+  }
 }
