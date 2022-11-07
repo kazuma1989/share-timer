@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import { Ref } from "react"
+import { Ref, useImperativeHandle, useRef } from "react"
 import { icon } from "./icon"
 import { TransparentButton } from "./TransparentButton"
 
@@ -9,11 +9,14 @@ export function InformationDialog({
   ...props
 }: JSX.IntrinsicElements["dialog"] & {
   ref?: "should use innerRef"
-  innerRef?: Ref<HTMLDialogElement>
+  innerRef?: Ref<HTMLDialogElement | null>
 }) {
+  const dialog$ = useRef<HTMLDialogElement>(null)
+  useImperativeHandle(innerRef, () => dialog$.current, [])
+
   return (
     <dialog
-      ref={innerRef}
+      ref={dialog$}
       className={clsx(
         "h-full container top-[3vh] max-h-[calc(100%-3vh)] overscroll-contain rounded-t-lg border border-b-0 max-w-prose",
         "border-neutral-300 bg-light text-inherit dark:border-neutral-700 dark:bg-dark",
@@ -24,7 +27,7 @@ export function InformationDialog({
         className
       )}
       onClick={() => {
-        innerRef.current?.close()
+        dialog$.current?.close()
       }}
       {...props}
     >
