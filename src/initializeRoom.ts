@@ -1,13 +1,12 @@
 import { doc, Firestore, runTransaction } from "firebase/firestore"
-import { Observable } from "rxjs"
+import { filter, Observable } from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { InvalidDoc, InvalidId } from "./mapToRoom"
-import { replaceHash } from "./observeHash"
 import { pauseWhileLoop } from "./util/pauseWhileLoop"
 import { sparse } from "./util/sparse"
 import { ActionOnFirestore } from "./zod/actionZod"
-import { newRoomId, RoomOnFirestore } from "./zod/roomZod"
+import { RoomOnFirestore } from "./zod/roomZod"
 
 export function initializeRoom(
   db: Firestore,
@@ -17,6 +16,7 @@ export function initializeRoom(
 
   invalid$
     .pipe(
+      filter((_): _ is InvalidDoc => _[0] === "invalid-doc"),
       sparse(200),
       pauseWhileLoop({
         criteria: import.meta.env.PROD ? 20 : 5,
@@ -28,26 +28,13 @@ export function initializeRoom(
         },
       })
     )
-    .subscribe(async (reason) => {
+    .subscribe(async ([, roomId]) => {
       abort.abort()
       abort = new AbortController()
 
-      const [type] = reason
-      switch (type) {
-        case "invalid-id": {
-          replaceHash(newRoomId())
-          break
-        }
-
-        case "invalid-doc": {
-          const [, roomId] = reason
-
-          await setupRoom(db, roomId, abort.signal).catch((_: unknown) => {
-            console.debug("aborted setup room", _)
-          })
-          break
-        }
-      }
+      await setupRoom(db, roomId, abort.signal).catch((_: unknown) => {
+        console.debug("aborted setup room", _)
+      })
     })
 }
 
