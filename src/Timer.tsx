@@ -18,6 +18,39 @@ import { useObservable } from "./useObservable"
 import { ActionOnFirestore } from "./zod/actionZod"
 import { Room } from "./zod/roomZod"
 
+interface Dialog {
+  open: boolean | undefined
+  close(): void
+  show(): void
+  showModal(): void
+  element: HTMLDialogElement | null
+}
+
+function useDialog(): [
+  dialog: Dialog,
+  setDialog: (dialog: Dialog["element"]) => void
+] {
+  const [dialog, setDialog] = useState<HTMLDialogElement | null>(null)
+  const open = useDialogOpen(dialog)
+
+  return [
+    {
+      open,
+      close() {
+        dialog?.close()
+      },
+      show() {
+        dialog?.show()
+      },
+      showModal() {
+        dialog?.showModal()
+      },
+      element: dialog,
+    },
+    setDialog,
+  ]
+}
+
 function useDialogOpen(
   dialog: HTMLDialogElement | null | undefined
 ): boolean | undefined {
@@ -62,8 +95,7 @@ export function Timer({
   })
   const primaryButton$ = useRef<HTMLButtonElement>(null)
 
-  const [dialog, setDialog] = useState<HTMLDialogElement | null>(null)
-  const dialogOpen = useDialogOpen(dialog)
+  const [dialog, setDialog] = useDialog()
 
   return (
     <>
@@ -71,7 +103,7 @@ export function Timer({
         className={clsx(
           "grid grid-rows-[auto_5fr_auto_4fr]",
           "transition-transform",
-          dialogOpen && "scale-95",
+          dialog.open && "scale-95",
           className
         )}
       >
@@ -185,7 +217,7 @@ export function Timer({
             title="情報を開く"
             className="h-12 w-12 text-2xl"
             onClick={() => {
-              dialog?.showModal()
+              dialog.showModal()
             }}
           >
             {icon("information")}
