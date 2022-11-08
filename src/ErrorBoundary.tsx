@@ -1,33 +1,65 @@
-import { Component, ReactNode } from "react"
+import { Component, ErrorInfo, ReactNode } from "react"
+import { createContext } from "./createContext"
+
+export const [ErrorProvider, useError] = createContext<unknown>("ErrorProvider")
+
+interface ResetError {
+  (): void
+}
+
+export const [ResetErrorProvider, useResetError] =
+  createContext<ResetError>("ResetErrorProvider")
+
+interface Props {
+  fallback?: ReactNode
+  children?: ReactNode
+}
+
+interface State {
+  error: unknown | null
+}
 
 /**
  * https://reactjs.org/docs/error-boundaries.html
  */
-export class ErrorBoundary extends Component<
-  { children?: ReactNode },
-  { hasError: boolean }
-> {
-  constructor(props: any) {
+export class ErrorBoundary extends Component<Props, State> {
+  static getDerivedStateFromError(error: unknown): State {
+    return {
+      error,
+    }
+  }
+
+  constructor(props: Props) {
     super(props)
-    this.state = { hasError: false }
+
+    this.state = {
+      error: null,
+    }
   }
 
-  static getDerivedStateFromError(error: any) {
-    // Update state so the next render will show the fallback UI.
-    return { hasError: true }
-  }
-
-  componentDidCatch(error: any, errorInfo: any) {
-    // You can also log the error to an error reporting service
+  componentDidCatch(error: unknown, errorInfo: ErrorInfo): void {
     console.warn(error, errorInfo)
   }
 
+  private resetError: ResetError = () => {
+    this.setState({
+      error: null,
+    })
+  }
+
   render() {
-    if (this.state.hasError) {
-      // You can render any custom fallback UI
-      return <h1>Something went wrong.</h1>
+    const { fallback, children } = this.props
+    const { error } = this.state
+    const { resetError } = this
+
+    if (error) {
+      return (
+        <ResetErrorProvider value={resetError}>
+          <ErrorProvider value={error}>{fallback}</ErrorProvider>
+        </ResetErrorProvider>
+      )
     }
 
-    return this.props.children
+    return children ?? null
   }
 }

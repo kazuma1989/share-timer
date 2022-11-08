@@ -1,5 +1,4 @@
 import { distinctUntilChanged, map, Observable } from "rxjs"
-import { ErrorBoundary } from "./ErrorBoundary"
 import { FlashCover } from "./FlashCover"
 import { mapToTimerState } from "./mapToTimerState"
 import { Timer } from "./Timer"
@@ -25,9 +24,7 @@ export function App({ room$ }: { room$: Observable<Room> }) {
     <div className="container mx-auto h-screen">
       <Timer room$={room$} timerState$={timerState$} className="h-full" />
 
-      <ErrorBoundary>
-        <FlashCover timerState$={timerState$} />
-      </ErrorBoundary>
+      <FlashCover timerState$={timerState$} />
     </div>
   )
 }
