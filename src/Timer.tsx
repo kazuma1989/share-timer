@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import { addDoc, serverTimestamp } from "firebase/firestore"
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
@@ -38,124 +38,150 @@ export function Timer({
   const primaryButton$ = useRef<HTMLButtonElement>(null)
 
   const dialog$ = useRef<HTMLDialogElement>(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
 
   return (
-    <div className={clsx("grid grid-rows-[auto_5fr_auto_4fr]", className)}>
-      <div className="pt-2 text-center">
-        <h1>{roomName}</h1>
-      </div>
-
-      <form
-        className="contents"
-        onSubmit={async (e) => {
-          e.preventDefault()
-
-          if (state.mode !== "editing") return
-
-          dispatch({
-            type: "start",
-            withDuration: durationSelect$.current.value,
-            at: serverTimestamp(),
-          })
-
-          primaryButton$.current?.focus()
-        }}
+    <>
+      <div
+        className={clsx(
+          "grid grid-rows-[auto_5fr_auto_4fr]",
+          "transition-transform",
+          dialogOpen && "scale-95",
+          className
+        )}
       >
-        <div className="grid min-h-[8rem] place-items-center tabular-nums">
-          {state.mode === "editing" ? (
-            <DurationSelect
-              key={state.mode + state.initialDuration}
-              innerRef={durationSelect$}
-              defaultValue={state.initialDuration}
-            />
-          ) : (
-            <div className="text-8xl font-thin sm:text-9xl">
-              <TimeViewer timerState$={timerState$} />
-            </div>
-          )}
+        <div className="pt-2 text-center">
+          <h1>{roomName}</h1>
         </div>
 
-        <div className="flex items-center justify-around">
-          <CircleButton
-            disabled={state.mode === "editing"}
-            className="text-xs"
-            onClick={() => {
-              dispatch({
-                type: "cancel",
-              })
-            }}
-          >
-            キャンセル
-          </CircleButton>
+        <form
+          className="contents"
+          onSubmit={async (e) => {
+            e.preventDefault()
 
-          {state.mode === "editing" ? (
-            <CircleButton innerRef={primaryButton$} color="green" type="submit">
-              開始
-            </CircleButton>
-          ) : state.mode === "running" ? (
-            <CircleButton
-              innerRef={primaryButton$}
-              color="orange"
-              onClick={() => {
-                dispatch({
-                  type: "pause",
-                  at: serverTimestamp(),
-                })
-              }}
-            >
-              一時停止
-            </CircleButton>
-          ) : (
-            <CircleButton
-              innerRef={primaryButton$}
-              color="green"
-              onClick={() => {
-                if (pending) return
+            if (state.mode !== "editing") return
 
-                dispatch({
-                  type: "resume",
-                  at: serverTimestamp(),
-                })
-              }}
-            >
-              再開
-            </CircleButton>
-          )}
-        </div>
-      </form>
+            dispatch({
+              type: "start",
+              withDuration: durationSelect$.current.value,
+              at: serverTimestamp(),
+            })
 
-      <div className="flex items-center justify-evenly px-6">
-        <TransparentButton
-          title="フラッシュを切り替える"
-          className="h-12 w-12 text-2xl"
-          // TODO toggle flash
-          onClick={() => {}}
-        >
-          {icon("flash")}
-        </TransparentButton>
-
-        <TransparentButton
-          title="音を切り替える"
-          className="h-12 w-12 text-2xl"
-          // TODO toggle volume
-          onClick={() => {}}
-        >
-          <VolumeIcon />
-        </TransparentButton>
-
-        <TransparentButton
-          title="情報を開く"
-          className="h-12 w-12 text-2xl"
-          onClick={() => {
-            dialog$.current?.showModal()
+            primaryButton$.current?.focus()
           }}
         >
-          {icon("information")}
-        </TransparentButton>
+          <div className="grid min-h-[8rem] place-items-center tabular-nums">
+            {state.mode === "editing" ? (
+              <DurationSelect
+                key={state.mode + state.initialDuration}
+                innerRef={durationSelect$}
+                defaultValue={state.initialDuration}
+              />
+            ) : (
+              <div className="text-8xl font-thin sm:text-9xl">
+                <TimeViewer timerState$={timerState$} />
+              </div>
+            )}
+          </div>
 
-        <InformationDialog innerRef={dialog$} />
+          <div className="flex items-center justify-around">
+            <CircleButton
+              disabled={state.mode === "editing"}
+              className="text-xs"
+              onClick={() => {
+                dispatch({
+                  type: "cancel",
+                })
+              }}
+            >
+              キャンセル
+            </CircleButton>
+
+            {state.mode === "editing" ? (
+              <CircleButton
+                innerRef={primaryButton$}
+                color="green"
+                type="submit"
+              >
+                開始
+              </CircleButton>
+            ) : state.mode === "running" ? (
+              <CircleButton
+                innerRef={primaryButton$}
+                color="orange"
+                onClick={() => {
+                  dispatch({
+                    type: "pause",
+                    at: serverTimestamp(),
+                  })
+                }}
+              >
+                一時停止
+              </CircleButton>
+            ) : (
+              <CircleButton
+                innerRef={primaryButton$}
+                color="green"
+                onClick={() => {
+                  if (pending) return
+
+                  dispatch({
+                    type: "resume",
+                    at: serverTimestamp(),
+                  })
+                }}
+              >
+                再開
+              </CircleButton>
+            )}
+          </div>
+        </form>
+
+        <div className="flex items-center justify-evenly px-6">
+          <TransparentButton
+            title="フラッシュを切り替える"
+            className="h-12 w-12 text-2xl"
+            // TODO toggle flash
+            onClick={() => {}}
+          >
+            {icon("flash")}
+          </TransparentButton>
+
+          <TransparentButton
+            title="音を切り替える"
+            className="h-12 w-12 text-2xl"
+            // TODO toggle volume
+            onClick={() => {}}
+          >
+            <VolumeIcon />
+          </TransparentButton>
+
+          <TransparentButton
+            title="情報を開く"
+            className="h-12 w-12 text-2xl"
+            onClick={() => {
+              const dialog = dialog$.current
+              if (!dialog) return
+
+              dialog.showModal()
+              setDialogOpen(dialog.open)
+
+              dialog.addEventListener(
+                "close",
+                () => {
+                  setDialogOpen(dialog.open)
+                },
+                { passive: true, once: true }
+              )
+            }}
+          >
+            {icon("information")}
+          </TransparentButton>
+        </div>
       </div>
-    </div>
+
+      <InformationDialog innerRef={dialog$} />
+    </>
   )
 }
 
