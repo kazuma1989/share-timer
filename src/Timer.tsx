@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import { addDoc, serverTimestamp } from "firebase/firestore"
-import { useRef, useState } from "react"
+import { useCallback, useRef, useState, useSyncExternalStore } from "react"
 import { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
@@ -17,6 +17,29 @@ import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
 import { ActionOnFirestore } from "./zod/actionZod"
 import { Room } from "./zod/roomZod"
+
+function useDialogOpen(
+  dialog: HTMLDialogElement | null | undefined
+): boolean | undefined {
+  const subscribe = useCallback(
+    (onStoreChange: () => void): (() => void) => {
+      const abort = new AbortController()
+
+      console.log("dialog?", dialog)
+      dialog?.addEventListener("close", onStoreChange, {
+        passive: true,
+        signal: abort.signal,
+      })
+
+      return () => {
+        abort.abort()
+      }
+    },
+    [dialog]
+  )
+
+  return useSyncExternalStore(subscribe, () => dialog?.open)
+}
 
 export function Timer({
   room$,
@@ -37,8 +60,8 @@ export function Timer({
   })
   const primaryButton$ = useRef<HTMLButtonElement>(null)
 
-  const dialog$ = useRef<HTMLDialogElement>(null)
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialog, setDialog] = useState<HTMLDialogElement | null>(null)
+  const dialogOpen = useDialogOpen(dialog)
 
   return (
     <>
@@ -160,19 +183,7 @@ export function Timer({
             title="情報を開く"
             className="h-12 w-12 text-2xl"
             onClick={() => {
-              const dialog = dialog$.current
-              if (!dialog) return
-
-              dialog.showModal()
-              setDialogOpen(dialog.open)
-
-              dialog.addEventListener(
-                "close",
-                () => {
-                  setDialogOpen(dialog.open)
-                },
-                { passive: true, once: true }
-              )
+              dialog?.showModal()
             }}
           >
             {icon("information")}
@@ -180,7 +191,7 @@ export function Timer({
         </div>
       </div>
 
-      <InformationDialog innerRef={dialog$} />
+      <InformationDialog innerRef={setDialog} />
     </>
   )
 }
