@@ -57,11 +57,19 @@ export function InformationDialog({
             このタイマーの URL
             <br />
             <a href={location.href} className="break-words">
+              {/* FIXME location.href だとリアクティブにならない気がする？ */}
               {location.href}
             </a>
           </p>
 
           <p>※ タイマーは誰でも開始／一時停止／キャンセルできます</p>
+
+          <p>
+            {/* FIXME なんとなくだがリンクボタン風にしたいな */}
+            <a href="#" target="_blank">
+              新しいタイマーを開く
+            </a>
+          </p>
         </div>
 
         <footer>
