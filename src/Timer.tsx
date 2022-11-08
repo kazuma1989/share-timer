@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import { addDoc, serverTimestamp } from "firebase/firestore"
-import { useRef, useState } from "react"
+import { useRef } from "react"
 import { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
@@ -13,6 +13,7 @@ import { TimeViewer } from "./TimeViewer"
 import { TransparentButton } from "./TransparentButton"
 import { useAllSettled } from "./useAllSettled"
 import { useMediaPermission } from "./useAudio"
+import { useDialog } from "./useDialog"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
 import { ActionOnFirestore } from "./zod/actionZod"
@@ -37,8 +38,7 @@ export function Timer({
   })
   const primaryButton$ = useRef<HTMLButtonElement>(null)
 
-  const dialog$ = useRef<HTMLDialogElement>(null)
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialog, setDialog] = useDialog()
 
   return (
     <>
@@ -46,7 +46,7 @@ export function Timer({
         className={clsx(
           "grid grid-rows-[auto_5fr_auto_4fr]",
           "transition-transform",
-          dialogOpen && "scale-95",
+          dialog.open && "scale-95",
           className
         )}
       >
@@ -160,19 +160,7 @@ export function Timer({
             title="情報を開く"
             className="h-12 w-12 text-2xl"
             onClick={() => {
-              const dialog = dialog$.current
-              if (!dialog) return
-
               dialog.showModal()
-              setDialogOpen(dialog.open)
-
-              dialog.addEventListener(
-                "close",
-                () => {
-                  setDialogOpen(dialog.open)
-                },
-                { passive: true, once: true }
-              )
             }}
           >
             {icon("information")}
@@ -180,7 +168,7 @@ export function Timer({
         </div>
       </div>
 
-      <InformationDialog innerRef={dialog$} />
+      <InformationDialog innerRef={setDialog} />
     </>
   )
 }

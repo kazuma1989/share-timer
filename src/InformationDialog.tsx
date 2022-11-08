@@ -57,11 +57,27 @@ export function InformationDialog({
             このタイマーの URL
             <br />
             <a href={location.href} className="break-words">
+              {/* FIXME location.href だとリアクティブにならない気がする？ */}
               {location.href}
             </a>
           </p>
 
           <p>※ タイマーは誰でも開始／一時停止／キャンセルできます</p>
+
+          <p>
+            <a
+              href="#"
+              target="_blank"
+              className={clsx(
+                "border border-gray-500 block px-4 py-3 text-center no-underline after:content-['_↗']",
+                // FIXME TransparentButtonと同じスタイルなのでなんとかコンポーネントにまとめられないか
+                "cursor-pointer rounded-md transition-colors",
+                "hover:bg-dark/10 active:bg-dark/20 dark:hover:bg-light/20 dark:active:bg-light/30"
+              )}
+            >
+              新しいタイマーを開く
+            </a>
+          </p>
         </div>
 
         <footer>
