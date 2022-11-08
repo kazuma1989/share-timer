@@ -18,6 +18,7 @@ export function TransparentButton({
       className={clsx(
         "cursor-pointer rounded-md transition-colors",
         "hover:bg-dark/10 active:bg-dark/20 dark:hover:bg-light/20 dark:active:bg-light/30",
+        // FIXME TransparentButtonにdisabledな見た目必要？
         // "disabled:cursor-auto disabled:border-neutral-400 disabled:text-neutral-700",
         // "dark:disabled:cursor-auto dark:disabled:border-neutral-700 dark:disabled:text-neutral-400",
         className
