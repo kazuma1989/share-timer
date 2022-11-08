@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import { addDoc, serverTimestamp } from "firebase/firestore"
-import { useCallback, useRef, useState, useSyncExternalStore } from "react"
+import { useRef } from "react"
 import { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
@@ -13,68 +13,11 @@ import { TimeViewer } from "./TimeViewer"
 import { TransparentButton } from "./TransparentButton"
 import { useAllSettled } from "./useAllSettled"
 import { useMediaPermission } from "./useAudio"
+import { useDialog } from "./useDialog"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
 import { ActionOnFirestore } from "./zod/actionZod"
 import { Room } from "./zod/roomZod"
-
-interface Dialog {
-  open: boolean | undefined
-  close(): void
-  show(): void
-  showModal(): void
-  element: HTMLDialogElement | null
-}
-
-function useDialog(): [
-  dialog: Dialog,
-  setDialog: (dialog: Dialog["element"]) => void
-] {
-  const [dialog, setDialog] = useState<HTMLDialogElement | null>(null)
-  const open = useDialogOpen(dialog)
-
-  return [
-    {
-      open,
-      close() {
-        dialog?.close()
-      },
-      show() {
-        dialog?.show()
-      },
-      showModal() {
-        dialog?.showModal()
-      },
-      element: dialog,
-    },
-    setDialog,
-  ]
-}
-
-function useDialogOpen(
-  dialog: HTMLDialogElement | null | undefined
-): boolean | undefined {
-  const subscribe = useCallback(
-    (onStoreChange: () => void): (() => void) => {
-      if (!dialog) {
-        return () => {}
-      }
-
-      const observer = new MutationObserver(() => {
-        onStoreChange()
-      })
-
-      observer.observe(dialog, { attributes: true, attributeFilter: ["open"] })
-
-      return () => {
-        observer.disconnect()
-      }
-    },
-    [dialog]
-  )
-
-  return useSyncExternalStore(subscribe, () => dialog?.open)
-}
 
 export function Timer({
   room$,
