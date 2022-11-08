@@ -23,16 +23,18 @@ function useDialogOpen(
 ): boolean | undefined {
   const subscribe = useCallback(
     (onStoreChange: () => void): (() => void) => {
-      const abort = new AbortController()
+      if (!dialog) {
+        return () => {}
+      }
 
-      console.log("dialog?", dialog)
-      dialog?.addEventListener("close", onStoreChange, {
-        passive: true,
-        signal: abort.signal,
+      const observer = new MutationObserver(() => {
+        onStoreChange()
       })
 
+      observer.observe(dialog, { attributes: true, attributeFilter: ["open"] })
+
       return () => {
-        abort.abort()
+        observer.disconnect()
       }
     },
     [dialog]
