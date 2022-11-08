@@ -13,7 +13,31 @@ export function useDialog(): [
   setDialog: (dialog: Dialog["element"]) => void
 ] {
   const [dialog, setDialog] = useState<HTMLDialogElement | null>(null)
-  const open = useDialogOpen(dialog)
+
+  const open = useSyncExternalStore(
+    useCallback(
+      (onStoreChange) => {
+        if (!dialog) {
+          return () => {}
+        }
+
+        const observer = new MutationObserver(() => {
+          onStoreChange()
+        })
+
+        observer.observe(dialog, {
+          attributes: true,
+          attributeFilter: ["open"],
+        })
+
+        return () => {
+          observer.disconnect()
+        }
+      },
+      [dialog]
+    ),
+    () => dialog?.open
+  )
 
   return [
     {
@@ -31,29 +55,4 @@ export function useDialog(): [
     },
     setDialog,
   ]
-}
-
-function useDialogOpen(
-  dialog: HTMLDialogElement | null | undefined
-): boolean | undefined {
-  const subscribe = useCallback(
-    (onStoreChange: () => void): (() => void) => {
-      if (!dialog) {
-        return () => {}
-      }
-
-      const observer = new MutationObserver(() => {
-        onStoreChange()
-      })
-
-      observer.observe(dialog, { attributes: true, attributeFilter: ["open"] })
-
-      return () => {
-        observer.disconnect()
-      }
-    },
-    [dialog]
-  )
-
-  return useSyncExternalStore(subscribe, () => dialog?.open)
 }
