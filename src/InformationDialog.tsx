@@ -21,7 +21,7 @@ export function InformationDialog({
         "h-full container top-[3vh] max-h-[calc(100%-3vh)] overscroll-contain rounded-t-lg border border-b-0 max-w-prose",
         "border-neutral-300 bg-light text-inherit dark:border-neutral-700 dark:bg-dark",
         "open:shadow-screen open:shadow-dark/10 dark:open:shadow-light/20",
-        "transition-[box-shadow,transform,visibility] duration-300 translate-y-full open:translate-y-0",
+        "transition-[box-shadow,transform,visibility] duration-300 [&:not([open])]:translate-y-full",
         // override default dialog style
         "fixed p-0 backdrop:bg-transparent open:visible [&:not([open])]:invisible [&:not([open])]:block",
         className
@@ -31,6 +31,15 @@ export function InformationDialog({
       }}
       {...props}
     >
+      <div className="flex justify-end">
+        <TransparentButton
+          title="閉じる"
+          className="h-12 w-12 text-2xl fixed m-2"
+        >
+          {icon("close")}
+        </TransparentButton>
+      </div>
+
       <article
         className={clsx(
           "min-h-full min-w-full",
@@ -95,13 +104,6 @@ export function InformationDialog({
           </p>
         </footer>
       </article>
-
-      <TransparentButton
-        title="閉じる"
-        className="h-12 w-12 text-2xl absolute right-2 top-2"
-      >
-        {icon("close")}
-      </TransparentButton>
     </dialog>
   )
 }
