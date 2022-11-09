@@ -1,6 +1,6 @@
 import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
-import { filter, map, partition } from "rxjs"
+import { partition } from "rxjs"
 import { App } from "./App"
 import { ErrorBoundary } from "./ErrorBoundary"
 import { FullViewportOops } from "./FullViewportOops"
@@ -15,8 +15,7 @@ import { observeMediaPermission } from "./observeMediaPermission"
 import smallAlert from "./sound/small-alert.mp3"
 import { AudioProvider, MediaPermissionProvider } from "./useAudio"
 import { FirestoreProvider } from "./useFirestore"
-import { nonNullable } from "./util/nonNullable"
-import { roomIdZod } from "./zod/roomZod"
+import { isRoomId } from "./zod/roomZod"
 
 const firestore = await initializeFirestore()
 
@@ -29,14 +28,7 @@ const root = document.getElementById("root")!
 const audio = new Audio(smallAlert)
 const permission$ = observeMediaPermission(audio, root)
 
-const hash$ = observeHash()
-const roomId$ = hash$.pipe(
-  map((hash) => {
-    const _ = roomIdZod.safeParse(hash)
-    return _.success ? _.data : null
-  }),
-  filter(nonNullable)
-)
+const [roomId$, anotherPageId$] = partition(observeHash(), isRoomId)
 const [room$, invalid$] = partition(roomId$.pipe(mapToRoom(firestore)), isRoom)
 
 initializeRoom(firestore, invalid$)
@@ -48,7 +40,7 @@ createRoot(root).render(
         <AudioProvider value={audio}>
           <MediaPermissionProvider value={permission$}>
             <Suspense fallback={<FullViewportProgress />}>
-              <App room$={room$} />
+              <App room$={room$} anotherPageId$={anotherPageId$} />
             </Suspense>
           </MediaPermissionProvider>
         </AudioProvider>

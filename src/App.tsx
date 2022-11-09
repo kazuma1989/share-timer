@@ -3,11 +3,27 @@ import { FlashCover } from "./FlashCover"
 import { mapToTimerState } from "./mapToTimerState"
 import { Timer } from "./Timer"
 import { useFirestore } from "./useFirestore"
+import { useObservable } from "./useObservable"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { createCache } from "./util/createCache"
 import { Room } from "./zod/roomZod"
 
-export function App({ room$ }: { room$: Observable<Room> }) {
+export function App({
+  room$,
+  anotherPageId$,
+}: {
+  room$: Observable<Room>
+  anotherPageId$: Observable<string>
+}) {
+  const id = useObservable(anotherPageId$, null)
+  if (id) {
+    return <div className="text-9xl">id: {id}</div>
+  }
+
+  return <TimerPage room$={room$} />
+}
+
+function TimerPage({ room$ }: { room$: Observable<Room> }) {
   const db = useFirestore()
 
   const timerState$ = cache(room$, () =>
