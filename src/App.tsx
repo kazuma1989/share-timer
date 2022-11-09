@@ -13,9 +13,9 @@ export function App({
   anotherPageId$,
 }: {
   room$: Observable<Room>
-  anotherPageId$: Observable<string>
+  anotherPageId$: Observable<string | null>
 }) {
-  const id = useObservable(anotherPageId$, null)
+  const id = useObservable(anotherPageId$)
   if (id) {
     return <div className="text-9xl">id: {id}</div>
   }

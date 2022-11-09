@@ -1,6 +1,6 @@
 import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
-import { partition } from "rxjs"
+import { map, merge, partition } from "rxjs"
 import { App } from "./App"
 import { ErrorBoundary } from "./ErrorBoundary"
 import { FullViewportOops } from "./FullViewportOops"
@@ -28,7 +28,9 @@ const root = document.getElementById("root")!
 const audio = new Audio(smallAlert)
 const permission$ = observeMediaPermission(audio, root)
 
-const [roomId$, anotherPageId$] = partition(observeHash(), isRoomId)
+const [roomId$, _else$] = partition(observeHash(), isRoomId)
+const anotherPageId$ = merge(_else$, roomId$.pipe(map(() => null)))
+
 const [room$, invalid$] = partition(roomId$.pipe(mapToRoom(firestore)), isRoom)
 
 initializeRoom(firestore, invalid$)
