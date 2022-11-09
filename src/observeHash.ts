@@ -12,7 +12,7 @@ export function observeHash(): Observable<string> {
     passive: true,
   }).pipe(
     startWith(null),
-    map(() => window.location.hash),
+    map(() => window.location.hash.slice("#".length)),
     distinctUntilChanged(),
     shareRecent()
   )

@@ -1,6 +1,6 @@
 import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
-import { map, partition } from "rxjs"
+import { filter, map, partition } from "rxjs"
 import { App } from "./App"
 import { ErrorBoundary } from "./ErrorBoundary"
 import { FullViewportOops } from "./FullViewportOops"
@@ -15,6 +15,8 @@ import { observeMediaPermission } from "./observeMediaPermission"
 import smallAlert from "./sound/small-alert.mp3"
 import { AudioProvider, MediaPermissionProvider } from "./useAudio"
 import { FirestoreProvider } from "./useFirestore"
+import { nonNullable } from "./util/nonNullable"
+import { roomIdZod } from "./zod/roomZod"
 
 const firestore = await initializeFirestore()
 
@@ -27,7 +29,14 @@ const root = document.getElementById("root")!
 const audio = new Audio(smallAlert)
 const permission$ = observeMediaPermission(audio, root)
 
-const roomId$ = observeHash().pipe(map((hash) => hash.slice("#".length)))
+const hash$ = observeHash()
+const roomId$ = hash$.pipe(
+  map((hash) => {
+    const _ = roomIdZod.safeParse(hash)
+    return _.success ? _.data : null
+  }),
+  filter(nonNullable)
+)
 const [room$, invalid$] = partition(roomId$.pipe(mapToRoom(firestore)), isRoom)
 
 initializeRoom(firestore, invalid$)

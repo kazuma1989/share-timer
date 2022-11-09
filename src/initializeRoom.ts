@@ -1,8 +1,8 @@
 import { doc, Firestore, runTransaction } from "firebase/firestore"
-import { filter, Observable } from "rxjs"
+import { Observable } from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
-import { InvalidDoc, InvalidId } from "./mapToRoom"
+import { InvalidDoc } from "./mapToRoom"
 import { pauseWhileLoop } from "./util/pauseWhileLoop"
 import { sparse } from "./util/sparse"
 import { ActionOnFirestore } from "./zod/actionZod"
@@ -10,13 +10,12 @@ import { RoomOnFirestore } from "./zod/roomZod"
 
 export function initializeRoom(
   db: Firestore,
-  invalid$: Observable<InvalidDoc | InvalidId>
+  invalid$: Observable<InvalidDoc>
 ): void {
   let abort = new AbortController()
 
   invalid$
     .pipe(
-      filter((_): _ is InvalidDoc => _[0] === "invalid-doc"),
       sparse(200),
       pauseWhileLoop({
         criteria: import.meta.env.PROD ? 20 : 5,
