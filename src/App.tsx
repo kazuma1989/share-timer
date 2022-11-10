@@ -1,5 +1,6 @@
 import { distinctUntilChanged, map, Observable } from "rxjs"
 import { FlashCover } from "./FlashCover"
+import { PageType } from "./mapToPageType"
 import { mapToTimerState } from "./mapToTimerState"
 import { Timer } from "./Timer"
 import { useFirestore } from "./useFirestore"
@@ -10,17 +11,25 @@ import { Room } from "./zod/roomZod"
 
 export function App({
   room$,
-  anotherPageId$,
+  pageType$,
 }: {
   room$: Observable<Room>
-  anotherPageId$: Observable<string | null>
+  pageType$: Observable<PageType>
 }) {
-  const id = useObservable(anotherPageId$)
-  if (id) {
-    return <div className="text-9xl">id: {id}</div>
-  }
+  const [id] = useObservable(pageType$)
+  switch (id) {
+    case "info": {
+      return <div className="text-9xl">id: {id}</div>
+    }
 
-  return <TimerPage room$={room$} />
+    case "room": {
+      return <TimerPage room$={room$} />
+    }
+
+    case "unknown": {
+      return <div>unknown</div>
+    }
+  }
 }
 
 function TimerPage({ room$ }: { room$: Observable<Room> }) {
