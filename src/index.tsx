@@ -14,6 +14,7 @@ import { calibrateClock } from "./now"
 import { observeHash } from "./observeHash"
 import { observeMediaPermission } from "./observeMediaPermission"
 import smallAlert from "./sound/small-alert.mp3"
+import { Route, Switch } from "./Switch"
 import { AudioProvider, MediaPermissionProvider } from "./useAudio"
 import { FirestoreProvider } from "./useFirestore"
 
@@ -42,7 +43,19 @@ createRoot(root).render(
         <AudioProvider value={audio}>
           <MediaPermissionProvider value={permission$}>
             <Suspense fallback={<FullViewportProgress />}>
-              <App room$={room$} pageType$={pageType$} />
+              <Switch pageType$={pageType$}>
+                <Route path="room">
+                  <App room$={room$} />
+                </Route>
+
+                <Route path="info">
+                  <Info />
+                </Route>
+
+                <Route path="unknown">
+                  <NotFound />
+                </Route>
+              </Switch>
             </Suspense>
           </MediaPermissionProvider>
         </AudioProvider>
@@ -50,3 +63,11 @@ createRoot(root).render(
     </ErrorBoundary>
   </StrictMode>
 )
+
+function Info() {
+  return <div>Info</div>
+}
+
+function NotFound() {
+  return <div>NotFound</div>
+}
