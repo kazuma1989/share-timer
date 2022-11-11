@@ -31,13 +31,30 @@ export function initializeRoom(
       abort.abort()
       abort = new AbortController()
 
-      await setupRoom(db, roomId, abort.signal).catch((_: unknown) => {
+      await setupRoom(db, roomId).catch((_: unknown) => {
         console.debug("aborted setup room", _)
       })
     })
 }
 
-export async function setupRoom(
+let abort = new AbortController()
+
+/**
+ * 同時に1つしか呼べない
+ *
+ * roomIdが同じであっても異なっても。
+ * 1つのJSプロセスで複数roomIdセットアップする使い方を想定しないため。
+ */
+export async function setupRoom(db: Firestore, roomId: string): Promise<void> {
+  abort.abort()
+  abort = new AbortController()
+
+  await _setupRoom(db, roomId, abort.signal).catch((_: unknown) => {
+    console.debug("aborted setup room", _)
+  })
+}
+
+async function _setupRoom(
   db: Firestore,
   roomId: string,
   signal: AbortSignal

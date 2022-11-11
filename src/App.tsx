@@ -40,8 +40,7 @@ export function App({ route$ }: { route$: Observable<Route> }) {
             if (called) return
             called = true
 
-            const abort = new AbortController()
-            await setupRoom(db, roomId, abort.signal).catch((_: unknown) => {
+            await setupRoom(db, roomId).catch((_: unknown) => {
               console.debug("aborted setup room", _)
             })
           }
