@@ -37,7 +37,7 @@ export function initializeRoom(
     })
 }
 
-async function setupRoom(
+export async function setupRoom(
   db: Firestore,
   roomId: string,
   signal: AbortSignal
