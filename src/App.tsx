@@ -1,4 +1,10 @@
-import { distinctUntilChanged, map, Observable, partition } from "rxjs"
+import {
+  distinctUntilChanged,
+  map,
+  Observable,
+  partition,
+  switchMap,
+} from "rxjs"
 import { FlashCover } from "./FlashCover"
 import { setupRoom } from "./initializeRoom"
 import { mapToRoomId, PageType } from "./mapToPageType"
@@ -41,14 +47,14 @@ export function App2({ pageType$ }: { pageType$: Observable<PageType> }) {
   const db = useFirestore()
 
   const [room$, invalid$] = cache(pageType$, () => {
-    const [room$, invalid$] = partition(
+    const [room$, _invalid$] = partition(
       pageType$.pipe(mapToRoomId(), mapToRoom(db)),
       isRoom
     )
 
     return [
       room$,
-      invalid$.pipe(
+      _invalid$.pipe(
         sparse(200),
         pauseWhileLoop({
           criteria: import.meta.env.PROD ? 20 : 5,
@@ -59,19 +65,20 @@ export function App2({ pageType$ }: { pageType$: Observable<PageType> }) {
             )
           },
         }),
-        map(([, roomId]) =>
-          setupRoom(db, roomId, new AbortController().signal).catch(
+        switchMap(async ([, roomId]) => {
+          console.log("call setupRoom", roomId)
+          await setupRoom(db, roomId, new AbortController().signal).catch(
             (_: unknown) => {
               console.debug("aborted setup room", _)
             }
           )
-        )
+          console.log("awaited setupRoom", roomId)
+        })
       ),
     ]
   })
 
-  const invalid = useObservable(invalid$, Promise.resolve())
-  useObservable(invalid)
+  useObservable(invalid$, null)
 
   const [type] = useObservable(pageType$)
 
