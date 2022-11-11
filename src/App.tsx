@@ -1,4 +1,4 @@
-import { Observable, partition, switchMap } from "rxjs"
+import { map, Observable, partition } from "rxjs"
 import { setupRoom } from "./initializeRoom"
 import { isRoom, mapToRoom } from "./mapToRoom"
 import { mapToRoomId, Route } from "./mapToRoute"
@@ -31,20 +31,27 @@ export function App({ route$ }: { route$: Observable<Route> }) {
             )
           },
         }),
-        switchMap(async ([, roomId]) => {
-          console.log("call setupRoom", roomId)
-          await setupRoom(db, roomId, new AbortController().signal).catch(
-            (_: unknown) => {
+        map(([, roomId]) => {
+          console.log("create callback")
+          let called = false
+
+          return async () => {
+            console.log("call callback")
+            if (called) return
+            called = true
+
+            const abort = new AbortController()
+            await setupRoom(db, roomId, abort.signal).catch((_: unknown) => {
               console.debug("aborted setup room", _)
-            }
-          )
-          console.log("awaited setupRoom", roomId)
+            })
+          }
         })
       ),
     ]
   })
 
-  useObservable(invalid$, null)
+  const x = useObservable(invalid$, null)
+  x?.()
 
   const [route] = useObservable(route$)
   switch (route) {
