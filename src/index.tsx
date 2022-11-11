@@ -6,7 +6,7 @@ import { FullViewportOops } from "./FullViewportOops"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
-import { mapToPageType } from "./mapToPageType"
+import { mapToRoute } from "./mapToRoute"
 import { calibrateClock } from "./now"
 import { observeHash } from "./observeHash"
 import { observeMediaPermission } from "./observeMediaPermission"
@@ -25,7 +25,7 @@ const root = document.getElementById("root")!
 const audio = new Audio(smallAlert)
 const permission$ = observeMediaPermission(audio, root)
 
-const pageType$ = observeHash().pipe(mapToPageType())
+const route$ = observeHash().pipe(mapToRoute())
 
 createRoot(root).render(
   <StrictMode>
@@ -34,7 +34,7 @@ createRoot(root).render(
         <AudioProvider value={audio}>
           <MediaPermissionProvider value={permission$}>
             <Suspense fallback={<FullViewportProgress />}>
-              <App2 pageType$={pageType$} />
+              <App2 route$={route$} />
             </Suspense>
           </MediaPermissionProvider>
         </AudioProvider>

@@ -7,8 +7,8 @@ import {
 } from "rxjs"
 import { FlashCover } from "./FlashCover"
 import { setupRoom } from "./initializeRoom"
-import { mapToRoomId, PageType } from "./mapToPageType"
 import { isRoom, mapToRoom } from "./mapToRoom"
+import { mapToRoomId, Route } from "./mapToRoute"
 import { mapToTimerState } from "./mapToTimerState"
 import { Timer } from "./Timer"
 import { useFirestore } from "./useFirestore"
@@ -43,12 +43,12 @@ export function App({ room$ }: { room$: Observable<Room> }) {
 
 const cache = createCache()
 
-export function App2({ pageType$ }: { pageType$: Observable<PageType> }) {
+export function App2({ route$ }: { route$: Observable<Route> }) {
   const db = useFirestore()
 
-  const [room$, invalid$] = cache(pageType$, () => {
+  const [room$, invalid$] = cache(route$, () => {
     const [room$, _invalid$] = partition(
-      pageType$.pipe(mapToRoomId(), mapToRoom(db)),
+      route$.pipe(mapToRoomId(), mapToRoom(db)),
       isRoom
     )
 
@@ -80,9 +80,8 @@ export function App2({ pageType$ }: { pageType$: Observable<PageType> }) {
 
   useObservable(invalid$, null)
 
-  const [type] = useObservable(pageType$)
-
-  switch (type) {
+  const [route] = useObservable(route$)
+  switch (route) {
     case "info": {
       return <div>INFO</div>
     }

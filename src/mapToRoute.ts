@@ -2,13 +2,13 @@ import { filter, map, OperatorFunction, pipe } from "rxjs"
 import { nonNullable } from "./util/nonNullable"
 import { isRoomId, Room } from "./zod/roomZod"
 
-export type PageType =
-  | [type: "room", payload: Room["id"]]
-  | [type: "info"]
-  | [type: "unknown"]
+export type Route =
+  | [key: "room", roomId: Room["id"]]
+  | [key: "info"]
+  | [key: "unknown"]
 
-export function mapToPageType(): OperatorFunction<string, PageType> {
-  return map((value): PageType => {
+export function mapToRoute(): OperatorFunction<string, Route> {
+  return map((value): Route => {
     if (value === "info") {
       return ["info"]
     }
@@ -21,7 +21,7 @@ export function mapToPageType(): OperatorFunction<string, PageType> {
   })
 }
 
-export function mapToRoomId(): OperatorFunction<PageType, Room["id"]> {
+export function mapToRoomId(): OperatorFunction<Route, Room["id"]> {
   return pipe(
     map(([type, payload]) => (type === "room" ? payload : null)),
     filter(nonNullable)
