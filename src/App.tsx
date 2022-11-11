@@ -1,8 +1,8 @@
-import { map, Observable, partition } from "rxjs"
+import { Observable, partition } from "rxjs"
 import { isRoom, mapToRoom } from "./mapToRoom"
 import { mapToRoomId, Route } from "./mapToRoute"
+import { mapToSetupRoom } from "./mapToSetupRoom"
 import { RoomView } from "./RoomView"
-import { setupRoom } from "./setupRoom"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
 import { createCache } from "./util/createCache"
@@ -12,15 +12,15 @@ import { sparse } from "./util/sparse"
 export function App({ route$ }: { route$: Observable<Route> }) {
   const db = useFirestore()
 
-  const [room$, invalid$] = cache(route$, () => {
-    const [room$, _invalid$] = partition(
+  const [room$, setupRoom$] = cache(route$, () => {
+    const [room$, invalid$] = partition(
       route$.pipe(mapToRoomId(), mapToRoom(db)),
       isRoom
     )
 
     return [
       room$,
-      _invalid$.pipe(
+      invalid$.pipe(
         sparse(200),
         pauseWhileLoop({
           criteria: import.meta.env.PROD ? 20 : 5,
@@ -31,26 +31,13 @@ export function App({ route$ }: { route$: Observable<Route> }) {
             )
           },
         }),
-        map(([, roomId]) => {
-          console.log("create callback")
-          let called = false
-
-          return async () => {
-            console.log("call callback")
-            if (called) return
-            called = true
-
-            await setupRoom(db, roomId).catch((_: unknown) => {
-              console.debug("aborted setup room", _)
-            })
-          }
-        })
+        mapToSetupRoom(db)
       ),
     ]
   })
 
-  const x = useObservable(invalid$, null)
-  x?.()
+  const setupRoom = useObservable(setupRoom$, null)
+  setupRoom?.()
 
   const [route] = useObservable(route$)
   switch (route) {
