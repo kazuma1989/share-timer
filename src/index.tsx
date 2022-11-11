@@ -1,6 +1,6 @@
 import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
-import { App2 } from "./App"
+import { App } from "./App"
 import { ErrorBoundary } from "./ErrorBoundary"
 import { FullViewportOops } from "./FullViewportOops"
 import { FullViewportProgress } from "./FullViewportProgress"
@@ -34,7 +34,7 @@ createRoot(root).render(
         <AudioProvider value={audio}>
           <MediaPermissionProvider value={permission$}>
             <Suspense fallback={<FullViewportProgress />}>
-              <App2 route$={route$} />
+              <App route$={route$} />
             </Suspense>
           </MediaPermissionProvider>
         </AudioProvider>
