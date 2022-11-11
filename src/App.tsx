@@ -39,7 +39,7 @@ export function App({ route$ }: { route$: Observable<Route> }) {
   const setupRoom = useObservable(setupRoom$, null)
   setupRoom?.()
 
-  const [route] = useObservable(route$)
+  const [route, payload] = useObservable(route$)
   switch (route) {
     case "info": {
       return <div>INFO</div>
@@ -50,7 +50,7 @@ export function App({ route$ }: { route$: Observable<Route> }) {
     }
 
     case "unknown": {
-      return <div>404</div>
+      return <div>404 &quot;{payload}&quot;</div>
     }
   }
 }

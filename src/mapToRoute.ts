@@ -5,7 +5,7 @@ import { isRoomId, Room } from "./zod/roomZod"
 export type Route =
   | [key: "room", roomId: Room["id"]]
   | [key: "info"]
-  | [key: "unknown"]
+  | [key: "unknown", payload: string]
 
 export function mapToRoute(): OperatorFunction<string, Route> {
   return map((value): Route => {
@@ -17,7 +17,7 @@ export function mapToRoute(): OperatorFunction<string, Route> {
       return ["room", value]
     }
 
-    return ["unknown"]
+    return ["unknown", value]
   })
 }
 
