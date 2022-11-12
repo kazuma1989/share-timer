@@ -1,12 +1,15 @@
 import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
+import { partition } from "rxjs"
 import { App } from "./App"
 import { ErrorBoundary } from "./ErrorBoundary"
 import { FullViewportOops } from "./FullViewportOops"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
-import { mapToRoute } from "./mapToRoute"
+import { initializeRoom } from "./initializeRoom"
+import { isRoom, mapToRoom } from "./mapToRoom"
+import { mapToRoomId, mapToRoute } from "./mapToRoute"
 import { calibrateClock } from "./now"
 import { observeHash } from "./observeHash"
 import { observeMediaPermission } from "./observeMediaPermission"
@@ -27,6 +30,13 @@ const permission$ = observeMediaPermission(audio, root)
 
 const route$ = observeHash().pipe(mapToRoute())
 
+const [room$, invalid$] = partition(
+  route$.pipe(mapToRoomId(), mapToRoom(firestore)),
+  isRoom
+)
+
+initializeRoom(firestore, invalid$)
+
 createRoot(root).render(
   <StrictMode>
     <ErrorBoundary fallback={<FullViewportOops />}>
@@ -34,7 +44,7 @@ createRoot(root).render(
         <AudioProvider value={audio}>
           <MediaPermissionProvider value={permission$}>
             <Suspense fallback={<FullViewportProgress />}>
-              <App route$={route$} />
+              <App route$={route$} room$={room$} />
             </Suspense>
           </MediaPermissionProvider>
         </AudioProvider>
