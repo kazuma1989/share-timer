@@ -8,7 +8,7 @@ import { sparse } from "./util/sparse"
 import { ActionOnFirestore } from "./zod/actionZod"
 import { RoomOnFirestore } from "./zod/roomZod"
 
-export function initializeRoom(
+export function restoreRoom(
   db: Firestore,
   invalid$: Observable<InvalidDoc>
 ): void {
