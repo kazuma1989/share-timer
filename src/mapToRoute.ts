@@ -1,5 +1,4 @@
-import { filter, map, OperatorFunction, pipe } from "rxjs"
-import { nonNullable } from "./util/nonNullable"
+import { distinctUntilChanged, filter, map, OperatorFunction, pipe } from "rxjs"
 import { isRoomId, Room } from "./zod/roomZod"
 
 export type Route =
@@ -7,14 +6,11 @@ export type Route =
   | [key: "info", roomId: Room["id"]]
   | [key: "unknown", payload: string]
 
-export function mapToRoute(): OperatorFunction<string, Route> {
-  return map(toRoute)
-}
-
-export function mapToRoomId(): OperatorFunction<Route, Room["id"]> {
+export function pickOnlyRoomId(): OperatorFunction<Route, Room["id"]> {
   return pipe(
-    map(([type, payload]) => (type === "room" ? payload : null)),
-    filter(nonNullable)
+    map(([, payload]) => payload),
+    distinctUntilChanged(),
+    filter(isRoomId)
   )
 }
 

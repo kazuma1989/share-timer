@@ -9,7 +9,7 @@ import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
 import { isRoom, mapToRoom } from "./mapToRoom"
-import { mapToRoomId } from "./mapToRoute"
+import { pickOnlyRoomId } from "./mapToRoute"
 import { calibrateClock } from "./now"
 import { observeHash } from "./observeHash"
 import { observeMediaPermission } from "./observeMediaPermission"
@@ -32,7 +32,7 @@ const permission$ = observeMediaPermission(audio, root)
 const route$ = observeHash()
 
 const [room$, invalid$] = partition(
-  route$.pipe(mapToRoomId(), mapToRoom(firestore)),
+  route$.pipe(pickOnlyRoomId(), mapToRoom(firestore)),
   isRoom
 )
 
