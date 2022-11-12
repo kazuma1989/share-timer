@@ -18,7 +18,7 @@ export function mapToRoomId(): OperatorFunction<Route, Room["id"]> {
   )
 }
 
-function toRoute(value: string): Route {
+export function toRoute(value: string): Route {
   const [first, second, ...rest] = value.split("/")
 
   if (rest.length === 0 && first !== undefined && isRoomId(first)) {
@@ -30,6 +30,23 @@ function toRoute(value: string): Route {
   }
 
   return ["unknown", value]
+}
+
+export function fromRoute(route: Route): string {
+  const [key, payload] = route
+  switch (key) {
+    case "room": {
+      return payload
+    }
+
+    case "info": {
+      return `${payload}/info`
+    }
+
+    case "unknown": {
+      return payload
+    }
+  }
 }
 
 if (import.meta.vitest) {
@@ -62,5 +79,19 @@ if (import.meta.vitest) {
       "info",
       "aaa-bbbb-ccc" as Room["id"],
     ])
+  })
+
+  test("fromRoute", () => {
+    const patterns = [
+      "",
+      "new",
+      "aaa-bbbb-ccc/",
+      "aaa-bbbb-ccc",
+      "aaa-bbbb-ccc/info",
+    ]
+
+    patterns.forEach((value) => {
+      expect(fromRoute(toRoute(value))).toBe(value)
+    })
   })
 }

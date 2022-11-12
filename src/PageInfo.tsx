@@ -1,11 +1,13 @@
 import clsx from "clsx"
 import { icon } from "./icon"
+import { fromRoute } from "./mapToRoute"
 import { setHash } from "./observeHash"
 import { TransparentButton } from "./TransparentButton"
 import { Room } from "./zod/roomZod"
 
 export function PageInfo({ roomId }: { roomId: Room["id"] }) {
-  const roomURL = location.origin + location.pathname + `#${roomId}`
+  const roomURL =
+    location.origin + location.pathname + `#${fromRoute(["room", roomId])}`
 
   return (
     <article
@@ -21,7 +23,7 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
           title="戻る"
           className="h-12 w-12 text-2xl -ml-4 my-2"
           onClick={() => {
-            setHash(roomId)
+            setHash(fromRoute(["room", roomId]))
           }}
         >
           {icon("arrow-left")}
