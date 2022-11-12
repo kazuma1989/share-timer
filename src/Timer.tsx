@@ -7,7 +7,6 @@ import { DurationSelect } from "./DurationSelect"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { icon } from "./icon"
-import { fromRoute } from "./mapToRoute"
 import { setHash } from "./observeHash"
 import { TimerState } from "./timerReducer"
 import { TimeViewer } from "./TimeViewer"
@@ -151,7 +150,7 @@ export function Timer({
             title="情報を開く"
             className="h-12 w-12 text-2xl"
             onClick={() => {
-              setHash(fromRoute(["info", roomId]))
+              setHash(["info", roomId])
             }}
           >
             {icon("information")}

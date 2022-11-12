@@ -23,7 +23,7 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
           title="戻る"
           className="h-12 w-12 text-2xl -ml-4 my-2"
           onClick={() => {
-            setHash(fromRoute(["room", roomId]))
+            setHash(["room", roomId])
           }}
         >
           {icon("arrow-left")}

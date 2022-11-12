@@ -9,7 +9,7 @@ import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
 import { isRoom, mapToRoom } from "./mapToRoom"
-import { mapToRoomId, mapToRoute } from "./mapToRoute"
+import { mapToRoomId } from "./mapToRoute"
 import { calibrateClock } from "./now"
 import { observeHash } from "./observeHash"
 import { observeMediaPermission } from "./observeMediaPermission"
@@ -29,7 +29,7 @@ const root = document.getElementById("root")!
 const audio = new Audio(smallAlert)
 const permission$ = observeMediaPermission(audio, root)
 
-const route$ = observeHash().pipe(mapToRoute())
+const route$ = observeHash()
 
 const [room$, invalid$] = partition(
   route$.pipe(mapToRoomId(), mapToRoom(firestore)),
