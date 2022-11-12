@@ -18,6 +18,10 @@ export function observeHash(): Observable<string> {
   )
 }
 
+export function setHash(hash: string): void {
+  window.location.assign("#" + hash)
+}
+
 export function replaceHash(hash: string): void {
   window.location.replace("#" + hash)
 }
