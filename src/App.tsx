@@ -1,9 +1,9 @@
 import { useEffect } from "react"
 import { Observable } from "rxjs"
-import { InfoPage } from "./InfoPage"
 import { Route } from "./mapToRoute"
 import { replaceHash } from "./observeHash"
-import { RoomView } from "./RoomView"
+import { PageInfo } from "./PageInfo"
+import { PageRoom } from "./PageRoom"
 import { useObservable } from "./useObservable"
 import { newRoomId, Room } from "./zod/roomZod"
 
@@ -26,11 +26,11 @@ export function App({
 
   switch (route) {
     case "info": {
-      return <InfoPage />
+      return <PageInfo />
     }
 
     case "room": {
-      return <RoomView room$={room$} />
+      return <PageRoom room$={room$} />
     }
 
     case "unknown": {

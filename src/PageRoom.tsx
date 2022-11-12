@@ -7,7 +7,7 @@ import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { createCache } from "./util/createCache"
 import { Room } from "./zod/roomZod"
 
-export function RoomView({ room$ }: { room$: Observable<Room> }) {
+export function PageRoom({ room$ }: { room$: Observable<Room> }) {
   const db = useFirestore()
 
   const timerState$ = cache(room$, () =>
