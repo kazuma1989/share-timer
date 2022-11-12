@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { Observable } from "rxjs"
+import { InfoPage } from "./InfoPage"
 import { Route } from "./mapToRoute"
 import { replaceHash } from "./observeHash"
 import { RoomView } from "./RoomView"
@@ -25,7 +26,7 @@ export function App({
 
   switch (route) {
     case "info": {
-      return <div>INFO</div>
+      return <InfoPage />
     }
 
     case "room": {
