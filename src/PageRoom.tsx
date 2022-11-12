@@ -21,7 +21,7 @@ export function PageRoom({ room$ }: { room$: Observable<Room> }) {
   useTitleAsTimeViewer(timerState$)
 
   return (
-    <div className="container mx-auto h-screen">
+    <div className="max-w-prose mx-auto h-screen">
       <Timer room$={room$} timerState$={timerState$} className="h-full" />
 
       <FlashCover timerState$={timerState$} />

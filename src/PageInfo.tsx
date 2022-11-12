@@ -12,7 +12,7 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
   return (
     <article
       className={clsx(
-        "container mx-auto h-screen",
+        "max-w-prose mx-auto h-screen",
         "text-dark/90 dark:text-light/90",
         "prose prose-headings:text-dark/70 prose-a:text-azure-700 dark:prose-headings:text-light/70 dark:prose-a:text-azure-300",
         "grid grid-rows-[1fr_auto]",
