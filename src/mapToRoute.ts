@@ -16,16 +16,30 @@ export function pickOnlyRoomId(): OperatorFunction<Route, Room["id"]> {
 
 export function toRoute(value: string): Route {
   const [first, second, ...rest] = value.split("/")
+  const unknown: Route = ["unknown", value]
 
-  if (rest.length === 0 && first !== undefined && isRoomId(first)) {
-    if (second === undefined) {
-      return ["room", first]
-    } else if (second === "info") {
-      return ["info", first]
+  if (rest.length !== 0) {
+    return unknown
+  }
+
+  if (first !== undefined && isRoomId(first)) {
+    const roomId = first
+    switch (second) {
+      case undefined: {
+        return ["room", roomId]
+      }
+
+      case "info": {
+        return ["info", roomId]
+      }
+
+      default: {
+        return unknown
+      }
     }
   }
 
-  return ["unknown", value]
+  return unknown
 }
 
 export function fromRoute(route: Route): string {
