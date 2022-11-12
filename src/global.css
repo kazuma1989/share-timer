@@ -8,8 +8,11 @@
     @apply dark:bg-dark dark:text-light/90;
   }
 
+  button,
+  input,
+  optgroup,
   select,
-  input {
+  textarea {
     font-variant: inherit;
   }
 }
