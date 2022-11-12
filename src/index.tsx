@@ -19,7 +19,7 @@ import { FirestoreProvider } from "./useFirestore"
 
 const firestore = await initializeFirestore()
 
-calibrateClock(firestore).catch((reason) => {
+calibrateClock(firestore).catch((reason: unknown) => {
   console.warn("calibration failed", reason)
 })
 
