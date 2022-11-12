@@ -1,4 +1,6 @@
 import clsx from "clsx"
+import { icon } from "./icon"
+import { TransparentButton } from "./TransparentButton"
 
 export function PageInfo() {
   return (
@@ -7,10 +9,20 @@ export function PageInfo() {
         "container mx-auto h-screen",
         "text-dark/90 dark:text-light/90 prose prose-headings:text-dark/70 prose-a:text-azure-700 dark:prose-headings:text-light/70 dark:prose-a:text-azure-300",
         "grid grid-rows-[1fr_auto]",
-        "pt-12 px-6"
+        "px-6"
       )}
     >
       <div>
+        <TransparentButton
+          title="戻る"
+          className="h-12 w-12 text-2xl -ml-4 my-2"
+          onClick={() => {
+            // setHash()
+          }}
+        >
+          {icon("chevron-left")}
+        </TransparentButton>
+
         <h1>
           <ruby>
             Share Timer <rp>(</rp>
