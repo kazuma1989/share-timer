@@ -18,6 +18,9 @@ import { pickOnlyRoomId } from "./toRoute"
 import { AudioProvider, MediaPermissionProvider } from "./useAudio"
 import { FirestoreProvider } from "./useFirestore"
 
+// https://neos21.net/blog/2018/08/19-01.html
+document.body.addEventListener("touchstart", () => {}, { passive: true })
+
 const firestore = await initializeFirestore()
 
 calibrateClock(firestore).catch((reason: unknown) => {
