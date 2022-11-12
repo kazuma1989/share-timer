@@ -20,7 +20,7 @@ export function PageInfo() {
             // setHash()
           }}
         >
-          {icon("chevron-left")}
+          {icon("arrow-left")}
         </TransparentButton>
 
         <h1>
