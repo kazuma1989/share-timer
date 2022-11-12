@@ -151,7 +151,7 @@ export function Timer({
             className="h-12 w-12 text-2xl"
             onClick={() => {
               // FIXME info に型制約をつけたい
-              setHash("info")
+              setHash(`${roomId}/info`)
             }}
           >
             {icon("information")}

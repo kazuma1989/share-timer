@@ -1,8 +1,12 @@
 import clsx from "clsx"
 import { icon } from "./icon"
+import { setHash } from "./observeHash"
 import { TransparentButton } from "./TransparentButton"
+import { Room } from "./zod/roomZod"
 
-export function PageInfo() {
+export function PageInfo({ roomId }: { roomId: Room["id"] }) {
+  const roomURL = location.origin + location.pathname + `#${roomId}`
+
   return (
     <article
       className={clsx(
@@ -17,7 +21,7 @@ export function PageInfo() {
           title="戻る"
           className="h-12 w-12 text-2xl -ml-4 my-2"
           onClick={() => {
-            // setHash()
+            setHash(roomId)
           }}
         >
           {icon("arrow-left")}
@@ -36,9 +40,8 @@ export function PageInfo() {
         <p>
           このタイマーの URL
           <br />
-          <a href={location.href} className="break-words">
-            {/* FIXME location.href だとリアクティブにならない気がする？ */}
-            {location.href}
+          <a href={roomURL} className="break-words">
+            {roomURL}
           </a>
         </p>
 

@@ -26,7 +26,8 @@ export function App({
 
   switch (route) {
     case "info": {
-      return <PageInfo />
+      const roomId = payload
+      return <PageInfo roomId={roomId} />
     }
 
     case "room": {
