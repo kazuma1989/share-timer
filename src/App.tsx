@@ -1,7 +1,7 @@
 import { Observable } from "rxjs"
-import { Route } from "./mapToRoute"
 import { PageInfo } from "./PageInfo"
 import { PageRoom } from "./PageRoom"
+import { Route } from "./toRoute"
 import { useObservable } from "./useObservable"
 import { Room } from "./zod/roomZod"
 

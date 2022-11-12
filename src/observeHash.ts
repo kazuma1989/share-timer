@@ -5,7 +5,7 @@ import {
   Observable,
   startWith,
 } from "rxjs"
-import { fromRoute, Route, toRoute } from "./mapToRoute"
+import { fromRoute, Route, toRoute } from "./toRoute"
 import { shareRecent } from "./util/shareRecent"
 
 export function observeHash(): Observable<Route> {

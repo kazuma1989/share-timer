@@ -1,7 +1,7 @@
 import clsx from "clsx"
 import { icon } from "./icon"
-import { fromRoute } from "./mapToRoute"
 import { setHash } from "./observeHash"
+import { fromRoute } from "./toRoute"
 import { TransparentButton } from "./TransparentButton"
 import { Room } from "./zod/roomZod"
 

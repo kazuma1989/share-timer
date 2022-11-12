@@ -1,6 +1,6 @@
 import { Observable } from "rxjs"
-import { Route } from "./mapToRoute"
 import { replaceHash } from "./observeHash"
+import { Route } from "./toRoute"
 import { newRoomId } from "./zod/roomZod"
 
 export function createNewRoom(route$: Observable<Route>): void {
