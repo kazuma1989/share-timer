@@ -29,11 +29,17 @@ function createStore<T>(
   let currentValue: T | Empty =
     initialValue !== undefined ? initialValue : Empty
 
-  const observable = from(source)
+  const source$ = from(source)
+
+  const prefetch = source$.subscribe((value) => {
+    currentValue = value
+  })
 
   return {
     subscribe(onStoreChange) {
-      const subscription = observable.subscribe((value) => {
+      prefetch.unsubscribe()
+
+      const subscription = source$.subscribe((value) => {
         currentValue = value
         onStoreChange()
       })
@@ -48,9 +54,7 @@ function createStore<T>(
         return currentValue
       }
 
-      throw firstValueFrom(observable).then((value) => {
-        currentValue = value
-      })
+      throw firstValueFrom(source$)
     },
   }
 }
