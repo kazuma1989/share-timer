@@ -1,4 +1,3 @@
-import { distinctUntilChanged, filter, map, OperatorFunction, pipe } from "rxjs"
 import { isRoomId, Room } from "./zod/roomZod"
 
 export type Route =
@@ -55,14 +54,6 @@ export function fromRoute(route: Route): string {
       return payload
     }
   }
-}
-
-export function pickOnlyRoomId(): OperatorFunction<Route, Room["id"]> {
-  return pipe(
-    map(([, payload]) => payload),
-    distinctUntilChanged(),
-    filter(isRoomId)
-  )
 }
 
 if (import.meta.vitest) {
