@@ -1,5 +1,5 @@
 import { doc, Firestore, runTransaction } from "firebase/firestore"
-import { Observable } from "rxjs"
+import { map, OperatorFunction, pipe } from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { InvalidDoc } from "./mapToRoom"
@@ -8,28 +8,29 @@ import { sparse } from "./util/sparse"
 import { ActionOnFirestore } from "./zod/actionZod"
 import { RoomOnFirestore } from "./zod/roomZod"
 
-export function restoreRoom(
-  db: Firestore,
-  invalid$: Observable<InvalidDoc>
-): void {
-  invalid$
-    .pipe(
-      sparse(200),
-      pauseWhileLoop({
-        criteria: import.meta.env.PROD ? 20 : 5,
-        debounce: 2_000,
-        onLoopDetected() {
-          throw new Error(
-            "Detect room initialization loop. Something went wrong"
-          )
-        },
-      })
-    )
-    .subscribe(async ([, roomId]) => {
-      await setupRoom(db, roomId).catch((_: unknown) => {
-        console.debug("aborted setup room", _)
-      })
+export function mapToSetup(
+  db: Firestore
+): OperatorFunction<InvalidDoc, () => Promise<void>> {
+  return pipe(
+    sparse(200),
+    pauseWhileLoop({
+      criteria: import.meta.env.PROD ? 20 : 5,
+      debounce: 2_000,
+      onLoopDetected() {
+        throw new Error("Detect room initialization loop. Something went wrong")
+      },
+    }),
+    map(([, roomId]) => {
+      let called = false
+
+      return async () => {
+        if (called) return
+        called = true
+
+        await setupRoom(db, roomId)
+      }
     })
+  )
 }
 
 /**
@@ -38,7 +39,7 @@ export function restoreRoom(
  * roomIdが同じであっても異なっても。
  * 1つのJSプロセスで複数roomIdセットアップする使い方を想定しないため。
  */
-export async function setupRoom(db: Firestore, roomId: string): Promise<void> {
+async function setupRoom(db: Firestore, roomId: string): Promise<void> {
   abort.abort()
   abort = new AbortController()
 
