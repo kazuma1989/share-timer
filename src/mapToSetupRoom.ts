@@ -2,15 +2,14 @@ import { doc, Firestore, runTransaction } from "firebase/firestore"
 import { map, OperatorFunction, pipe } from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
-import { InvalidDoc } from "./mapToRoom"
 import { pauseWhileLoop } from "./util/pauseWhileLoop"
 import { sparse } from "./util/sparse"
 import { ActionOnFirestore } from "./zod/actionZod"
-import { RoomOnFirestore } from "./zod/roomZod"
+import { Room, RoomOnFirestore } from "./zod/roomZod"
 
 export function mapToSetupRoom(
   db: Firestore
-): OperatorFunction<InvalidDoc, () => Promise<void>> {
+): OperatorFunction<Room["id"], () => Promise<void>> {
   return pipe(
     sparse(200),
     pauseWhileLoop({
@@ -20,7 +19,7 @@ export function mapToSetupRoom(
         throw new Error("Detect room initialization loop. Something went wrong")
       },
     }),
-    map(([, roomId]) => {
+    map((roomId) => {
       let called = false
 
       return async () => {

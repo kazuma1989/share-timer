@@ -19,7 +19,10 @@ export function PageRoom({ roomId }: { roomId: Room["id"] }) {
 
     const setup$ = merge(
       room$.pipe(map(() => null)),
-      invalid$.pipe(mapToSetupRoom(db))
+      invalid$.pipe(
+        map(([, roomId]) => roomId),
+        mapToSetupRoom(db)
+      )
     )
 
     return [room$, setup$]
