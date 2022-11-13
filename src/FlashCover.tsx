@@ -61,7 +61,8 @@ export function FlashCover({
     <div
       className={clsx(
         "pointer-events-none absolute inset-0 text-cerise-500/75 dark:text-gray-100/75",
-        config.flash === "on" && flashing && "animate-flash",
+        flashing && "animate-flash",
+        config.flash !== "on" && "invisible",
         className
       )}
     />
