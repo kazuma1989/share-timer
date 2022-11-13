@@ -8,7 +8,7 @@ import { sparse } from "./util/sparse"
 import { ActionOnFirestore } from "./zod/actionZod"
 import { RoomOnFirestore } from "./zod/roomZod"
 
-export function mapToSetup(
+export function mapToSetupRoom(
   db: Firestore
 ): OperatorFunction<InvalidDoc, () => Promise<void>> {
   return pipe(

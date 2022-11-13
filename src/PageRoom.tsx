@@ -1,8 +1,8 @@
 import { distinctUntilChanged, map, merge, of, partition } from "rxjs"
 import { FlashCover } from "./FlashCover"
 import { isRoom, mapToRoom } from "./mapToRoom"
+import { mapToSetupRoom } from "./mapToSetupRoom"
 import { mapToTimerState } from "./mapToTimerState"
-import { mapToSetup } from "./restoreRoom"
 import { Timer } from "./Timer"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
@@ -19,7 +19,7 @@ export function PageRoom({ roomId }: { roomId: Room["id"] }) {
 
     const setup$ = merge(
       room$.pipe(map(() => null)),
-      invalid$.pipe(mapToSetup(db))
+      invalid$.pipe(mapToSetupRoom(db))
     )
 
     return [room$, setup$]
