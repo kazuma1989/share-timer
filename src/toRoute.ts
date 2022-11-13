@@ -6,14 +6,6 @@ export type Route =
   | [key: "info", roomId: Room["id"]]
   | [key: "unknown", payload: string]
 
-export function pickOnlyRoomId(): OperatorFunction<Route, Room["id"]> {
-  return pipe(
-    map(([, payload]) => payload),
-    distinctUntilChanged(),
-    filter(isRoomId)
-  )
-}
-
 export function toRoute(value: string): Route {
   const [first, second, ...rest] = value.split("/")
   const unknown: Route = ["unknown", value]
@@ -57,6 +49,14 @@ export function fromRoute(route: Route): string {
       return payload
     }
   }
+}
+
+export function pickOnlyRoomId(): OperatorFunction<Route, Room["id"]> {
+  return pipe(
+    map(([, payload]) => payload),
+    distinctUntilChanged(),
+    filter(isRoomId)
+  )
 }
 
 if (import.meta.vitest) {
