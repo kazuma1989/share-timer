@@ -5,15 +5,9 @@ import { PageRoom } from "./PageRoom"
 import { Route } from "./toRoute"
 import { useObservable } from "./useObservable"
 import { suspend } from "./util/suspend"
-import { newRoomId, Room } from "./zod/roomZod"
+import { newRoomId } from "./zod/roomZod"
 
-export function App({
-  route$,
-  room$,
-}: {
-  route$: Observable<Route>
-  room$: Observable<Room>
-}) {
+export function App({ route$ }: { route$: Observable<Route> }) {
   const [route, payload] = useObservable(route$)
 
   switch (route) {
@@ -24,7 +18,7 @@ export function App({
 
     case "room": {
       const roomId = payload
-      return <PageRoom roomId={roomId} room$={room$} />
+      return <PageRoom roomId={roomId} />
     }
 
     case "newRoom": {

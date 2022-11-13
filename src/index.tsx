@@ -47,7 +47,7 @@ createRoot(root).render(
         <AudioProvider value={audio}>
           <MediaPermissionProvider value={permission$}>
             <Suspense fallback={<FullViewportProgress />}>
-              <App route$={route$} room$={room$} />
+              <App route$={route$} />
             </Suspense>
           </MediaPermissionProvider>
         </AudioProvider>
