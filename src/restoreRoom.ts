@@ -38,7 +38,7 @@ export function restoreRoom(
  * roomIdが同じであっても異なっても。
  * 1つのJSプロセスで複数roomIdセットアップする使い方を想定しないため。
  */
-async function setupRoom(db: Firestore, roomId: string): Promise<void> {
+export async function setupRoom(db: Firestore, roomId: string): Promise<void> {
   abort.abort()
   abort = new AbortController()
 
