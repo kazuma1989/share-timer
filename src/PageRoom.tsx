@@ -1,13 +1,34 @@
-import { distinctUntilChanged, map, Observable } from "rxjs"
+import {
+  distinctUntilChanged,
+  lastValueFrom,
+  map,
+  Observable,
+  skipWhile,
+} from "rxjs"
 import { FlashCover } from "./FlashCover"
 import { mapToTimerState } from "./mapToTimerState"
 import { Timer } from "./Timer"
 import { useFirestore } from "./useFirestore"
+import { useObservable } from "./useObservable"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { createCache } from "./util/createCache"
+import { suspend } from "./util/suspend"
 import { Room } from "./zod/roomZod"
 
-export function PageRoom({ room$ }: { room$: Observable<Room> }) {
+export function PageRoom({
+  roomId,
+  room$,
+}: {
+  roomId: Room["id"]
+  room$: Observable<Room>
+}) {
+  const room = useObservable(room$)
+  if (room.id !== roomId) {
+    suspend(() =>
+      lastValueFrom(room$.pipe(skipWhile((room) => room.id !== roomId)))
+    )
+  }
+
   const db = useFirestore()
 
   const timerState$ = cache(room$, () =>

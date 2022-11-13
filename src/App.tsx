@@ -23,7 +23,8 @@ export function App({
     }
 
     case "room": {
-      return <PageRoom room$={room$} />
+      const roomId = payload
+      return <PageRoom roomId={roomId} room$={room$} />
     }
 
     case "newRoom": {
