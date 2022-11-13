@@ -2,19 +2,16 @@ import { doc, Firestore, runTransaction } from "firebase/firestore"
 import { Observable } from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
-import { InvalidDoc, InvalidId } from "./mapToRoom"
-import { replaceHash } from "./observeHash"
+import { InvalidDoc } from "./mapToRoom"
 import { pauseWhileLoop } from "./util/pauseWhileLoop"
 import { sparse } from "./util/sparse"
 import { ActionOnFirestore } from "./zod/actionZod"
-import { newRoomId, RoomOnFirestore } from "./zod/roomZod"
+import { RoomOnFirestore } from "./zod/roomZod"
 
-export function initializeRoom(
+export function restoreRoom(
   db: Firestore,
-  invalid$: Observable<InvalidDoc | InvalidId>
+  invalid$: Observable<InvalidDoc>
 ): void {
-  let abort = new AbortController()
-
   invalid$
     .pipe(
       sparse(200),
@@ -28,30 +25,31 @@ export function initializeRoom(
         },
       })
     )
-    .subscribe(async (reason) => {
-      abort.abort()
-      abort = new AbortController()
-
-      const [type] = reason
-      switch (type) {
-        case "invalid-id": {
-          replaceHash(newRoomId())
-          break
-        }
-
-        case "invalid-doc": {
-          const [, roomId] = reason
-
-          await setupRoom(db, roomId, abort.signal).catch((_: unknown) => {
-            console.debug("aborted setup room", _)
-          })
-          break
-        }
-      }
+    .subscribe(async ([, roomId]) => {
+      await setupRoom(db, roomId).catch((_: unknown) => {
+        console.debug("aborted setup room", _)
+      })
     })
 }
 
-async function setupRoom(
+/**
+ * 同時に1つしか呼べない
+ *
+ * roomIdが同じであっても異なっても。
+ * 1つのJSプロセスで複数roomIdセットアップする使い方を想定しないため。
+ */
+async function setupRoom(db: Firestore, roomId: string): Promise<void> {
+  abort.abort()
+  abort = new AbortController()
+
+  await _setupRoom(db, roomId, abort.signal).catch((_: unknown) => {
+    console.debug("aborted setup room", _)
+  })
+}
+
+let abort = new AbortController()
+
+async function _setupRoom(
   db: Firestore,
   roomId: string,
   signal: AbortSignal
@@ -99,4 +97,4 @@ async function setupRoom(
   )
 }
 
-const DEFAULT_DURATION = 3 * 60_000
+const DEFAULT_DURATION = 3 * 60000

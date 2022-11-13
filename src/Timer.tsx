@@ -7,13 +7,12 @@ import { DurationSelect } from "./DurationSelect"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { icon } from "./icon"
-import { InformationDialog } from "./InformationDialog"
+import { setHash } from "./observeHash"
 import { TimerState } from "./timerReducer"
 import { TimeViewer } from "./TimeViewer"
 import { TransparentButton } from "./TransparentButton"
 import { useAllSettled } from "./useAllSettled"
 import { useMediaPermission } from "./useAudio"
-import { useDialog } from "./useDialog"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
 import { ActionOnFirestore } from "./zod/actionZod"
@@ -38,18 +37,9 @@ export function Timer({
   })
   const primaryButton$ = useRef<HTMLButtonElement>(null)
 
-  const [dialog, setDialog] = useDialog()
-
   return (
     <>
-      <div
-        className={clsx(
-          "grid grid-rows-[auto_5fr_auto_4fr]",
-          "transition-transform",
-          dialog.open && "scale-95",
-          className
-        )}
-      >
+      <div className={clsx("grid grid-rows-[auto_5fr_auto_4fr]", className)}>
         <div className="pt-2 text-center">
           <h1>{roomName}</h1>
         </div>
@@ -160,15 +150,13 @@ export function Timer({
             title="情報を開く"
             className="h-12 w-12 text-2xl"
             onClick={() => {
-              dialog.showModal()
+              setHash(["info", roomId])
             }}
           >
             {icon("information")}
           </TransparentButton>
         </div>
       </div>
-
-      <InformationDialog innerRef={setDialog} />
     </>
   )
 }

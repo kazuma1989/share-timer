@@ -4,12 +4,15 @@
 
 @layer base {
   body {
-    @apply bg-light text-dark;
-    @apply dark:bg-dark dark:text-light;
+    @apply bg-light text-dark/90;
+    @apply dark:bg-dark dark:text-light/90;
   }
 
+  button,
+  input,
+  optgroup,
   select,
-  input {
+  textarea {
     font-variant: inherit;
   }
 }

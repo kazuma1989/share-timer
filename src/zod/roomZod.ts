@@ -16,6 +16,10 @@ export const roomIdZod = z
   .regex(/^[a-z]{3}-[a-z]{4}-[a-z]{3}$/)
   .brand()
 
+export function isRoomId(id: string): id is Room["id"] {
+  return roomIdZod.safeParse(id).success
+}
+
 export function newRoomId(): Room["id"] {
   return nanoid(10).replace(/^(.{3})(.{4})(.+)$/, "$1-$2-$3") as Room["id"]
 }

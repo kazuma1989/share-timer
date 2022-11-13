@@ -1,32 +1,31 @@
-import { distinctUntilChanged, map, Observable } from "rxjs"
-import { FlashCover } from "./FlashCover"
-import { mapToTimerState } from "./mapToTimerState"
-import { Timer } from "./Timer"
-import { useFirestore } from "./useFirestore"
-import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
-import { createCache } from "./util/createCache"
+import { Observable } from "rxjs"
+import { PageInfo } from "./PageInfo"
+import { PageRoom } from "./PageRoom"
+import { Route } from "./toRoute"
+import { useObservable } from "./useObservable"
 import { Room } from "./zod/roomZod"
 
-export function App({ room$ }: { room$: Observable<Room> }) {
-  const db = useFirestore()
+export function App({
+  route$,
+  room$,
+}: {
+  route$: Observable<Route>
+  room$: Observable<Room>
+}) {
+  const [route, payload] = useObservable(route$)
 
-  const timerState$ = cache(room$, () =>
-    room$.pipe(
-      map((_) => _.id),
-      distinctUntilChanged(),
-      mapToTimerState(db)
-    )
-  )
+  switch (route) {
+    case "info": {
+      const roomId = payload
+      return <PageInfo roomId={roomId} />
+    }
 
-  useTitleAsTimeViewer(timerState$)
+    case "room": {
+      return <PageRoom room$={room$} />
+    }
 
-  return (
-    <div className="container mx-auto h-screen">
-      <Timer room$={room$} timerState$={timerState$} className="h-full" />
-
-      <FlashCover timerState$={timerState$} />
-    </div>
-  )
+    case "unknown": {
+      return <div>404 &quot;{payload}&quot;</div>
+    }
+  }
 }
-
-const cache = createCache()
