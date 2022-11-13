@@ -13,7 +13,7 @@ import { TimeViewer } from "./TimeViewer"
 import { TransparentButton } from "./TransparentButton"
 import { useAllSettled } from "./useAllSettled"
 import { useMediaPermission } from "./useAudio"
-import { configDispatch$ } from "./useConfig"
+import { toggleConfig } from "./useConfig"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
 import { ActionOnFirestore } from "./zod/actionZod"
@@ -132,9 +132,8 @@ export function Timer({
           <TransparentButton
             title="フラッシュを切り替える"
             className="h-12 w-12 text-2xl"
-            // TODO toggle flash
             onClick={() => {
-              configDispatch$.next({ flash: "off" })
+              toggleConfig("flash")
             }}
           >
             {icon("flash")}
@@ -143,9 +142,8 @@ export function Timer({
           <TransparentButton
             title="音を切り替える"
             className="h-12 w-12 text-2xl"
-            // TODO toggle volume
             onClick={() => {
-              configDispatch$.next({ sound: "off" })
+              toggleConfig("sound")
             }}
           >
             <VolumeIcon />

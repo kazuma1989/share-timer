@@ -6,13 +6,31 @@ interface Config {
   sound: "on" | "off"
 }
 
-export const configDispatch$ = new Subject<Partial<Config>>()
+type ConfigKey = keyof Config
+
+export function toggleConfig(key: ConfigKey): void {
+  configDispatch$.next(key)
+}
+
+const configDispatch$ = new Subject<ConfigKey>()
 
 export const config$ = configDispatch$.pipe(
-  startWith({}),
-  scan((acc: Config, value): Config => ({ ...acc, ...value }), {
-    flash: "on",
-    sound: "on",
-  }),
+  startWith(null),
+  scan(
+    (acc: Config, key): Config => {
+      if (!key) {
+        return acc
+      }
+
+      return {
+        ...acc,
+        [key]: acc[key] === "on" ? "off" : "on",
+      }
+    },
+    {
+      flash: "on",
+      sound: "on",
+    }
+  ),
   shareRecent()
 )
