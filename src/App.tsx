@@ -25,13 +25,13 @@ export function App({
       return <PageRoom room$={room$} />
     }
 
-    case "unknown": {
-      if (["", "new"].includes(payload)) {
-        throw Promise.resolve().then(() => {
-          replaceHash(["room", newRoomId()])
-        })
-      }
+    case "newRoom": {
+      throw Promise.resolve().then(() => {
+        replaceHash(["room", newRoomId()])
+      })
+    }
 
+    case "unknown": {
       return <div>404 &quot;{payload}&quot;</div>
     }
   }

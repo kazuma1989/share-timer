@@ -4,6 +4,7 @@ import { isRoomId, Room } from "./zod/roomZod"
 export type Route =
   | [key: "room", roomId: Room["id"]]
   | [key: "info", roomId: Room["id"]]
+  | [key: "newRoom", payload: string]
   | [key: "unknown", payload: string]
 
 export function toRoute(value: string): Route {
@@ -31,6 +32,10 @@ export function toRoute(value: string): Route {
     }
   }
 
+  if (first === "" || first === "new") {
+    return ["newRoom", value]
+  }
+
   return unknown
 }
 
@@ -45,6 +50,7 @@ export function fromRoute(route: Route): string {
       return `${payload}/info`
     }
 
+    case "newRoom":
     case "unknown": {
       return payload
     }
@@ -63,11 +69,11 @@ if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
 
   test("toRoute", () => {
-    expect(toRoute("")).toStrictEqual<Route>(["unknown", ""])
+    expect(toRoute("")).toStrictEqual<Route>(["newRoom", ""])
   })
 
   test("toRoute", () => {
-    expect(toRoute("new")).toStrictEqual<Route>(["unknown", "new"])
+    expect(toRoute("new")).toStrictEqual<Route>(["newRoom", "new"])
   })
 
   test("toRoute", () => {
