@@ -11,6 +11,7 @@ import {
 import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { useAudio } from "./useAudio"
+import { config$ } from "./useConfig"
 import { useObservable } from "./useObservable"
 import { createCache } from "./util/createCache"
 import { interval } from "./util/interval"
@@ -31,8 +32,13 @@ export function FlashCover({
     ),
   ])
 
+  const config = useObservable(config$)
+  console.log(config)
+
   const audio = useAudio()
   useEffect(() => {
+    if (config.sound !== "on") return
+
     const sub = sounding$.subscribe(() => {
       console.debug("audio.play()")
 
@@ -47,7 +53,7 @@ export function FlashCover({
       audio.pause()
       audio.currentTime = 0
     }
-  }, [audio, sounding$])
+  }, [audio, config.sound, sounding$])
 
   const flashing = useObservable(flashing$, false)
 
@@ -55,7 +61,7 @@ export function FlashCover({
     <div
       className={clsx(
         "pointer-events-none absolute inset-0 text-cerise-500/75 dark:text-gray-100/75",
-        flashing && "animate-flash",
+        config.flash === "on" && flashing && "animate-flash",
         className
       )}
     />
