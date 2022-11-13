@@ -4,6 +4,7 @@ import { PageInfo } from "./PageInfo"
 import { PageRoom } from "./PageRoom"
 import { Route } from "./toRoute"
 import { useObservable } from "./useObservable"
+import { suspend } from "./util/suspend"
 import { newRoomId, Room } from "./zod/roomZod"
 
 export function App({
@@ -26,7 +27,7 @@ export function App({
     }
 
     case "newRoom": {
-      throw Promise.resolve().then(() => {
+      return suspend(() => {
         replaceHash(["room", newRoomId()])
       })
     }
