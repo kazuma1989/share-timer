@@ -33,7 +33,7 @@ export function FlashCover({
   ])
 
   const config = useObservable(useConfig())
-  console.log(config)
+  import.meta.env.DEV && console.debug(config)
 
   const audio = useAudio()
   useEffect(() => {
