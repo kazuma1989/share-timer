@@ -11,7 +11,7 @@ import {
 import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { useAudio } from "./useAudio"
-import { config$ } from "./useConfig"
+import { useConfig } from "./useConfig"
 import { useObservable } from "./useObservable"
 import { createCache } from "./util/createCache"
 import { interval } from "./util/interval"
@@ -32,7 +32,7 @@ export function FlashCover({
     ),
   ])
 
-  const config = useObservable(config$)
+  const config = useObservable(useConfig())
   console.log(config)
 
   const audio = useAudio()

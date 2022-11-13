@@ -1,4 +1,4 @@
-import { scan, startWith, Subject } from "rxjs"
+import { Observable, scan, startWith, Subject } from "rxjs"
 import { shareRecent } from "./util/shareRecent"
 
 interface Config {
@@ -8,13 +8,17 @@ interface Config {
 
 type ConfigKey = keyof Config
 
+export function useConfig(): Observable<Config> {
+  return config$
+}
+
 export function toggleConfig(key: ConfigKey): void {
   configDispatch$.next(key)
 }
 
 const configDispatch$ = new Subject<ConfigKey>()
 
-export const config$ = configDispatch$.pipe(
+const config$ = configDispatch$.pipe(
   startWith(null),
   scan(
     (acc: Config, key): Config => {
@@ -29,7 +33,7 @@ export const config$ = configDispatch$.pipe(
     },
     {
       flash: "on",
-      sound: "on",
+      sound: "off",
     }
   ),
   shareRecent()

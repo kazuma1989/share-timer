@@ -13,7 +13,7 @@ import { TimeViewer } from "./TimeViewer"
 import { TransparentButton } from "./TransparentButton"
 import { useAllSettled } from "./useAllSettled"
 import { useMediaPermission } from "./useAudio"
-import { toggleConfig } from "./useConfig"
+import { toggleConfig, useConfig } from "./useConfig"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
 import { ActionOnFirestore } from "./zod/actionZod"
@@ -136,7 +136,7 @@ export function Timer({
               toggleConfig("flash")
             }}
           >
-            {icon("flash")}
+            <FlashIcon />
           </TransparentButton>
 
           <TransparentButton
@@ -164,10 +164,19 @@ export function Timer({
   )
 }
 
+function FlashIcon() {
+  const config = useObservable(useConfig())
+
+  return config.flash === "on" ? icon("flash") : icon("flash-off")
+}
+
 function VolumeIcon() {
   const permission = useObservable(useMediaPermission(), "denied")
+  const config = useObservable(useConfig())
 
-  return permission === "canplay" ? icon("volume-high") : icon("volume-off")
+  return config.sound === "on" && permission === "canplay"
+    ? icon("volume-high")
+    : icon("volume-off")
 }
 
 function useDispatch(
