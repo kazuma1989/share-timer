@@ -1,9 +1,10 @@
 import { Observable } from "rxjs"
+import { replaceHash } from "./observeHash"
 import { PageInfo } from "./PageInfo"
 import { PageRoom } from "./PageRoom"
 import { Route } from "./toRoute"
 import { useObservable } from "./useObservable"
-import { Room } from "./zod/roomZod"
+import { newRoomId, Room } from "./zod/roomZod"
 
 export function App({
   route$,
@@ -25,6 +26,12 @@ export function App({
     }
 
     case "unknown": {
+      if (["", "new"].includes(payload)) {
+        throw Promise.resolve().then(() => {
+          replaceHash(["room", newRoomId()])
+        })
+      }
+
       return <div>404 &quot;{payload}&quot;</div>
     }
   }

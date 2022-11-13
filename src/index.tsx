@@ -2,7 +2,6 @@ import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
 import { partition } from "rxjs"
 import { App } from "./App"
-import { createNewRoom } from "./createNewRoom"
 import { ErrorBoundary } from "./ErrorBoundary"
 import { FullViewportOops } from "./FullViewportOops"
 import { FullViewportProgress } from "./FullViewportProgress"
@@ -39,7 +38,6 @@ const [room$, invalid$] = partition(
   isRoom
 )
 
-createNewRoom(route$)
 restoreRoom(firestore, invalid$)
 
 createRoot(root).render(
