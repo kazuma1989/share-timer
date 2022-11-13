@@ -1,17 +1,17 @@
 import { parseDuration } from "./parseDuration"
 
 export function formatDuration(durationMs: number): string {
-  if (durationMs <= 0) {
-    return "00:00"
-  }
+  const sign = durationMs >= 0 ? "" : "-"
+  const { hours, minutes, seconds } = parseDuration(Math.abs(durationMs))
 
-  const { hours, minutes, seconds } = parseDuration(durationMs)
-
-  return [
-    ...(hours ? [hours] : []),
-    minutes.toString().padStart(2, "0"),
-    seconds.toString().padStart(2, "0"),
-  ].join(":")
+  return (
+    sign +
+    [
+      ...(hours ? [hours] : []),
+      minutes.toString().padStart(2, "0"),
+      seconds.toString().padStart(2, "0"),
+    ].join(":")
+  )
 }
 
 if (import.meta.vitest) {
@@ -30,6 +30,6 @@ if (import.meta.vitest) {
   })
 
   test("negative", () => {
-    expect(formatDuration(-60_000)).toBe("00:00")
+    expect(formatDuration(-60_000)).toBe("-01:00")
   })
 }
