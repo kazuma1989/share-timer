@@ -21,7 +21,7 @@ export function isRoomId(id: string): id is Room["id"] {
 }
 
 export function newRoomId(): Room["id"] {
-  return nanoid(10).replace(/^(.{3})(.{4})(.+)$/, "$1-$2-$3") as Room["id"]
+  return nanoid(10).replace(/^(.{3})(.{4})(.{3})$/, "$1-$2-$3") as Room["id"]
 }
 
 if (import.meta.vitest) {
