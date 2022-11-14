@@ -17,24 +17,20 @@ export function toggleConfig(key: ConfigKey): void {
 
 const configDispatch$ = new Subject<ConfigKey>()
 
-const config$ = configDispatch$.pipe(
-  startWith(null),
-  scan(
-    (acc: Config, key): Config => {
-      if (!key) {
-        return acc
-      }
+const initialConfig: Config = {
+  flash: "on",
+  sound: "on",
+}
 
-      return {
-        ...acc,
-        [key]: acc[key] === "on" ? "off" : "on",
-      }
-    },
-    {
-      flash: "on",
-      sound: "off",
-    }
+const config$ = configDispatch$.pipe(
+  scan(
+    (acc, key) => ({
+      ...acc,
+      [key]: acc[key] === "on" ? "off" : "on",
+    }),
+    initialConfig
   ),
+  startWith(initialConfig),
   share({
     resetOnRefCountZero: false,
   })

@@ -165,6 +165,8 @@ function ConfigArea({
         title="音を切り替える"
         className="h-12 w-12 text-2xl"
         onClick={() => {
+          if (permission === "denied") return
+
           toggleConfig("sound")
         }}
       >
