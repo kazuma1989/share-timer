@@ -1,35 +1,35 @@
 import { doc, Firestore, runTransaction } from "firebase/firestore"
-import { Observable } from "rxjs"
+import { map, OperatorFunction, pipe } from "rxjs"
 import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
-import { InvalidDoc } from "./mapToRoom"
 import { pauseWhileLoop } from "./util/pauseWhileLoop"
 import { sparse } from "./util/sparse"
 import { ActionOnFirestore } from "./zod/actionZod"
-import { RoomOnFirestore } from "./zod/roomZod"
+import { Room, RoomOnFirestore } from "./zod/roomZod"
 
-export function restoreRoom(
-  db: Firestore,
-  invalid$: Observable<InvalidDoc>
-): void {
-  invalid$
-    .pipe(
-      sparse(200),
-      pauseWhileLoop({
-        criteria: import.meta.env.PROD ? 20 : 5,
-        debounce: 2_000,
-        onLoopDetected() {
-          throw new Error(
-            "Detect room initialization loop. Something went wrong"
-          )
-        },
-      })
-    )
-    .subscribe(async ([, roomId]) => {
-      await setupRoom(db, roomId).catch((_: unknown) => {
-        console.debug("aborted setup room", _)
-      })
+export function mapToSetupRoom(
+  db: Firestore
+): OperatorFunction<Room["id"], () => Promise<void>> {
+  return pipe(
+    sparse(200),
+    pauseWhileLoop({
+      criteria: import.meta.env.PROD ? 20 : 5,
+      debounce: 2_000,
+      onLoopDetected() {
+        throw new Error("Detect room initialization loop. Something went wrong")
+      },
+    }),
+    map((roomId) => {
+      let called = false
+
+      return async () => {
+        if (called) return
+        called = true
+
+        await setupRoom(db, roomId)
+      }
     })
+  )
 }
 
 /**

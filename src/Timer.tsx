@@ -13,6 +13,7 @@ import { TimeViewer } from "./TimeViewer"
 import { TransparentButton } from "./TransparentButton"
 import { useAllSettled } from "./useAllSettled"
 import { useMediaPermission } from "./useAudio"
+import { toggleConfig, useConfig } from "./useConfig"
 import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
 import { ActionOnFirestore } from "./zod/actionZod"
@@ -127,44 +128,62 @@ export function Timer({
           </div>
         </form>
 
-        <div className="flex items-center justify-evenly px-6">
-          <TransparentButton
-            title="フラッシュを切り替える"
-            className="h-12 w-12 text-2xl"
-            // TODO toggle flash
-            onClick={() => {}}
-          >
-            {icon("flash")}
-          </TransparentButton>
-
-          <TransparentButton
-            title="音を切り替える"
-            className="h-12 w-12 text-2xl"
-            // TODO toggle volume
-            onClick={() => {}}
-          >
-            <VolumeIcon />
-          </TransparentButton>
-
-          <TransparentButton
-            title="情報を開く"
-            className="h-12 w-12 text-2xl"
-            onClick={() => {
-              setHash(["info", roomId])
-            }}
-          >
-            {icon("information")}
-          </TransparentButton>
-        </div>
+        <ConfigArea
+          className="flex items-center justify-evenly px-6"
+          onInfoClick={() => {
+            setHash(["info", roomId])
+          }}
+        />
       </div>
     </>
   )
 }
 
-function VolumeIcon() {
+function ConfigArea({
+  className,
+  onInfoClick,
+}: {
+  className?: string
+  onInfoClick?(): void
+}) {
+  const config = useObservable(useConfig())
   const permission = useObservable(useMediaPermission(), "denied")
 
-  return permission === "canplay" ? icon("volume-high") : icon("volume-off")
+  return (
+    <div className={className}>
+      <TransparentButton
+        title="フラッシュを切り替える"
+        className="h-12 w-12 text-2xl"
+        onClick={() => {
+          toggleConfig("flash")
+        }}
+      >
+        {config.flash === "on" ? icon("flash") : icon("flash-off")}
+      </TransparentButton>
+
+      <TransparentButton
+        title="音を切り替える"
+        className="h-12 w-12 text-2xl"
+        onClick={() => {
+          if (permission === "denied") return
+
+          toggleConfig("sound")
+        }}
+      >
+        {config.sound === "on" && permission === "canplay"
+          ? icon("volume-high")
+          : icon("volume-off")}
+      </TransparentButton>
+
+      <TransparentButton
+        title="情報を開く"
+        className="h-12 w-12 text-2xl"
+        onClick={onInfoClick}
+      >
+        {icon("information")}
+      </TransparentButton>
+    </div>
+  )
 }
 
 function useDispatch(

@@ -1,14 +1,37 @@
-import { distinctUntilChanged, map, Observable } from "rxjs"
+import { distinctUntilChanged, map, merge, of, partition } from "rxjs"
 import { FlashCover } from "./FlashCover"
+import { isRoom, mapToRoom } from "./mapToRoom"
+import { mapToSetupRoom } from "./mapToSetupRoom"
 import { mapToTimerState } from "./mapToTimerState"
 import { Timer } from "./Timer"
 import { useFirestore } from "./useFirestore"
+import { useObservable } from "./useObservable"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { createCache } from "./util/createCache"
+import { suspend } from "./util/suspend"
 import { Room } from "./zod/roomZod"
 
-export function PageRoom({ room$ }: { room$: Observable<Room> }) {
+export function PageRoom({ roomId }: { roomId: Room["id"] }) {
   const db = useFirestore()
+
+  const [room$, setup$] = cacheHard(roomId, () => {
+    const [room$, invalid$] = partition(of(roomId).pipe(mapToRoom(db)), isRoom)
+
+    const setup$ = merge(
+      room$.pipe(map(() => null)),
+      invalid$.pipe(
+        map(([, roomId]) => roomId),
+        mapToSetupRoom(db)
+      )
+    )
+
+    return [room$, setup$]
+  })
+
+  const setup = useObservable(setup$)
+  if (setup) {
+    suspend(setup)
+  }
 
   const timerState$ = cache(room$, () =>
     room$.pipe(
@@ -30,3 +53,4 @@ export function PageRoom({ room$ }: { room$: Observable<Room> }) {
 }
 
 const cache = createCache()
+const cacheHard = createCache(true)

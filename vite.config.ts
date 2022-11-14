@@ -30,6 +30,8 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
   const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env
 
   return {
+    appType: "mpa",
+
     server: {
       host: HOST || "localhost",
       port: (PORT && Number.parseInt(PORT)) || 3000,
