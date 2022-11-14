@@ -11,7 +11,7 @@ import { observeHash } from "./observeHash"
 import { observeMediaPermission } from "./observeMediaPermission"
 import smallAlert from "./sound/small-alert.mp3"
 import { getItem, setItem } from "./storage"
-import { AudioProvider, MediaPermissionProvider } from "./useAudio"
+import { Audio, AudioProvider, MediaPermissionProvider } from "./useAudio"
 import { FirestoreProvider } from "./useFirestore"
 import { nanoid } from "./util/nanoid"
 
@@ -30,10 +30,20 @@ if (!getItem("userId")) {
 
 const root = document.getElementById("root")!
 
-const audio = new Audio(smallAlert)
-const permission$ = observeMediaPermission(audio, root)
+const _audio = new globalThis.Audio(smallAlert)
+const permission$ = observeMediaPermission(_audio, root)
 
 const route$ = observeHash()
+
+const audio: Audio = {
+  start() {
+    _audio.play()
+  },
+  stop() {
+    _audio.pause()
+  },
+  async reset() {},
+}
 
 createRoot(root).render(
   <StrictMode>

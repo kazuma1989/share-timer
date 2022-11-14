@@ -41,16 +41,13 @@ export function FlashCover({
     const sub = sounding$.subscribe(() => {
       console.debug("audio.play()")
 
-      audio.pause()
-      audio.currentTime = 0
-      audio.play()
+      audio.start()
     })
 
     return () => {
       sub.unsubscribe()
 
-      audio.pause()
-      audio.currentTime = 0
+      audio.stop()
     }
   }, [audio, config.sound, sounding$])
 

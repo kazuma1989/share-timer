@@ -2,8 +2,13 @@ import { Observable } from "rxjs"
 import { createContext } from "./createContext"
 import { Permission } from "./util/checkMediaPermission"
 
-export const [AudioProvider, useAudio] =
-  createContext<HTMLAudioElement>("AudioProvider")
+export interface Audio {
+  start(): void
+  stop(): void
+  reset(): PromiseLike<void>
+}
+
+export const [AudioProvider, useAudio] = createContext<Audio>("AudioProvider")
 
 export const [MediaPermissionProvider, useMediaPermission] = createContext<
   Observable<Permission>

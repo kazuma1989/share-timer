@@ -18,13 +18,13 @@ export function DebugCheckAudioButton() {
         osc.start()
         osc.stop(1)
 
-        audio.play()
+        audio.start()
 
         await setTimeout(1_000)
 
-        audio.pause()
-        audio.currentTime = 0
-        audio.play()
+        audio.stop()
+        await audio.reset()
+        audio.start()
       }}
     >
       {icon("volume-high")}
