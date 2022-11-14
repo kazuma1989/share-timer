@@ -38,9 +38,10 @@ export function FlashCover({
   useEffect(() => {
     if (config.sound !== "on") return
 
-    const sub = sounding$.subscribe(() => {
+    const sub = sounding$.subscribe(async () => {
       console.debug("audio.play()")
 
+      await audio.reset()
       audio.start()
     })
 

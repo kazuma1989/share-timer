@@ -35,14 +35,32 @@ const permission$ = observeMediaPermission(_audio, root)
 
 const route$ = observeHash()
 
+const context = new AudioContext()
+const audioData = await fetch(smallAlert).then((_) => _.arrayBuffer())
+
+async function createSource(
+  context: BaseAudioContext,
+  audioData: ArrayBuffer
+): Promise<AudioBufferSourceNode> {
+  const sourceNode = context.createBufferSource()
+  sourceNode.buffer = await context.decodeAudioData(audioData.slice(0))
+  sourceNode.connect(context.destination)
+
+  return sourceNode
+}
+
+let sourceNode: AudioBufferSourceNode | undefined
+
 const audio: Audio = {
   start() {
-    _audio.play()
+    sourceNode?.start()
   },
   stop() {
-    _audio.pause()
+    sourceNode?.stop()
   },
-  async reset() {},
+  async reset() {
+    sourceNode = await createSource(context, audioData)
+  },
 }
 
 createRoot(root).render(
