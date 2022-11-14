@@ -54,7 +54,9 @@ function createStore<T>(
         return currentValue
       }
 
-      throw firstValueFrom(source$)
+      throw firstValueFrom(source$).then((value) => {
+        currentValue = value
+      })
     },
   }
 }
