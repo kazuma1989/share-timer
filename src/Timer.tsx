@@ -128,55 +128,60 @@ export function Timer({
           </div>
         </form>
 
-        <div className="flex items-center justify-evenly px-6">
-          <TransparentButton
-            title="フラッシュを切り替える"
-            className="h-12 w-12 text-2xl"
-            onClick={() => {
-              toggleConfig("flash")
-            }}
-          >
-            <FlashIcon />
-          </TransparentButton>
-
-          <TransparentButton
-            title="音を切り替える"
-            className="h-12 w-12 text-2xl"
-            onClick={() => {
-              toggleConfig("sound")
-            }}
-          >
-            <VolumeIcon />
-          </TransparentButton>
-
-          <TransparentButton
-            title="情報を開く"
-            className="h-12 w-12 text-2xl"
-            onClick={() => {
-              setHash(["info", roomId])
-            }}
-          >
-            {icon("information")}
-          </TransparentButton>
-        </div>
+        <ConfigArea
+          className="flex items-center justify-evenly px-6"
+          onInfoClick={() => {
+            setHash(["info", roomId])
+          }}
+        />
       </div>
     </>
   )
 }
 
-function FlashIcon() {
+function ConfigArea({
+  className,
+  onInfoClick,
+}: {
+  className?: string
+  onInfoClick?(): void
+}) {
   const config = useObservable(useConfig())
-
-  return config.flash === "on" ? icon("flash") : icon("flash-off")
-}
-
-function VolumeIcon() {
   const permission = useObservable(useMediaPermission(), "denied")
-  const config = useObservable(useConfig())
 
-  return config.sound === "on" && permission === "canplay"
-    ? icon("volume-high")
-    : icon("volume-off")
+  return (
+    <div className={className}>
+      <TransparentButton
+        title="フラッシュを切り替える"
+        className="h-12 w-12 text-2xl"
+        onClick={() => {
+          toggleConfig("flash")
+        }}
+      >
+        {config.flash === "on" ? icon("flash") : icon("flash-off")}
+      </TransparentButton>
+
+      <TransparentButton
+        title="音を切り替える"
+        className="h-12 w-12 text-2xl"
+        onClick={() => {
+          toggleConfig("sound")
+        }}
+      >
+        {config.sound === "on" && permission === "canplay"
+          ? icon("volume-high")
+          : icon("volume-off")}
+      </TransparentButton>
+
+      <TransparentButton
+        title="情報を開く"
+        className="h-12 w-12 text-2xl"
+        onClick={onInfoClick}
+      >
+        {icon("information")}
+      </TransparentButton>
+    </div>
+  )
 }
 
 function useDispatch(
