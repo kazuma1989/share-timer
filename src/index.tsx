@@ -36,6 +36,19 @@ const permission$ = observeMediaPermission(_audio, root)
 const route$ = observeHash()
 
 const context = new AudioContext()
+
+document.addEventListener(
+  // https://qiita.com/zprodev/items/7fcd8335d7e8e613a01f#解決策-1
+  (document.ontouchend ? "touchend" : "mouseup") as keyof DocumentEventMap,
+  () => {
+    context.resume()
+  },
+  {
+    once: true,
+    passive: true,
+  }
+)
+
 const audioData = await fetch(smallAlert).then((_) => _.arrayBuffer())
 
 async function createSource(
