@@ -7,7 +7,7 @@ import { getItem } from "./storage"
 import { fromRoute } from "./toRoute"
 import { TransparentButton } from "./TransparentButton"
 import { useFirestore } from "./useFirestore"
-import { Room, RoomOnFirestore } from "./zod/roomZod"
+import { Room, RoomOnFirestore, roomZod } from "./zod/roomZod"
 
 export function PageInfo({ roomId }: { roomId: Room["id"] }) {
   const db = useFirestore()
@@ -90,6 +90,9 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
                   if (signal.aborted) throw "aborted 1"
 
                   if (!roomDoc.exists()) throw "aborted 2"
+
+                  const room = roomZod.parse(roomDoc.data())
+                  if (room.lockedBy) throw "aborted 3"
 
                   transaction.update<RoomOnFirestore>(roomDoc.ref, {
                     lockedBy: userId,

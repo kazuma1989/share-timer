@@ -8,6 +8,7 @@ import { collection } from "./firestore/collection"
 import { withMeta } from "./firestore/withMeta"
 import { icon } from "./icon"
 import { setHash } from "./observeHash"
+import { getItem } from "./storage"
 import { TimerState } from "./timerReducer"
 import { TimeViewer } from "./TimeViewer"
 import { TransparentButton } from "./TransparentButton"
@@ -28,7 +29,9 @@ export function Timer({
   timerState$: Observable<TimerState>
   className?: string
 }) {
-  const { id: roomId, name: roomName } = useObservable(room$)
+  const { id: roomId, name: roomName, lockedBy } = useObservable(room$)
+  const locked = lockedBy && lockedBy !== getItem("userId")
+
   const state = useObservable(timerState$)
 
   const [pending, dispatch] = useDispatch(roomId)
@@ -75,7 +78,12 @@ export function Timer({
             )}
           </div>
 
-          <div className="flex items-center justify-around">
+          <div
+            className={clsx(
+              "flex items-center justify-around",
+              locked && "invisible"
+            )}
+          >
             <CircleButton
               disabled={state.mode === "editing"}
               className="text-xs"
