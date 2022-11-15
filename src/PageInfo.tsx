@@ -1,11 +1,17 @@
 import clsx from "clsx"
+import { doc, runTransaction } from "firebase/firestore"
+import { collection } from "./firestore/collection"
 import { icon } from "./icon"
 import { setHash } from "./observeHash"
+import { getItem } from "./storage"
 import { fromRoute } from "./toRoute"
 import { TransparentButton } from "./TransparentButton"
-import { Room } from "./zod/roomZod"
+import { useFirestore } from "./useFirestore"
+import { Room, RoomOnFirestore } from "./zod/roomZod"
 
 export function PageInfo({ roomId }: { roomId: Room["id"] }) {
+  const db = useFirestore()
+
   const roomURL =
     location.origin + location.pathname + `#${fromRoute(["room", roomId])}`
 
@@ -63,6 +69,40 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
           >
             新しいタイマーを開く
           </a>
+        </p>
+
+        <p>
+          <TransparentButton
+            className={clsx("w-full border border-gray-500 block px-4 py-3")}
+            onClick={async () => {
+              const userId = getItem("userId")
+              if (!userId) return
+
+              const abort = new AbortController()
+              const { signal } = abort
+
+              await runTransaction(
+                db,
+                async (transaction) => {
+                  const roomDoc = await transaction.get(
+                    doc(collection(db, "rooms"), roomId)
+                  )
+                  if (signal.aborted) throw "aborted 1"
+
+                  if (!roomDoc.exists()) throw "aborted 2"
+
+                  transaction.update<RoomOnFirestore>(roomDoc.ref, {
+                    lockedBy: userId,
+                  })
+                },
+                {
+                  maxAttempts: 1,
+                }
+              )
+            }}
+          >
+            編集をロックする (experimental)
+          </TransparentButton>
         </p>
       </div>
 
