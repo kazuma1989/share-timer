@@ -65,7 +65,7 @@ export function Timer({
           }}
         >
           <div className="grid min-h-[8rem] place-items-center tabular-nums">
-            {state.mode === "editing" ? (
+            {!locked && state.mode === "editing" ? (
               <DurationSelect
                 key={state.mode + state.initialDuration}
                 innerRef={durationSelect$}
