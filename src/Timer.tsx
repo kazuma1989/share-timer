@@ -78,62 +78,73 @@ export function Timer({
             )}
           </div>
 
-          <div
-            className={clsx(
-              "flex items-center justify-around",
-              locked && "invisible"
-            )}
-          >
-            <CircleButton
-              disabled={state.mode === "editing"}
-              className="text-xs"
-              onClick={() => {
-                dispatch({
-                  type: "cancel",
-                })
-              }}
-            >
-              キャンセル
-            </CircleButton>
-
-            {state.mode === "editing" ? (
-              <CircleButton
-                innerRef={primaryButton$}
-                color="green"
-                type="submit"
-              >
-                開始
+          {locked ? (
+            <div className="flex items-center justify-around">
+              <CircleButton disabled className="text-2xl">
+                {icon("lock-outline")}
               </CircleButton>
-            ) : state.mode === "running" ? (
+
               <CircleButton
-                innerRef={primaryButton$}
-                color="orange"
+                disabled
+                className="text-2xl"
+                color={state.mode === "running" ? "orange" : "green"}
+              >
+                {icon("lock-outline")}
+              </CircleButton>
+            </div>
+          ) : (
+            <div className="flex items-center justify-around">
+              <CircleButton
+                disabled={state.mode === "editing"}
+                className="text-xs"
                 onClick={() => {
                   dispatch({
-                    type: "pause",
-                    at: serverTimestamp(),
+                    type: "cancel",
                   })
                 }}
               >
-                一時停止
+                キャンセル
               </CircleButton>
-            ) : (
-              <CircleButton
-                innerRef={primaryButton$}
-                color="green"
-                onClick={() => {
-                  if (pending) return
 
-                  dispatch({
-                    type: "resume",
-                    at: serverTimestamp(),
-                  })
-                }}
-              >
-                再開
-              </CircleButton>
-            )}
-          </div>
+              {state.mode === "editing" ? (
+                <CircleButton
+                  innerRef={primaryButton$}
+                  color="green"
+                  type="submit"
+                >
+                  開始
+                </CircleButton>
+              ) : state.mode === "running" ? (
+                <CircleButton
+                  innerRef={primaryButton$}
+                  color="orange"
+                  onClick={() => {
+                    dispatch({
+                      type: "pause",
+                      at: serverTimestamp(),
+                    })
+                  }}
+                >
+                  一時停止
+                </CircleButton>
+              ) : (
+                <CircleButton
+                  innerRef={primaryButton$}
+                  color="green"
+                  onClick={() => {
+                    if (pending) return
+
+                    dispatch({
+                      type: "resume",
+                      at: serverTimestamp(),
+                    })
+                  }}
+                >
+                  再開
+                </CircleButton>
+              )}
+            </div>
+          )}
         </form>
 
         <ConfigArea
