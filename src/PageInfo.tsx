@@ -80,7 +80,11 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
 
               const abort = new AbortController()
 
-              type AbortReason = "already-locked" | "room-not-exists" | "signal"
+              type AbortReason =
+                | "signal"
+                | "room-not-exists"
+                | "already-locked"
+                | "user-deny"
               const AbortReason = (_: AbortReason) => _
 
               await runTransaction(
@@ -102,6 +106,13 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
                     throw AbortReason("already-locked")
                   }
 
+                  const confirmed = confirm(
+                    "解除の方法はありませんが、本当にロックしますか？"
+                  )
+                  if (!confirmed) {
+                    throw AbortReason("user-deny")
+                  }
+
                   transaction.update<RoomOnFirestore>(roomDoc.ref, {
                     lockedBy: userId,
                   })
@@ -113,6 +124,10 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
                 switch (reason) {
                   case "already-locked": {
                     alert("already locked by another user")
+                    break
+                  }
+
+                  case "user-deny": {
                     break
                   }
 
