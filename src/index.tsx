@@ -11,7 +11,7 @@ import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
 import smallAlert from "./sound/small-alert.mp3"
 import { getItem, setItem } from "./storage"
-import { Audio, AudioProvider, MediaPermissionProvider } from "./useAudio"
+import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
 import { FirestoreProvider } from "./useFirestore"
 import { nanoid } from "./util/nanoid"
 
@@ -36,31 +36,7 @@ const context = new AudioContext()
 const permission$ = observeAudioPermission(context)
 
 const audioData = await fetch(smallAlert).then((_) => _.arrayBuffer())
-
-async function createSource(
-  context: BaseAudioContext,
-  audioData: ArrayBuffer
-): Promise<AudioBufferSourceNode> {
-  const sourceNode = context.createBufferSource()
-  sourceNode.buffer = await context.decodeAudioData(audioData.slice(0))
-  sourceNode.connect(context.destination)
-
-  return sourceNode
-}
-
-let sourceNode: AudioBufferSourceNode | undefined
-
-const audio: Audio = {
-  start() {
-    sourceNode?.start()
-  },
-  stop() {
-    sourceNode?.stop()
-  },
-  async reset() {
-    sourceNode = await createSource(context, audioData)
-  },
-}
+const audio = createAudio(context, audioData)
 
 createRoot(root).render(
   <StrictMode>
