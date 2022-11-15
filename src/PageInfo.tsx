@@ -79,7 +79,9 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
               if (!userId) return
 
               const abort = new AbortController()
-              const { signal } = abort
+
+              type AbortReason = "already-locked" | "room-not-exists" | "signal"
+              const AbortReason = (_: AbortReason) => _
 
               await runTransaction(
                 db,
@@ -87,12 +89,18 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
                   const roomDoc = await transaction.get(
                     doc(collection(db, "rooms"), roomId)
                   )
-                  if (signal.aborted) throw "aborted 1"
+                  if (abort.signal.aborted) {
+                    throw AbortReason("signal")
+                  }
 
-                  if (!roomDoc.exists()) throw "aborted 2"
+                  if (!roomDoc.exists()) {
+                    throw AbortReason("room-not-exists")
+                  }
 
                   const room = roomZod.parse(roomDoc.data())
-                  if (room.lockedBy) throw "aborted 3"
+                  if (room.lockedBy) {
+                    throw AbortReason("already-locked")
+                  }
 
                   transaction.update<RoomOnFirestore>(roomDoc.ref, {
                     lockedBy: userId,
@@ -101,7 +109,18 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
                 {
                   maxAttempts: 1,
                 }
-              )
+              ).catch((reason: AbortReason) => {
+                switch (reason) {
+                  case "already-locked": {
+                    alert("already locked by another user")
+                    break
+                  }
+
+                  default: {
+                    throw reason
+                  }
+                }
+              })
             }}
           >
             編集をロックする (experimental)
