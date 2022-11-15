@@ -7,8 +7,8 @@ import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
 import { calibrateClock } from "./now"
+import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
-import { observeMediaPermission } from "./observeMediaPermission"
 import smallAlert from "./sound/small-alert.mp3"
 import { getItem, setItem } from "./storage"
 import { Audio, AudioProvider, MediaPermissionProvider } from "./useAudio"
@@ -30,24 +30,10 @@ if (!getItem("userId")) {
 
 const root = document.getElementById("root")!
 
-const _audio = new globalThis.Audio(smallAlert)
-const permission$ = observeMediaPermission(_audio, root)
-
 const route$ = observeHash()
 
 const context = new AudioContext()
-
-document.addEventListener(
-  // https://qiita.com/zprodev/items/7fcd8335d7e8e613a01f#解決策-1
-  (document.ontouchend ? "touchend" : "mouseup") as keyof DocumentEventMap,
-  () => {
-    context.resume()
-  },
-  {
-    once: true,
-    passive: true,
-  }
-)
+const permission$ = observeAudioPermission(context)
 
 const audioData = await fetch(smallAlert).then((_) => _.arrayBuffer())
 

@@ -1,6 +1,6 @@
 import { Observable } from "rxjs"
 import { createContext } from "./createContext"
-import { Permission } from "./util/checkMediaPermission"
+import { Permission } from "./observeAudioPermission"
 
 export interface Audio {
   start(): void
