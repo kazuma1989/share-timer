@@ -9,6 +9,7 @@ export interface RoomOnFirestore extends z.input<typeof roomZod> {}
 
 export const roomZod = z.object({
   name: z.string().max(1_000).optional(),
+  lockedBy: z.string().max(10).optional(),
 })
 
 export const roomIdZod = z
@@ -21,7 +22,7 @@ export function isRoomId(id: string): id is Room["id"] {
 }
 
 export function newRoomId(): Room["id"] {
-  return nanoid(10).replace(/^(.{3})(.{4})(.+)$/, "$1-$2-$3") as Room["id"]
+  return nanoid(10).replace(/^(.{3})(.{4})(.{3})$/, "$1-$2-$3") as Room["id"]
 }
 
 if (import.meta.vitest) {

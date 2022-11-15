@@ -10,8 +10,10 @@ import { calibrateClock } from "./now"
 import { observeHash } from "./observeHash"
 import { observeMediaPermission } from "./observeMediaPermission"
 import smallAlert from "./sound/small-alert.mp3"
+import { getItem, setItem } from "./storage"
 import { AudioProvider, MediaPermissionProvider } from "./useAudio"
 import { FirestoreProvider } from "./useFirestore"
+import { nanoid } from "./util/nanoid"
 
 // https://neos21.net/blog/2018/08/19-01.html
 document.body.addEventListener("touchstart", () => {}, { passive: true })
@@ -21,6 +23,10 @@ const firestore = await initializeFirestore()
 calibrateClock(firestore).catch((reason: unknown) => {
   console.warn("calibration failed", reason)
 })
+
+if (!getItem("userId")) {
+  setItem("userId", nanoid(10))
+}
 
 const root = document.getElementById("root")!
 
