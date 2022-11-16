@@ -1,45 +1,33 @@
-import { distinctUntilChanged, map, merge, of, partition } from "rxjs"
+import { map, merge, partition } from "rxjs"
 import { FlashCover } from "./FlashCover"
-import { isRoom, mapToRoom } from "./mapToRoom"
-import { mapToSetupRoom } from "./mapToSetupRoom"
-import { mapToTimerState } from "./mapToTimerState"
+import { isRoom } from "./mapToRoom"
 import { Timer } from "./Timer"
-import { useFirestore } from "./useFirestore"
 import { useObservable } from "./useObservable"
+import { useRoom } from "./useRoom"
+import { useTimerState } from "./useTimerState"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { createCache } from "./util/createCache"
-import { suspend } from "./util/suspend"
 import { Room } from "./zod/roomZod"
 
 export function PageRoom({ roomId }: { roomId: Room["id"] }) {
-  const db = useFirestore()
+  const _room$ = useRoom(roomId)
+  const [room$, invalidRoomId$] = cache(_room$, () => {
+    const [room$, invalid$] = partition(_room$, isRoom)
 
-  const [room$, setup$] = cacheHard(roomId, () => {
-    const [room$, invalid$] = partition(of(roomId).pipe(mapToRoom(db)), isRoom)
-
-    const setup$ = merge(
+    const invalidRoomId$ = merge(
       room$.pipe(map(() => null)),
-      invalid$.pipe(
-        map(([, roomId]) => roomId),
-        mapToSetupRoom(db)
-      )
+      invalid$.pipe(map(([, roomId]) => roomId))
     )
 
-    return [room$, setup$]
+    return [room$, invalidRoomId$]
   })
 
-  const setup = useObservable(setup$)
-  if (setup) {
-    suspend(setup)
+  const invalidRoomId = useObservable(invalidRoomId$)
+  if (invalidRoomId) {
+    throw invalidRoomId
   }
 
-  const timerState$ = cache(room$, () =>
-    room$.pipe(
-      map((_) => _.id),
-      distinctUntilChanged(),
-      mapToTimerState(db)
-    )
-  )
+  const timerState$ = useTimerState(room$)
 
   useTitleAsTimeViewer(timerState$)
 
@@ -53,4 +41,3 @@ export function PageRoom({ roomId }: { roomId: Room["id"] }) {
 }
 
 const cache = createCache()
-const cacheHard = createCache(true)
