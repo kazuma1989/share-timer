@@ -7,11 +7,11 @@ import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { initializeFirestore } from "./initializeFirestore"
 import { calibrateClock } from "./now"
+import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
-import { observeMediaPermission } from "./observeMediaPermission"
 import smallAlert from "./sound/small-alert.mp3"
 import { getItem, setItem } from "./storage"
-import { AudioProvider, MediaPermissionProvider } from "./useAudio"
+import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
 import { FirestoreProvider } from "./useFirestore"
 import { nanoid } from "./util/nanoid"
 
@@ -30,10 +30,13 @@ if (!getItem("userId")) {
 
 const root = document.getElementById("root")!
 
-const audio = new Audio(smallAlert)
-const permission$ = observeMediaPermission(audio, root)
-
 const route$ = observeHash()
+
+const context = new AudioContext()
+const permission$ = observeAudioPermission(context)
+
+const audioData = await fetch(smallAlert).then((_) => _.arrayBuffer())
+const audio = createAudio(context, audioData)
 
 createRoot(root).render(
   <StrictMode>

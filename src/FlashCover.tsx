@@ -40,17 +40,11 @@ export function FlashCover({
 
     const sub = sounding$.subscribe(() => {
       console.debug("audio.play()")
-
-      audio.pause()
-      audio.currentTime = 0
       audio.play()
     })
 
     return () => {
       sub.unsubscribe()
-
-      audio.pause()
-      audio.currentTime = 0
     }
   }, [audio, config.sound, sounding$])
 
