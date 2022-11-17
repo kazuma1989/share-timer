@@ -11,6 +11,7 @@ export const [ResetErrorProvider, useResetError] =
   createContext<ResetError>("ResetErrorProvider")
 
 interface Props {
+  shouldCatch?(error: unknown): boolean | null | undefined
   fallback?: ReactNode
   children?: ReactNode
 }
@@ -48,11 +49,15 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   render() {
-    const { fallback, children } = this.props
+    const { shouldCatch, fallback, children } = this.props
     const { error } = this.state
     const { resetError } = this
 
     if (error) {
+      if (shouldCatch && !shouldCatch(error)) {
+        throw error
+      }
+
       return (
         <ResetErrorProvider value={resetError}>
           <ErrorProvider value={error}>{fallback}</ErrorProvider>
