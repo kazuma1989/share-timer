@@ -1,13 +1,36 @@
-import { Observable, of } from "rxjs"
-import { InvalidDoc, mapToRoom } from "../mapToRoom"
+import { doc } from "firebase/firestore"
+import { map, Observable } from "rxjs"
 import { createCache } from "../util/createCache"
-import { Room } from "../zod/roomZod"
+import { shareRecent } from "../util/shareRecent"
+import { snapshotOf } from "../util/snapshotOf"
+import { InvalidDoc, Room, roomZod } from "../zod/roomZod"
+import { collection } from "./collection"
 import { useFirestore } from "./useFirestore"
 
 export function useRoomImpl(roomId: Room["id"]): Observable<Room | InvalidDoc> {
   const db = useFirestore()
 
-  const room$ = hardCache(roomId, () => of(roomId).pipe(mapToRoom(db)))
+  const room$ = hardCache(roomId, () =>
+    snapshotOf(doc(collection(db, "rooms"), roomId)).pipe(
+      map((doc): Room | InvalidDoc => {
+        const rawData = doc.data()
+        const _ = roomZod.safeParse(rawData)
+        if (!_.success) {
+          if (rawData) {
+            console.debug(rawData, _.error)
+          }
+
+          return ["invalid-doc", roomId]
+        }
+
+        return {
+          ..._.data,
+          id: roomId,
+        }
+      }),
+      shareRecent(30_000)
+    )
+  )
 
   return room$
 }

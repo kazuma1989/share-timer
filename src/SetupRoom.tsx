@@ -1,8 +1,8 @@
 import { ReactNode, useEffect } from "react"
 import { ErrorBoundary, useError, useResetError } from "./ErrorBoundary"
-import { InvalidDoc } from "./mapToRoom"
 import { useSetup } from "./useSetup"
 import { suspend } from "./util/suspend"
+import { InvalidDoc } from "./zod/roomZod"
 
 export function SetupRoom({ children }: { children?: ReactNode }) {
   return (

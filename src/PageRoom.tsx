@@ -1,13 +1,12 @@
 import { map, merge, partition } from "rxjs"
 import { FlashCover } from "./FlashCover"
-import { isRoom } from "./mapToRoom"
 import { Timer } from "./Timer"
 import { useObservable } from "./useObservable"
 import { useRoom } from "./useRoom"
 import { useTimerState } from "./useTimerState"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { createCache } from "./util/createCache"
-import { Room } from "./zod/roomZod"
+import { isRoom, Room } from "./zod/roomZod"
 
 export function PageRoom({ roomId }: { roomId: Room["id"] }) {
   const _room$ = useRoom(roomId)
