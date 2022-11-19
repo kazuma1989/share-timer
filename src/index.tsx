@@ -2,9 +2,9 @@ import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
 import { App } from "./App"
 import { ErrorBoundary } from "./ErrorBoundary"
-import { useDispatch } from "./firestore/useDispatch"
-import { useRoom } from "./firestore/useRoom"
-import { useTimerState } from "./firestore/useTimerState"
+import { useDispatchImpl } from "./firestore/useDispatchImpl"
+import { useRoomImpl } from "./firestore/useRoomImpl"
+import { useTimerStateImpl } from "./firestore/useTimerStateImpl"
 import { FullViewportOops } from "./FullViewportOops"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
@@ -50,9 +50,9 @@ createRoot(root).render(
       <FirestoreProvider value={firestore}>
         <AudioProvider value={audio}>
           <MediaPermissionProvider value={permission$}>
-            <UseDispatchProvider value={useDispatch}>
-              <UseRoomProvider value={useRoom}>
-                <UseTimerStateProvider value={useTimerState}>
+            <UseDispatchProvider value={useDispatchImpl}>
+              <UseRoomProvider value={useRoomImpl}>
+                <UseTimerStateProvider value={useTimerStateImpl}>
                   <Suspense fallback={<FullViewportProgress />}>
                     <App route$={route$} />
                   </Suspense>

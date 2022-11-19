@@ -6,7 +6,7 @@ import { Room } from "../zod/roomZod"
 import { collection } from "./collection"
 import { withMeta } from "./withMeta"
 
-export function useDispatch(
+export function useDispatchImpl(
   roomId: Room["id"]
 ): [
   pending: boolean,

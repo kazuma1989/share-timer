@@ -5,7 +5,9 @@ import { useFirestore } from "../useFirestore"
 import { createCache } from "../util/createCache"
 import { Room } from "../zod/roomZod"
 
-export function useTimerState(room$: Observable<Room>): Observable<TimerState> {
+export function useTimerStateImpl(
+  room$: Observable<Room>
+): Observable<TimerState> {
   const db = useFirestore()
 
   const timerState$ = cache(room$, () =>
