@@ -5,6 +5,7 @@ import { ErrorBoundary } from "./ErrorBoundary"
 import { useDispatchImpl } from "./firestore/useDispatchImpl"
 import { FirestoreProvider } from "./firestore/useFirestore"
 import { useRoomImpl } from "./firestore/useRoomImpl"
+import { useSetupImpl } from "./firestore/useSetupImpl"
 import { useTimerStateImpl } from "./firestore/useTimerStateImpl"
 import { FullViewportOops } from "./FullViewportOops"
 import { FullViewportProgress } from "./FullViewportProgress"
@@ -18,6 +19,7 @@ import { getItem, setItem } from "./storage"
 import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
 import { UseDispatchProvider } from "./useDispatch"
 import { UseRoomProvider } from "./useRoom"
+import { UseSetupProvider } from "./useSetup"
 import { UseTimerStateProvider } from "./useTimerState"
 import { nanoid } from "./util/nanoid"
 
@@ -53,9 +55,11 @@ createRoot(root).render(
             <UseDispatchProvider value={useDispatchImpl}>
               <UseRoomProvider value={useRoomImpl}>
                 <UseTimerStateProvider value={useTimerStateImpl}>
-                  <Suspense fallback={<FullViewportProgress />}>
-                    <App route$={route$} />
-                  </Suspense>
+                  <UseSetupProvider value={useSetupImpl}>
+                    <Suspense fallback={<FullViewportProgress />}>
+                      <App route$={route$} />
+                    </Suspense>
+                  </UseSetupProvider>
                 </UseTimerStateProvider>
               </UseRoomProvider>
             </UseDispatchProvider>
