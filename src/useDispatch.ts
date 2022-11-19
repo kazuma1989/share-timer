@@ -15,5 +15,8 @@ export { ImplProvider as UseDispatchProvider }
 
 const [ImplProvider, useImpl] = createContext<typeof useDispatch>(
   "UseDispatchProvider",
-  () => [false, async () => {}]
+  () => [pending, dispatch]
 )
+
+const pending = false
+const dispatch = async () => {}
