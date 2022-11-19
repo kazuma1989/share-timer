@@ -2,6 +2,7 @@ import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
 import { App } from "./App"
 import { ErrorBoundary } from "./ErrorBoundary"
+import { useDispatch } from "./firestore/useDispatch"
 import { FullViewportOops } from "./FullViewportOops"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
@@ -12,6 +13,7 @@ import { observeHash } from "./observeHash"
 import smallAlert from "./sound/small-alert.mp3"
 import { getItem, setItem } from "./storage"
 import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
+import { UseDispatchProvider } from "./useDispatch"
 import { FirestoreProvider } from "./useFirestore"
 import { nanoid } from "./util/nanoid"
 
@@ -44,9 +46,11 @@ createRoot(root).render(
       <FirestoreProvider value={firestore}>
         <AudioProvider value={audio}>
           <MediaPermissionProvider value={permission$}>
-            <Suspense fallback={<FullViewportProgress />}>
-              <App route$={route$} />
-            </Suspense>
+            <UseDispatchProvider value={useDispatch}>
+              <Suspense fallback={<FullViewportProgress />}>
+                <App route$={route$} />
+              </Suspense>
+            </UseDispatchProvider>
           </MediaPermissionProvider>
         </AudioProvider>
       </FirestoreProvider>

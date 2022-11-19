@@ -1,18 +1,18 @@
 import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
-import { App } from "./App"
+import { of } from "rxjs"
 import { ErrorBoundary } from "./ErrorBoundary"
 import { FullViewportOops } from "./FullViewportOops"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { observeAudioPermission } from "./observeAudioPermission"
-import { observeHash } from "./observeHash"
 import smallAlert from "./sound/small-alert.mp3"
+import { Timer } from "./Timer"
+import { TimerState } from "./timerReducer"
 import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
+import { Room } from "./zod/roomZod"
 
 const root = document.getElementById("root")!
-
-const route$ = observeHash()
 
 const context = new AudioContext()
 const permission$ = observeAudioPermission(context)
@@ -26,7 +26,17 @@ createRoot(root).render(
       <AudioProvider value={audio}>
         <MediaPermissionProvider value={permission$}>
           <Suspense fallback={<FullViewportProgress />}>
-            <App route$={route$} />
+            <Timer
+              room$={of({
+                id: "",
+                name: "hello",
+              } as Room)}
+              timerState$={of({
+                initialDuration: 3 * 60_000,
+                mode: "paused",
+                restDuration: 2 * 60_000,
+              } as TimerState)}
+            />
           </Suspense>
         </MediaPermissionProvider>
       </AudioProvider>
