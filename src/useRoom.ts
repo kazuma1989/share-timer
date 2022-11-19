@@ -1,15 +1,20 @@
 import { Observable, of } from "rxjs"
-import { InvalidDoc, mapToRoom } from "./mapToRoom"
-import { useFirestore } from "./useFirestore"
-import { createCache } from "./util/createCache"
+import { createContext } from "./createContext"
+import { InvalidDoc } from "./mapToRoom"
 import { Room } from "./zod/roomZod"
 
 export function useRoom(roomId: Room["id"]): Observable<Room | InvalidDoc> {
-  const db = useFirestore()
-
-  const room$ = hardCache(roomId, () => of(roomId).pipe(mapToRoom(db)))
-
-  return room$
+  return useImpl()(roomId)
 }
 
-const hardCache = createCache(true)
+export { ImplProvider as UseRoomProvider }
+
+const [ImplProvider, useImpl] = createContext<typeof useRoom>(
+  "UseRoomProvider",
+  () => room$
+)
+
+const room$ = of({
+  id: "mock-id",
+  name: "mocked room",
+} as Room)

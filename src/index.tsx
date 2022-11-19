@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client"
 import { App } from "./App"
 import { ErrorBoundary } from "./ErrorBoundary"
 import { useDispatch } from "./firestore/useDispatch"
+import { useRoom } from "./firestore/useRoom"
 import { FullViewportOops } from "./FullViewportOops"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
@@ -15,6 +16,7 @@ import { getItem, setItem } from "./storage"
 import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
 import { UseDispatchProvider } from "./useDispatch"
 import { FirestoreProvider } from "./useFirestore"
+import { UseRoomProvider } from "./useRoom"
 import { nanoid } from "./util/nanoid"
 
 // https://neos21.net/blog/2018/08/19-01.html
@@ -47,9 +49,11 @@ createRoot(root).render(
         <AudioProvider value={audio}>
           <MediaPermissionProvider value={permission$}>
             <UseDispatchProvider value={useDispatch}>
-              <Suspense fallback={<FullViewportProgress />}>
-                <App route$={route$} />
-              </Suspense>
+              <UseRoomProvider value={useRoom}>
+                <Suspense fallback={<FullViewportProgress />}>
+                  <App route$={route$} />
+                </Suspense>
+              </UseRoomProvider>
             </UseDispatchProvider>
           </MediaPermissionProvider>
         </AudioProvider>
