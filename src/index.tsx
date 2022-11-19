@@ -4,6 +4,7 @@ import { App } from "./App"
 import { ErrorBoundary } from "./ErrorBoundary"
 import { useDispatch } from "./firestore/useDispatch"
 import { useRoom } from "./firestore/useRoom"
+import { useTimerState } from "./firestore/useTimerState"
 import { FullViewportOops } from "./FullViewportOops"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
@@ -17,6 +18,7 @@ import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
 import { UseDispatchProvider } from "./useDispatch"
 import { FirestoreProvider } from "./useFirestore"
 import { UseRoomProvider } from "./useRoom"
+import { UseTimerStateProvider } from "./useTimerState"
 import { nanoid } from "./util/nanoid"
 
 // https://neos21.net/blog/2018/08/19-01.html
@@ -50,9 +52,11 @@ createRoot(root).render(
           <MediaPermissionProvider value={permission$}>
             <UseDispatchProvider value={useDispatch}>
               <UseRoomProvider value={useRoom}>
-                <Suspense fallback={<FullViewportProgress />}>
-                  <App route$={route$} />
-                </Suspense>
+                <UseTimerStateProvider value={useTimerState}>
+                  <Suspense fallback={<FullViewportProgress />}>
+                    <App route$={route$} />
+                  </Suspense>
+                </UseTimerStateProvider>
               </UseRoomProvider>
             </UseDispatchProvider>
           </MediaPermissionProvider>

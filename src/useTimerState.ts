@@ -1,22 +1,21 @@
-import { distinctUntilChanged, map, Observable } from "rxjs"
-import { mapToTimerState } from "./mapToTimerState"
+import { Observable, of } from "rxjs"
+import { createContext } from "./createContext"
 import { TimerState } from "./timerReducer"
-import { useFirestore } from "./useFirestore"
-import { createCache } from "./util/createCache"
 import { Room } from "./zod/roomZod"
 
 export function useTimerState(room$: Observable<Room>): Observable<TimerState> {
-  const db = useFirestore()
-
-  const timerState$ = cache(room$, () =>
-    room$.pipe(
-      map((_) => _.id),
-      distinctUntilChanged(),
-      mapToTimerState(db)
-    )
-  )
-
-  return timerState$
+  return useImpl()(room$)
 }
 
-const cache = createCache()
+export { ImplProvider as UseTimerStateProvider }
+
+const [ImplProvider, useImpl] = createContext<typeof useTimerState>(
+  "UseTimerStateProvider",
+  () => timerState$
+)
+
+const timerState$ = of({
+  mode: "paused",
+  initialDuration: 3 * 60_000,
+  restDuration: 2 * 60_000 + 47_000,
+} as TimerState)
