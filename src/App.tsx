@@ -2,12 +2,21 @@ import { Observable } from "rxjs"
 import { replaceHash } from "./observeHash"
 import { PageInfo } from "./PageInfo"
 import { PageRoom } from "./PageRoom"
+import { SetupRoom } from "./SetupRoom"
 import { Route } from "./toRoute"
 import { useObservable } from "./useObservable"
 import { suspend } from "./util/suspend"
 import { newRoomId } from "./zod/roomZod"
 
-export function App({ route$ }: { route$: Observable<Route> }) {
+export function App(props: { route$: Observable<Route> }) {
+  return (
+    <SetupRoom>
+      <AppInner {...props} />
+    </SetupRoom>
+  )
+}
+
+function AppInner({ route$ }: { route$: Observable<Route> }) {
   const [route, payload] = useObservable(route$)
 
   switch (route) {

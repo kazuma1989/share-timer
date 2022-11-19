@@ -11,20 +11,16 @@ import { Room } from "./zod/roomZod"
 
 export function PageRoom({ roomId }: { roomId: Room["id"] }) {
   const _room$ = useRoom(roomId)
-  const [room$, invalidRoomId$] = cache(_room$, () => {
-    const [room$, invalid$] = partition(_room$, isRoom)
+  const [room$, invalid$] = cache(_room$, () => {
+    const [room$, _invalid$] = partition(_room$, isRoom)
+    const invalid$ = merge(room$.pipe(map(() => null)), _invalid$)
 
-    const invalidRoomId$ = merge(
-      room$.pipe(map(() => null)),
-      invalid$.pipe(map(([, roomId]) => roomId))
-    )
-
-    return [room$, invalidRoomId$]
+    return [room$, invalid$]
   })
 
-  const invalidRoomId = useObservable(invalidRoomId$)
-  if (invalidRoomId) {
-    throw invalidRoomId
+  const invalid = useObservable(invalid$)
+  if (invalid) {
+    throw invalid
   }
 
   const timerState$ = useTimerState(room$)
