@@ -12,16 +12,10 @@ export function SetupRoom({ children }: { children?: ReactNode }) {
 
 function SetupRoomFallback() {
   const error = useError()
-  if (!Array.isArray(error)) {
-    throw error
-  }
+  assertInvalidDoc(error)
 
-  const [reason, payload] = error as InvalidDoc
-  if (reason !== "invalid-doc") {
-    throw error
-  }
+  const [, invalidRoomId] = error
 
-  const invalidRoomId = payload
   const setup = useSetup(invalidRoomId)
   if (setup) {
     suspend(setup)
@@ -33,4 +27,15 @@ function SetupRoomFallback() {
   }, [resetError])
 
   return null
+}
+
+function assertInvalidDoc(error: unknown): asserts error is InvalidDoc {
+  if (!Array.isArray(error)) {
+    throw error
+  }
+
+  const [reason] = error as InvalidDoc
+  if (reason !== "invalid-doc") {
+    throw error
+  }
 }
