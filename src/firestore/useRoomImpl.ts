@@ -1,8 +1,8 @@
 import { Observable, of } from "rxjs"
 import { InvalidDoc, mapToRoom } from "../mapToRoom"
-import { useFirestore } from "../useFirestore"
 import { createCache } from "../util/createCache"
 import { Room } from "../zod/roomZod"
+import { useFirestore } from "./useFirestore"
 
 export function useRoomImpl(roomId: Room["id"]): Observable<Room | InvalidDoc> {
   const db = useFirestore()

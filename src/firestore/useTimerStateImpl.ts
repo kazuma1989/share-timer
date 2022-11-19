@@ -1,9 +1,9 @@
 import { distinctUntilChanged, map, Observable } from "rxjs"
 import { mapToTimerState } from "../mapToTimerState"
 import { TimerState } from "../timerReducer"
-import { useFirestore } from "../useFirestore"
 import { createCache } from "../util/createCache"
 import { Room } from "../zod/roomZod"
+import { useFirestore } from "./useFirestore"
 
 export function useTimerStateImpl(
   room$: Observable<Room>

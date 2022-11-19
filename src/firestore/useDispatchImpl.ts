@@ -1,9 +1,9 @@
 import { addDoc } from "firebase/firestore"
 import { useAllSettled } from "../useAllSettled"
-import { useFirestore } from "../useFirestore"
 import { ActionOnFirestore } from "../zod/actionZod"
 import { Room } from "../zod/roomZod"
 import { collection } from "./collection"
+import { useFirestore } from "./useFirestore"
 import { withMeta } from "./withMeta"
 
 export function useDispatchImpl(

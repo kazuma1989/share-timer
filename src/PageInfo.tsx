@@ -1,12 +1,12 @@
 import clsx from "clsx"
 import { doc, runTransaction } from "firebase/firestore"
 import { collection } from "./firestore/collection"
+import { useFirestore } from "./firestore/useFirestore"
 import { icon } from "./icon"
 import { setHash } from "./observeHash"
 import { getItem } from "./storage"
 import { fromRoute } from "./toRoute"
 import { TransparentButton } from "./TransparentButton"
-import { useFirestore } from "./useFirestore"
 import { Room, RoomOnFirestore, roomZod } from "./zod/roomZod"
 
 export function PageInfo({ roomId }: { roomId: Room["id"] }) {

@@ -1,7 +1,7 @@
 import { setupRoom } from "../mapToSetupRoom"
-import { useFirestore } from "../useFirestore"
 import { createCache } from "../util/createCache"
 import { Room } from "../zod/roomZod"
+import { useFirestore } from "./useFirestore"
 
 export function useSetupImpl(roomId: Room["id"]): (() => void) | null {
   const db = useFirestore()
