@@ -1,18 +1,13 @@
-import { setupRoom } from "./mapToSetupRoom"
-import { useFirestore } from "./useFirestore"
-import { createCache } from "./util/createCache"
+import { createContext } from "./createContext"
 import { Room } from "./zod/roomZod"
 
 export function useSetup(roomId: Room["id"]): (() => void) | null {
-  const db = useFirestore()
-
-  const setup = hardCache(roomId, () => async () => {
-    import.meta.env.DEV && console.debug("setup called")
-
-    await setupRoom(db, roomId)
-  })
-
-  return setup
+  return useImpl()(roomId)
 }
 
-const hardCache = createCache(true)
+export { ImplProvider as UseSetupProvider }
+
+const [ImplProvider, useImpl] = createContext<typeof useSetup>(
+  "UseSetupProvider",
+  () => null
+)
