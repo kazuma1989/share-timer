@@ -1,5 +1,5 @@
-import { ReactNode } from "react"
-import { ErrorBoundary, useError } from "./ErrorBoundary"
+import { ReactNode, useEffect } from "react"
+import { ErrorBoundary, useError, useResetError } from "./ErrorBoundary"
 import { InvalidDoc } from "./mapToRoom"
 import { useSetup } from "./useSetup"
 import { suspend } from "./util/suspend"
@@ -26,6 +26,11 @@ function SetupRoomFallback() {
   if (setup) {
     suspend(setup)
   }
+
+  const resetError = useResetError()
+  useEffect(() => {
+    resetError()
+  }, [resetError])
 
   return null
 }
