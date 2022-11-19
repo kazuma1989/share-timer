@@ -1,3 +1,9 @@
+import { createCache } from "./createCache"
+
 export function suspend(until: () => PromiseLike<unknown> | unknown): never {
-  throw Promise.resolve().then(until)
+  const suspending = cache(until, () => Promise.resolve().then(until))
+
+  throw suspending
 }
+
+const cache = createCache()
