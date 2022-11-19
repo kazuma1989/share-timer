@@ -1,32 +1,27 @@
-import { ReactNode, useState } from "react"
-import { ErrorBoundary } from "./ErrorBoundary"
+import { ReactNode } from "react"
+import { ErrorBoundary, useError } from "./ErrorBoundary"
 import { InvalidDoc } from "./mapToRoom"
 import { useSetup } from "./useSetup"
 import { suspend } from "./util/suspend"
-import { Room } from "./zod/roomZod"
 
 export function SetupRoom({ children }: { children?: ReactNode }) {
-  const [invalidRoomId, setInvalidRoomId] = useState<Room["id"]>()
-
   return (
-    <ErrorBoundary
-      shouldCatch={(error) => {
-        if (!Array.isArray(error)) return
-
-        const [reason, payload] = error as InvalidDoc
-        if (reason == "invalid-doc") {
-          setInvalidRoomId(payload)
-          return true
-        }
-      }}
-      fallback={<SetupRoomFallback invalidRoomId={invalidRoomId} />}
-    >
-      {children}
-    </ErrorBoundary>
+    <ErrorBoundary fallback={<SetupRoomFallback />}>{children}</ErrorBoundary>
   )
 }
 
-function SetupRoomFallback({ invalidRoomId }: { invalidRoomId?: Room["id"] }) {
+function SetupRoomFallback() {
+  const error = useError()
+  if (!Array.isArray(error)) {
+    throw error
+  }
+
+  const [reason, payload] = error as InvalidDoc
+  if (reason !== "invalid-doc") {
+    throw error
+  }
+
+  const invalidRoomId = payload
   const setup = useSetup(invalidRoomId)
   if (setup) {
     suspend(setup)

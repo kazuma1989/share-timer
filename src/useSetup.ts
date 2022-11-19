@@ -1,21 +1,19 @@
-import { useMemo } from "react"
 import { useResetError } from "./ErrorBoundary"
 import { setupRoom } from "./mapToSetupRoom"
 import { useFirestore } from "./useFirestore"
+import { createCache } from "./util/createCache"
 import { Room } from "./zod/roomZod"
 
-export function useSetup(roomId: Room["id"] | undefined): (() => void) | null {
+export function useSetup(roomId: Room["id"]): (() => void) | null {
   const db = useFirestore()
   const resetError = useResetError()
 
-  const setup = useMemo(() => {
-    if (!roomId) {
-      return null
-    }
-
+  const setup = hardCache(roomId, () => {
     let called = false
 
     return async () => {
+      import.meta.env.DEV && console.count("setup")
+
       if (called) return
       called = true
 
@@ -23,7 +21,9 @@ export function useSetup(roomId: Room["id"] | undefined): (() => void) | null {
 
       resetError()
     }
-  }, [db, resetError, roomId])
+  })
 
   return setup
 }
+
+const hardCache = createCache(true)
