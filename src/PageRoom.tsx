@@ -22,7 +22,7 @@ export function PageRoom({ roomId }: { roomId: Room["id"] }) {
     throw invalid
   }
 
-  const timerState$ = useTimerState(room$)
+  const timerState$ = useTimerState(roomId)
 
   useTitleAsTimeViewer(timerState$)
 

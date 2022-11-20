@@ -5,7 +5,7 @@ import {
   queryEqual,
   startAt,
 } from "firebase/firestore"
-import { distinctUntilChanged, map, Observable, switchMap } from "rxjs"
+import { distinctUntilChanged, from, map, Observable, switchMap } from "rxjs"
 import { timerReducer, TimerState } from "../timerReducer"
 import { createCache } from "../util/createCache"
 import { safeParseDocsWith } from "../util/safeParseDocsWith"
@@ -19,32 +19,26 @@ import { orderBy } from "./orderBy"
 import { useFirestore } from "./useFirestore"
 import { where } from "./where"
 
-export function useTimerStateImpl(
-  room$: Observable<Room>
-): Observable<TimerState> {
+export function useTimerStateImpl(roomId: Room["id"]): Observable<TimerState> {
   const db = useFirestore()
 
-  const timerState$ = cache(room$, () =>
-    room$.pipe(
-      map((_) => _.id),
-      distinctUntilChanged(),
-      switchMap((roomId) =>
-        getDocs(
-          query(
-            collection(db, "rooms", roomId, "actions"),
-            where("type", "==", "start"),
-            orderBy("createdAt", "asc"),
-            limitToLast(1)
-          )
-        ).then(({ docs: [doc] }) =>
-          query(
-            collection(db, "rooms", roomId, "actions"),
-            orderBy("createdAt", "asc"),
-            ...(hasNoEstimateTimestamp(doc?.metadata) ? [startAt(doc)] : [])
-          )
+  const timerState$ = hardCache(roomId, () =>
+    from(
+      getDocs(
+        query(
+          collection(db, "rooms", roomId, "actions"),
+          where("type", "==", "start"),
+          orderBy("createdAt", "asc"),
+          limitToLast(1)
         )
-      ),
-
+      ).then(({ docs: [doc] }) =>
+        query(
+          collection(db, "rooms", roomId, "actions"),
+          orderBy("createdAt", "asc"),
+          ...(hasNoEstimateTimestamp(doc?.metadata) ? [startAt(doc)] : [])
+        )
+      )
+    ).pipe(
       distinctUntilChanged(queryEqual),
       switchMap((selectActions) => {
         const parseDocs = safeParseDocsWith(actionZod)
@@ -72,4 +66,4 @@ export function useTimerStateImpl(
   return timerState$
 }
 
-const cache = createCache()
+const hardCache = createCache(true)

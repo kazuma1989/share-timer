@@ -3,8 +3,8 @@ import { createContext } from "./createContext"
 import { TimerState } from "./timerReducer"
 import { Room } from "./zod/roomZod"
 
-export function useTimerState(room$: Observable<Room>): Observable<TimerState> {
-  return useImpl()(room$)
+export function useTimerState(roomId: Room["id"]): Observable<TimerState> {
+  return useImpl()(roomId)
 }
 
 export { ImplProvider as UseTimerStateProvider }
