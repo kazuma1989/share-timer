@@ -2,9 +2,9 @@ import { doc } from "firebase/firestore"
 import { map, Observable } from "rxjs"
 import { createCache } from "../util/createCache"
 import { shareRecent } from "../util/shareRecent"
-import { snapshotOf } from "../util/snapshotOf"
 import { InvalidDoc, Room, roomZod } from "../zod/roomZod"
 import { collection } from "./collection"
+import { snapshotOf } from "./snapshotOf"
 import { useFirestore } from "./useFirestore"
 
 export function useRoomImpl(roomId: Room["id"]): Observable<Room | InvalidDoc> {
