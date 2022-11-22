@@ -6,6 +6,7 @@ import { calibrateClock } from "./firestore/calibrateClock"
 import { initializeFirestore } from "./firestore/initializeFirestore"
 import { useDispatchImpl } from "./firestore/useDispatchImpl"
 import { FirestoreProvider } from "./firestore/useFirestore"
+import { useLockRoomImpl } from "./firestore/useLockRoomImpl"
 import { useRoomImpl } from "./firestore/useRoomImpl"
 import { useSetupImpl } from "./firestore/useSetupImpl"
 import { useTimerStateImpl } from "./firestore/useTimerStateImpl"
@@ -18,6 +19,7 @@ import smallAlert from "./sound/small-alert.mp3"
 import { getItem, setItem } from "./storage"
 import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
 import { UseDispatchProvider } from "./useDispatch"
+import { UseLockRoomProvider } from "./useLockRoom"
 import { UseRoomProvider } from "./useRoom"
 import { UseSetupProvider } from "./useSetup"
 import { UseTimerStateProvider } from "./useTimerState"
@@ -56,9 +58,11 @@ createRoot(root).render(
               <UseRoomProvider value={useRoomImpl}>
                 <UseTimerStateProvider value={useTimerStateImpl}>
                   <UseSetupProvider value={useSetupImpl}>
-                    <Suspense fallback={<FullViewportProgress />}>
-                      <App route$={route$} />
-                    </Suspense>
+                    <UseLockRoomProvider value={useLockRoomImpl}>
+                      <Suspense fallback={<FullViewportProgress />}>
+                        <App route$={route$} />
+                      </Suspense>
+                    </UseLockRoomProvider>
                   </UseSetupProvider>
                 </UseTimerStateProvider>
               </UseRoomProvider>
