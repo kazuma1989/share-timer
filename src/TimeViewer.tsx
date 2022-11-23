@@ -45,10 +45,8 @@ export function TimeViewer({
 
   useEffect(() => {
     const canvas = canvas$.current
-    if (!canvas) return
-
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
+    const ctx = canvas?.getContext("2d")
+    if (!canvas || !ctx) return
 
     // https://developer.mozilla.org/ja/docs/Web/API/Window/devicePixelRatio
     // 表示サイズを設定（CSS におけるピクセル数です）。
@@ -102,26 +100,26 @@ export function TimeViewer({
   }, [duration$, scale])
 
   const video$ = useRef<HTMLVideoElement>(null)
+
   useEffect(() => {
-    const canvas = canvas$.current
-    if (!canvas) return
-
     const video = video$.current
-    if (!video) return
+    const canvas = canvas$.current
+    if (!video || !canvas) return
 
-    video.autoplay = true
-    video.muted = true
-    video.playsInline = true
-    video.width = canvasWidth
-    video.height = canvasHeight
     video.srcObject = canvas.captureStream(60)
-
-    video.play()
   }, [])
 
   return (
     <div className={clsx("bg-light dark:bg-dark", className)}>
-      <video ref={video$} />
+      <video
+        ref={video$}
+        autoPlay
+        muted
+        playsInline
+        width={canvasWidth}
+        height={canvasHeight}
+      />
+
       <canvas ref={canvas$} className="hidden bg-inherit" />
     </div>
   )
