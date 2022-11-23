@@ -63,16 +63,19 @@ export function TimeViewer({
     ctx.font = "100 128px/1 system-ui,sans-serif"
 
     let color: "white" | "black" = "black"
+    let backgroundColor: "white" | "black" = "white"
+
     const subDarkMode = darkMode$.subscribe((isDark) => {
       color = isDark ? "white" : "black"
+      backgroundColor = isDark ? "black" : "white"
     })
 
     let prevTextWidth: number | null = null
     let prevTextLength: number | null = null
 
     const subDuration = duration$.subscribe((duration) => {
-      ctx.clearRect(0, 0, width, height)
-      ctx.fillStyle = color
+      ctx.fillStyle = backgroundColor
+      ctx.fillRect(0, 0, width, height)
 
       const durationText = formatDuration(duration)
 
@@ -84,6 +87,8 @@ export function TimeViewer({
 
       const x = (width - prevTextWidth) / 2
       const y = height / 2
+
+      ctx.fillStyle = color
       ctx.fillText(durationText, x, y)
     })
 
