@@ -19,6 +19,9 @@ const darkMode$ = observeMediaQuery(
   window.matchMedia("(prefers-color-scheme: dark)")
 ).pipe(map((_) => _.matches))
 
+const canvasWidth = 512
+const canvasHeight = 288
+
 export function TimeViewer({
   timerState$,
   scale = 1,
@@ -37,9 +40,6 @@ export function TimeViewer({
 
   const canvas$ = useRef<HTMLCanvasElement>(null)
 
-  const width = 512
-  const height = 288
-
   useEffect(() => {
     const canvas = canvas$.current
     if (!canvas) return
@@ -49,14 +49,12 @@ export function TimeViewer({
 
     // https://developer.mozilla.org/ja/docs/Web/API/Window/devicePixelRatio
     // 表示サイズを設定（CSS におけるピクセル数です）。
-    canvas.style.width = `${width}px`
-    canvas.style.height = `${height}px`
+    canvas.style.width = `${canvasWidth}px`
+    canvas.style.height = `${canvasHeight}px`
 
     // メモリ上における実際のサイズを設定（ピクセル密度の分だけ倍増させます）。
-    canvas.width = Math.floor(width * scale)
-    canvas.height = Math.floor(height * scale)
-
-    // CSS 上のピクセル数を前提としているシステムに合わせます。
+    canvas.width = Math.floor(canvasWidth * scale)
+    canvas.height = Math.floor(canvasHeight * scale)
     ctx.scale(scale, scale)
 
     ctx.textAlign = "left"
@@ -77,7 +75,7 @@ export function TimeViewer({
 
     const subDuration = duration$.subscribe((duration) => {
       ctx.fillStyle = backgroundColor
-      ctx.fillRect(0, 0, width, height)
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
       const durationText = formatDuration(duration)
 
@@ -87,8 +85,8 @@ export function TimeViewer({
         prevTextLength = durationText.length
       }
 
-      const x = (width - prevTextWidth) / 2
-      const y = height / 2
+      const x = (canvasWidth - prevTextWidth) / 2
+      const y = canvasHeight / 2
 
       ctx.fillStyle = color
       ctx.fillText(durationText, x, y)
@@ -111,8 +109,8 @@ export function TimeViewer({
     video.autoplay = true
     video.muted = true
     video.playsInline = true
-    video.width = width
-    video.height = height
+    video.width = canvasWidth
+    video.height = canvasHeight
     video.srcObject = canvas.captureStream(60)
 
     video.play()
