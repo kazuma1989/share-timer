@@ -26,6 +26,9 @@ export function TimeViewer({
 
   const canvas$ = useRef<HTMLCanvasElement>(null)
 
+  const width = 512
+  const height = 288
+
   useEffect(() => {
     const canvas = canvas$.current
     if (!canvas) return
@@ -35,8 +38,6 @@ export function TimeViewer({
 
     // https://developer.mozilla.org/ja/docs/Web/API/Window/devicePixelRatio
     // 表示サイズを設定（CSS におけるピクセル数です）。
-    const width = 512
-    const height = 288
     canvas.style.width = `${width}px`
     canvas.style.height = `${height}px`
 
@@ -70,7 +71,30 @@ export function TimeViewer({
     }
   }, [duration$])
 
-  return <canvas ref={canvas$} className={className} />
+  const video$ = useRef<HTMLVideoElement>(null)
+  useEffect(() => {
+    const canvas = canvas$.current
+    if (!canvas) return
+
+    const video = video$.current
+    if (!video) return
+
+    video.autoplay = true
+    video.muted = true
+    video.playsInline = true
+    video.width = width
+    video.height = height
+    video.srcObject = canvas.captureStream(60)
+
+    video.play()
+  }, [])
+
+  return (
+    <div className={className}>
+      <video ref={video$} />
+      <canvas ref={canvas$} className="hidden" />
+    </div>
+  )
 }
 
 const cache = createCache()
