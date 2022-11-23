@@ -35,7 +35,6 @@ export function TimeViewer({
     timerState$.pipe(mapToCurrentDuration(interval("ui")), mapToDuration())
   )
 
-  const div$ = useRef<HTMLDivElement>(null)
   const canvas$ = useRef<HTMLCanvasElement>(null)
 
   const width = 512
@@ -67,15 +66,8 @@ export function TimeViewer({
     let color: string = "black"
     let backgroundColor: string = "white"
 
-    const subDarkMode = darkMode$.subscribe((isDark) => {
-      const div = div$.current
-      if (!div) {
-        color = isDark ? "white" : "black"
-        backgroundColor = isDark ? "black" : "white"
-        return
-      }
-
-      const style = window.getComputedStyle(div)
+    const subDarkMode = darkMode$.subscribe(() => {
+      const style = window.getComputedStyle(canvas)
       color = style.color
       backgroundColor = style.backgroundColor
     })
@@ -127,9 +119,9 @@ export function TimeViewer({
   }, [])
 
   return (
-    <div ref={div$} className={clsx("bg-light dark:bg-dark", className)}>
+    <div className={clsx("bg-light dark:bg-dark", className)}>
       <video ref={video$} />
-      <canvas ref={canvas$} className="hidden" />
+      <canvas ref={canvas$} className="hidden bg-inherit" />
     </div>
   )
 }
