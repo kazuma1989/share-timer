@@ -34,6 +34,7 @@ export function TimeViewer({
     timerState$.pipe(mapToCurrentDuration(interval("ui")), mapToDuration())
   )
 
+  const div$ = useRef<HTMLDivElement>(null)
   const canvas$ = useRef<HTMLCanvasElement>(null)
 
   const width = 512
@@ -62,12 +63,20 @@ export function TimeViewer({
     ctx.textBaseline = "middle"
     ctx.font = "100 128px/1 system-ui,sans-serif"
 
-    let color: "white" | "black" = "black"
-    let backgroundColor: "white" | "black" = "white"
+    let color: string = "black"
+    let backgroundColor: string = "white"
 
     const subDarkMode = darkMode$.subscribe((isDark) => {
-      color = isDark ? "white" : "black"
-      backgroundColor = isDark ? "black" : "white"
+      const div = div$.current
+      if (!div) {
+        color = isDark ? "white" : "black"
+        backgroundColor = isDark ? "black" : "white"
+        return
+      }
+
+      const style = window.getComputedStyle(div)
+      color = style.color
+      backgroundColor = style.backgroundColor
     })
 
     let prevTextWidth: number | null = null
@@ -117,7 +126,7 @@ export function TimeViewer({
   }, [])
 
   return (
-    <div className={className}>
+    <div ref={div$} className={className}>
       <video ref={video$} />
       <canvas ref={canvas$} className="hidden" />
     </div>
