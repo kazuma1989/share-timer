@@ -1,3 +1,4 @@
+import clsx from "clsx"
 import { useEffect, useRef } from "react"
 import {
   distinctUntilChanged,
@@ -126,7 +127,7 @@ export function TimeViewer({
   }, [])
 
   return (
-    <div ref={div$} className={className}>
+    <div ref={div$} className={clsx("bg-light dark:bg-dark", className)}>
       <video ref={video$} />
       <canvas ref={canvas$} className="hidden" />
     </div>

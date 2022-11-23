@@ -71,7 +71,6 @@ export function Timer({
               <TimeViewer
                 timerState$={timerState$}
                 scale={window.devicePixelRatio}
-                className="bg-light dark:bg-dark"
               />
             )}
           </div>
