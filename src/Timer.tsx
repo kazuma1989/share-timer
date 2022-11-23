@@ -68,7 +68,10 @@ export function Timer({
                 defaultValue={state.initialDuration}
               />
             ) : (
-              <TimeViewer timerState$={timerState$} />
+              <TimeViewer
+                timerState$={timerState$}
+                scale={window.devicePixelRatio}
+              />
             )}
           </div>
 

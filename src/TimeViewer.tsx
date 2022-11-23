@@ -15,9 +15,14 @@ import { interval } from "./util/interval"
 
 export function TimeViewer({
   timerState$,
+  scale = 1,
   className,
 }: {
   timerState$: Observable<TimerState>
+  /**
+   * レティナでこの値を 1 にするとぼやけた canvas になります
+   */
+  scale?: number
   className?: string
 }) {
   const duration$ = cache(timerState$, () =>
@@ -42,7 +47,6 @@ export function TimeViewer({
     canvas.style.height = `${height}px`
 
     // メモリ上における実際のサイズを設定（ピクセル密度の分だけ倍増させます）。
-    const scale = window.devicePixelRatio // レティナでこの値を 1 にするとぼやけた canvas になります
     canvas.width = Math.floor(width * scale)
     canvas.height = Math.floor(height * scale)
 
@@ -66,7 +70,7 @@ export function TimeViewer({
     return () => {
       sub.unsubscribe()
     }
-  }, [duration$])
+  }, [duration$, scale])
 
   const video$ = useRef<HTMLVideoElement>(null)
   useEffect(() => {
