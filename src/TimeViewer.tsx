@@ -46,15 +46,12 @@ export function TimeViewer({
     canvas.width = Math.floor(width * scale)
     canvas.height = Math.floor(height * scale)
 
-    ctx.fillStyle = "black"
-    ctx.font = "100 8rem/1 system-ui,sans-serif"
-    ctx.textBaseline = "top"
-
     // CSS 上のピクセル数を前提としているシステムに合わせます。
     ctx.scale(scale, scale)
 
     ctx.textAlign = "center"
     ctx.textBaseline = "middle"
+    ctx.font = "100 128px/1 system-ui,sans-serif"
 
     const x = width / 2
     const y = height / 2

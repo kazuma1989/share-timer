@@ -68,9 +68,7 @@ export function Timer({
                 defaultValue={state.initialDuration}
               />
             ) : (
-              <div className="text-8xl font-thin sm:text-9xl">
-                <TimeViewer timerState$={timerState$} />
-              </div>
+              <TimeViewer timerState$={timerState$} />
             )}
           </div>
 
