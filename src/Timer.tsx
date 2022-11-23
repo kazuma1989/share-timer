@@ -74,7 +74,7 @@ export function Timer({
 
                 <Canvas
                   timerState$={timerState$}
-                  className="inset-0 absolute h-full w-full"
+                  className="inset-0 absolute h-full w-full bg-light"
                 />
               </div>
             )}
