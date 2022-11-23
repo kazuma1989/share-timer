@@ -53,18 +53,28 @@ export function TimeViewer({
     // CSS 上のピクセル数を前提としているシステムに合わせます。
     ctx.scale(scale, scale)
 
-    ctx.textAlign = "center"
+    ctx.textAlign = "left"
     ctx.textBaseline = "middle"
     ctx.font = "100 128px/1 system-ui,sans-serif"
 
-    const x = width / 2
-    const y = height / 2
+    let prevTextWidth: number | null = null
+    let prevTextLength: number | null = null
 
     const sub = duration$.subscribe((duration) => {
       ctx.clearRect(0, 0, width, height)
-
       ctx.fillStyle = "white"
-      ctx.fillText(formatDuration(duration), x, y)
+
+      const durationText = formatDuration(duration)
+
+      if (prevTextWidth === null || durationText.length !== prevTextLength) {
+        // 初回のほか、1:00:00 -> 59:59 などと変化したとき、サイズを測りなおす
+        prevTextWidth = ctx.measureText(durationText).width
+        prevTextLength = durationText.length
+      }
+
+      const x = (width - prevTextWidth) / 2
+      const y = height / 2
+      ctx.fillText(durationText, x, y)
     })
 
     return () => {
