@@ -2,13 +2,13 @@ import clsx from "clsx"
 import { serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
 import { Observable } from "rxjs"
-import { Canvas } from "./Canvas"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
 import { icon } from "./icon"
 import { setHash } from "./observeHash"
 import { getItem } from "./storage"
 import { TimerState } from "./timerReducer"
+import { TimeViewer } from "./TimeViewer"
 import { TransparentButton } from "./TransparentButton"
 import { useMediaPermission } from "./useAudio"
 import { toggleConfig, useConfig } from "./useConfig"
@@ -69,7 +69,7 @@ export function Timer({
               />
             ) : (
               <div className="text-8xl font-thin sm:text-9xl">
-                <Canvas timerState$={timerState$} className="bg-light" />
+                <TimeViewer timerState$={timerState$} />
               </div>
             )}
           </div>
