@@ -118,6 +118,9 @@ export function TimeViewer({
         playsInline
         width={canvasWidth}
         height={canvasHeight}
+        onDoubleClick={(e) => {
+          e.currentTarget.requestPictureInPicture()
+        }}
       />
 
       <canvas ref={canvas$} className="hidden bg-inherit" />
