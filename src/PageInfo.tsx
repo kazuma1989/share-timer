@@ -1,19 +1,17 @@
 import clsx from "clsx"
-import { doc, runTransaction } from "firebase/firestore"
-import { collection } from "./firestore/collection"
 import { icon } from "./icon"
 import { setHash } from "./observeHash"
 import { getItem } from "./storage"
 import { fromRoute } from "./toRoute"
 import { TransparentButton } from "./TransparentButton"
-import { useFirestore } from "./useFirestore"
-import { Room, RoomOnFirestore, roomZod } from "./zod/roomZod"
+import { AbortReason, useLockRoom } from "./useLockRoom"
+import { Room } from "./zod/roomZod"
 
 export function PageInfo({ roomId }: { roomId: Room["id"] }) {
-  const db = useFirestore()
-
   const roomURL =
     location.origin + location.pathname + `#${fromRoute(["room", roomId])}`
+
+  const lockRoom = useLockRoom()
 
   return (
     <article
@@ -80,47 +78,17 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
 
               const abort = new AbortController()
 
-              type AbortReason =
-                | "signal"
-                | "room-not-exists"
-                | "already-locked"
-                | "user-deny"
-              const AbortReason = (_: AbortReason) => _
-
-              await runTransaction(
-                db,
-                async (transaction) => {
-                  const roomDoc = await transaction.get(
-                    doc(collection(db, "rooms"), roomId)
-                  )
-                  if (abort.signal.aborted) {
-                    throw AbortReason("signal")
-                  }
-
-                  if (!roomDoc.exists()) {
-                    throw AbortReason("room-not-exists")
-                  }
-
-                  const room = roomZod.parse(roomDoc.data())
-                  if (room.lockedBy) {
-                    throw AbortReason("already-locked")
-                  }
-
+              await lockRoom(roomId, userId, {
+                signal: abort.signal,
+                onBeforeUpdate() {
                   const confirmed = confirm(
                     "解除の方法はありませんが、本当にロックしますか？"
                   )
                   if (!confirmed) {
                     throw AbortReason("user-deny")
                   }
-
-                  transaction.update<RoomOnFirestore>(roomDoc.ref, {
-                    lockedBy: userId,
-                  })
                 },
-                {
-                  maxAttempts: 1,
-                }
-              ).catch((reason: AbortReason) => {
+              }).catch((reason: AbortReason) => {
                 switch (reason) {
                   case "already-locked": {
                     alert("already locked by another user")

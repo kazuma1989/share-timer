@@ -1,36 +1,24 @@
 import { doc, Firestore, runTransaction } from "firebase/firestore"
-import { map, OperatorFunction, pipe } from "rxjs"
-import { collection } from "./firestore/collection"
-import { withMeta } from "./firestore/withMeta"
-import { pauseWhileLoop } from "./util/pauseWhileLoop"
-import { sparse } from "./util/sparse"
-import { ActionOnFirestore } from "./zod/actionZod"
-import { Room, RoomOnFirestore } from "./zod/roomZod"
+import { createCache } from "../util/createCache"
+import { ActionOnFirestore } from "../zod/actionZod"
+import { Room, RoomOnFirestore } from "../zod/roomZod"
+import { collection } from "./collection"
+import { useFirestore } from "./useFirestore"
+import { withMeta } from "./withMeta"
 
-export function mapToSetupRoom(
-  db: Firestore
-): OperatorFunction<Room["id"], () => Promise<void>> {
-  return pipe(
-    sparse(200),
-    pauseWhileLoop({
-      criteria: import.meta.env.PROD ? 20 : 5,
-      debounce: 2_000,
-      onLoopDetected() {
-        throw new Error("Detect room initialization loop. Something went wrong")
-      },
-    }),
-    map((roomId) => {
-      let called = false
+export function useSetupImpl(roomId: Room["id"]): (() => void) | null {
+  const db = useFirestore()
 
-      return async () => {
-        if (called) return
-        called = true
+  const setup = hardCache(roomId, () => async () => {
+    import.meta.env.DEV && console.debug("setup called")
 
-        await setupRoom(db, roomId)
-      }
-    })
-  )
+    await setupRoom(db, roomId)
+  })
+
+  return setup
 }
+
+const hardCache = createCache(true)
 
 /**
  * 同時に1つしか呼べない
@@ -54,7 +42,7 @@ async function _setupRoom(
   roomId: string,
   signal: AbortSignal
 ): Promise<void> {
-  const emoji = await import("./emoji/Animals & Nature.json").then(
+  const emoji = await import("../emoji/Animals & Nature.json").then(
     (_) => _.default
   )
   if (signal.aborted) throw "aborted 1"

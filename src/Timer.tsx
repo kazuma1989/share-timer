@@ -1,23 +1,19 @@
 import clsx from "clsx"
-import { addDoc, serverTimestamp } from "firebase/firestore"
+import { serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
 import { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
-import { collection } from "./firestore/collection"
-import { withMeta } from "./firestore/withMeta"
 import { icon } from "./icon"
 import { setHash } from "./observeHash"
 import { getItem } from "./storage"
 import { TimerState } from "./timerReducer"
 import { TimeViewer } from "./TimeViewer"
 import { TransparentButton } from "./TransparentButton"
-import { useAllSettled } from "./useAllSettled"
 import { useMediaPermission } from "./useAudio"
 import { toggleConfig, useConfig } from "./useConfig"
-import { useFirestore } from "./useFirestore"
+import { useDispatch } from "./useDispatch"
 import { useObservable } from "./useObservable"
-import { ActionOnFirestore } from "./zod/actionZod"
 import { Room } from "./zod/roomZod"
 
 export function Timer({
@@ -203,24 +199,4 @@ function ConfigArea({
       </TransparentButton>
     </div>
   )
-}
-
-function useDispatch(
-  roomId: Room["id"]
-): [
-  pending: boolean,
-  dispatch: (action: ActionOnFirestore) => Promise<unknown>
-] {
-  const [_allSettled, addPromise] = useAllSettled()
-  const pending = !_allSettled
-
-  const db = useFirestore()
-
-  return [
-    pending,
-    (action) =>
-      addPromise(
-        addDoc(collection(db, "rooms", roomId, "actions"), withMeta(action))
-      ),
-  ]
 }

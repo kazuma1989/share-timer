@@ -7,6 +7,12 @@ export interface Room extends z.output<typeof roomZod> {
 
 export interface RoomOnFirestore extends z.input<typeof roomZod> {}
 
+export type InvalidDoc = [reason: "invalid-doc", payload: Room["id"]]
+
+export function isRoom(value: Room | InvalidDoc): value is Room {
+  return !Array.isArray(value)
+}
+
 export const roomZod = z.object({
   name: z.string().max(1_000).optional(),
   lockedBy: z.string().max(10).optional(),
