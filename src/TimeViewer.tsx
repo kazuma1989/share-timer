@@ -17,7 +17,10 @@ import { interval } from "./util/interval"
 
 const darkMode$ = observeMediaQuery(
   window.matchMedia("(prefers-color-scheme: dark)")
-).pipe(map((_) => _.matches))
+).pipe(
+  map((_) => (_.matches ? "dark" : "light")),
+  distinctUntilChanged()
+)
 
 const canvasWidth = 512
 const canvasHeight = 288
