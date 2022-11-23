@@ -9,7 +9,6 @@ import { icon } from "./icon"
 import { setHash } from "./observeHash"
 import { getItem } from "./storage"
 import { TimerState } from "./timerReducer"
-import { TimeViewer } from "./TimeViewer"
 import { TransparentButton } from "./TransparentButton"
 import { useMediaPermission } from "./useAudio"
 import { toggleConfig, useConfig } from "./useConfig"
@@ -61,7 +60,7 @@ export function Timer({
             primaryButton$.current?.focus()
           }}
         >
-          <div className="grid min-h-[8rem] place-items-center tabular-nums">
+          <div className="grid place-items-center tabular-nums">
             {!locked && state.mode === "editing" ? (
               <DurationSelect
                 key={state.mode + state.initialDuration}
@@ -69,13 +68,8 @@ export function Timer({
                 defaultValue={state.initialDuration}
               />
             ) : (
-              <div className="text-8xl font-thin sm:text-9xl relative">
-                <TimeViewer timerState$={timerState$} />
-
-                <Canvas
-                  timerState$={timerState$}
-                  className="inset-0 absolute h-full w-full bg-light"
-                />
+              <div className="text-8xl font-thin sm:text-9xl">
+                <Canvas timerState$={timerState$} className="bg-light" />
               </div>
             )}
           </div>

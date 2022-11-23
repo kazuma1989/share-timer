@@ -35,14 +35,15 @@ export function Canvas({
 
     // https://developer.mozilla.org/ja/docs/Web/API/Window/devicePixelRatio
     // 表示サイズを設定（CSS におけるピクセル数です）。
-    const size = 400
-    canvas.style.width = `${size}px`
-    canvas.style.height = `${size}px`
+    const width = 512
+    const height = 288
+    canvas.style.width = `${width}px`
+    canvas.style.height = `${height}px`
 
     // メモリ上における実際のサイズを設定（ピクセル密度の分だけ倍増させます）。
     const scale = window.devicePixelRatio // レティナでこの値を 1 にするとぼやけた canvas になります
-    canvas.width = Math.floor(size * scale)
-    canvas.height = Math.floor(size * scale)
+    canvas.width = Math.floor(width * scale)
+    canvas.height = Math.floor(height * scale)
 
     ctx.fillStyle = "black"
     ctx.font = "100 8rem/1 system-ui,sans-serif"
@@ -54,11 +55,11 @@ export function Canvas({
     ctx.textAlign = "center"
     ctx.textBaseline = "middle"
 
-    const x = size / 2
-    const y = size / 2
+    const x = width / 2
+    const y = height / 2
 
     const sub = duration$.subscribe((duration) => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.clearRect(0, 0, width, height)
 
       ctx.fillStyle = "black"
       ctx.fillText(formatDuration(duration), x, y)
