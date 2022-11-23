@@ -7,11 +7,16 @@ import {
   pipe,
 } from "rxjs"
 import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
+import { observeMediaQuery } from "./observeMediaQuery"
 import { TimerState } from "./timerReducer"
 import { createCache } from "./util/createCache"
 import { floor } from "./util/floor"
 import { formatDuration } from "./util/formatDuration"
 import { interval } from "./util/interval"
+
+const darkMode$ = observeMediaQuery(
+  window.matchMedia("(prefers-color-scheme: dark)")
+).pipe(map((_) => _.matches))
 
 export function TimeViewer({
   timerState$,
@@ -57,12 +62,17 @@ export function TimeViewer({
     ctx.textBaseline = "middle"
     ctx.font = "100 128px/1 system-ui,sans-serif"
 
+    let color: "white" | "black" = "black"
+    const subDarkMode = darkMode$.subscribe((isDark) => {
+      color = isDark ? "white" : "black"
+    })
+
     let prevTextWidth: number | null = null
     let prevTextLength: number | null = null
 
-    const sub = duration$.subscribe((duration) => {
+    const subDuration = duration$.subscribe((duration) => {
       ctx.clearRect(0, 0, width, height)
-      ctx.fillStyle = "white"
+      ctx.fillStyle = color
 
       const durationText = formatDuration(duration)
 
@@ -78,7 +88,8 @@ export function TimeViewer({
     })
 
     return () => {
-      sub.unsubscribe()
+      subDarkMode.unsubscribe()
+      subDuration.unsubscribe()
     }
   }, [duration$, scale])
 
