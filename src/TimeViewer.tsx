@@ -106,7 +106,7 @@ export function TimeViewer({
     const canvas = canvas$.current
     if (!video || !canvas) return
 
-    video.srcObject = canvas.captureStream(60)
+    video.srcObject = canvas.captureStream()
   }, [])
 
   return (
