@@ -68,8 +68,10 @@ export function Timer({
                 defaultValue={state.initialDuration}
               />
             ) : (
-              <div className="text-8xl font-thin sm:text-9xl">
+              <div className="text-8xl font-thin sm:text-9xl relative">
                 <TimeViewer timerState$={timerState$} />
+
+                <canvas className="inset-0 absolute h-full w-full" />
               </div>
             )}
           </div>
