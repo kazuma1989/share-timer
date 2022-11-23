@@ -2,6 +2,7 @@ import clsx from "clsx"
 import { serverTimestamp } from "firebase/firestore"
 import { useRef } from "react"
 import { Observable } from "rxjs"
+import { Canvas } from "./Canvas"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
 import { icon } from "./icon"
@@ -71,7 +72,10 @@ export function Timer({
               <div className="text-8xl font-thin sm:text-9xl relative">
                 <TimeViewer timerState$={timerState$} />
 
-                <canvas className="inset-0 absolute h-full w-full" />
+                <Canvas
+                  timerState$={timerState$}
+                  className="inset-0 absolute h-full w-full"
+                />
               </div>
             )}
           </div>
