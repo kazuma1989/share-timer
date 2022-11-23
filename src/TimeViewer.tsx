@@ -107,6 +107,12 @@ export function TimeViewer({
     if (!video || !canvas) return
 
     video.srcObject = canvas.captureStream()
+
+    return () => {
+      if (document.pictureInPictureElement === video) {
+        document.exitPictureInPicture?.()
+      }
+    }
   }, [])
 
   return (
