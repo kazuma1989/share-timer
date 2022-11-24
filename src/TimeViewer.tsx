@@ -27,14 +27,9 @@ const canvasHeight = 288
 
 export function TimeViewer({
   timerState$,
-  scale = 1,
   className,
 }: {
   timerState$: Observable<TimerState>
-  /**
-   * レティナでこの値を 1 にするとぼやけた canvas になります
-   */
-  scale?: number
   className?: string
 }) {
   const duration$ = cache(timerState$, () =>
@@ -52,6 +47,9 @@ export function TimeViewer({
     // 表示サイズを設定（CSS におけるピクセル数です）。
     canvas.style.width = `${canvasWidth}px`
     canvas.style.height = `${canvasHeight}px`
+
+    // レティナでこの値を 1 にするとぼやけた canvas になります
+    const scale = window.devicePixelRatio
 
     // メモリ上における実際のサイズを設定（ピクセル密度の分だけ倍増させます）。
     canvas.width = Math.floor(canvasWidth * scale)
@@ -97,7 +95,7 @@ export function TimeViewer({
       subDarkMode.unsubscribe()
       subDuration.unsubscribe()
     }
-  }, [duration$, scale])
+  }, [duration$])
 
   const video$ = useRef<HTMLVideoElement>(null)
 

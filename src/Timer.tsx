@@ -70,10 +70,7 @@ export function Timer({
                 />
               </div>
             ) : (
-              <TimeViewer
-                timerState$={timerState$}
-                scale={window.devicePixelRatio}
-              />
+              <TimeViewer timerState$={timerState$} />
             )}
           </div>
 
