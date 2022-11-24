@@ -124,8 +124,11 @@ export function TimeViewer({
         playsInline
         width={canvasWidth}
         height={canvasHeight}
-        onDoubleClick={(e) => {
-          e.currentTarget.requestPictureInPicture()
+        onClick={({ currentTarget: video }) => {
+          video.play()
+        }}
+        onDoubleClick={({ currentTarget: video }) => {
+          video.requestPictureInPicture()
         }}
       />
 
