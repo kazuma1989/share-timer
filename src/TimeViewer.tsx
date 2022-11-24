@@ -38,6 +38,40 @@ export function TimeViewer({
 
   const canvas$ = useRef<HTMLCanvasElement>(null)
 
+  useStartDrawing(canvas$, duration$)
+
+  const video$ = useRef<HTMLVideoElement>(null)
+
+  useConnectVideoWithCanvas(video$, canvas$)
+  useDestroyPiP(video$)
+  useRestartVideo(video$)
+
+  return (
+    <div className={clsx("bg-light dark:bg-dark", className)}>
+      <video
+        ref={video$}
+        autoPlay
+        muted
+        playsInline
+        width={canvasWidth}
+        height={canvasHeight}
+        onClick={({ currentTarget: video }) => {
+          video.play()
+        }}
+        onDoubleClick={({ currentTarget: video }) => {
+          video.requestPictureInPicture()
+        }}
+      />
+
+      <canvas ref={canvas$} className="hidden bg-inherit" />
+    </div>
+  )
+}
+
+function useStartDrawing(
+  canvas$: { current: HTMLCanvasElement | null },
+  duration$: Observable<number>
+): void {
   useEffect(() => {
     const canvas = canvas$.current
     const ctx = canvas?.getContext("2d")
@@ -95,25 +129,37 @@ export function TimeViewer({
       subDarkMode.unsubscribe()
       subDuration.unsubscribe()
     }
-  }, [duration$])
+  }, [canvas$, duration$])
+}
 
-  const video$ = useRef<HTMLVideoElement>(null)
-
+function useConnectVideoWithCanvas(
+  video$: { current: HTMLVideoElement | null },
+  canvas$: { current: HTMLCanvasElement | null }
+): void {
   useEffect(() => {
     const video = video$.current
     const canvas = canvas$.current
     if (!video || !canvas) return
 
     video.srcObject = canvas.captureStream()
+  }, [canvas$, video$])
+}
+
+function useDestroyPiP(video$: { current: HTMLVideoElement | null }): void {
+  useEffect(() => {
+    const video = video$.current
+    if (!video) return
 
     return () => {
       if (document.pictureInPictureElement === video) {
         document.exitPictureInPicture?.()
       }
     }
-  }, [])
+  }, [video$])
+}
 
-  useEffect(function restartVideoWhenPageBecomesVisible() {
+function useRestartVideo(video$: { current: HTMLVideoElement | null }): void {
+  useEffect(() => {
     const video = video$.current
     if (!video) return
 
@@ -134,28 +180,7 @@ export function TimeViewer({
     return () => {
       abort.abort()
     }
-  }, [])
-
-  return (
-    <div className={clsx("bg-light dark:bg-dark", className)}>
-      <video
-        ref={video$}
-        autoPlay
-        muted
-        playsInline
-        width={canvasWidth}
-        height={canvasHeight}
-        onClick={({ currentTarget: video }) => {
-          video.play()
-        }}
-        onDoubleClick={({ currentTarget: video }) => {
-          video.requestPictureInPicture()
-        }}
-      />
-
-      <canvas ref={canvas$} className="hidden bg-inherit" />
-    </div>
-  )
+  }, [video$])
 }
 
 const cache = createCache()
