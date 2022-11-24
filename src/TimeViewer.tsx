@@ -104,25 +104,22 @@ function useStartDrawing(
 
     const fillText$ = duration$.pipe(
       map((_) => formatDuration(_)),
-      scan<
-        string,
-        { text: string; prevTextWidth: number; prevTextLength: number }
-      >(
-        ({ prevTextWidth, prevTextLength }, text, i) => {
+      scan<string, { text: string; prevWidth: number; prevLength: number }>(
+        ({ prevWidth, prevLength }, text, i) => {
           const firstTime = i === 0
-          if (firstTime || text.length !== prevTextLength) {
+          if (firstTime || text.length !== prevLength) {
             // 初回のほか、1:00:00 -> 59:59 などと変化したとき、サイズを測りなおす
-            prevTextWidth = ctx.measureText(text).width
-            prevTextLength = text.length
+            prevWidth = ctx.measureText(text).width
+            prevLength = text.length
           }
 
-          return { text, prevTextWidth, prevTextLength }
+          return { text, prevWidth, prevLength }
         },
-        { text: "", prevTextWidth: 0, prevTextLength: 0 }
+        { text: "", prevWidth: 0, prevLength: 0 }
       ),
-      map(({ text, prevTextWidth }): [text: string, x: number, y: number] => [
+      map(({ text, prevWidth }): [text: string, x: number, y: number] => [
         text,
-        (canvasWidth - prevTextWidth) / 2,
+        (canvasWidth - prevWidth) / 2,
         canvasHeight / 2,
       ])
     )
