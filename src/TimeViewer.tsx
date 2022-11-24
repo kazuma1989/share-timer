@@ -1,11 +1,13 @@
 import clsx from "clsx"
 import { useEffect, useRef } from "react"
 import {
+  combineLatestWith,
   distinctUntilChanged,
   map,
   Observable,
   OperatorFunction,
   pipe,
+  startWith,
 } from "rxjs"
 import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
 import { observeMediaQuery } from "./observeMediaQuery"
@@ -94,40 +96,38 @@ function useStartDrawing(
     ctx.textBaseline = "middle"
     ctx.font = "100 128px/1 system-ui,sans-serif"
 
-    let color: string = "black"
-    let backgroundColor: string = "white"
-
-    const subDarkMode = darkMode$.subscribe(() => {
-      const style = window.getComputedStyle(canvas)
-      color = style.color
-      backgroundColor = style.backgroundColor
-    })
+    const style$ = darkMode$.pipe(
+      startWith(null),
+      map(() => window.getComputedStyle(canvas))
+    )
 
     let prevTextWidth: number | null = null
     let prevTextLength: number | null = null
 
-    const subDuration = duration$.subscribe((duration) => {
-      ctx.fillStyle = backgroundColor
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight)
+    const sub = duration$
+      .pipe(
+        map((_) => formatDuration(_)),
+        combineLatestWith(style$)
+      )
+      .subscribe(([durationText, { color, backgroundColor }]) => {
+        ctx.fillStyle = backgroundColor
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
-      const durationText = formatDuration(duration)
+        if (prevTextWidth === null || durationText.length !== prevTextLength) {
+          // 初回のほか、1:00:00 -> 59:59 などと変化したとき、サイズを測りなおす
+          prevTextWidth = ctx.measureText(durationText).width
+          prevTextLength = durationText.length
+        }
 
-      if (prevTextWidth === null || durationText.length !== prevTextLength) {
-        // 初回のほか、1:00:00 -> 59:59 などと変化したとき、サイズを測りなおす
-        prevTextWidth = ctx.measureText(durationText).width
-        prevTextLength = durationText.length
-      }
+        const x = (canvasWidth - prevTextWidth) / 2
+        const y = canvasHeight / 2
 
-      const x = (canvasWidth - prevTextWidth) / 2
-      const y = canvasHeight / 2
-
-      ctx.fillStyle = color
-      ctx.fillText(durationText, x, y)
-    })
+        ctx.fillStyle = color
+        ctx.fillText(durationText, x, y)
+      })
 
     return () => {
-      subDarkMode.unsubscribe()
-      subDuration.unsubscribe()
+      sub.unsubscribe()
     }
   }, [canvas$, duration$])
 }
