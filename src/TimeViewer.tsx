@@ -9,6 +9,7 @@ import {
   pipe,
   scan,
   startWith,
+  throttleTime,
 } from "rxjs"
 import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
 import { observeMediaQuery } from "./observeMediaQuery"
@@ -36,7 +37,11 @@ export function TimeViewer({
   className?: string
 }) {
   const duration$ = cache(timerState$, () =>
-    timerState$.pipe(mapToCurrentDuration(interval("ui")), mapToDuration())
+    timerState$.pipe(
+      mapToCurrentDuration(interval("ui")),
+      mapToDuration(),
+      throttleTime(300, undefined, { leading: true })
+    )
   )
 
   const canvas$ = useRef<HTMLCanvasElement>(null)
