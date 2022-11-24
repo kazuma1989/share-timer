@@ -113,6 +113,29 @@ export function TimeViewer({
     }
   }, [])
 
+  useEffect(function restartVideoWhenPageBecomesVisible() {
+    const video = video$.current
+    if (!video) return
+
+    const abort = new AbortController()
+
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        if (document.visibilityState === "visible") {
+          video.play()
+        }
+      },
+      {
+        signal: abort.signal,
+      }
+    )
+
+    return () => {
+      abort.abort()
+    }
+  }, [])
+
   return (
     <div className={clsx("bg-light dark:bg-dark", className)}>
       <video
