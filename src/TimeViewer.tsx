@@ -192,6 +192,18 @@ function useRestartVideo(video$: { current: HTMLVideoElement | null }): void {
       },
       {
         signal: abort.signal,
+        passive: true,
+      }
+    )
+
+    video.addEventListener(
+      "leavepictureinpicture",
+      () => {
+        video.play()
+      },
+      {
+        signal: abort.signal,
+        passive: true,
       }
     )
 
