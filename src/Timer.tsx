@@ -60,17 +60,20 @@ export function Timer({
             primaryButton$.current?.focus()
           }}
         >
-          <div className="grid min-h-[8rem] place-items-center tabular-nums">
+          <div className="grid place-items-center tabular-nums">
             {!locked && state.mode === "editing" ? (
-              <DurationSelect
-                key={state.mode + state.initialDuration}
-                innerRef={durationSelect$}
-                defaultValue={state.initialDuration}
-              />
-            ) : (
-              <div className="text-8xl font-thin sm:text-9xl">
-                <TimeViewer timerState$={timerState$} />
+              <div className="w-[512px] max-w-[100vw] aspect-video grid place-items-center">
+                <DurationSelect
+                  key={state.mode + state.initialDuration}
+                  innerRef={durationSelect$}
+                  defaultValue={state.initialDuration}
+                />
               </div>
+            ) : (
+              <TimeViewer
+                timerState$={timerState$}
+                scale={window.devicePixelRatio}
+              />
             )}
           </div>
 
