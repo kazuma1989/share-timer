@@ -7,6 +7,7 @@ import {
   Observable,
   OperatorFunction,
   pipe,
+  scan,
   startWith,
 } from "rxjs"
 import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
@@ -96,34 +97,46 @@ function useStartDrawing(
     ctx.textBaseline = "middle"
     ctx.font = "100 128px/1 system-ui,sans-serif"
 
-    const style$ = darkMode$.pipe(
-      startWith(null),
-      map(() => window.getComputedStyle(canvas))
+    const fillText$ = duration$.pipe(
+      map((_) => formatDuration(_)),
+      scan<
+        string,
+        { text: string; prevTextWidth: number; prevTextLength: number }
+      >(
+        ({ prevTextWidth, prevTextLength }, text, i) => {
+          const firstTime = i === 0
+          if (firstTime || text.length !== prevTextLength) {
+            // 初回のほか、1:00:00 -> 59:59 などと変化したとき、サイズを測りなおす
+            prevTextWidth = ctx.measureText(text).width
+            prevTextLength = text.length
+          }
+
+          return { text, prevTextWidth, prevTextLength }
+        },
+        { text: "", prevTextWidth: 0, prevTextLength: 0 }
+      ),
+      map(({ text, prevTextWidth }): [text: string, x: number, y: number] => [
+        text,
+        (canvasWidth - prevTextWidth) / 2,
+        canvasHeight / 2,
+      ])
     )
 
-    let prevTextWidth: number | null = null
-    let prevTextLength: number | null = null
-
-    const sub = duration$
-      .pipe(
-        map((_) => formatDuration(_)),
-        combineLatestWith(style$)
+    const style$ = darkMode$.pipe(
+      startWith(null),
+      map((): { color: string; backgroundColor: string } =>
+        window.getComputedStyle(canvas)
       )
-      .subscribe(([durationText, { color, backgroundColor }]) => {
+    )
+
+    const sub = fillText$
+      .pipe(combineLatestWith(style$))
+      .subscribe(([[text, x, y], { color, backgroundColor }]) => {
         ctx.fillStyle = backgroundColor
         ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
-        if (prevTextWidth === null || durationText.length !== prevTextLength) {
-          // 初回のほか、1:00:00 -> 59:59 などと変化したとき、サイズを測りなおす
-          prevTextWidth = ctx.measureText(durationText).width
-          prevTextLength = durationText.length
-        }
-
-        const x = (canvasWidth - prevTextWidth) / 2
-        const y = canvasHeight / 2
-
         ctx.fillStyle = color
-        ctx.fillText(durationText, x, y)
+        ctx.fillText(text, x, y)
       })
 
     return () => {
