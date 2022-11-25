@@ -1,4 +1,5 @@
-import { Observable, scan, share, startWith, Subject } from "rxjs"
+import { Observable, scan, startWith, Subject } from "rxjs"
+import { shareRecent } from "./util/shareRecent"
 
 interface Config {
   flash: "on" | "off"
@@ -31,7 +32,5 @@ const config$ = configDispatch$.pipe(
     initialConfig
   ),
   startWith(initialConfig),
-  share({
-    resetOnRefCountZero: false,
-  })
+  shareRecent(false)
 )
