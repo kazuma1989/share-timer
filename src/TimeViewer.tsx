@@ -1,11 +1,15 @@
 import clsx from "clsx"
 import { useEffect, useRef } from "react"
 import {
+  combineLatestWith,
   distinctUntilChanged,
   map,
   Observable,
   OperatorFunction,
   pipe,
+  scan,
+  startWith,
+  throttleTime,
 } from "rxjs"
 import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
 import { observeMediaQuery } from "./observeMediaQuery"
@@ -27,93 +31,28 @@ const canvasHeight = 288
 
 export function TimeViewer({
   timerState$,
-  scale = 1,
   className,
 }: {
   timerState$: Observable<TimerState>
-  /**
-   * レティナでこの値を 1 にするとぼやけた canvas になります
-   */
-  scale?: number
   className?: string
 }) {
   const duration$ = cache(timerState$, () =>
-    timerState$.pipe(mapToCurrentDuration(interval("ui")), mapToDuration())
+    timerState$.pipe(
+      mapToCurrentDuration(interval("ui")),
+      mapToDuration(),
+      throttleTime(300, undefined, { leading: true })
+    )
   )
 
   const canvas$ = useRef<HTMLCanvasElement>(null)
 
-  useEffect(() => {
-    const canvas = canvas$.current
-    const ctx = canvas?.getContext("2d")
-    if (!canvas || !ctx) return
-
-    // https://developer.mozilla.org/ja/docs/Web/API/Window/devicePixelRatio
-    // 表示サイズを設定（CSS におけるピクセル数です）。
-    canvas.style.width = `${canvasWidth}px`
-    canvas.style.height = `${canvasHeight}px`
-
-    // メモリ上における実際のサイズを設定（ピクセル密度の分だけ倍増させます）。
-    canvas.width = Math.floor(canvasWidth * scale)
-    canvas.height = Math.floor(canvasHeight * scale)
-    ctx.scale(scale, scale)
-
-    ctx.textAlign = "left"
-    ctx.textBaseline = "middle"
-    ctx.font = "100 128px/1 system-ui,sans-serif"
-
-    let color: string = "black"
-    let backgroundColor: string = "white"
-
-    const subDarkMode = darkMode$.subscribe(() => {
-      const style = window.getComputedStyle(canvas)
-      color = style.color
-      backgroundColor = style.backgroundColor
-    })
-
-    let prevTextWidth: number | null = null
-    let prevTextLength: number | null = null
-
-    const subDuration = duration$.subscribe((duration) => {
-      ctx.fillStyle = backgroundColor
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight)
-
-      const durationText = formatDuration(duration)
-
-      if (prevTextWidth === null || durationText.length !== prevTextLength) {
-        // 初回のほか、1:00:00 -> 59:59 などと変化したとき、サイズを測りなおす
-        prevTextWidth = ctx.measureText(durationText).width
-        prevTextLength = durationText.length
-      }
-
-      const x = (canvasWidth - prevTextWidth) / 2
-      const y = canvasHeight / 2
-
-      ctx.fillStyle = color
-      ctx.fillText(durationText, x, y)
-    })
-
-    return () => {
-      subDarkMode.unsubscribe()
-      subDuration.unsubscribe()
-    }
-  }, [duration$, scale])
+  useStartDrawing(canvas$, duration$)
 
   const video$ = useRef<HTMLVideoElement>(null)
 
-  useEffect(() => {
-    const video = video$.current
-    const canvas = canvas$.current
-    if (!video || !canvas) return
-
-    video.srcObject = canvas.captureStream()
-
-    return () => {
-      if (document.pictureInPictureElement === video) {
-        document.exitPictureInPicture?.()
-      }
-    }
-  }, [])
+  useConnectVideoWithCanvas(video$, canvas$)
+  useDestroyPiP(video$)
+  useRestartVideo(video$)
 
   return (
     <div className={clsx("bg-light dark:bg-dark", className)}>
@@ -124,14 +63,151 @@ export function TimeViewer({
         playsInline
         width={canvasWidth}
         height={canvasHeight}
-        onDoubleClick={(e) => {
-          e.currentTarget.requestPictureInPicture()
+        onClick={({ currentTarget: video }) => {
+          video.play()
+        }}
+        onDoubleClick={({ currentTarget: video }) => {
+          video.requestPictureInPicture()
         }}
       />
 
       <canvas ref={canvas$} className="hidden bg-inherit" />
     </div>
   )
+}
+
+function useStartDrawing(
+  canvas$: { current: HTMLCanvasElement | null },
+  duration$: Observable<number>
+): void {
+  useEffect(() => {
+    const canvas = canvas$.current
+    const ctx = canvas?.getContext("2d")
+    if (!canvas || !ctx) return
+
+    // https://developer.mozilla.org/ja/docs/Web/API/Window/devicePixelRatio
+    // 表示サイズを設定（CSS におけるピクセル数です）。
+    canvas.style.width = `${canvasWidth}px`
+    canvas.style.height = `${canvasHeight}px`
+
+    // レティナでこの値を 1 にするとぼやけた canvas になります
+    const scale = window.devicePixelRatio
+
+    // メモリ上における実際のサイズを設定（ピクセル密度の分だけ倍増させます）。
+    canvas.width = Math.floor(canvasWidth * scale)
+    canvas.height = Math.floor(canvasHeight * scale)
+    ctx.scale(scale, scale)
+
+    ctx.textAlign = "left"
+    ctx.textBaseline = "middle"
+    ctx.font = "100 128px/1 system-ui,sans-serif"
+
+    const fillText$ = duration$.pipe(
+      map((_) => formatDuration(_)),
+      scan<string, { text: string; prevWidth: number; prevLength: number }>(
+        ({ prevWidth, prevLength }, text, i) => {
+          const firstTime = i === 0
+          if (firstTime || text.length !== prevLength) {
+            // 初回のほか、1:00:00 -> 59:59 などと変化したとき、サイズを測りなおす
+            prevWidth = ctx.measureText(text).width
+            prevLength = text.length
+          }
+
+          return { text, prevWidth, prevLength }
+        },
+        { text: "", prevWidth: 0, prevLength: 0 }
+      ),
+      map(({ text, prevWidth }): [text: string, x: number, y: number] => [
+        text,
+        (canvasWidth - prevWidth) / 2,
+        canvasHeight / 2,
+      ])
+    )
+
+    const style$ = darkMode$.pipe(
+      startWith(null),
+      map((): { color: string; backgroundColor: string } =>
+        window.getComputedStyle(canvas)
+      )
+    )
+
+    const sub = fillText$
+      .pipe(combineLatestWith(style$))
+      .subscribe(([[text, x, y], { color, backgroundColor }]) => {
+        ctx.fillStyle = backgroundColor
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight)
+
+        ctx.fillStyle = color
+        ctx.fillText(text, x, y)
+      })
+
+    return () => {
+      sub.unsubscribe()
+    }
+  }, [canvas$, duration$])
+}
+
+function useConnectVideoWithCanvas(
+  video$: { current: HTMLVideoElement | null },
+  canvas$: { current: HTMLCanvasElement | null }
+): void {
+  useEffect(() => {
+    const video = video$.current
+    const canvas = canvas$.current
+    if (!video || !canvas) return
+
+    video.srcObject = canvas.captureStream()
+  }, [canvas$, video$])
+}
+
+function useDestroyPiP(video$: { current: HTMLVideoElement | null }): void {
+  useEffect(() => {
+    const video = video$.current
+    if (!video) return
+
+    return () => {
+      if (document.pictureInPictureElement === video) {
+        document.exitPictureInPicture?.()
+      }
+    }
+  }, [video$])
+}
+
+function useRestartVideo(video$: { current: HTMLVideoElement | null }): void {
+  useEffect(() => {
+    const video = video$.current
+    if (!video) return
+
+    const abort = new AbortController()
+
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        if (document.visibilityState === "visible") {
+          video.play()
+        }
+      },
+      {
+        signal: abort.signal,
+        passive: true,
+      }
+    )
+
+    video.addEventListener(
+      "leavepictureinpicture",
+      () => {
+        video.play()
+      },
+      {
+        signal: abort.signal,
+        passive: true,
+      }
+    )
+
+    return () => {
+      abort.abort()
+    }
+  }, [video$])
 }
 
 const cache = createCache()
