@@ -18,7 +18,6 @@ import { createCache } from "./util/createCache"
 import { floor } from "./util/floor"
 import { formatDuration } from "./util/formatDuration"
 import { interval } from "./util/interval"
-import { isDesktopSafari } from "./util/isDesktopSafari"
 
 const darkMode$ = observeMediaQuery(
   window.matchMedia("(prefers-color-scheme: dark)")
@@ -39,9 +38,7 @@ export function TimeViewer({
 }) {
   const duration$ = cache(timerState$, () =>
     timerState$.pipe(
-      mapToCurrentDuration(
-        isDesktopSafari() ? interval("worker", 100) : interval("ui")
-      ),
+      mapToCurrentDuration(interval("worker", 100)),
       mapToDuration(),
       throttleTime(300, undefined, { leading: true })
     )
