@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import { Ref, useImperativeHandle, useRef } from "react"
+import { Ref, useImperativeHandle, useRef, useState } from "react"
 import { parseDuration } from "./util/parseDuration"
 
 export function DurationSelect({
@@ -25,6 +25,8 @@ export function DurationSelect({
     []
   )
 
+  const [io, setIO] = useState<IntersectionObserver>()
+
   const selectStyle = clsx(
     "cursor-pointer appearance-none rounded-md p-2 transition-colors",
     "bg-light hover:bg-dark/10 dark:bg-dark dark:hover:bg-light/20"
@@ -40,9 +42,53 @@ export function DurationSelect({
   return (
     <span className={clsx("inline-flex gap-4 text-3xl", className)}>
       <span>
-        <span className={selectStyle2}>
+        <span
+          ref={(root) => {
+            if (!root) return
+
+            setIO((io) => {
+              if (io?.root && io.root === root) {
+                return io
+              }
+
+              io?.disconnect()
+
+              return new IntersectionObserver(
+                (entries) => {
+                  const [e] = entries
+                    .filter(
+                      (
+                        _
+                      ): _ is Omit<IntersectionObserverEntry, "target"> & {
+                        target: HTMLElement
+                      } => _.isIntersecting && _.target instanceof HTMLElement
+                    )
+                    .map((_) => _.target)
+                  if (!e) return
+
+                  duration$.current.hours = Number(e.dataset.value)
+                },
+                {
+                  root,
+                  threshold: 1,
+                }
+              )
+            })
+          }}
+          className={selectStyle2}
+        >
           {Array.from(Array(24).keys()).map((i) => (
-            <span key={i}>{i.toString(10).padStart(2, "0")}</span>
+            <span
+              data-value={i}
+              key={i}
+              ref={(e) => {
+                if (!e) return
+
+                io?.observe(e)
+              }}
+            >
+              {i.toString(10).padStart(2, "0")}
+            </span>
           ))}
         </span>
         &nbsp;時間
