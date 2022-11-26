@@ -86,24 +86,36 @@ function Select({
 
   const scrollCalled$ = useRef(false)
 
+  const [currentValue, setCurrentValue] = useState<number>()
+
   return (
     <span
       ref={(root) => {
         if (!root) return
 
-        createObserver(root, (e) => {
-          onChange?.(e.dataset.value)
-        })
+        createObserver(
+          root,
+          (e) => {
+            setCurrentValue(Number(e.dataset.value))
+
+            onChange?.(e.dataset.value)
+          },
+          {
+            rootMargin: "-8px 0px",
+          }
+        )
       }}
       className={clsx(
         "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
-        "px-4 h-[68px] [&>:first-child]:pt-4 [&>:last-child]:pb-4",
+        "px-4 h-[calc(36px+3rem)] [&>:first-child]:mt-6 [&>:last-child]:mb-6",
         className
       )}
     >
       {Array.from(Array(length).keys()).map((value) => (
         <span
           data-value={value}
+          aria-selected={value === currentValue ? "true" : undefined}
+          className="aria-selected:opacity-100 opacity-25"
           key={value}
           ref={(e) => {
             if (!e) return
@@ -111,7 +123,7 @@ function Select({
             observer?.observe(e)
 
             if (value === defaultValue && !scrollCalled$.current) {
-              e.scrollIntoView()
+              e.scrollIntoView({ block: "center" })
 
               scrollCalled$.current = true
             }
@@ -128,14 +140,15 @@ function useObserver(): [
   observer: IntersectionObserver | null,
   createObserver: (
     root: HTMLElement,
-    onIntersecting?: (...targets: [HTMLElement, ...HTMLElement[]]) => void
+    onIntersecting?: (...targets: [HTMLElement, ...HTMLElement[]]) => void,
+    options?: IntersectionObserverInit
   ) => void
 ] {
   const [observer, setObserver] = useState<IntersectionObserver | null>(null)
 
   return [
     observer,
-    (root, onIntersecting) => {
+    (root, onIntersecting, options) => {
       setObserver((io) => {
         if (io?.root && io.root === root) {
           return io
@@ -160,8 +173,9 @@ function useObserver(): [
             }
           },
           {
-            root,
             threshold: 1,
+            root,
+            ...options,
           }
         )
       })
