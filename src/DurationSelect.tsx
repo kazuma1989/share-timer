@@ -26,13 +26,10 @@ export function DurationSelect({
   )
 
   const [hoursObserver, createHoursObserver] = useObserver()
+  const [minutesObserver, createMinutesObserver] = useObserver()
+  const [secondsObserver, createSecondsObserver] = useObserver()
 
   const selectStyle = clsx(
-    "cursor-pointer appearance-none rounded-md p-2 transition-colors",
-    "bg-light hover:bg-dark/10 dark:bg-dark dark:hover:bg-light/20"
-  )
-
-  const selectStyle2 = clsx(
     "cursor-pointer rounded-md px-4 transition-colors",
     "bg-light hover:bg-dark/10 dark:bg-dark dark:hover:bg-light/20",
     "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
@@ -50,7 +47,7 @@ export function DurationSelect({
               duration$.current.hours = Number(e.dataset.value)
             })
           }}
-          className={selectStyle2}
+          className={selectStyle}
         >
           {Array.from(Array(24).keys()).map((i) => (
             <span
@@ -70,36 +67,58 @@ export function DurationSelect({
       </span>
 
       <span>
-        <select
-          defaultValue={defaultDuration.minutes}
-          className={selectStyle}
-          onChange={(e) => {
-            duration$.current.minutes = Number(e.currentTarget.value)
+        <span
+          ref={(root) => {
+            if (!root) return
+
+            createMinutesObserver(root, (e) => {
+              duration$.current.minutes = Number(e.dataset.value)
+            })
           }}
+          className={selectStyle}
         >
           {Array.from(Array(60).keys()).map((i) => (
-            <option key={i} value={i}>
+            <span
+              data-value={i}
+              key={i}
+              ref={(e) => {
+                if (!e) return
+
+                minutesObserver?.observe(e)
+              }}
+            >
               {i.toString(10).padStart(2, "0")}
-            </option>
+            </span>
           ))}
-        </select>
+        </span>
         &nbsp;分
       </span>
 
       <span>
-        <select
-          defaultValue={defaultDuration.seconds}
-          className={selectStyle}
-          onChange={(e) => {
-            duration$.current.seconds = Number(e.currentTarget.value)
+        <span
+          ref={(root) => {
+            if (!root) return
+
+            createSecondsObserver(root, (e) => {
+              duration$.current.seconds = Number(e.dataset.value)
+            })
           }}
+          className={selectStyle}
         >
           {Array.from(Array(60).keys()).map((i) => (
-            <option key={i} value={i}>
+            <span
+              data-value={i}
+              key={i}
+              ref={(e) => {
+                if (!e) return
+
+                secondsObserver?.observe(e)
+              }}
+            >
               {i.toString(10).padStart(2, "0")}
-            </option>
+            </span>
           ))}
-        </select>
+        </span>
         &nbsp;秒
       </span>
     </span>
