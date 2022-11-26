@@ -25,102 +25,88 @@ export function DurationSelect({
     []
   )
 
-  const [hoursObserver, createHoursObserver] = useObserver()
-  const [minutesObserver, createMinutesObserver] = useObserver()
-  const [secondsObserver, createSecondsObserver] = useObserver()
-
   const selectStyle = clsx(
-    "cursor-pointer rounded-md px-4 transition-colors",
-    "bg-light hover:bg-dark/10 dark:bg-dark dark:hover:bg-light/20",
-    "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
-    "h-[68px] [&>:first-child]:pt-4 [&>:last-child]:pb-4"
+    "cursor-pointer rounded-md transition-colors",
+    "bg-light hover:bg-dark/10 dark:bg-dark dark:hover:bg-light/20"
   )
 
   return (
     <span className={clsx("inline-flex gap-4 text-3xl", className)}>
       <span>
-        <span
-          ref={(root) => {
-            if (!root) return
-
-            createHoursObserver(root, (e) => {
-              duration$.current.hours = Number(e.dataset.value)
-            })
-          }}
+        <Select
+          length={24}
           className={selectStyle}
-        >
-          {Array.from(Array(24).keys()).map((i) => (
-            <span
-              data-value={i}
-              key={i}
-              ref={(e) => {
-                if (!e) return
-
-                hoursObserver?.observe(e)
-              }}
-            >
-              {i.toString(10).padStart(2, "0")}
-            </span>
-          ))}
-        </span>
+          onChange={(value) => {
+            duration$.current.hours = Number(value)
+          }}
+        />
         &nbsp;時間
       </span>
 
       <span>
-        <span
-          ref={(root) => {
-            if (!root) return
-
-            createMinutesObserver(root, (e) => {
-              duration$.current.minutes = Number(e.dataset.value)
-            })
-          }}
+        <Select
+          length={60}
           className={selectStyle}
-        >
-          {Array.from(Array(60).keys()).map((i) => (
-            <span
-              data-value={i}
-              key={i}
-              ref={(e) => {
-                if (!e) return
-
-                minutesObserver?.observe(e)
-              }}
-            >
-              {i.toString(10).padStart(2, "0")}
-            </span>
-          ))}
-        </span>
+          onChange={(value) => {
+            duration$.current.minutes = Number(value)
+          }}
+        />
         &nbsp;分
       </span>
 
       <span>
-        <span
-          ref={(root) => {
-            if (!root) return
-
-            createSecondsObserver(root, (e) => {
-              duration$.current.seconds = Number(e.dataset.value)
-            })
-          }}
+        <Select
+          length={60}
           className={selectStyle}
-        >
-          {Array.from(Array(60).keys()).map((i) => (
-            <span
-              data-value={i}
-              key={i}
-              ref={(e) => {
-                if (!e) return
-
-                secondsObserver?.observe(e)
-              }}
-            >
-              {i.toString(10).padStart(2, "0")}
-            </span>
-          ))}
-        </span>
+          onChange={(value) => {
+            duration$.current.seconds = Number(value)
+          }}
+        />
         &nbsp;秒
       </span>
+    </span>
+  )
+}
+
+function Select({
+  length,
+  onChange,
+  className,
+}: {
+  length?: number
+  onChange?(value: string | undefined): void
+  className?: string
+}) {
+  const [observer, createObserver] = useObserver()
+
+  return (
+    <span
+      ref={(root) => {
+        if (!root) return
+
+        createObserver(root, (e) => {
+          onChange?.(e.dataset.value)
+        })
+      }}
+      className={clsx(
+        "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
+        "px-4 h-[68px] [&>:first-child]:pt-4 [&>:last-child]:pb-4",
+        className
+      )}
+    >
+      {Array.from(Array(length).keys()).map((i) => (
+        <span
+          data-value={i}
+          key={i}
+          ref={(e) => {
+            if (!e) return
+
+            observer?.observe(e)
+          }}
+        >
+          {i.toString(10).padStart(2, "0")}
+        </span>
+      ))}
     </span>
   )
 }
