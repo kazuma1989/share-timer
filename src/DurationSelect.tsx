@@ -34,6 +34,7 @@ export function DurationSelect({
     <span className={clsx("inline-flex gap-4 text-3xl", className)}>
       <span>
         <Select
+          defaultValue={defaultDuration.hours}
           length={24}
           className={selectStyle}
           onChange={(value) => {
@@ -45,6 +46,7 @@ export function DurationSelect({
 
       <span>
         <Select
+          defaultValue={defaultDuration.minutes}
           length={60}
           className={selectStyle}
           onChange={(value) => {
@@ -56,6 +58,7 @@ export function DurationSelect({
 
       <span>
         <Select
+          defaultValue={defaultDuration.seconds}
           length={60}
           className={selectStyle}
           onChange={(value) => {
@@ -69,15 +72,19 @@ export function DurationSelect({
 }
 
 function Select({
+  defaultValue,
   length,
   onChange,
   className,
 }: {
+  defaultValue?: number
   length?: number
   onChange?(value: string | undefined): void
   className?: string
 }) {
   const [observer, createObserver] = useObserver()
+
+  const scrollCalled$ = useRef(false)
 
   return (
     <span
@@ -94,17 +101,23 @@ function Select({
         className
       )}
     >
-      {Array.from(Array(length).keys()).map((i) => (
+      {Array.from(Array(length).keys()).map((value) => (
         <span
-          data-value={i}
-          key={i}
+          data-value={value}
+          key={value}
           ref={(e) => {
             if (!e) return
 
             observer?.observe(e)
+
+            if (value === defaultValue && !scrollCalled$.current) {
+              e.scrollIntoView()
+
+              scrollCalled$.current = true
+            }
           }}
         >
-          {i.toString(10).padStart(2, "0")}
+          {value.toString(10).padStart(2, "0")}
         </span>
       ))}
     </span>
