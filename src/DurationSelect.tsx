@@ -30,9 +30,20 @@ export function DurationSelect({
     "bg-light hover:bg-dark/10 dark:bg-dark dark:hover:bg-light/20"
   )
 
+  const selectStyle2 = clsx(
+    "cursor-pointer rounded-md [&>*]:p-4 transition-colors",
+    "bg-light hover:bg-dark/10 dark:bg-dark dark:hover:bg-light/20",
+    "scrollbar-hidden h-[68px] inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-start"
+  )
+
   return (
     <span className={clsx("inline-flex gap-4 text-3xl", className)}>
       <span>
+        <span className={selectStyle2}>
+          {Array.from(Array(24).keys()).map((i) => (
+            <span key={i}>{i.toString(10).padStart(2, "0")}</span>
+          ))}
+        </span>
         <select
           defaultValue={defaultDuration.hours}
           className={selectStyle}
