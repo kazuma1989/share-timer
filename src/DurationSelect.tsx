@@ -25,7 +25,7 @@ export function DurationSelect({
     []
   )
 
-  const [io, setIO] = useState<IntersectionObserver>()
+  const [hoursObserver, createHoursObserver] = useObserver()
 
   const selectStyle = clsx(
     "cursor-pointer appearance-none rounded-md p-2 transition-colors",
@@ -46,33 +46,8 @@ export function DurationSelect({
           ref={(root) => {
             if (!root) return
 
-            setIO((io) => {
-              if (io?.root && io.root === root) {
-                return io
-              }
-
-              io?.disconnect()
-
-              return new IntersectionObserver(
-                (entries) => {
-                  const [e] = entries
-                    .filter(
-                      (
-                        _
-                      ): _ is Omit<IntersectionObserverEntry, "target"> & {
-                        target: HTMLElement
-                      } => _.isIntersecting && _.target instanceof HTMLElement
-                    )
-                    .map((_) => _.target)
-                  if (!e) return
-
-                  duration$.current.hours = Number(e.dataset.value)
-                },
-                {
-                  root,
-                  threshold: 1,
-                }
-              )
+            createHoursObserver(root, (e) => {
+              duration$.current.hours = Number(e.dataset.value)
             })
           }}
           className={selectStyle2}
@@ -84,7 +59,7 @@ export function DurationSelect({
               ref={(e) => {
                 if (!e) return
 
-                io?.observe(e)
+                hoursObserver?.observe(e)
               }}
             >
               {i.toString(10).padStart(2, "0")}
@@ -129,4 +104,49 @@ export function DurationSelect({
       </span>
     </span>
   )
+}
+
+function useObserver(): [
+  observer: IntersectionObserver | null,
+  createObserver: (
+    root: HTMLElement,
+    onIntersecting?: (...targets: [HTMLElement, ...HTMLElement[]]) => void
+  ) => void
+] {
+  const [observer, setObserver] = useState<IntersectionObserver | null>(null)
+
+  return [
+    observer,
+    (root, onIntersecting) => {
+      setObserver((io) => {
+        if (io?.root && io.root === root) {
+          return io
+        }
+
+        io?.disconnect()
+
+        return new IntersectionObserver(
+          (entries) => {
+            const [target, ...targets] = entries
+              .filter(
+                (
+                  _
+                ): _ is Omit<IntersectionObserverEntry, "target"> & {
+                  target: HTMLElement
+                } => _.isIntersecting && _.target instanceof HTMLElement
+              )
+              .map((_) => _.target)
+
+            if (target) {
+              onIntersecting?.(target, ...targets)
+            }
+          },
+          {
+            root,
+            threshold: 1,
+          }
+        )
+      })
+    },
+  ]
 }
