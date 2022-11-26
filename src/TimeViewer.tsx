@@ -13,6 +13,7 @@ import {
 import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { useDarkMode } from "./useDarkMode"
+import { useVideo } from "./useVideo"
 import { bufferedLast } from "./util/bufferedLast"
 import { createCache } from "./util/createCache"
 import { floor } from "./util/floor"
@@ -41,29 +42,18 @@ export function TimeViewer({
 
   useStartDrawing(canvas$, duration$)
 
-  const video$ = useRef<HTMLVideoElement>(null)
+  const video$ = useRef(useVideo())
 
   useConnectVideoWithCanvas(video$, canvas$)
-  useDestroyPiP(video$)
+  useSetupVideo(video$)
   useRestartVideo(video$)
 
-  return (
-    <div className={clsx("bg-light dark:bg-dark", className)}>
-      <video
-        ref={video$}
-        autoPlay
-        muted
-        playsInline
-        width={canvasWidth}
-        height={canvasHeight}
-        onClick={({ currentTarget: video }) => {
-          video.play()
-        }}
-        onDoubleClick={({ currentTarget: video }) => {
-          video.requestPictureInPicture()
-        }}
-      />
+  const div$ = useRef<HTMLDivElement>(null)
 
+  usePrependElement(div$, video$)
+
+  return (
+    <div ref={div$} className={clsx("bg-light dark:bg-dark", className)}>
       <canvas ref={canvas$} className="hidden bg-inherit" />
     </div>
   )
@@ -155,19 +145,6 @@ function useConnectVideoWithCanvas(
   }, [canvas$, video$])
 }
 
-function useDestroyPiP(video$: { current: HTMLVideoElement | null }): void {
-  useEffect(() => {
-    const video = video$.current
-    if (!video) return
-
-    return () => {
-      if (document.pictureInPictureElement === video) {
-        document.exitPictureInPicture?.()
-      }
-    }
-  }, [video$])
-}
-
 function useRestartVideo(video$: { current: HTMLVideoElement | null }): void {
   useEffect(() => {
     const video = video$.current
@@ -192,6 +169,64 @@ function useRestartVideo(video$: { current: HTMLVideoElement | null }): void {
       "leavepictureinpicture",
       () => {
         video.play()
+      },
+      {
+        signal: abort.signal,
+        passive: true,
+      }
+    )
+
+    return () => {
+      abort.abort()
+    }
+  }, [video$])
+}
+
+function usePrependElement(
+  parent$: { current: HTMLElement | null },
+  child$: { current: HTMLElement | null }
+): void {
+  useEffect(() => {
+    const parent = parent$.current
+    const child = child$.current
+    if (!parent || !child) return
+
+    parent.prepend(child)
+
+    return () => {
+      parent.removeChild(child)
+    }
+  }, [parent$, child$])
+}
+
+function useSetupVideo(video$: { current: HTMLVideoElement | null }): void {
+  useEffect(() => {
+    const video = video$.current
+    if (!video) return
+
+    const abort = new AbortController()
+
+    video.autoplay = true
+    video.muted = true
+    video.playsInline = true
+    video.width = canvasWidth
+    video.height = canvasHeight
+
+    video.addEventListener(
+      "click",
+      () => {
+        video.play()
+      },
+      {
+        signal: abort.signal,
+        passive: true,
+      }
+    )
+
+    video.addEventListener(
+      "dblclick",
+      () => {
+        video.requestPictureInPicture()
       },
       {
         signal: abort.signal,
