@@ -13,6 +13,7 @@ import {
 import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { useDarkMode } from "./useDarkMode"
+import { bufferedLast } from "./util/bufferedLast"
 import { createCache } from "./util/createCache"
 import { floor } from "./util/floor"
 import { formatDuration } from "./util/formatDuration"
@@ -30,6 +31,7 @@ export function TimeViewer({
 }) {
   const duration$ = cache(timerState$, () =>
     timerState$.pipe(
+      bufferedLast(interval("worker", 400)),
       mapToCurrentDuration(interval("worker", 100)),
       mapToDuration()
     )
