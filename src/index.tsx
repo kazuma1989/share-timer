@@ -30,8 +30,6 @@ if (!getItem("userId")) {
   setItem("userId", nanoid(10))
 }
 
-const root = document.getElementById("root")!
-
 const video = document.createElement("video")
 
 const darkMode$ = observeDarkMode()
@@ -44,7 +42,7 @@ const audio = createAudio(context, audioData)
 
 const route$ = observeHash()
 
-createRoot(root).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <FirestoreImplProvider firestore={firestore}>
       <ErrorBoundary fallback={<FullViewportOops />}>
