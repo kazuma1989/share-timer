@@ -31,9 +31,10 @@ export function DurationSelect({
   )
 
   const selectStyle2 = clsx(
-    "cursor-pointer rounded-md [&>*]:p-4 transition-colors",
+    "cursor-pointer rounded-md px-4 transition-colors",
     "bg-light hover:bg-dark/10 dark:bg-dark dark:hover:bg-light/20",
-    "scrollbar-hidden h-[68px] inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-start"
+    "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
+    "h-[68px] [&>:first-child]:pt-4 [&>:last-child]:pb-4"
   )
 
   return (
@@ -44,19 +45,6 @@ export function DurationSelect({
             <span key={i}>{i.toString(10).padStart(2, "0")}</span>
           ))}
         </span>
-        <select
-          defaultValue={defaultDuration.hours}
-          className={selectStyle}
-          onChange={(e) => {
-            duration$.current.hours = Number(e.currentTarget.value)
-          }}
-        >
-          {Array.from(Array(24).keys()).map((i) => (
-            <option key={i} value={i}>
-              {i.toString(10).padStart(2, "0")}
-            </option>
-          ))}
-        </select>
         &nbsp;時間
       </span>
 
