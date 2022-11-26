@@ -3,10 +3,12 @@ import { useEffect } from "react"
 import {
   distinctUntilChanged,
   filter,
+  map,
   Observable,
   OperatorFunction,
   pipe,
   scan,
+  withLatestFrom,
 } from "rxjs"
 import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
@@ -23,22 +25,31 @@ export function FlashCover({
   timerState$: Observable<TimerState>
   className?: string
 }) {
-  const [flashing$, sounding$] = cache(timerState$, () => [
-    timerState$.pipe(mapToCurrentDuration(interval("ui")), notifyFirstZero()),
-    timerState$.pipe(
-      mapToCurrentDuration(interval("worker", 100)),
-      notifyFirstZero(),
-      filter(Boolean)
-    ),
-  ])
+  const config$ = useConfig()
 
-  const config = useObservable(useConfig())
+  const [flashing$, sounding$] = cache(config$, createCache)(
+    timerState$,
+    () => [
+      timerState$.pipe(
+        mapToCurrentDuration(interval("ui")),
+        notifyFirstZero(),
+        withLatestFrom(config$),
+        map(([_, config]) => config.flash === "on" && _)
+      ),
+
+      timerState$.pipe(
+        mapToCurrentDuration(interval("worker", 100)),
+        notifyFirstZero(),
+        withLatestFrom(config$),
+        map(([_, config]) => config.sound === "on" && _)
+      ),
+    ]
+  )
 
   const audio = useAudio()
-  useEffect(() => {
-    if (config.sound !== "on") return
 
-    const sub = sounding$.subscribe(() => {
+  useEffect(() => {
+    const sub = sounding$.pipe(filter((_) => _ === true)).subscribe(() => {
       console.debug("audio.play()")
       audio.play()
     })
@@ -46,7 +57,7 @@ export function FlashCover({
     return () => {
       sub.unsubscribe()
     }
-  }, [audio, config.sound, sounding$])
+  }, [audio, sounding$])
 
   const flashing = useObservable(flashing$, false)
 
@@ -55,7 +66,6 @@ export function FlashCover({
       className={clsx(
         "pointer-events-none absolute inset-0 text-cerise-500/75 dark:text-gray-100/75",
         flashing && "animate-flash",
-        config.flash !== "on" && "invisible",
         className
       )}
     />

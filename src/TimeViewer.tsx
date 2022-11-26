@@ -9,22 +9,15 @@ import {
   pipe,
   scan,
   startWith,
-  throttleTime,
 } from "rxjs"
 import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
-import { observeMediaQuery } from "./observeMediaQuery"
 import { TimerState } from "./timerReducer"
+import { useDarkMode } from "./useDarkMode"
+import { bufferedLast } from "./util/bufferedLast"
 import { createCache } from "./util/createCache"
 import { floor } from "./util/floor"
 import { formatDuration } from "./util/formatDuration"
 import { interval } from "./util/interval"
-
-const darkMode$ = observeMediaQuery(
-  window.matchMedia("(prefers-color-scheme: dark)")
-).pipe(
-  map((_) => (_.matches ? "dark" : "light")),
-  distinctUntilChanged()
-)
 
 const canvasWidth = 512
 const canvasHeight = 288
@@ -38,9 +31,9 @@ export function TimeViewer({
 }) {
   const duration$ = cache(timerState$, () =>
     timerState$.pipe(
-      mapToCurrentDuration(interval("ui")),
-      mapToDuration(),
-      throttleTime(300, undefined, { leading: true })
+      bufferedLast(interval("worker", 400)),
+      mapToCurrentDuration(interval("worker", 100)),
+      mapToDuration()
     )
   )
 
@@ -80,6 +73,8 @@ function useStartDrawing(
   canvas$: { current: HTMLCanvasElement | null },
   duration$: Observable<number>
 ): void {
+  const darkMode$ = useDarkMode()
+
   useEffect(() => {
     const canvas = canvas$.current
     const ctx = canvas?.getContext("2d")
@@ -144,7 +139,7 @@ function useStartDrawing(
     return () => {
       sub.unsubscribe()
     }
-  }, [canvas$, duration$])
+  }, [canvas$, darkMode$, duration$])
 }
 
 function useConnectVideoWithCanvas(
