@@ -31,7 +31,7 @@ export function DurationSelect({
   )
 
   const selectStyle = clsx(
-    "cursor-pointer rounded-md transition-colors",
+    "select-none cursor-pointer rounded-md transition-colors",
     "hover:bg-dark/10 dark:hover:bg-light/20",
     "text-3xl pr-14 -mr-12"
   )
@@ -104,13 +104,13 @@ function Select({
             onChange?.(e.dataset.value)
           },
           {
-            rootMargin: "-8px 0px",
+            rootMargin: "-32px 0px",
           }
         )
       }}
       className={clsx(
         "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
-        "px-4 h-[calc(36px+3rem)] [&>:first-child]:mt-6 [&>:last-child]:mb-6",
+        "px-4 h-[calc(36px+6rem)] [&>:first-child]:mt-12 [&>:last-child]:mb-12",
         className
       )}
     >
