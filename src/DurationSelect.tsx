@@ -118,7 +118,7 @@ function Select({
         <span
           data-value={value}
           aria-selected={value === currentValue ? "true" : undefined}
-          className="aria-selected:opacity-100 opacity-25"
+          className="text-right aria-selected:opacity-100 opacity-25 aria-selected:font-normal font-thin"
           key={value}
           ref={(e) => {
             if (!e) return
