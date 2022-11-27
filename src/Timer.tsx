@@ -205,9 +205,10 @@ function ConfigArea({
       <dialog
         className={clsx(
           "transition-[opacity,visibility] [&:not([open])]:opacity-0",
-          "w-full h-full text-inherit bg-dark/10 dark:bg-light/20",
+          "text-inherit bg-transparent overflow-visible",
+          "open:shadow-screen open:shadow-dark/10 dark:open:shadow-light/20",
           // override default dialog style
-          "fixed inset-0 p-0 max-w-full max-h-full backdrop:bg-transparent open:visible [&:not([open])]:invisible [&:not([open])]:block"
+          "fixed inset-0 p-0 m-0 max-w-full max-h-full backdrop:bg-transparent open:visible [&:not([open])]:invisible [&:not([open])]:block"
         )}
         ref={(dialog) => {
           dialog$.current = dialog
@@ -221,9 +222,14 @@ function ConfigArea({
           const infoButton = infoButton$.current
           if (!(inner instanceof HTMLElement) || !infoButton) return
 
-          const { top, left, width } = infoButton.getBoundingClientRect()
-          inner.style.top = `${top}px`
-          inner.style.left = `${left + width / 2}px`
+          const { top, left, width, height } =
+            infoButton.getBoundingClientRect()
+
+          dialog.style.top = `${top}px`
+          dialog.style.left = `${left}px`
+          dialog.style.width = `${width}px`
+          dialog.style.height = `${height}px`
+
           inner.style.transform = "translate(-50%, -100%)"
         }}
         onClick={() => {
@@ -235,8 +241,8 @@ function ConfigArea({
             "max-w-prose overscroll-contain rounded border",
             "border-gray-500 bg-light dark:bg-dark",
             "p-8 absolute",
-            "before:border-8 before:border-t-gray-500 before:translate-y-full before:-translate-x-1/2 before:content-[''] before:border-transparent before:absolute before:left-1/2 before:bottom-0",
-            "after:border-[6.5px] after:border-t-light after:dark:border-t-dark after:translate-y-full after:-translate-x-1/2 after:content-[''] after:border-transparent after:absolute after:left-1/2 after:bottom-0"
+            "before:border-8 before:border-t-gray-500 before:left-3/4 before:bottom-0 before:translate-y-full before:-translate-x-1/2 before:content-[''] before:border-transparent before:absolute",
+            "after:border-[6.5px] after:border-t-light after:dark:border-t-dark after:left-3/4 after:bottom-0 after:translate-y-full after:-translate-x-1/2 after:content-[''] after:border-transparent after:absolute"
           )}
           onClick={(e) => {
             e.stopPropagation()
