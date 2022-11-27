@@ -6,7 +6,7 @@ import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
 import { icon } from "./icon"
 import { setHash } from "./observeHash"
-import { getItem } from "./storage"
+import { getItem, setItem } from "./storage"
 import { TimerState } from "./timerReducer"
 import { TimeViewer } from "./TimeViewer"
 import { TransparentButton } from "./TransparentButton"
@@ -167,6 +167,12 @@ function ConfigArea({
   const dialog$ = useRef<HTMLDialogElement | null>(null)
   const infoButton$ = useRef<HTMLButtonElement>(null)
 
+  const isTutorialDone = getItem("tutorial") === "done"
+  const doneTutorial = () => {
+    dialog$.current?.close()
+    setItem("tutorial", "done")
+  }
+
   return (
     <div className={className}>
       <TransparentButton
@@ -202,65 +208,60 @@ function ConfigArea({
         {icon("information")}
       </TransparentButton>
 
-      <dialog
-        className={clsx(
-          "transition-[box-shadow,opacity,visibility] [&:not([open])]:opacity-0",
-          "text-inherit bg-transparent overflow-visible rounded-sm",
-          "open:shadow-screen open:shadow-dark/10 dark:open:shadow-light/20",
-          // override default dialog style
-          "fixed inset-0 p-0 m-0 max-w-full max-h-full backdrop:bg-transparent open:visible [&:not([open])]:invisible [&:not([open])]:block"
-        )}
-        ref={(dialog) => {
-          dialog$.current = dialog
-
-          if (!dialog || dialog.open || dialog.dataset.used === "true") return
-
-          dialog.dataset.used = "true"
-          dialog.showModal()
-
-          const infoButton = infoButton$.current
-          if (!infoButton) return
-
-          const { top, left, width, height } =
-            infoButton.getBoundingClientRect()
-
-          dialog.style.top = `${top}px`
-          dialog.style.left = `${left}px`
-          dialog.style.width = `${width}px`
-          dialog.style.height = `${height}px`
-        }}
-        onClick={() => {
-          dialog$.current?.close()
-        }}
-      >
-        <article
+      {!isTutorialDone && (
+        <dialog
           className={clsx(
-            "max-w-prose overscroll-contain rounded border px-6 py-4 pt-8",
-            "text-dark/90 dark:text-light/90",
-            "prose prose-headings:text-dark/70 prose-a:text-azure-700 dark:prose-headings:text-light/70 dark:prose-a:text-azure-300",
-            "w-80 absolute right-0 bottom-0 translate-x-14 -translate-y-14",
-            "border-gray-500 before:border-t-gray-500 bg-light after:border-t-light dark:bg-dark dark:after:border-t-dark",
-            "before:border-8 before:left-3/4 before:bottom-0 before:translate-y-full before:-translate-x-1/2 before:content-[''] before:border-transparent before:absolute",
-            "after:border-[6.5px] after:left-3/4 after:bottom-0 after:translate-y-full after:-translate-x-1/2 after:content-[''] after:border-transparent after:absolute"
+            "transition-[box-shadow,opacity,visibility] [&:not([open])]:opacity-0",
+            "text-inherit bg-transparent overflow-visible rounded-sm",
+            "open:shadow-screen open:shadow-dark/10 dark:open:shadow-light/20",
+            // override default dialog style
+            "fixed inset-0 p-0 m-0 max-w-full max-h-full backdrop:bg-transparent open:visible [&:not([open])]:invisible [&:not([open])]:block"
           )}
-          onClick={(e) => {
-            e.stopPropagation()
-          }}
-        >
-          <p>タイマーを共有したり新しくつくったりするには、ここをタップ！</p>
+          ref={(dialog) => {
+            dialog$.current = dialog
 
-          <p className="text-right">
-            <TransparentButton
-              className="px-4 py-1"
-              onClick={() => {
-                dialog$.current?.close()
-              }}
-            >
-              OK
-            </TransparentButton>
-          </p>
-        </article>
-      </dialog>
+            if (!dialog || dialog.open || dialog.dataset.used === "true") return
+
+            dialog.dataset.used = "true"
+            dialog.showModal()
+
+            const infoButton = infoButton$.current
+            if (!infoButton) return
+
+            const { top, left, width, height } =
+              infoButton.getBoundingClientRect()
+
+            dialog.style.top = `${top}px`
+            dialog.style.left = `${left}px`
+            dialog.style.width = `${width}px`
+            dialog.style.height = `${height}px`
+          }}
+          onClick={doneTutorial}
+        >
+          <article
+            className={clsx(
+              "max-w-prose overscroll-contain rounded border px-6 py-4 pt-8",
+              "text-dark/90 dark:text-light/90",
+              "prose prose-headings:text-dark/70 prose-a:text-azure-700 dark:prose-headings:text-light/70 dark:prose-a:text-azure-300",
+              "w-80 absolute right-0 bottom-0 translate-x-14 -translate-y-14",
+              "border-gray-500 before:border-t-gray-500 bg-light after:border-t-light dark:bg-dark dark:after:border-t-dark",
+              "before:border-8 before:left-3/4 before:bottom-0 before:translate-y-full before:-translate-x-1/2 before:content-[''] before:border-transparent before:absolute",
+              "after:border-[6.5px] after:left-3/4 after:bottom-0 after:translate-y-full after:-translate-x-1/2 after:content-[''] after:border-transparent after:absolute"
+            )}
+            onClick={(e) => {
+              e.stopPropagation()
+            }}
+          >
+            <p>タイマーを共有したり新しくつくったりするには、ここをタップ！</p>
+
+            <p className="text-right">
+              <TransparentButton className="px-4 py-1" onClick={doneTutorial}>
+                OK
+              </TransparentButton>
+            </p>
+          </article>
+        </dialog>
+      )}
     </div>
   )
 }
