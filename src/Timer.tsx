@@ -212,18 +212,19 @@ function ConfigArea({
         ref={(dialog) => {
           dialog$.current = dialog
 
-          if (dialog && !dialog.open) {
-            dialog.showModal()
+          if (!dialog || dialog.open || dialog.dataset.used === "true") return
 
-            const inner = dialog.firstElementChild
-            const infoButton = infoButton$.current
-            if (!(inner instanceof HTMLElement) || !infoButton) return
+          dialog.dataset.used = "true"
+          dialog.showModal()
 
-            const { top, left, width } = infoButton.getBoundingClientRect()
-            inner.style.top = `${top}px`
-            inner.style.left = `${left + width / 2}px`
-            inner.style.transform = "translate(-50%, -100%)"
-          }
+          const inner = dialog.firstElementChild
+          const infoButton = infoButton$.current
+          if (!(inner instanceof HTMLElement) || !infoButton) return
+
+          const { top, left, width } = infoButton.getBoundingClientRect()
+          inner.style.top = `${top}px`
+          inner.style.left = `${left + width / 2}px`
+          inner.style.transform = "translate(-50%, -100%)"
         }}
         onClick={() => {
           dialog$.current?.close()
