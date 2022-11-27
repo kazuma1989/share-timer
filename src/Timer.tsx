@@ -164,6 +164,9 @@ function ConfigArea({
   const config = useObservable(useConfig())
   const permission = useObservable(useMediaPermission(), "denied")
 
+  const dialog$ = useRef<HTMLDialogElement | null>(null)
+  const infoButton$ = useRef<HTMLButtonElement>(null)
+
   return (
     <div className={className}>
       <TransparentButton
@@ -191,12 +194,64 @@ function ConfigArea({
       </TransparentButton>
 
       <TransparentButton
+        innerRef={infoButton$}
         title="情報を開く"
         className="h-12 w-12 text-2xl"
         onClick={onInfoClick}
       >
         {icon("information")}
       </TransparentButton>
+
+      <dialog
+        className={clsx(
+          "transition-[opacity,visibility] [&:not([open])]:opacity-0",
+          "w-full h-full text-inherit bg-dark/10 dark:bg-light/20",
+          // override default dialog style
+          "fixed inset-0 p-0 max-w-full max-h-full backdrop:bg-transparent open:visible [&:not([open])]:invisible [&:not([open])]:block"
+        )}
+        ref={(dialog) => {
+          dialog$.current = dialog
+
+          if (dialog && !dialog.open) {
+            dialog.showModal()
+
+            const inner = dialog.firstElementChild
+            const infoButton = infoButton$.current
+            if (!(inner instanceof HTMLElement) || !infoButton) return
+
+            const { top, left, width } = infoButton.getBoundingClientRect()
+            inner.style.top = `${top}px`
+            inner.style.left = `${left + width / 2}px`
+            inner.style.transform = "translate(-50%, -100%)"
+          }
+        }}
+        onClick={() => {
+          dialog$.current?.close()
+        }}
+      >
+        <article
+          className={clsx(
+            "max-w-prose overscroll-contain rounded border",
+            "border-gray-500 bg-light dark:bg-dark",
+            "p-8 absolute",
+            "before:border-8 before:border-t-gray-500 before:translate-y-full before:-translate-x-1/2 before:content-[''] before:border-transparent before:absolute before:left-1/2 before:bottom-0",
+            "after:border-[6.5px] after:border-t-light after:dark:border-t-dark after:translate-y-full after:-translate-x-1/2 after:content-[''] after:border-transparent after:absolute after:left-1/2 after:bottom-0"
+          )}
+          onClick={(e) => {
+            e.stopPropagation()
+          }}
+        >
+          hello
+          <TransparentButton
+            className="w-full border border-gray-500 block px-4 py-3"
+            onClick={() => {
+              dialog$.current?.close()
+            }}
+          >
+            OK!
+          </TransparentButton>
+        </article>
+      </dialog>
     </div>
   )
 }
