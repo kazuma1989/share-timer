@@ -204,8 +204,8 @@ function ConfigArea({
 
       <dialog
         className={clsx(
-          "transition-[opacity,visibility] [&:not([open])]:opacity-0",
-          "text-inherit bg-transparent overflow-visible",
+          "transition-[box-shadow,opacity,visibility] [&:not([open])]:opacity-0",
+          "text-inherit bg-transparent overflow-visible rounded-sm",
           "open:shadow-screen open:shadow-dark/10 dark:open:shadow-light/20",
           // override default dialog style
           "fixed inset-0 p-0 m-0 max-w-full max-h-full backdrop:bg-transparent open:visible [&:not([open])]:invisible [&:not([open])]:block"
@@ -235,26 +235,30 @@ function ConfigArea({
       >
         <article
           className={clsx(
-            "max-w-prose overscroll-contain rounded border p-8",
+            "max-w-prose overscroll-contain rounded border px-6 py-4 pt-8",
+            "text-dark/90 dark:text-light/90",
+            "prose prose-headings:text-dark/70 prose-a:text-azure-700 dark:prose-headings:text-light/70 dark:prose-a:text-azure-300",
             "w-80 absolute right-0 bottom-0 translate-x-14 -translate-y-14",
-            "border-gray-500 bg-light dark:bg-dark",
-            "before:border-8 before:border-t-gray-500 before:left-3/4 before:bottom-0 before:translate-y-full before:-translate-x-1/2 before:content-[''] before:border-transparent before:absolute",
-            "after:border-[6.5px] after:border-t-light after:dark:border-t-dark after:left-3/4 after:bottom-0 after:translate-y-full after:-translate-x-1/2 after:content-[''] after:border-transparent after:absolute"
+            "border-gray-500 before:border-t-gray-500 bg-light after:border-t-light dark:bg-dark dark:after:border-t-dark",
+            "before:border-8 before:left-3/4 before:bottom-0 before:translate-y-full before:-translate-x-1/2 before:content-[''] before:border-transparent before:absolute",
+            "after:border-[6.5px] after:left-3/4 after:bottom-0 after:translate-y-full after:-translate-x-1/2 after:content-[''] after:border-transparent after:absolute"
           )}
           onClick={(e) => {
             e.stopPropagation()
           }}
         >
-          <p>使い方はこちら</p>
+          <p>タイマーを共有したり新しくつくったりするには、ここをタップ！</p>
 
-          <TransparentButton
-            className="w-full border border-gray-500 block px-4 py-3"
-            onClick={() => {
-              dialog$.current?.close()
-            }}
-          >
-            OK!
-          </TransparentButton>
+          <p className="text-right">
+            <TransparentButton
+              className="px-4 py-1"
+              onClick={() => {
+                dialog$.current?.close()
+              }}
+            >
+              OK
+            </TransparentButton>
+          </p>
         </article>
       </dialog>
     </div>
