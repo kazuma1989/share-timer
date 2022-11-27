@@ -152,12 +152,12 @@ function useObserver(): [
   return [
     observer,
     (root, onIntersecting, options) => {
-      setObserver((io) => {
-        if (io?.root && io.root === root) {
-          return io
+      setObserver((observer) => {
+        if (observer?.root && observer.root === root) {
+          return observer
         }
 
-        io?.disconnect()
+        observer?.disconnect()
 
         return new IntersectionObserver(
           (entries) => {
