@@ -14,6 +14,7 @@ import smallAlert from "./sound/small-alert.mp3"
 import { getItem, setItem } from "./storage"
 import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
 import { DarkModeProvider, observeDarkMode } from "./useDarkMode"
+import { VideoProvider } from "./useVideo"
 import { nanoid } from "./util/nanoid"
 
 // https://neos21.net/blog/2018/08/19-01.html
@@ -29,7 +30,7 @@ if (!getItem("userId")) {
   setItem("userId", nanoid(10))
 }
 
-const root = document.getElementById("root")!
+const video = document.createElement("video")
 
 const darkMode$ = observeDarkMode()
 
@@ -41,19 +42,21 @@ const audio = createAudio(context, audioData)
 
 const route$ = observeHash()
 
-createRoot(root).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <FirestoreImplProvider firestore={firestore}>
       <ErrorBoundary fallback={<FullViewportOops />}>
-        <DarkModeProvider value={darkMode$}>
-          <AudioProvider value={audio}>
-            <MediaPermissionProvider value={permission$}>
-              <Suspense fallback={<FullViewportProgress />}>
-                <App route$={route$} />
-              </Suspense>
-            </MediaPermissionProvider>
-          </AudioProvider>
-        </DarkModeProvider>
+        <VideoProvider value={video}>
+          <DarkModeProvider value={darkMode$}>
+            <AudioProvider value={audio}>
+              <MediaPermissionProvider value={permission$}>
+                <Suspense fallback={<FullViewportProgress />}>
+                  <App route$={route$} />
+                </Suspense>
+              </MediaPermissionProvider>
+            </AudioProvider>
+          </DarkModeProvider>
+        </VideoProvider>
       </ErrorBoundary>
     </FirestoreImplProvider>
   </StrictMode>

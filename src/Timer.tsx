@@ -62,7 +62,7 @@ export function Timer({
         >
           <div className="grid place-items-center tabular-nums">
             {!locked && state.mode === "editing" ? (
-              <div className="w-[512px] max-w-[100vw] aspect-video grid place-items-center">
+              <div className="w-[512px] max-w-[100vw] aspect-video grid place-items-center touch-pinch-zoom">
                 <DurationSelect
                   key={state.mode + state.initialDuration}
                   innerRef={durationSelect$}
