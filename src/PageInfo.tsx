@@ -74,7 +74,7 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
 
         <p>
           <TransparentButton
-            className={clsx("w-full border border-gray-500 block px-4 py-3")}
+            className="w-full border border-gray-500 block px-4 py-3"
             onClick={async () => {
               const userId = getItem("userId")
               if (!userId) return
