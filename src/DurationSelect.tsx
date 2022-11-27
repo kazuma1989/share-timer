@@ -25,14 +25,20 @@ export function DurationSelect({
     []
   )
 
+  const wrapperStyle = clsx(
+    "after:content-[attr(data-label)] after:pointer-events-none after:text-lg after:inline-block",
+    "after:w-12 after:pr-2 after:text-right"
+  )
+
   const selectStyle = clsx(
     "cursor-pointer rounded-md transition-colors",
-    "bg-light hover:bg-dark/10 dark:bg-dark dark:hover:bg-light/20"
+    "hover:bg-dark/10 dark:hover:bg-light/20",
+    "text-3xl pr-14 -mr-12"
   )
 
   return (
-    <span className={clsx("inline-flex gap-4 text-3xl", className)}>
-      <span>
+    <span className={clsx("inline-flex gap-2", className)}>
+      <span className={wrapperStyle} data-label="時間">
         <Select
           defaultValue={defaultDuration.hours}
           length={24}
@@ -41,10 +47,9 @@ export function DurationSelect({
             duration$.current.hours = Number(value)
           }}
         />
-        &nbsp;時間
       </span>
 
-      <span>
+      <span className={wrapperStyle} data-label="分">
         <Select
           defaultValue={defaultDuration.minutes}
           length={60}
@@ -53,10 +58,9 @@ export function DurationSelect({
             duration$.current.minutes = Number(value)
           }}
         />
-        &nbsp;分
       </span>
 
-      <span>
+      <span className={wrapperStyle} data-label="秒">
         <Select
           defaultValue={defaultDuration.seconds}
           length={60}
@@ -65,7 +69,6 @@ export function DurationSelect({
             duration$.current.seconds = Number(value)
           }}
         />
-        &nbsp;秒
       </span>
     </span>
   )
