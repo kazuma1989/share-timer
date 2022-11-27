@@ -218,9 +218,8 @@ function ConfigArea({
           dialog.dataset.used = "true"
           dialog.showModal()
 
-          const inner = dialog.firstElementChild
           const infoButton = infoButton$.current
-          if (!(inner instanceof HTMLElement) || !infoButton) return
+          if (!infoButton) return
 
           const { top, left, width, height } =
             infoButton.getBoundingClientRect()
@@ -229,8 +228,6 @@ function ConfigArea({
           dialog.style.left = `${left}px`
           dialog.style.width = `${width}px`
           dialog.style.height = `${height}px`
-
-          inner.style.transform = "translate(-50%, -100%)"
         }}
         onClick={() => {
           dialog$.current?.close()
@@ -238,9 +235,9 @@ function ConfigArea({
       >
         <article
           className={clsx(
-            "max-w-prose overscroll-contain rounded border",
+            "max-w-prose overscroll-contain rounded border p-8",
+            "w-80 absolute right-0 bottom-0 translate-x-14 -translate-y-14",
             "border-gray-500 bg-light dark:bg-dark",
-            "p-8 absolute",
             "before:border-8 before:border-t-gray-500 before:left-3/4 before:bottom-0 before:translate-y-full before:-translate-x-1/2 before:content-[''] before:border-transparent before:absolute",
             "after:border-[6.5px] after:border-t-light after:dark:border-t-dark after:left-3/4 after:bottom-0 after:translate-y-full after:-translate-x-1/2 after:content-[''] after:border-transparent after:absolute"
           )}
@@ -248,7 +245,8 @@ function ConfigArea({
             e.stopPropagation()
           }}
         >
-          hello
+          <p>使い方はこちら</p>
+
           <TransparentButton
             className="w-full border border-gray-500 block px-4 py-3"
             onClick={() => {
