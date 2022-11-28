@@ -43,6 +43,7 @@
     "firebase": "9.13.x",
     "firebase-tools": "11.16.x",
     "postcss": "8.4.x",
+    "qrcode-generator": "1.4.x",
     "react": "18.2.x",
     "react-dom": "18.2.x",
     "rxjs": "7.5.x",
