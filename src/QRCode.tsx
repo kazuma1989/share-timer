@@ -1,14 +1,12 @@
 import clsx from "clsx"
-import { useObservable } from "./useObservable"
-import { createCache } from "./util/createCache"
+import qrcode from "qrcode-generator"
 
 export function QRCode({
   data,
   className,
   ...props
 }: { data: string } & JSX.IntrinsicElements["svg"]) {
-  const qr$ = hardCache(data, () => qrcode(data))
-  const { size, d } = useObservable(qr$)
+  const { size, d } = qrToSVG(data)
 
   return (
     <svg
@@ -21,14 +19,10 @@ export function QRCode({
   )
 }
 
-const hardCache = createCache(true)
-
-async function qrcode(data: string): Promise<{
+function qrToSVG(data: string): {
   size: number
   d: string
-}> {
-  const { default: qrcode } = await import("qrcode-generator")
-
+} {
   const typeAuto = 0
   const qr = qrcode(typeAuto, "M")
   qr.addData(data)
