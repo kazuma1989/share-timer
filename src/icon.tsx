@@ -1,3 +1,4 @@
+import clsx from "clsx"
 import icons from "./icon.json"
 
 /**
@@ -5,11 +6,14 @@ import icons from "./icon.json"
  */
 export function icon(
   name: keyof typeof icons,
-  props?: JSX.IntrinsicElements["svg"]
+  { className, ...props }: JSX.IntrinsicElements["svg"] = {}
 ) {
   return (
     <svg
-      className="inline-block h-[1em] w-[1em] align-[-0.15em]"
+      className={clsx(
+        "inline-block h-[1em] w-[1em] align-[-0.15em]",
+        className
+      )}
       viewBox="0 0 24 24"
       {...props}
     >

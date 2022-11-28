@@ -1,12 +1,16 @@
+import { lazy } from "react"
 import { Observable } from "rxjs"
 import { replaceHash } from "./observeHash"
-import { PageInfo } from "./PageInfo"
 import { PageRoom } from "./PageRoom"
 import { SetupRoom } from "./SetupRoom"
 import { Route } from "./toRoute"
 import { useObservable } from "./useObservable"
 import { suspend } from "./util/suspend"
 import { newRoomId } from "./zod/roomZod"
+
+const PageInfo = lazy(() =>
+  import("./PageInfo").then((_) => ({ default: _.PageInfo }))
+)
 
 export function App(props: { route$: Observable<Route> }) {
   return (

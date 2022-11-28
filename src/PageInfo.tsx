@@ -1,6 +1,7 @@
 import clsx from "clsx"
 import { icon } from "./icon"
 import { setHash } from "./observeHash"
+import { QRCode } from "./QRCode"
 import { getItem } from "./storage"
 import { fromRoute } from "./toRoute"
 import { TransparentButton } from "./TransparentButton"
@@ -44,11 +45,17 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
 
         <p>URL でタイマーを簡単共有！</p>
 
-        <p>
-          このタイマーの URL
-          <br />
+        <p className="text-center">
           <a href={roomURL} className="break-words">
-            {roomURL}
+            <QRCode
+              data={roomURL}
+              width={160}
+              height={160}
+              className="inline-block mb-2"
+            />
+            <br />
+
+            <span>{roomURL}</span>
           </a>
         </p>
 
