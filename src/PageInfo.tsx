@@ -136,27 +136,58 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
 }
 
 function QRCode() {
-  const svgHTML = useObservable(x$)
+  const { size, d } = useObservable(qr$)
 
   return (
-    <div
-      dangerouslySetInnerHTML={{
-        __html: svgHTML,
-      }}
-    ></div>
+    <svg
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+      width="240px"
+      height="240px"
+      viewBox={`0 0 ${size} ${size}`}
+      preserveAspectRatio="xMinYMin meet"
+    >
+      <rect width="100%" height="100%" fill="white" cx="0" cy="0"></rect>
+      <path d={d} stroke="transparent" fill="black"></path>
+    </svg>
   )
 }
 
-async function x(data: string): Promise<string> {
+async function qrcode(data: string): Promise<{
+  size: number
+  d: string
+}> {
   const { default: qrcode } = await import("qrcode-generator")
 
-  const autoDetectTypeNumber = 0
-  const qr = qrcode(autoDetectTypeNumber, "M")
-
+  const autoDetect = 0
+  const qr = qrcode(autoDetect, "M")
   qr.addData(data)
   qr.make()
 
-  return qr.createSvgTag()
+  const moduleCount = qr.getModuleCount()
+  const cellSize = 2
+  const margin = cellSize * 4
+
+  const rect = `l${cellSize},0 0,${cellSize} -${cellSize},0 0,-${cellSize}z `
+
+  let d = ""
+  for (let row = 0; row < moduleCount; row += 1) {
+    const mr = row * cellSize + margin
+
+    for (let col = 0; col < moduleCount; col += 1) {
+      if (qr.isDark(row, col)) {
+        const mc = col * cellSize + margin
+        d += `M${mc},${mr}${rect}`
+      }
+    }
+  }
+
+  const size = moduleCount * cellSize + margin * 2
+
+  return {
+    size,
+    d,
+  }
 }
 
-const x$ = x("http://192.168.11.27:3000/#dmf-rjhn-yvu")
+const qr$ = qrcode("http://192.168.11.27:3000/#dmf-rjhn-yvu")
