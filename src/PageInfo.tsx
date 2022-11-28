@@ -1,11 +1,11 @@
 import clsx from "clsx"
 import { icon } from "./icon"
 import { setHash } from "./observeHash"
+import { QRCode } from "./QRCode"
 import { getItem } from "./storage"
 import { fromRoute } from "./toRoute"
 import { TransparentButton } from "./TransparentButton"
 import { AbortReason, useLockRoom } from "./useLockRoom"
-import { useObservable } from "./useObservable"
 import { Room } from "./zod/roomZod"
 
 export function PageInfo({ roomId }: { roomId: Room["id"] }) {
@@ -45,7 +45,9 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
 
         <p>URL でタイマーを簡単共有！</p>
 
-        <QRCode />
+        <p>
+          <QRCode data={roomURL} />
+        </p>
 
         <p>
           このタイマーの URL
@@ -134,46 +136,3 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
     </article>
   )
 }
-
-function QRCode() {
-  const { size, d } = useObservable(qr$)
-
-  return (
-    <svg className="bg-white text-black" viewBox={`0 0 ${size} ${size}`}>
-      <path stroke="transparent" fill="currentColor" d={d} />
-    </svg>
-  )
-}
-
-async function qrcode(data: string): Promise<{
-  size: number
-  d: string
-}> {
-  const { default: qrcode } = await import("qrcode-generator")
-
-  const typeAuto = 0
-  const qr = qrcode(typeAuto, "M")
-  qr.addData(data)
-  qr.make()
-
-  const count = qr.getModuleCount()
-  const margin = 1
-
-  const size = margin + count + margin
-
-  let d = ""
-  for (let row = 0; row < count; row += 1) {
-    for (let col = 0; col < count; col += 1) {
-      if (qr.isDark(row, col)) {
-        d += `M${margin + col},${margin + row}l1,0 0,1 -1,0 0,-1z `
-      }
-    }
-  }
-
-  return {
-    size,
-    d,
-  }
-}
-
-const qr$ = qrcode("http://192.168.11.27:3000/#dmf-rjhn-yvu")
