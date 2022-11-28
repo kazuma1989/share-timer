@@ -45,15 +45,17 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
 
         <p>URL でタイマーを簡単共有！</p>
 
-        <p>
-          <QRCode data={roomURL} />
-        </p>
-
-        <p>
-          このタイマーの URL
-          <br />
+        <p className="text-center">
           <a href={roomURL} className="break-words">
-            {roomURL}
+            <QRCode
+              data={roomURL}
+              width={160}
+              height={160}
+              className="inline-block mb-2"
+            />
+            <br />
+
+            <span>{roomURL}</span>
           </a>
         </p>
 
