@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import { serverTimestamp } from "firebase/firestore"
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
 import { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
@@ -173,6 +173,29 @@ function ConfigArea({
     setItem("tutorial", "done")
   }
 
+  useEffect(() => {
+    if (isTutorialDone) return
+
+    const resize = new ResizeObserver(() => {
+      const dialog = dialog$.current
+      const infoButton = infoButton$.current
+      if (!dialog || !infoButton) return
+
+      const { top, left, width, height } = infoButton.getBoundingClientRect()
+
+      dialog.style.top = `${top}px`
+      dialog.style.left = `${left}px`
+      dialog.style.width = `${width}px`
+      dialog.style.height = `${height}px`
+    })
+
+    resize.observe(document.body)
+
+    return () => {
+      resize.disconnect()
+    }
+  }, [isTutorialDone])
+
   return (
     <div className={className}>
       <TransparentButton
@@ -224,17 +247,6 @@ function ConfigArea({
 
             dialog.dataset.used = "true"
             dialog.showModal()
-
-            const infoButton = infoButton$.current
-            if (!infoButton) return
-
-            const { top, left, width, height } =
-              infoButton.getBoundingClientRect()
-
-            dialog.style.top = `${top}px`
-            dialog.style.left = `${left}px`
-            dialog.style.width = `${width}px`
-            dialog.style.height = `${height}px`
           }}
           onClick={doneTutorial}
         >
