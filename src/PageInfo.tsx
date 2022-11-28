@@ -5,6 +5,7 @@ import { getItem } from "./storage"
 import { fromRoute } from "./toRoute"
 import { TransparentButton } from "./TransparentButton"
 import { AbortReason, useLockRoom } from "./useLockRoom"
+import { useObservable } from "./useObservable"
 import { Room } from "./zod/roomZod"
 
 export function PageInfo({ roomId }: { roomId: Room["id"] }) {
@@ -43,6 +44,8 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
         </h1>
 
         <p>URL でタイマーを簡単共有！</p>
+
+        <QRCode />
 
         <p>
           このタイマーの URL
@@ -131,3 +134,29 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
     </article>
   )
 }
+
+function QRCode() {
+  const svgHTML = useObservable(x$)
+
+  return (
+    <div
+      dangerouslySetInnerHTML={{
+        __html: svgHTML,
+      }}
+    ></div>
+  )
+}
+
+async function x(data: string): Promise<string> {
+  const { default: qrcode } = await import("qrcode-generator")
+
+  const autoDetectTypeNumber = 0
+  const qr = qrcode(autoDetectTypeNumber, "M")
+
+  qr.addData(data)
+  qr.make()
+
+  return qr.createSvgTag()
+}
+
+const x$ = x("http://192.168.11.27:3000/#dmf-rjhn-yvu")
