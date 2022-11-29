@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import { Ref, useImperativeHandle, useRef, useState } from "react"
+import { Ref, useId, useImperativeHandle, useRef, useState } from "react"
 import { parseDuration } from "./util/parseDuration"
 
 export function DurationSelect({
@@ -91,33 +91,43 @@ function Select({
 
   const [currentValue, setCurrentValue] = useState<number>()
 
+  const _id = useId()
+  const id = (value: number) => `${_id}-${value}`
+
   return (
     <span
-      ref={(root) => {
-        if (!root) return
+      role="listbox"
+      aria-activedescendant={
+        currentValue === undefined ? undefined : id(currentValue)
+      }
+      tabIndex={1}
+      className={clsx(
+        "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
+        "px-4 h-[calc(36px+6rem)] [&>:first-child]:mt-12 [&>:last-child]:mb-12",
+        className
+      )}
+      ref={(listbox) => {
+        if (!listbox) return
 
         createObserver(
-          root,
-          (e) => {
-            setCurrentValue(Number(e.dataset.value))
+          listbox,
+          (option) => {
+            setCurrentValue(Number(option.dataset.value))
 
-            onChange?.(e.dataset.value)
+            onChange?.(option.dataset.value)
           },
           {
             rootMargin: "-32px 0px",
           }
         )
       }}
-      className={clsx(
-        "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
-        "px-4 h-[calc(36px+6rem)] [&>:first-child]:mt-12 [&>:last-child]:mb-12",
-        className
-      )}
     >
       {Array.from(Array(length).keys()).map((value) => (
         <span
+          id={id(value)}
+          role="option"
           data-value={value}
-          aria-selected={value === currentValue ? "true" : undefined}
+          aria-selected={value === currentValue}
           className="text-right aria-selected:opacity-100 opacity-25 aria-selected:font-normal font-thin"
           key={value}
           ref={(e) => {
