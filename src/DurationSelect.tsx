@@ -44,7 +44,7 @@ export function DurationSelect({
           length={24}
           className={selectStyle}
           onChange={(value) => {
-            duration$.current.hours = Number(value)
+            duration$.current.hours = value
           }}
         />
       </span>
@@ -55,7 +55,7 @@ export function DurationSelect({
           length={60}
           className={selectStyle}
           onChange={(value) => {
-            duration$.current.minutes = Number(value)
+            duration$.current.minutes = value
           }}
         />
       </span>
@@ -66,7 +66,7 @@ export function DurationSelect({
           length={60}
           className={selectStyle}
           onChange={(value) => {
-            duration$.current.seconds = Number(value)
+            duration$.current.seconds = value
           }}
         />
       </span>
@@ -82,14 +82,17 @@ function Select({
 }: {
   defaultValue?: number
   length?: number
-  onChange?(value: string | undefined): void
+  onChange?(value: number): void
   className?: string
 }) {
+  const onChange$ = useRef(onChange)
+  onChange$.current = onChange
+
+  const [currentValue, setCurrentValue] = useState<number>()
+
   const [observer, createObserver] = useObserver()
 
   const scrollCalled$ = useRef(false)
-
-  const [currentValue, setCurrentValue] = useState<number>()
 
   const _id = useId()
   const id = (value: number) => `${_id}-${value}`
@@ -112,9 +115,10 @@ function Select({
         createObserver(
           listbox,
           (option) => {
-            setCurrentValue(Number(option.dataset.value))
+            const value = Number(option.dataset.value)
 
-            onChange?.(option.dataset.value)
+            setCurrentValue(value)
+            onChange$.current?.(value)
           },
           {
             rootMargin: "-32px 0px",
@@ -124,19 +128,19 @@ function Select({
     >
       {Array.from(Array(length).keys()).map((value) => (
         <span
+          key={value}
           id={id(value)}
           role="option"
-          data-value={value}
           aria-selected={value === currentValue}
+          data-value={value}
           className="text-right aria-selected:opacity-100 opacity-25 aria-selected:font-normal font-thin"
-          key={value}
-          ref={(e) => {
-            if (!e) return
+          ref={(option) => {
+            if (!option) return
 
-            observer?.observe(e)
+            observer?.observe(option)
 
             if (value === defaultValue && !scrollCalled$.current) {
-              e.scrollIntoView({ block: "center" })
+              option.scrollIntoView({ block: "center" })
 
               scrollCalled$.current = true
             }
