@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import { serverTimestamp } from "firebase/firestore"
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
 import { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
@@ -164,7 +164,7 @@ function ConfigArea({
   const config = useObservable(useConfig())
   const permission = useObservable(useMediaPermission(), "denied")
 
-  const dialog$ = useRef<HTMLDialogElement | null>(null)
+  const dialog$ = useRef<HTMLDialogElement>(null)
   const infoButton$ = useRef<HTMLButtonElement>(null)
 
   const isTutorialDone = getItem("tutorial") === "done"
@@ -172,6 +172,9 @@ function ConfigArea({
     dialog$.current?.close()
     setItem("tutorial", "done")
   }
+
+  useShowDialogOnce(dialog$, isTutorialDone)
+  usePlaceDialog(dialog$, infoButton$, isTutorialDone)
 
   return (
     <div className={className}>
@@ -210,6 +213,7 @@ function ConfigArea({
 
       {!isTutorialDone && (
         <dialog
+          ref={dialog$}
           className={clsx(
             "transition-[box-shadow,opacity,visibility] [&:not([open])]:opacity-0",
             "text-inherit bg-transparent overflow-visible rounded-sm",
@@ -217,25 +221,6 @@ function ConfigArea({
             // override default dialog style
             "fixed inset-0 p-0 m-0 max-w-full max-h-full backdrop:bg-transparent open:visible [&:not([open])]:invisible [&:not([open])]:block"
           )}
-          ref={(dialog) => {
-            dialog$.current = dialog
-
-            if (!dialog || dialog.open || dialog.dataset.used === "true") return
-
-            dialog.dataset.used = "true"
-            dialog.showModal()
-
-            const infoButton = infoButton$.current
-            if (!infoButton) return
-
-            const { top, left, width, height } =
-              infoButton.getBoundingClientRect()
-
-            dialog.style.top = `${top}px`
-            dialog.style.left = `${left}px`
-            dialog.style.width = `${width}px`
-            dialog.style.height = `${height}px`
-          }}
           onClick={doneTutorial}
         >
           <article
@@ -265,3 +250,49 @@ function ConfigArea({
     </div>
   )
 }
+
+function useShowDialogOnce(
+  dialog$: { current: HTMLDialogElement | null },
+  disabled?: boolean
+): void {
+  useEffect(() => {
+    if (disabled) return
+
+    const dialog = dialog$.current
+    if (!dialog || dialog.open || dialogUsed.has(dialog)) return
+
+    dialog.showModal()
+    dialogUsed.add(dialog)
+  }, [dialog$, disabled])
+}
+
+function usePlaceDialog(
+  dialog$: { current: HTMLDialogElement | null },
+  target$: { current: HTMLElement | null },
+  disabled?: boolean
+): void {
+  useEffect(() => {
+    if (disabled) return
+
+    const resize = new ResizeObserver(() => {
+      const dialog = dialog$.current
+      const target = target$.current
+      if (!dialog || !target) return
+
+      const { top, left, width, height } = target.getBoundingClientRect()
+
+      dialog.style.top = `${top}px`
+      dialog.style.left = `${left}px`
+      dialog.style.width = `${width}px`
+      dialog.style.height = `${height}px`
+    })
+
+    resize.observe(document.body)
+
+    return () => {
+      resize.disconnect()
+    }
+  }, [dialog$, disabled, target$])
+}
+
+const dialogUsed = new WeakSet<HTMLDialogElement>()

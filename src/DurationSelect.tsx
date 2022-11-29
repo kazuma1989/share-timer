@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import { Ref, useImperativeHandle, useRef, useState } from "react"
+import { Ref, useId, useImperativeHandle, useRef, useState } from "react"
 import { parseDuration } from "./util/parseDuration"
 
 export function DurationSelect({
@@ -44,7 +44,7 @@ export function DurationSelect({
           length={24}
           className={selectStyle}
           onChange={(value) => {
-            duration$.current.hours = Number(value)
+            duration$.current.hours = value
           }}
         />
       </span>
@@ -55,7 +55,7 @@ export function DurationSelect({
           length={60}
           className={selectStyle}
           onChange={(value) => {
-            duration$.current.minutes = Number(value)
+            duration$.current.minutes = value
           }}
         />
       </span>
@@ -66,7 +66,7 @@ export function DurationSelect({
           length={60}
           className={selectStyle}
           onChange={(value) => {
-            duration$.current.seconds = Number(value)
+            duration$.current.seconds = value
           }}
         />
       </span>
@@ -82,51 +82,65 @@ function Select({
 }: {
   defaultValue?: number
   length?: number
-  onChange?(value: string | undefined): void
+  onChange?(value: number): void
   className?: string
 }) {
+  const onChange$ = useRef(onChange)
+  onChange$.current = onChange
+
+  const [currentValue, setCurrentValue] = useState<number>()
+
   const [observer, createObserver] = useObserver()
 
   const scrollCalled$ = useRef(false)
 
-  const [currentValue, setCurrentValue] = useState<number>()
+  const _id = useId()
+  const id = (value: number) => `${_id}-${value}`
 
   return (
     <span
-      ref={(root) => {
-        if (!root) return
+      role="listbox"
+      aria-activedescendant={
+        currentValue === undefined ? undefined : id(currentValue)
+      }
+      tabIndex={1}
+      className={clsx(
+        "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
+        "px-4 h-[calc(36px+6rem)] [&>:first-child]:mt-12 [&>:last-child]:mb-12",
+        className
+      )}
+      ref={(listbox) => {
+        if (!listbox) return
 
         createObserver(
-          root,
-          (e) => {
-            setCurrentValue(Number(e.dataset.value))
+          listbox,
+          (option) => {
+            const value = Number(option.dataset.value)
 
-            onChange?.(e.dataset.value)
+            setCurrentValue(value)
+            onChange$.current?.(value)
           },
           {
             rootMargin: "-32px 0px",
           }
         )
       }}
-      className={clsx(
-        "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
-        "px-4 h-[calc(36px+6rem)] [&>:first-child]:mt-12 [&>:last-child]:mb-12",
-        className
-      )}
     >
       {Array.from(Array(length).keys()).map((value) => (
         <span
-          data-value={value}
-          aria-selected={value === currentValue ? "true" : undefined}
-          className="text-right aria-selected:opacity-100 opacity-25 aria-selected:font-normal font-thin"
           key={value}
-          ref={(e) => {
-            if (!e) return
+          id={id(value)}
+          role="option"
+          aria-selected={value === currentValue}
+          data-value={value}
+          className="text-right aria-selected:opacity-100 opacity-25 aria-selected:font-normal font-thin"
+          ref={(option) => {
+            if (!option) return
 
-            observer?.observe(e)
+            observer?.observe(option)
 
             if (value === defaultValue && !scrollCalled$.current) {
-              e.scrollIntoView({ block: "center" })
+              option.scrollIntoView({ block: "center" })
 
               scrollCalled$.current = true
             }
