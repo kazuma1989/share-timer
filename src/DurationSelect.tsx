@@ -99,7 +99,7 @@ function Select({
 
   const [observer, createObserver] = useObserver()
 
-  const scrollCalled$ = useRef(false)
+  const defaultValueUsed$ = useRef(false)
 
   return (
     <span
@@ -144,10 +144,10 @@ function Select({
 
             observer?.observe(option)
 
-            if (value === defaultValue && !scrollCalled$.current) {
+            if (value === defaultValue && !defaultValueUsed$.current) {
               option.scrollIntoView({ block: "center" })
 
-              scrollCalled$.current = true
+              defaultValueUsed$.current = true
             }
           }}
         >
