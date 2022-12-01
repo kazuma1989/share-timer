@@ -2,7 +2,6 @@ import clsx from "clsx"
 import {
   Ref,
   useEffect,
-  useId,
   useImperativeHandle,
   useReducer,
   useRef,
@@ -96,21 +95,19 @@ function Select({
   const onChange$ = useRef(onChange)
   onChange$.current = onChange
 
-  const [currentValue, setCurrentValue] = useState<number>()
+  const [valuenow, setValuenow] = useState<number>()
 
   const [observer, createObserver] = useObserver()
 
   const scrollCalled$ = useRef(false)
 
-  const _id = useId()
-  const id = (value: number) => `${_id}-${value}`
-
   return (
     <span
-      role="listbox"
-      aria-activedescendant={
-        currentValue === undefined ? undefined : id(currentValue)
-      }
+      role="slider"
+      aria-orientation="vertical"
+      aria-valuemin={0}
+      aria-valuemax={(length || 1) - 1}
+      aria-valuenow={valuenow}
       tabIndex={1}
       className={clsx(
         "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
@@ -125,7 +122,7 @@ function Select({
           onIntersecting(option) {
             const value = Number(option.dataset.value)
 
-            setCurrentValue(value)
+            setValuenow(value)
             onChange$.current?.(value)
           },
           options: {
@@ -137,11 +134,11 @@ function Select({
       {Array.from(Array(length).keys()).map((value) => (
         <span
           key={value}
-          id={id(value)}
-          role="option"
-          aria-selected={value === currentValue}
           data-value={value}
-          className="text-right aria-selected:opacity-100 opacity-25 aria-selected:font-normal font-thin"
+          className={clsx(
+            "text-right",
+            value !== valuenow && "opacity-25 font-thin"
+          )}
           ref={(option) => {
             if (!option) return
 
