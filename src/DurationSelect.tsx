@@ -37,7 +37,7 @@ export function DurationSelect({
     "after:w-12 after:pr-2 after:text-right"
   )
 
-  const selectStyle = clsx(
+  const sliderStyle = clsx(
     "select-none cursor-pointer rounded-md transition-colors",
     "hover:bg-dark/10 dark:hover:bg-light/20",
     "text-3xl pr-14 -mr-12"
@@ -46,11 +46,11 @@ export function DurationSelect({
   return (
     <span className={clsx("inline-flex gap-2", className)}>
       <span className={wrapperStyle} data-label="時間">
-        <Select
+        <Slider
           label="時間"
           defaultValue={defaultDuration.hours}
-          length={24}
-          className={selectStyle}
+          valueMax={23}
+          className={sliderStyle}
           onChange={(value) => {
             duration$.current.hours = value
           }}
@@ -58,11 +58,11 @@ export function DurationSelect({
       </span>
 
       <span className={wrapperStyle} data-label="分">
-        <Select
+        <Slider
           label="分"
           defaultValue={defaultDuration.minutes}
-          length={60}
-          className={selectStyle}
+          valueMax={59}
+          className={sliderStyle}
           onChange={(value) => {
             duration$.current.minutes = value
           }}
@@ -70,11 +70,11 @@ export function DurationSelect({
       </span>
 
       <span className={wrapperStyle} data-label="秒">
-        <Select
+        <Slider
           label="秒"
           defaultValue={defaultDuration.seconds}
-          length={60}
-          className={selectStyle}
+          valueMax={59}
+          className={sliderStyle}
           onChange={(value) => {
             duration$.current.seconds = value
           }}
@@ -84,23 +84,23 @@ export function DurationSelect({
   )
 }
 
-function Select({
-  label,
+function Slider({
+  label = "",
   defaultValue,
-  length,
+  valueMax = 0,
   onChange,
   className,
 }: {
   label?: string
   defaultValue?: number
-  length?: number
+  valueMax?: number
   onChange?(value: number): void
   className?: string
 }) {
   const onChange$ = useRef(onChange)
   onChange$.current = onChange
 
-  const [valuenow, setValuenow] = useState<number>()
+  const [valueNow, setValueNow] = useState<number>()
 
   const currentOption$ = useRef<HTMLElement>()
 
@@ -113,10 +113,10 @@ function Select({
       role="slider"
       aria-orientation="vertical"
       aria-valuemin={0}
-      aria-valuemax={(length || 1) - 1}
-      aria-valuenow={valuenow}
+      aria-valuemax={valueMax}
+      aria-valuenow={valueNow}
       aria-valuetext={
-        valuenow === undefined ? undefined : `${valuenow}${label ?? ""}`
+        valueNow === undefined ? undefined : `${valueNow}${label}`
       }
       tabIndex={1}
       className={clsx(
@@ -124,17 +124,17 @@ function Select({
         "px-4 h-[calc(36px+6rem)] [&>:first-child]:mt-12 [&>:last-child]:mb-12",
         className
       )}
-      ref={(listbox) => {
-        if (!listbox) return
+      ref={(slider) => {
+        if (!slider) return
 
         createObserver({
-          root: listbox,
+          root: slider,
           onIntersecting(option) {
             currentOption$.current = option
 
             const value = Number(option.dataset.value)
 
-            setValuenow(value)
+            setValueNow(value)
             onChange$.current?.(value)
           },
           options: {
@@ -168,21 +168,21 @@ function Select({
         }
       }}
     >
-      {Array.from(Array(length).keys()).map((value) => (
+      {Array.from(Array(valueMax + 1).keys()).map((value) => (
         <span
           key={value}
           data-value={value}
           className={clsx(
             "text-right",
-            value !== valuenow && "opacity-25 font-thin"
+            value !== valueNow && "opacity-25 font-thin"
           )}
-          ref={(option) => {
-            if (!option) return
+          ref={(step) => {
+            if (!step) return
 
-            observer?.observe(option)
+            observer?.observe(step)
 
             if (value === defaultValue && !defaultValueUsed$.current) {
-              option.scrollIntoView({ block: "center" })
+              step.scrollIntoView({ block: "center" })
 
               defaultValueUsed$.current = true
             }
