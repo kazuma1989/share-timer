@@ -99,8 +99,6 @@ function Slider({
         valueNow === undefined ? undefined : `${valueNow}${label}`
       }
       tabIndex={1}
-      className="after:content-[attr(data-label)] after:pointer-events-none after:text-lg after:inline-block after:w-12 after:pr-2 after:text-right"
-      data-label={label}
       onKeyDown={(e) => {
         import.meta.env.DEV && console.debug(e.key, e.keyCode)
 
@@ -178,6 +176,10 @@ function Slider({
             {value.toString(10).padStart(2, "0")}
           </span>
         ))}
+      </span>
+
+      <span className="pointer-events-none text-lg inline-block w-12 pr-2 text-right">
+        {label}
       </span>
     </span>
   )
