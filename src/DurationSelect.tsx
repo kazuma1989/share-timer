@@ -32,54 +32,34 @@ export function DurationSelect({
     []
   )
 
-  const wrapperStyle = clsx(
-    "after:content-[attr(data-label)] after:pointer-events-none after:text-lg after:inline-block",
-    "after:w-12 after:pr-2 after:text-right"
-  )
-
-  const sliderStyle = clsx(
-    "select-none cursor-pointer rounded-md transition-colors",
-    "hover:bg-dark/10 dark:hover:bg-light/20",
-    "text-3xl pr-14 -mr-12"
-  )
-
   return (
     <span className={clsx("inline-flex gap-2", className)}>
-      <span className={wrapperStyle} data-label="時間">
-        <Slider
-          label="時間"
-          defaultValue={defaultDuration.hours}
-          valueMax={23}
-          className={sliderStyle}
-          onChange={(value) => {
-            duration$.current.hours = value
-          }}
-        />
-      </span>
+      <Slider
+        label="時間"
+        defaultValue={defaultDuration.hours}
+        valueMax={23}
+        onChange={(value) => {
+          duration$.current.hours = value
+        }}
+      />
 
-      <span className={wrapperStyle} data-label="分">
-        <Slider
-          label="分"
-          defaultValue={defaultDuration.minutes}
-          valueMax={59}
-          className={sliderStyle}
-          onChange={(value) => {
-            duration$.current.minutes = value
-          }}
-        />
-      </span>
+      <Slider
+        label="分"
+        defaultValue={defaultDuration.minutes}
+        valueMax={59}
+        onChange={(value) => {
+          duration$.current.minutes = value
+        }}
+      />
 
-      <span className={wrapperStyle} data-label="秒">
-        <Slider
-          label="秒"
-          defaultValue={defaultDuration.seconds}
-          valueMax={59}
-          className={sliderStyle}
-          onChange={(value) => {
-            duration$.current.seconds = value
-          }}
-        />
-      </span>
+      <Slider
+        label="秒"
+        defaultValue={defaultDuration.seconds}
+        valueMax={59}
+        onChange={(value) => {
+          duration$.current.seconds = value
+        }}
+      />
     </span>
   )
 }
@@ -110,87 +90,95 @@ function Slider({
 
   return (
     <span
-      role="slider"
-      aria-orientation="vertical"
-      aria-valuemin={0}
-      aria-valuemax={valueMax}
-      aria-valuenow={valueNow}
-      aria-valuetext={
-        valueNow === undefined ? undefined : `${valueNow}${label}`
-      }
-      tabIndex={1}
-      className={clsx(
-        "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
-        "px-4 h-[calc(36px+6rem)] [&>:first-child]:mt-12 [&>:last-child]:mb-12",
-        className
-      )}
-      ref={(slider) => {
-        if (!slider) return
-
-        createObserver({
-          root: slider,
-          onIntersecting(option) {
-            currentOption$.current = option
-
-            const value = Number(option.dataset.value)
-
-            setValueNow(value)
-            onChange$.current?.(value)
-          },
-          options: {
-            rootMargin: "-32px 0px",
-          },
-        })
-      }}
-      onKeyDown={(e) => {
-        import.meta.env.DEV && console.debug(e.key, e.keyCode)
-
-        switch (e.key) {
-          case "ArrowUp":
-          case "ArrowRight": {
-            e.preventDefault()
-
-            // increment
-            const next = currentOption$.current?.nextElementSibling
-            next?.scrollIntoView({ block: "center" })
-            break
-          }
-
-          case "ArrowDown":
-          case "ArrowLeft": {
-            e.preventDefault()
-
-            // decrement
-            const prev = currentOption$.current?.previousElementSibling
-            prev?.scrollIntoView({ block: "center" })
-            break
-          }
-        }
-      }}
+      className="after:content-[attr(data-label)] after:pointer-events-none after:text-lg after:inline-block after:w-12 after:pr-2 after:text-right"
+      data-label={label}
     >
-      {Array.from(Array(valueMax + 1).keys()).map((value) => (
-        <span
-          key={value}
-          data-value={value}
-          className={clsx(
-            "text-right",
-            value !== valueNow && "opacity-25 font-thin"
-          )}
-          ref={(step) => {
-            if (!step) return
+      <span
+        role="slider"
+        aria-orientation="vertical"
+        aria-valuemin={0}
+        aria-valuemax={valueMax}
+        aria-valuenow={valueNow}
+        aria-valuetext={
+          valueNow === undefined ? undefined : `${valueNow}${label}`
+        }
+        tabIndex={1}
+        className={clsx(
+          "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
+          "px-4 h-[calc(36px+6rem)] [&>:first-child]:mt-12 [&>:last-child]:mb-12",
+          "select-none cursor-pointer rounded-md transition-colors",
+          "hover:bg-dark/10 dark:hover:bg-light/20",
+          "text-3xl pr-14 -mr-12",
+          className
+        )}
+        ref={(slider) => {
+          if (!slider) return
 
-            observer?.observe(step)
+          createObserver({
+            root: slider,
+            onIntersecting(option) {
+              currentOption$.current = option
 
-            if (value === defaultValue && !defaultValueUsed$.current) {
-              step.scrollIntoView({ block: "center" })
+              const value = Number(option.dataset.value)
 
-              defaultValueUsed$.current = true
+              setValueNow(value)
+              onChange$.current?.(value)
+            },
+            options: {
+              rootMargin: "-32px 0px",
+            },
+          })
+        }}
+        onKeyDown={(e) => {
+          import.meta.env.DEV && console.debug(e.key, e.keyCode)
+
+          switch (e.key) {
+            case "ArrowUp":
+            case "ArrowRight": {
+              e.preventDefault()
+
+              // increment
+              const next = currentOption$.current?.nextElementSibling
+              next?.scrollIntoView({ block: "center" })
+              break
             }
-          }}
-        >
-          {value.toString(10).padStart(2, "0")}
-        </span>
-      ))}
+
+            case "ArrowDown":
+            case "ArrowLeft": {
+              e.preventDefault()
+
+              // decrement
+              const prev = currentOption$.current?.previousElementSibling
+              prev?.scrollIntoView({ block: "center" })
+              break
+            }
+          }
+        }}
+      >
+        {Array.from(Array(valueMax + 1).keys()).map((value) => (
+          <span
+            key={value}
+            data-value={value}
+            className={clsx(
+              "text-right",
+              value !== valueNow && "opacity-25 font-thin"
+            )}
+            ref={(step) => {
+              if (!step) return
+
+              observer?.observe(step)
+
+              if (value === defaultValue && !defaultValueUsed$.current) {
+                step.scrollIntoView({ block: "center" })
+
+                defaultValueUsed$.current = true
+              }
+            }}
+          >
+            {value.toString(10).padStart(2, "0")}
+          </span>
+        ))}
+      </span>
     </span>
   )
 }
