@@ -14,7 +14,7 @@ import smallAlert from "./sound/small-alert.mp3"
 import { getItem, setItem } from "./storage"
 import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
 import { DarkModeProvider, observeDarkMode } from "./useDarkMode"
-import { VideoProvider } from "./useVideo"
+import { VideoTimerProvider } from "./useVideoTimer"
 import { nanoid } from "./util/nanoid"
 
 // https://neos21.net/blog/2018/08/19-01.html
@@ -31,6 +31,7 @@ if (!getItem("userId")) {
 }
 
 const video = document.createElement("video")
+video.setAttribute("role", "timer")
 
 const darkMode$ = observeDarkMode()
 
@@ -46,7 +47,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <FirestoreImplProvider firestore={firestore}>
       <ErrorBoundary fallback={<FullViewportOops />}>
-        <VideoProvider value={video}>
+        <VideoTimerProvider value={video}>
           <DarkModeProvider value={darkMode$}>
             <AudioProvider value={audio}>
               <MediaPermissionProvider value={permission$}>
@@ -56,7 +57,7 @@ createRoot(document.getElementById("root")!).render(
               </MediaPermissionProvider>
             </AudioProvider>
           </DarkModeProvider>
-        </VideoProvider>
+        </VideoTimerProvider>
       </ErrorBoundary>
     </FirestoreImplProvider>
   </StrictMode>

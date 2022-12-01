@@ -13,12 +13,13 @@ import {
 import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { useDarkMode } from "./useDarkMode"
-import { useVideo } from "./useVideo"
+import { useVideoTimer } from "./useVideoTimer"
 import { bufferedLast } from "./util/bufferedLast"
 import { createCache } from "./util/createCache"
 import { floor } from "./util/floor"
 import { formatDuration } from "./util/formatDuration"
 import { interval } from "./util/interval"
+import { parseDuration } from "./util/parseDuration"
 
 const canvasWidth = 512
 const canvasHeight = 288
@@ -42,8 +43,9 @@ export function TimeViewer({
 
   useStartDrawing(canvas$, duration$)
 
-  const video$ = useRef(useVideo())
+  const video$ = useRef(useVideoTimer())
 
+  useSetLabel(video$, duration$)
   useConnectVideoWithCanvas(video$, canvas$)
   useSetupVideo(video$)
   useRestartVideo(video$)
@@ -130,6 +132,33 @@ function useStartDrawing(
       sub.unsubscribe()
     }
   }, [canvas$, darkMode$, duration$])
+}
+
+function useSetLabel(
+  video$: { current: HTMLVideoElement | null },
+  duration$: Observable<number>
+): void {
+  useEffect(() => {
+    const video = video$.current
+    if (!video) return
+
+    // フォーカス可能にしておかないと VoiceOver が読んでくれない
+    video.tabIndex = 0
+
+    const sub = duration$.subscribe((_) => {
+      const { hours, minutes, seconds } = parseDuration(_)
+
+      video.ariaLabel = [
+        hours ? `${hours}時間` : "",
+        minutes ? `${minutes}分` : "",
+        seconds ? `${seconds}秒` : "",
+      ].join("")
+    })
+
+    return () => {
+      sub.unsubscribe()
+    }
+  }, [duration$, video$])
 }
 
 function useConnectVideoWithCanvas(
