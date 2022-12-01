@@ -4,6 +4,7 @@ import {
   useEffect,
   useId,
   useImperativeHandle,
+  useReducer,
   useRef,
   useState,
 } from "react"
@@ -119,18 +120,18 @@ function Select({
       ref={(listbox) => {
         if (!listbox) return
 
-        createObserver(
-          listbox,
-          (option) => {
+        createObserver({
+          root: listbox,
+          onIntersecting(option) {
             const value = Number(option.dataset.value)
 
             setCurrentValue(value)
             onChange$.current?.(value)
           },
-          {
+          options: {
             rootMargin: "-32px 0px",
-          }
-        )
+          },
+        })
       }}
     >
       {Array.from(Array(length).keys()).map((value) => (
@@ -160,27 +161,28 @@ function Select({
   )
 }
 
-interface CreateObserver {
-  (
-    root: HTMLElement,
-    onIntersecting?: (...targets: [HTMLElement, ...HTMLElement[]]) => void,
-    options?: IntersectionObserverInit
-  ): void
+interface Init {
+  root: HTMLElement
+  onIntersecting?: (...targets: [HTMLElement, ...HTMLElement[]]) => void
+  options?: IntersectionObserverInit
 }
 
 function useObserver(): [
   observer: IntersectionObserver | null,
-  createObserver: CreateObserver
+  createObserver: (init: Init) => void
 ] {
-  type Init = Parameters<CreateObserver>
-  const [init, setInit] = useState<Init>()
+  const [init, setInit] = useReducer(
+    (prev: Init | null, next: Init): Init | null =>
+      prev && prev.root === next.root ? prev : next,
+    null
+  )
 
   const [observer, setObserver] = useState<IntersectionObserver | null>(null)
 
   useEffect(() => {
     if (!init) return
 
-    const [root, onIntersecting, options] = init
+    const { root, onIntersecting, options } = init
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -212,20 +214,5 @@ function useObserver(): [
     }
   }, [init])
 
-  return [
-    observer,
-    (...params) => {
-      setInit((init) => {
-        if (init) {
-          const [nextRoot] = params
-          const [prevRoot] = init
-          if (prevRoot === nextRoot) {
-            return init
-          }
-        }
-
-        return params
-      })
-    },
-  ]
+  return [observer, setInit]
 }
