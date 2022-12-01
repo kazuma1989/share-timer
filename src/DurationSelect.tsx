@@ -97,52 +97,12 @@ function Select({
 
   const [currentValue, setCurrentValue] = useState<number>()
 
+  const [observer, createObserver] = useObserver()
+
   const scrollCalled$ = useRef(false)
 
   const _id = useId()
   const id = (value: number) => `${_id}-${value}`
-
-  interface Options extends IntersectionObserverInit {
-    onIntersecting?: (...targets: [HTMLElement, ...HTMLElement[]]) => void
-  }
-  const [options, setOptions] = useState<Options>()
-
-  const [observer, setObserver] = useState<IntersectionObserver>()
-
-  useEffect(() => {
-    if (!options) return
-
-    const { root, rootMargin, threshold, onIntersecting } = options
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [target, ...targets] = entries
-          .filter(
-            (
-              _
-            ): _ is Omit<IntersectionObserverEntry, "target"> & {
-              target: HTMLElement
-            } => _.isIntersecting && _.target instanceof HTMLElement
-          )
-          .map((_) => _.target)
-
-        if (target) {
-          onIntersecting?.(target, ...targets)
-        }
-      },
-      {
-        root,
-        rootMargin,
-        threshold: threshold ?? 1,
-      }
-    )
-
-    setObserver(observer)
-
-    return () => {
-      observer.disconnect()
-    }
-  }, [options])
 
   return (
     <span
@@ -159,22 +119,18 @@ function Select({
       ref={(listbox) => {
         if (!listbox) return
 
-        setOptions((options) => {
-          if (options?.root === listbox) {
-            return options
-          }
+        createObserver(
+          listbox,
+          (option) => {
+            const value = Number(option.dataset.value)
 
-          return {
-            root: listbox,
+            setCurrentValue(value)
+            onChange$.current?.(value)
+          },
+          {
             rootMargin: "-32px 0px",
-            onIntersecting(option) {
-              const value = Number(option.dataset.value)
-
-              setCurrentValue(value)
-              onChange$.current?.(value)
-            },
           }
-        })
+        )
       }}
     >
       {Array.from(Array(length).keys()).map((value) => (
@@ -204,48 +160,71 @@ function Select({
   )
 }
 
-function useObserver(): [
-  observer: IntersectionObserver | null,
-  createObserver: (
+interface CreateObserver {
+  (
     root: HTMLElement,
     onIntersecting?: (...targets: [HTMLElement, ...HTMLElement[]]) => void,
     options?: IntersectionObserverInit
-  ) => void
+  ): void
+}
+
+function useObserver(): [
+  observer: IntersectionObserver | null,
+  createObserver: CreateObserver
 ] {
+  type Init = Parameters<CreateObserver>
+  const [init, setInit] = useState<Init>()
+
   const [observer, setObserver] = useState<IntersectionObserver | null>(null)
+
+  useEffect(() => {
+    if (!init) return
+
+    const [root, onIntersecting, options] = init
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [target, ...targets] = entries
+          .filter(
+            (
+              _
+            ): _ is Omit<IntersectionObserverEntry, "target"> & {
+              target: HTMLElement
+            } => _.isIntersecting && _.target instanceof HTMLElement
+          )
+          .map((_) => _.target)
+
+        if (target) {
+          onIntersecting?.(target, ...targets)
+        }
+      },
+      {
+        threshold: 1,
+        ...options,
+        root,
+      }
+    )
+
+    setObserver(observer)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [init])
 
   return [
     observer,
-    (root, onIntersecting, options) => {
-      setObserver((observer) => {
-        if (observer?.root && observer.root === root) {
-          return observer
+    (...params) => {
+      setInit((init) => {
+        if (init) {
+          const [nextRoot] = params
+          const [prevRoot] = init
+          if (prevRoot === nextRoot) {
+            return init
+          }
         }
 
-        observer?.disconnect()
-
-        return new IntersectionObserver(
-          (entries) => {
-            const [target, ...targets] = entries
-              .filter(
-                (
-                  _
-                ): _ is Omit<IntersectionObserverEntry, "target"> & {
-                  target: HTMLElement
-                } => _.isIntersecting && _.target instanceof HTMLElement
-              )
-              .map((_) => _.target)
-
-            if (target) {
-              onIntersecting?.(target, ...targets)
-            }
-          },
-          {
-            threshold: 1,
-            root,
-            ...options,
-          }
-        )
+        return params
       })
     },
   ]
