@@ -1,5 +1,12 @@
 import clsx from "clsx"
-import { Ref, useId, useImperativeHandle, useRef, useState } from "react"
+import {
+  Ref,
+  useEffect,
+  useImperativeHandle,
+  useReducer,
+  useRef,
+  useState,
+} from "react"
 import { parseDuration } from "./util/parseDuration"
 
 export function DurationSelect({
@@ -30,7 +37,7 @@ export function DurationSelect({
     "after:w-12 after:pr-2 after:text-right"
   )
 
-  const selectStyle = clsx(
+  const sliderStyle = clsx(
     "select-none cursor-pointer rounded-md transition-colors",
     "hover:bg-dark/10 dark:hover:bg-light/20",
     "text-3xl pr-14 -mr-12"
@@ -39,10 +46,11 @@ export function DurationSelect({
   return (
     <span className={clsx("inline-flex gap-2", className)}>
       <span className={wrapperStyle} data-label="時間">
-        <Select
+        <Slider
+          label="時間"
           defaultValue={defaultDuration.hours}
-          length={24}
-          className={selectStyle}
+          valueMax={23}
+          className={sliderStyle}
           onChange={(value) => {
             duration$.current.hours = value
           }}
@@ -50,10 +58,11 @@ export function DurationSelect({
       </span>
 
       <span className={wrapperStyle} data-label="分">
-        <Select
+        <Slider
+          label="分"
           defaultValue={defaultDuration.minutes}
-          length={60}
-          className={selectStyle}
+          valueMax={59}
+          className={sliderStyle}
           onChange={(value) => {
             duration$.current.minutes = value
           }}
@@ -61,10 +70,11 @@ export function DurationSelect({
       </span>
 
       <span className={wrapperStyle} data-label="秒">
-        <Select
+        <Slider
+          label="秒"
           defaultValue={defaultDuration.seconds}
-          length={60}
-          className={selectStyle}
+          valueMax={59}
+          className={sliderStyle}
           onChange={(value) => {
             duration$.current.seconds = value
           }}
@@ -74,34 +84,39 @@ export function DurationSelect({
   )
 }
 
-function Select({
+function Slider({
+  label = "",
   defaultValue,
-  length,
+  valueMax = 0,
   onChange,
   className,
 }: {
+  label?: string
   defaultValue?: number
-  length?: number
+  valueMax?: number
   onChange?(value: number): void
   className?: string
 }) {
   const onChange$ = useRef(onChange)
   onChange$.current = onChange
 
-  const [currentValue, setCurrentValue] = useState<number>()
+  const [valueNow, setValueNow] = useState<number>()
+
+  const currentOption$ = useRef<HTMLElement>()
 
   const [observer, createObserver] = useObserver()
 
-  const scrollCalled$ = useRef(false)
-
-  const _id = useId()
-  const id = (value: number) => `${_id}-${value}`
+  const defaultValueUsed$ = useRef(false)
 
   return (
     <span
-      role="listbox"
-      aria-activedescendant={
-        currentValue === undefined ? undefined : id(currentValue)
+      role="slider"
+      aria-orientation="vertical"
+      aria-valuemin={0}
+      aria-valuemax={valueMax}
+      aria-valuenow={valueNow}
+      aria-valuetext={
+        valueNow === undefined ? undefined : `${valueNow}${label}`
       }
       tabIndex={1}
       className={clsx(
@@ -109,40 +124,67 @@ function Select({
         "px-4 h-[calc(36px+6rem)] [&>:first-child]:mt-12 [&>:last-child]:mb-12",
         className
       )}
-      ref={(listbox) => {
-        if (!listbox) return
+      ref={(slider) => {
+        if (!slider) return
 
-        createObserver(
-          listbox,
-          (option) => {
+        createObserver({
+          root: slider,
+          onIntersecting(option) {
+            currentOption$.current = option
+
             const value = Number(option.dataset.value)
 
-            setCurrentValue(value)
+            setValueNow(value)
             onChange$.current?.(value)
           },
-          {
+          options: {
             rootMargin: "-32px 0px",
+          },
+        })
+      }}
+      onKeyDown={(e) => {
+        import.meta.env.DEV && console.debug(e.key, e.keyCode)
+
+        switch (e.key) {
+          case "ArrowUp":
+          case "ArrowRight": {
+            e.preventDefault()
+
+            // increment
+            const next = currentOption$.current?.nextElementSibling
+            next?.scrollIntoView({ block: "center" })
+            break
           }
-        )
+
+          case "ArrowDown":
+          case "ArrowLeft": {
+            e.preventDefault()
+
+            // decrement
+            const prev = currentOption$.current?.previousElementSibling
+            prev?.scrollIntoView({ block: "center" })
+            break
+          }
+        }
       }}
     >
-      {Array.from(Array(length).keys()).map((value) => (
+      {Array.from(Array(valueMax + 1).keys()).map((value) => (
         <span
           key={value}
-          id={id(value)}
-          role="option"
-          aria-selected={value === currentValue}
           data-value={value}
-          className="text-right aria-selected:opacity-100 opacity-25 aria-selected:font-normal font-thin"
-          ref={(option) => {
-            if (!option) return
+          className={clsx(
+            "text-right",
+            value !== valueNow && "opacity-25 font-thin"
+          )}
+          ref={(step) => {
+            if (!step) return
 
-            observer?.observe(option)
+            observer?.observe(step)
 
-            if (value === defaultValue && !scrollCalled$.current) {
-              option.scrollIntoView({ block: "center" })
+            if (value === defaultValue && !defaultValueUsed$.current) {
+              step.scrollIntoView({ block: "center" })
 
-              scrollCalled$.current = true
+              defaultValueUsed$.current = true
             }
           }}
         >
@@ -153,49 +195,58 @@ function Select({
   )
 }
 
+interface Init {
+  root: HTMLElement
+  onIntersecting?: (...targets: [HTMLElement, ...HTMLElement[]]) => void
+  options?: IntersectionObserverInit
+}
+
 function useObserver(): [
   observer: IntersectionObserver | null,
-  createObserver: (
-    root: HTMLElement,
-    onIntersecting?: (...targets: [HTMLElement, ...HTMLElement[]]) => void,
-    options?: IntersectionObserverInit
-  ) => void
+  createObserver: (init: Init) => void
 ] {
+  const [init, setInit] = useReducer(
+    (prev: Init | null, next: Init): Init | null =>
+      prev && prev.root === next.root ? prev : next,
+    null
+  )
+
   const [observer, setObserver] = useState<IntersectionObserver | null>(null)
 
-  return [
-    observer,
-    (root, onIntersecting, options) => {
-      setObserver((observer) => {
-        if (observer?.root && observer.root === root) {
-          return observer
+  useEffect(() => {
+    if (!init) return
+
+    const { root, onIntersecting, options } = init
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [target, ...targets] = entries
+          .filter(
+            (
+              _
+            ): _ is Omit<IntersectionObserverEntry, "target"> & {
+              target: HTMLElement
+            } => _.isIntersecting && _.target instanceof HTMLElement
+          )
+          .map((_) => _.target)
+
+        if (target) {
+          onIntersecting?.(target, ...targets)
         }
+      },
+      {
+        threshold: 1,
+        ...options,
+        root,
+      }
+    )
 
-        observer?.disconnect()
+    setObserver(observer)
 
-        return new IntersectionObserver(
-          (entries) => {
-            const [target, ...targets] = entries
-              .filter(
-                (
-                  _
-                ): _ is Omit<IntersectionObserverEntry, "target"> & {
-                  target: HTMLElement
-                } => _.isIntersecting && _.target instanceof HTMLElement
-              )
-              .map((_) => _.target)
+    return () => {
+      observer.disconnect()
+    }
+  }, [init])
 
-            if (target) {
-              onIntersecting?.(target, ...targets)
-            }
-          },
-          {
-            threshold: 1,
-            root,
-            ...options,
-          }
-        )
-      })
-    },
-  ]
+  return [observer, setInit]
 }
