@@ -47,6 +47,7 @@ export function DurationSelect({
     <span className={clsx("inline-flex gap-2", className)}>
       <span className={wrapperStyle} data-label="時間">
         <Select
+          label="時間"
           defaultValue={defaultDuration.hours}
           length={24}
           className={selectStyle}
@@ -58,6 +59,7 @@ export function DurationSelect({
 
       <span className={wrapperStyle} data-label="分">
         <Select
+          label="分"
           defaultValue={defaultDuration.minutes}
           length={60}
           className={selectStyle}
@@ -69,6 +71,7 @@ export function DurationSelect({
 
       <span className={wrapperStyle} data-label="秒">
         <Select
+          label="秒"
           defaultValue={defaultDuration.seconds}
           length={60}
           className={selectStyle}
@@ -82,11 +85,13 @@ export function DurationSelect({
 }
 
 function Select({
+  label,
   defaultValue,
   length,
   onChange,
   className,
 }: {
+  label?: string
   defaultValue?: number
   length?: number
   onChange?(value: number): void
@@ -96,6 +101,8 @@ function Select({
   onChange$.current = onChange
 
   const [valuenow, setValuenow] = useState<number>()
+
+  const currentOption$ = useRef<HTMLElement>()
 
   const [observer, createObserver] = useObserver()
 
@@ -108,6 +115,9 @@ function Select({
       aria-valuemin={0}
       aria-valuemax={(length || 1) - 1}
       aria-valuenow={valuenow}
+      aria-valuetext={
+        valuenow === undefined ? undefined : `${valuenow}${label ?? ""}`
+      }
       tabIndex={1}
       className={clsx(
         "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
@@ -120,6 +130,8 @@ function Select({
         createObserver({
           root: listbox,
           onIntersecting(option) {
+            currentOption$.current = option
+
             const value = Number(option.dataset.value)
 
             setValuenow(value)
@@ -129,6 +141,31 @@ function Select({
             rootMargin: "-32px 0px",
           },
         })
+      }}
+      onKeyDown={(e) => {
+        import.meta.env.DEV && console.debug(e.key, e.keyCode)
+
+        switch (e.key) {
+          case "ArrowUp":
+          case "ArrowRight": {
+            e.preventDefault()
+
+            // increment
+            const next = currentOption$.current?.nextElementSibling
+            next?.scrollIntoView({ block: "center" })
+            break
+          }
+
+          case "ArrowDown":
+          case "ArrowLeft": {
+            e.preventDefault()
+
+            // decrement
+            const prev = currentOption$.current?.previousElementSibling
+            prev?.scrollIntoView({ block: "center" })
+            break
+          }
+        }
       }}
     >
       {Array.from(Array(length).keys()).map((value) => (
