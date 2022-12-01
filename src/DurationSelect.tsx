@@ -1,7 +1,6 @@
 import clsx from "clsx"
 import {
   Ref,
-  useCallback,
   useEffect,
   useId,
   useImperativeHandle,
@@ -82,10 +81,6 @@ export function DurationSelect({
   )
 }
 
-const options = {
-  rootMargin: "-32px 0px",
-}
-
 function Select({
   defaultValue,
   length,
@@ -107,21 +102,18 @@ function Select({
   const _id = useId()
   const id = (value: number) => `${_id}-${value}`
 
-  const [listbox, setListbox] = useState<HTMLElement | null>(null)
-
-  const onIntersecting = useCallback(
-    (option: HTMLElement, ...targets: HTMLElement[]) => {
-      const value = Number(option.dataset.value)
-
-      setCurrentValue(value)
-      onChange$.current?.(value)
-    },
-    []
-  )
+  interface Options extends IntersectionObserverInit {
+    onIntersecting?: (...targets: [HTMLElement, ...HTMLElement[]]) => void
+  }
+  const [options, setOptions] = useState<Options>()
 
   const [observer, setObserver] = useState<IntersectionObserver>()
 
   useEffect(() => {
+    if (!options) return
+
+    const { root, rootMargin, threshold, onIntersecting } = options
+
     const observer = new IntersectionObserver(
       (entries) => {
         const [target, ...targets] = entries
@@ -139,9 +131,9 @@ function Select({
         }
       },
       {
-        threshold: 1,
-        root: listbox,
-        ...options,
+        root,
+        rootMargin,
+        threshold: threshold ?? 1,
       }
     )
 
@@ -150,7 +142,7 @@ function Select({
     return () => {
       observer.disconnect()
     }
-  }, [listbox, onIntersecting])
+  }, [options])
 
   return (
     <span
@@ -164,7 +156,26 @@ function Select({
         "px-4 h-[calc(36px+6rem)] [&>:first-child]:mt-12 [&>:last-child]:mb-12",
         className
       )}
-      ref={setListbox}
+      ref={(listbox) => {
+        if (!listbox) return
+
+        setOptions((options) => {
+          if (options?.root === listbox) {
+            return options
+          }
+
+          return {
+            root: listbox,
+            rootMargin: "-32px 0px",
+            onIntersecting(option) {
+              const value = Number(option.dataset.value)
+
+              setCurrentValue(value)
+              onChange$.current?.(value)
+            },
+          }
+        })
+      }}
     >
       {Array.from(Array(length).keys()).map((value) => (
         <span
