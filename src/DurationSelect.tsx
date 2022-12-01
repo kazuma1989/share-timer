@@ -1,5 +1,13 @@
 import clsx from "clsx"
-import { Ref, useId, useImperativeHandle, useRef, useState } from "react"
+import {
+  Ref,
+  useCallback,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react"
 import { parseDuration } from "./util/parseDuration"
 
 export function DurationSelect({
@@ -74,6 +82,10 @@ export function DurationSelect({
   )
 }
 
+const options = {
+  rootMargin: "-32px 0px",
+}
+
 function Select({
   defaultValue,
   length,
@@ -90,12 +102,55 @@ function Select({
 
   const [currentValue, setCurrentValue] = useState<number>()
 
-  const [observer, createObserver] = useObserver()
-
   const scrollCalled$ = useRef(false)
 
   const _id = useId()
   const id = (value: number) => `${_id}-${value}`
+
+  const [listbox, setListbox] = useState<HTMLElement | null>(null)
+
+  const onIntersecting = useCallback(
+    (option: HTMLElement, ...targets: HTMLElement[]) => {
+      const value = Number(option.dataset.value)
+
+      setCurrentValue(value)
+      onChange$.current?.(value)
+    },
+    []
+  )
+
+  const [observer, setObserver] = useState<IntersectionObserver>()
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [target, ...targets] = entries
+          .filter(
+            (
+              _
+            ): _ is Omit<IntersectionObserverEntry, "target"> & {
+              target: HTMLElement
+            } => _.isIntersecting && _.target instanceof HTMLElement
+          )
+          .map((_) => _.target)
+
+        if (target) {
+          onIntersecting?.(target, ...targets)
+        }
+      },
+      {
+        threshold: 1,
+        root: listbox,
+        ...options,
+      }
+    )
+
+    setObserver(observer)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [listbox, onIntersecting])
 
   return (
     <span
@@ -109,22 +164,7 @@ function Select({
         "px-4 h-[calc(36px+6rem)] [&>:first-child]:mt-12 [&>:last-child]:mb-12",
         className
       )}
-      ref={(listbox) => {
-        if (!listbox) return
-
-        createObserver(
-          listbox,
-          (option) => {
-            const value = Number(option.dataset.value)
-
-            setCurrentValue(value)
-            onChange$.current?.(value)
-          },
-          {
-            rootMargin: "-32px 0px",
-          }
-        )
-      }}
+      ref={setListbox}
     >
       {Array.from(Array(length).keys()).map((value) => (
         <span
