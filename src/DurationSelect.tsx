@@ -90,19 +90,44 @@ function Slider({
 
   return (
     <span
+      role="slider"
+      aria-orientation="vertical"
+      aria-valuemin={0}
+      aria-valuemax={valueMax}
+      aria-valuenow={valueNow}
+      aria-valuetext={
+        valueNow === undefined ? undefined : `${valueNow}${label}`
+      }
+      tabIndex={1}
       className="after:content-[attr(data-label)] after:pointer-events-none after:text-lg after:inline-block after:w-12 after:pr-2 after:text-right"
       data-label={label}
+      onKeyDown={(e) => {
+        import.meta.env.DEV && console.debug(e.key, e.keyCode)
+
+        switch (e.key) {
+          case "ArrowUp":
+          case "ArrowRight": {
+            e.preventDefault()
+
+            // increment
+            const next = currentOption$.current?.nextElementSibling
+            next?.scrollIntoView({ block: "center" })
+            break
+          }
+
+          case "ArrowDown":
+          case "ArrowLeft": {
+            e.preventDefault()
+
+            // decrement
+            const prev = currentOption$.current?.previousElementSibling
+            prev?.scrollIntoView({ block: "center" })
+            break
+          }
+        }
+      }}
     >
       <span
-        role="slider"
-        aria-orientation="vertical"
-        aria-valuemin={0}
-        aria-valuemax={valueMax}
-        aria-valuenow={valueNow}
-        aria-valuetext={
-          valueNow === undefined ? undefined : `${valueNow}${label}`
-        }
-        tabIndex={1}
         className={clsx(
           "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
           "px-4 h-[calc(36px+6rem)] [&>:first-child]:mt-12 [&>:last-child]:mb-12",
@@ -128,31 +153,6 @@ function Slider({
               rootMargin: "-32px 0px",
             },
           })
-        }}
-        onKeyDown={(e) => {
-          import.meta.env.DEV && console.debug(e.key, e.keyCode)
-
-          switch (e.key) {
-            case "ArrowUp":
-            case "ArrowRight": {
-              e.preventDefault()
-
-              // increment
-              const next = currentOption$.current?.nextElementSibling
-              next?.scrollIntoView({ block: "center" })
-              break
-            }
-
-            case "ArrowDown":
-            case "ArrowLeft": {
-              e.preventDefault()
-
-              // decrement
-              const prev = currentOption$.current?.previousElementSibling
-              prev?.scrollIntoView({ block: "center" })
-              break
-            }
-          }
         }}
       >
         {Array.from(Array(valueMax + 1).keys()).map((value) => (
