@@ -1,10 +1,11 @@
 import clsx from "clsx"
 import { serverTimestamp } from "firebase/firestore"
-import { useEffect, useRef } from "react"
+import { useEffect, useId, useRef } from "react"
 import { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
 import { icon } from "./icon"
+import { now } from "./now"
 import { setHash } from "./observeHash"
 import { getItem, setItem } from "./storage"
 import { TimerState } from "./timerReducer"
@@ -14,6 +15,7 @@ import { useMediaPermission } from "./useAudio"
 import { toggleConfig, useConfig } from "./useConfig"
 import { useDispatch } from "./useDispatch"
 import { useObservable } from "./useObservable"
+import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
 import { Room } from "./zod/roomZod"
 
 export function Timer({
@@ -37,11 +39,14 @@ export function Timer({
   })
   const primaryButton$ = useRef<HTMLButtonElement>(null)
 
+  const _id = useId()
+  const id = (_: "timer" | "status") => _id + _
+
   return (
     <>
       <div className={clsx("grid grid-rows-[auto_5fr_auto_4fr]", className)}>
         <div className="pt-2 text-center">
-          <h1>{roomName}</h1>
+          <h1 aria-label={`タイマーの名前: ${roomName}`}>{roomName}</h1>
         </div>
 
         <form
@@ -60,7 +65,34 @@ export function Timer({
             primaryButton$.current?.focus()
           }}
         >
-          <div className="grid place-items-center tabular-nums">
+          <p id={id("status")} role="status" className="sr-only">
+            {((): string => {
+              switch (state.mode) {
+                case "editing": {
+                  return `タイマーは編集中です。値は${humanReadableLabelOf(
+                    state.initialDuration
+                  )}`
+                }
+
+                case "running": {
+                  return `タイマーは実行中です。残り${humanReadableLabelOf(
+                    state.restDuration - (now() - state.startedAt)
+                  )}`
+                }
+
+                case "paused": {
+                  return `タイマーは一時停止中です。残り${humanReadableLabelOf(
+                    state.restDuration
+                  )}`
+                }
+              }
+            })()}
+          </p>
+
+          <div
+            id={id("timer")}
+            className="grid place-items-center tabular-nums"
+          >
             {!locked && state.mode === "editing" ? (
               <div className="w-[512px] max-w-[100vw] aspect-video grid place-items-center touch-pinch-zoom">
                 <DurationSelect
@@ -76,11 +108,16 @@ export function Timer({
 
           {locked ? (
             <div className="flex items-center justify-around">
-              <CircleButton disabled className="text-2xl">
+              <CircleButton
+                aria-controls={`${id("status")} ${id("timer")}`}
+                disabled
+                className="text-2xl"
+              >
                 {icon("lock-outline")}
               </CircleButton>
 
               <CircleButton
+                aria-controls={`${id("status")} ${id("timer")}`}
                 disabled
                 className="text-2xl"
                 color={state.mode === "running" ? "orange" : "green"}
@@ -91,6 +128,7 @@ export function Timer({
           ) : (
             <div className="flex items-center justify-around">
               <CircleButton
+                aria-controls={`${id("status")} ${id("timer")}`}
                 disabled={state.mode === "editing"}
                 className="text-xs"
                 onClick={() => {
@@ -104,6 +142,7 @@ export function Timer({
 
               {state.mode === "editing" ? (
                 <CircleButton
+                  aria-controls={`${id("status")} ${id("timer")}`}
                   innerRef={primaryButton$}
                   color="green"
                   type="submit"
@@ -112,6 +151,7 @@ export function Timer({
                 </CircleButton>
               ) : state.mode === "running" ? (
                 <CircleButton
+                  aria-controls={`${id("status")} ${id("timer")}`}
                   innerRef={primaryButton$}
                   color="orange"
                   onClick={() => {
@@ -125,6 +165,7 @@ export function Timer({
                 </CircleButton>
               ) : (
                 <CircleButton
+                  aria-controls={`${id("status")} ${id("timer")}`}
                   innerRef={primaryButton$}
                   color="green"
                   onClick={() => {
@@ -176,9 +217,19 @@ function ConfigArea({
   useShowDialogOnce(dialog$, isTutorialDone)
   usePlaceDialog(dialog$, infoButton$, isTutorialDone)
 
+  const _id = useId()
+  const id = (_: "flash" | "sound") => _id + _
+
   return (
     <div className={className}>
+      <span id={id("flash")} role="status" className="sr-only">
+        {config.flash === "on"
+          ? "フラッシュはオンです"
+          : "フラッシュはオフです"}
+      </span>
+
       <TransparentButton
+        aria-controls={id("flash")}
         title="フラッシュを切り替える"
         className="h-12 w-12 text-2xl"
         onClick={() => {
@@ -188,7 +239,14 @@ function ConfigArea({
         {config.flash === "on" ? icon("flash") : icon("flash-off")}
       </TransparentButton>
 
+      <span id={id("sound")} role="status" className="sr-only">
+        {config.sound === "on" && permission === "canplay"
+          ? "音はオンです"
+          : "音はオフです"}
+      </span>
+
       <TransparentButton
+        aria-controls={id("sound")}
         title="音を切り替える"
         className="h-12 w-12 text-2xl"
         onClick={() => {

@@ -13,11 +13,12 @@ import {
 import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
 import { TimerState } from "./timerReducer"
 import { useDarkMode } from "./useDarkMode"
-import { useVideo } from "./useVideo"
+import { useVideoTimer } from "./useVideoTimer"
 import { bufferedLast } from "./util/bufferedLast"
 import { createCache } from "./util/createCache"
 import { floor } from "./util/floor"
 import { formatDuration } from "./util/formatDuration"
+import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
 import { interval } from "./util/interval"
 
 const canvasWidth = 512
@@ -42,8 +43,9 @@ export function TimeViewer({
 
   useStartDrawing(canvas$, duration$)
 
-  const video$ = useRef(useVideo())
+  const video$ = useRef(useVideoTimer())
 
+  useSetLabel(video$, duration$)
   useConnectVideoWithCanvas(video$, canvas$)
   useSetupVideo(video$)
   useRestartVideo(video$)
@@ -130,6 +132,24 @@ function useStartDrawing(
       sub.unsubscribe()
     }
   }, [canvas$, darkMode$, duration$])
+}
+
+function useSetLabel(
+  video$: { current: HTMLVideoElement | null },
+  duration$: Observable<number>
+): void {
+  useEffect(() => {
+    const video = video$.current
+    if (!video) return
+
+    const sub = duration$.subscribe((duration) => {
+      video.ariaLabel = humanReadableLabelOf(duration)
+    })
+
+    return () => {
+      sub.unsubscribe()
+    }
+  }, [duration$, video$])
 }
 
 function useConnectVideoWithCanvas(

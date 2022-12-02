@@ -8,8 +8,11 @@ export function FullViewportOops({ className }: { className?: string }) {
   return (
     <div className={clsx("grid h-screen place-items-center", className)}>
       <div className="max-w-full overflow-auto">
-        <h1 className="mb-8 text-center text-8xl sm:text-9xl">
-          {icon("emoticon-dead-outline", { role: "img", "aria-label": "o" })}
+        <h1
+          aria-label="Oops!"
+          className="mb-8 text-center text-8xl sm:text-9xl"
+        >
+          {icon("emoticon-dead-outline")}
           ops!
         </h1>
 
