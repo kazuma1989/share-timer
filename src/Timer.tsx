@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import { serverTimestamp } from "firebase/firestore"
-import { useEffect, useId, useRef, useState } from "react"
+import { useEffect, useId, useRef } from "react"
 import { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
@@ -39,13 +39,17 @@ export function Timer({
 
   const timerAreaId = useId()
 
-  const [statusMessage, setStatusMessage] = useState("")
+  const timerStatusMessage: Record<TimerState["mode"], string> = {
+    editing: "タイマーは編集中です。",
+    running: "タイマーは実行中です。",
+    paused: "タイマーは一時停止中です。",
+  }
 
   return (
     <>
       <div className={clsx("grid grid-rows-[auto_5fr_auto_4fr]", className)}>
         <p role="status" className="sr-only">
-          {statusMessage}
+          {timerStatusMessage[state.mode]}
         </p>
 
         <div className="pt-2 text-center">
@@ -111,8 +115,6 @@ export function Timer({
                 disabled={state.mode === "editing"}
                 className="text-xs"
                 onClick={() => {
-                  setStatusMessage("タイマーをキャンセルしました")
-
                   dispatch({
                     type: "cancel",
                   })
@@ -127,9 +129,6 @@ export function Timer({
                   innerRef={primaryButton$}
                   color="green"
                   type="submit"
-                  onClick={() => {
-                    setStatusMessage("タイマーを開始しました")
-                  }}
                 >
                   開始
                 </CircleButton>
@@ -139,8 +138,6 @@ export function Timer({
                   innerRef={primaryButton$}
                   color="orange"
                   onClick={() => {
-                    setStatusMessage("タイマーを一時停止しました")
-
                     dispatch({
                       type: "pause",
                       at: serverTimestamp(),
@@ -156,8 +153,6 @@ export function Timer({
                   color="green"
                   onClick={() => {
                     if (pending) return
-
-                    setStatusMessage("タイマーを再開しました")
 
                     dispatch({
                       type: "resume",
