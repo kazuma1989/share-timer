@@ -32,6 +32,8 @@ if (!getItem("userId")) {
 
 const video = document.createElement("video")
 video.setAttribute("role", "timer")
+// フォーカス可能にしておかないと VoiceOver が読んでくれない
+video.tabIndex = 0
 
 const darkMode$ = observeDarkMode()
 

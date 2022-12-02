@@ -142,9 +142,6 @@ function useSetLabel(
     const video = video$.current
     if (!video) return
 
-    // フォーカス可能にしておかないと VoiceOver が読んでくれない
-    video.tabIndex = 0
-
     const sub = duration$.subscribe((duration) => {
       video.ariaLabel = humanReadableLabelOf(duration)
     })
