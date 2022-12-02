@@ -33,4 +33,10 @@
     /* Chrome, Safari 対応 */
     display: none;
   }
+
+  @media speech {
+    .content-sr-hidden {
+      visibility: hidden;
+    }
+  }
 }
