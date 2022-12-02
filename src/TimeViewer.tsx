@@ -18,8 +18,8 @@ import { bufferedLast } from "./util/bufferedLast"
 import { createCache } from "./util/createCache"
 import { floor } from "./util/floor"
 import { formatDuration } from "./util/formatDuration"
+import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
 import { interval } from "./util/interval"
-import { parseDuration } from "./util/parseDuration"
 
 const canvasWidth = 512
 const canvasHeight = 288
@@ -145,14 +145,8 @@ function useSetLabel(
     // フォーカス可能にしておかないと VoiceOver が読んでくれない
     video.tabIndex = 0
 
-    const sub = duration$.subscribe((_) => {
-      const { hours, minutes, seconds } = parseDuration(_)
-
-      video.ariaLabel = [
-        hours ? `${hours}時間` : "",
-        minutes ? `${minutes}分` : "",
-        seconds ? `${seconds}秒` : "",
-      ].join("")
+    const sub = duration$.subscribe((duration) => {
+      video.ariaLabel = humanReadableLabelOf(duration)
     })
 
     return () => {
