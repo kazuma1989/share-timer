@@ -98,7 +98,7 @@ function Slider({
       aria-valuetext={
         valueNow === undefined ? undefined : `${valueNow}${label}`
       }
-      tabIndex={1}
+      tabIndex={0}
       onKeyDown={(e) => {
         import.meta.env.DEV && console.debug(e.key, e.keyCode)
 
