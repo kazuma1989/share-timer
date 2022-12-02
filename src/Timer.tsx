@@ -14,6 +14,7 @@ import { useMediaPermission } from "./useAudio"
 import { toggleConfig, useConfig } from "./useConfig"
 import { useDispatch } from "./useDispatch"
 import { useObservable } from "./useObservable"
+import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
 import { Room } from "./zod/roomZod"
 
 export function Timer({
@@ -39,17 +40,31 @@ export function Timer({
 
   const timerAreaId = useId()
 
-  const timerStatusMessage: Record<TimerState["mode"], string> = {
-    editing: "タイマーは編集中です。",
-    running: "タイマーは実行中です。",
-    paused: "タイマーは一時停止中です。",
-  }
-
   return (
     <>
       <div className={clsx("grid grid-rows-[auto_5fr_auto_4fr]", className)}>
         <p role="status" className="sr-only">
-          {timerStatusMessage[state.mode]}
+          {((): string => {
+            switch (state.mode) {
+              case "editing": {
+                return `タイマーは編集中です。値は${humanReadableLabelOf(
+                  state.initialDuration
+                )}。`
+              }
+
+              case "running": {
+                return `タイマーは実行中です。残り${humanReadableLabelOf(
+                  state.restDuration
+                )}。`
+              }
+
+              case "paused": {
+                return `タイマーは一時停止中です。残り${humanReadableLabelOf(
+                  state.restDuration
+                )}。`
+              }
+            }
+          })()}
         </p>
 
         <div className="pt-2 text-center">
