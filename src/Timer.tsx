@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import { serverTimestamp } from "firebase/firestore"
-import { useEffect, useRef } from "react"
+import { useEffect, useId, useRef } from "react"
 import { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
@@ -37,6 +37,8 @@ export function Timer({
   })
   const primaryButton$ = useRef<HTMLButtonElement>(null)
 
+  const timerAreaId = useId()
+
   return (
     <>
       <div className={clsx("grid grid-rows-[auto_5fr_auto_4fr]", className)}>
@@ -60,7 +62,10 @@ export function Timer({
             primaryButton$.current?.focus()
           }}
         >
-          <div className="grid place-items-center tabular-nums">
+          <div
+            id={timerAreaId}
+            className="grid place-items-center tabular-nums"
+          >
             {!locked && state.mode === "editing" ? (
               <div className="w-[512px] max-w-[100vw] aspect-video grid place-items-center touch-pinch-zoom">
                 <DurationSelect
@@ -76,11 +81,16 @@ export function Timer({
 
           {locked ? (
             <div className="flex items-center justify-around">
-              <CircleButton disabled className="text-2xl">
+              <CircleButton
+                aria-controls={timerAreaId}
+                disabled
+                className="text-2xl"
+              >
                 {icon("lock-outline")}
               </CircleButton>
 
               <CircleButton
+                aria-controls={timerAreaId}
                 disabled
                 className="text-2xl"
                 color={state.mode === "running" ? "orange" : "green"}
@@ -91,6 +101,7 @@ export function Timer({
           ) : (
             <div className="flex items-center justify-around">
               <CircleButton
+                aria-controls={timerAreaId}
                 disabled={state.mode === "editing"}
                 className="text-xs"
                 onClick={() => {
@@ -104,6 +115,7 @@ export function Timer({
 
               {state.mode === "editing" ? (
                 <CircleButton
+                  aria-controls={timerAreaId}
                   innerRef={primaryButton$}
                   color="green"
                   type="submit"
@@ -112,6 +124,7 @@ export function Timer({
                 </CircleButton>
               ) : state.mode === "running" ? (
                 <CircleButton
+                  aria-controls={timerAreaId}
                   innerRef={primaryButton$}
                   color="orange"
                   onClick={() => {
@@ -125,6 +138,7 @@ export function Timer({
                 </CircleButton>
               ) : (
                 <CircleButton
+                  aria-controls={timerAreaId}
                   innerRef={primaryButton$}
                   color="green"
                   onClick={() => {
