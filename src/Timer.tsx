@@ -45,7 +45,7 @@ export function Timer({
     <>
       <div className={clsx("grid grid-rows-[auto_5fr_auto_4fr]", className)}>
         <div className="pt-2 text-center">
-          <h1>{roomName}</h1>
+          <h1 aria-label={`タイマーの名前: ${roomName}`}>{roomName}</h1>
         </div>
 
         <form
