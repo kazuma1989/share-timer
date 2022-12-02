@@ -60,11 +60,11 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
         </p>
 
         <p>
-          <span className="before:content-sr-hidden before:content-['※_']">
+          <span className="before:content-['※_']">
             タイマーは誰でも開始／一時停止／キャンセルできます
           </span>
           <br />
-          <span className="before:content-sr-hidden before:content-['※_']">
+          <span className="before:content-['※_']">
             カウントダウン中の数字部分をダブルタップすると…？
           </span>
         </p>
