@@ -5,6 +5,7 @@ import { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
 import { icon } from "./icon"
+import { now } from "./now"
 import { setHash } from "./observeHash"
 import { getItem, setItem } from "./storage"
 import { TimerState } from "./timerReducer"
@@ -75,7 +76,7 @@ export function Timer({
 
                 case "running": {
                   return `タイマーは実行中です。残り${humanReadableLabelOf(
-                    state.restDuration
+                    state.restDuration - (now() - state.startedAt)
                   )}`
                 }
 
