@@ -226,9 +226,6 @@ function useSetupVideo(video$: { current: HTMLVideoElement | null }): void {
 
     const abort = new AbortController()
 
-    video.autoplay = true
-    video.muted = true
-    video.playsInline = true
     video.width = canvasWidth
     video.height = canvasHeight
 
