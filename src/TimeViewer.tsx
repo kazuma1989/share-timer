@@ -47,7 +47,6 @@ export function TimeViewer({
 
   useSetLabel(video$, duration$)
   useConnectVideoWithCanvas(video$, canvas$)
-  useSetupVideo(video$)
   useRestartVideo(video$)
 
   const div$ = useRef<HTMLDivElement>(null)
@@ -161,6 +160,9 @@ function useConnectVideoWithCanvas(
     const canvas = canvas$.current
     if (!video || !canvas) return
 
+    video.width = canvasWidth
+    video.height = canvasHeight
+
     video.srcObject = canvas.captureStream()
   }, [canvas$, video$])
 }
@@ -217,47 +219,6 @@ function usePrependElement(
       parent.removeChild(child)
     }
   }, [parent$, child$])
-}
-
-function useSetupVideo(video$: { current: HTMLVideoElement | null }): void {
-  useEffect(() => {
-    const video = video$.current
-    if (!video) return
-
-    const abort = new AbortController()
-
-    video.autoplay = true
-    video.muted = true
-    video.playsInline = true
-    video.width = canvasWidth
-    video.height = canvasHeight
-
-    video.addEventListener(
-      "click",
-      () => {
-        video.play()
-      },
-      {
-        signal: abort.signal,
-        passive: true,
-      }
-    )
-
-    video.addEventListener(
-      "dblclick",
-      () => {
-        video.requestPictureInPicture()
-      },
-      {
-        signal: abort.signal,
-        passive: true,
-      }
-    )
-
-    return () => {
-      abort.abort()
-    }
-  }, [video$])
 }
 
 const cache = createCache()
