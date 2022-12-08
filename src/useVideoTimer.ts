@@ -15,5 +15,22 @@ export function createVideoTimer(): HTMLVideoElement {
   video.muted = true
   video.playsInline = true
 
+  // controls off にしておくので、扱いやすいようなイベントをあらかじめ付与
+  video.addEventListener(
+    "click",
+    () => {
+      video.play()
+    },
+    { passive: true }
+  )
+
+  video.addEventListener(
+    "dblclick",
+    () => {
+      video.requestPictureInPicture()
+    },
+    { passive: true }
+  )
+
   return video
 }
