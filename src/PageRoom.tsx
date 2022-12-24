@@ -27,7 +27,7 @@ export function PageRoom({ roomId }: { roomId: Room["id"] }) {
   useTitleAsTimeViewer(timerState$)
 
   return (
-    <div className="max-w-prose mx-auto h-screen">
+    <div className="mx-auto h-screen max-w-prose">
       <Timer room$={room$} timerState$={timerState$} className="h-full" />
 
       <FlashCover timerState$={timerState$} />

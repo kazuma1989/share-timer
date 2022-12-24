@@ -94,7 +94,7 @@ export function Timer({
             className="grid place-items-center tabular-nums"
           >
             {!locked && state.mode === "editing" ? (
-              <div className="w-[512px] max-w-[100vw] aspect-video grid place-items-center touch-pinch-zoom">
+              <div className="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center">
                 <DurationSelect
                   key={state.mode + state.initialDuration}
                   innerRef={durationSelect$}
@@ -274,10 +274,10 @@ function ConfigArea({
           ref={dialog$}
           className={clsx(
             "transition-[box-shadow,opacity,visibility] [&:not([open])]:opacity-0",
-            "text-inherit bg-transparent overflow-visible rounded-sm",
+            "overflow-visible rounded-sm bg-transparent text-inherit",
             "open:shadow-screen open:shadow-dark/10 dark:open:shadow-light/20",
             // override default dialog style
-            "fixed inset-0 p-0 m-0 max-w-full max-h-full backdrop:bg-transparent open:visible [&:not([open])]:invisible [&:not([open])]:block"
+            "fixed inset-0 m-0 max-h-full max-w-full p-0 backdrop:bg-transparent open:visible [&:not([open])]:invisible [&:not([open])]:block"
           )}
           onClick={doneTutorial}
         >
@@ -286,10 +286,10 @@ function ConfigArea({
               "max-w-prose overscroll-contain rounded border px-6 py-4 pt-8",
               "text-dark/90 dark:text-light/90",
               "prose prose-headings:text-dark/70 prose-a:text-azure-700 dark:prose-headings:text-light/70 dark:prose-a:text-azure-300",
-              "w-80 absolute right-0 bottom-0 translate-x-14 -translate-y-14",
-              "border-gray-500 before:border-t-gray-500 bg-light after:border-t-light dark:bg-dark dark:after:border-t-dark",
-              "before:border-8 before:left-3/4 before:bottom-0 before:translate-y-full before:-translate-x-1/2 before:content-[''] before:border-transparent before:absolute",
-              "after:border-[6.5px] after:left-3/4 after:bottom-0 after:translate-y-full after:-translate-x-1/2 after:content-[''] after:border-transparent after:absolute"
+              "absolute right-0 bottom-0 w-80 translate-x-14 -translate-y-14",
+              "border-gray-500 bg-light before:border-t-gray-500 after:border-t-light dark:bg-dark dark:after:border-t-dark",
+              "before:absolute before:left-3/4 before:bottom-0 before:translate-y-full before:-translate-x-1/2 before:border-8 before:border-transparent before:content-['']",
+              "after:absolute after:left-3/4 after:bottom-0 after:translate-y-full after:-translate-x-1/2 after:border-[6.5px] after:border-transparent after:content-['']"
             )}
             onClick={(e) => {
               e.stopPropagation()

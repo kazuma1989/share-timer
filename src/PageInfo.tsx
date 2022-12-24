@@ -17,7 +17,7 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
   return (
     <article
       className={clsx(
-        "max-w-prose mx-auto h-screen",
+        "mx-auto h-screen max-w-prose",
         "text-dark/90 dark:text-light/90",
         "prose prose-headings:text-dark/70 prose-a:text-azure-700 dark:prose-headings:text-light/70 dark:prose-a:text-azure-300",
         "grid grid-rows-[1fr_auto]",
@@ -27,7 +27,7 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
       <div>
         <TransparentButton
           title="戻る"
-          className="h-12 w-12 text-2xl -ml-4 my-2"
+          className="my-2 -ml-4 h-12 w-12 text-2xl"
           onClick={() => {
             setHash(["room", roomId])
           }}
@@ -51,7 +51,7 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
               data={roomURL}
               width={160}
               height={160}
-              className="inline-block mb-2"
+              className="mb-2 inline-block"
             />
             <br />
 
@@ -74,7 +74,7 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
             href="#"
             target="_blank"
             className={clsx(
-              "border border-gray-500 block px-4 py-3 text-center no-underline after:content-['_↗']",
+              "block border border-gray-500 px-4 py-3 text-center no-underline after:content-['_↗']",
               // FIXME TransparentButtonと同じスタイルなのでなんとかコンポーネントにまとめられないか
               "cursor-pointer rounded-md transition-colors",
               "hover:bg-dark/10 active:bg-dark/20 dark:hover:bg-light/20 dark:active:bg-light/30"
@@ -86,7 +86,7 @@ export function PageInfo({ roomId }: { roomId: Room["id"] }) {
 
         <p>
           <TransparentButton
-            className="w-full border border-gray-500 block px-4 py-3"
+            className="block w-full border border-gray-500 px-4 py-3"
             onClick={async () => {
               const userId = getItem("userId")
               if (!userId) return
