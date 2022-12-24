@@ -127,11 +127,11 @@ function Slider({
     >
       <span
         className={clsx(
-          "scrollbar-hidden inline-flex flex-col overflow-y-scroll overscroll-contain snap-y snap-mandatory [&>*]:snap-center",
-          "px-4 h-[calc(36px+6rem)] [&>:first-child]:mt-12 [&>:last-child]:mb-12",
-          "select-none cursor-pointer rounded-md transition-colors",
+          "scrollbar-hidden inline-flex snap-y snap-mandatory flex-col overflow-y-scroll overscroll-contain [&>*]:snap-center",
+          "h-[calc(36px+6rem)] px-4 [&>:first-child]:mt-12 [&>:last-child]:mb-12",
+          "cursor-pointer select-none rounded-md transition-colors",
           "hover:bg-dark/10 dark:hover:bg-light/20",
-          "text-3xl pr-14 -mr-12",
+          "-mr-12 pr-14 text-3xl",
           className
         )}
         ref={(slider) => {
@@ -159,7 +159,7 @@ function Slider({
             data-value={value}
             className={clsx(
               "text-right",
-              value !== valueNow && "opacity-25 font-thin"
+              value !== valueNow && "font-thin opacity-25"
             )}
             ref={(step) => {
               if (!step) return
@@ -178,7 +178,7 @@ function Slider({
         ))}
       </span>
 
-      <span className="pointer-events-none text-lg inline-block w-12 pr-2 text-right">
+      <span className="pointer-events-none inline-block w-12 pr-2 text-right text-lg">
         {label}
       </span>
     </span>
