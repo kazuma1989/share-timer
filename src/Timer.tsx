@@ -1,5 +1,4 @@
 import clsx from "clsx"
-import { serverTimestamp } from "firebase/firestore"
 import { useEffect, useId, useRef } from "react"
 import { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
@@ -16,6 +15,7 @@ import { toggleConfig, useConfig } from "./useConfig"
 import { useDispatch } from "./useDispatch"
 import { useObservable } from "./useObservable"
 import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
+import { ServerTimestamp } from "./util/ServerTimestamp"
 import { Room } from "./zod/roomZod"
 
 export function Timer({
@@ -59,7 +59,7 @@ export function Timer({
             dispatch({
               type: "start",
               withDuration: durationSelect$.current.value,
-              at: serverTimestamp(),
+              at: new ServerTimestamp(),
             })
 
             primaryButton$.current?.focus()
@@ -157,7 +157,7 @@ export function Timer({
                   onClick={() => {
                     dispatch({
                       type: "pause",
-                      at: serverTimestamp(),
+                      at: new ServerTimestamp(),
                     })
                   }}
                 >
@@ -173,7 +173,7 @@ export function Timer({
 
                     dispatch({
                       type: "resume",
-                      at: serverTimestamp(),
+                      at: new ServerTimestamp(),
                     })
                   }}
                 >

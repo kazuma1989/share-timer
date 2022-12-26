@@ -1,6 +1,6 @@
 import { doc, Firestore, runTransaction } from "firebase/firestore"
 import { createCache } from "../util/createCache"
-import { ActionOnFirestore } from "../zod/actionZod"
+import { ActionInput } from "../zod/actionZod"
 import { Room, RoomOnFirestore } from "../zod/roomZod"
 import { collection } from "./collection"
 import { useFirestore } from "./useFirestore"
@@ -73,10 +73,10 @@ async function _setupRoom(
 
       transaction.set(
         doc(collection(db, "rooms", roomId, "actions")),
-        withMeta<ActionOnFirestore>({
+        withMeta({
           type: "cancel",
           withDuration: DEFAULT_DURATION,
-        })
+        } satisfies ActionInput)
       )
     },
     {
