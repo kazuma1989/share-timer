@@ -1,6 +1,7 @@
 import { Timestamp } from "firebase/firestore"
 import * as z from "zod"
 import { ServerTimestamp } from "../util/ServerTimestamp"
+import { ActionInput } from "../zod/actionZod"
 
 const timestampToTimestamp = z
   .instanceof(Timestamp)
@@ -28,3 +29,11 @@ export const actionZodImpl = z.union([
     withDuration: z.number().optional(),
   }),
 ])
+
+if (import.meta.vitest) {
+  const { test } = import.meta.vitest
+
+  test("一応型の整合テストはできるが、unionが不足していることは検知できない", () => {
+    actionZodImpl.parse({}) satisfies ActionInput
+  })
+}
