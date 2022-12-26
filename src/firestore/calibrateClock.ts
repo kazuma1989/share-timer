@@ -15,10 +15,10 @@ export async function calibrateClock(db: Firestore): Promise<void> {
   const clientDoc = doc(collection(db, "calibrations"))
   await setDoc(
     clientDoc,
-    withMeta<Calibration>({
+    withMeta({
       clientTime: Timestamp.fromMillis(now()),
       serverTime: serverTimestamp() as Timestamp,
-    })
+    } satisfies Calibration)
   )
 
   const serverDoc = await getDocFromServer(clientDoc)

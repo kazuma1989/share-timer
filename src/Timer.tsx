@@ -59,7 +59,7 @@ export function Timer({
             dispatch({
               type: "start",
               withDuration: durationSelect$.current.value,
-              at: new ServerTimestamp(),
+              at: new ServerTimestamp(now()),
             })
 
             primaryButton$.current?.focus()
@@ -157,7 +157,7 @@ export function Timer({
                   onClick={() => {
                     dispatch({
                       type: "pause",
-                      at: new ServerTimestamp(),
+                      at: new ServerTimestamp(now()),
                     })
                   }}
                 >
@@ -173,7 +173,7 @@ export function Timer({
 
                     dispatch({
                       type: "resume",
-                      at: new ServerTimestamp(),
+                      at: new ServerTimestamp(now()),
                     })
                   }}
                 >

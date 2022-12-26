@@ -65,9 +65,9 @@ async function _setupRoom(
       } else {
         transaction.set(
           roomDoc.ref,
-          withMeta<RoomOnFirestore>({
+          withMeta({
             name: roomName,
-          })
+          } satisfies RoomOnFirestore)
         )
       }
 

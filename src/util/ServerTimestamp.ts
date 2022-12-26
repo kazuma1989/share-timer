@@ -1,6 +1,3 @@
 export class ServerTimestamp {
-  toMillis(): number {
-    // TODO impl
-    return 0
-  }
+  constructor(public readonly millis: number) {}
 }

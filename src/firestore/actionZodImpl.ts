@@ -1,29 +1,26 @@
+import { Timestamp } from "firebase/firestore"
 import * as z from "zod"
 import { ServerTimestamp } from "../util/ServerTimestamp"
 
-export type Action = z.output<typeof actionZod>
+const timestampToTimestamp = z
+  .instanceof(Timestamp)
+  .transform((_) => new ServerTimestamp(_.toMillis()))
 
-export type ActionInput = z.input<typeof actionZod>
-
-const timestampToMillis = z
-  .instanceof(ServerTimestamp)
-  .transform((_) => _.millis)
-
-export const actionZod = z.union([
+export const actionZodImpl = z.union([
   z.object({
     type: z.literal("start"),
     withDuration: z.number(),
-    at: timestampToMillis,
+    at: timestampToTimestamp,
   }),
 
   z.object({
     type: z.literal("pause"),
-    at: timestampToMillis,
+    at: timestampToTimestamp,
   }),
 
   z.object({
     type: z.literal("resume"),
-    at: timestampToMillis,
+    at: timestampToTimestamp,
   }),
 
   z.object({
