@@ -1,6 +1,6 @@
 import { doc, runTransaction } from "firebase/firestore"
 import { AbortReason } from "../useLockRoom"
-import { Room, RoomOnFirestore, roomZod } from "../zod/roomZod"
+import { Room, RoomInput, roomZod } from "../zod/roomZod"
 import { collection } from "./collection"
 import { useFirestore } from "./useFirestore"
 
@@ -48,7 +48,9 @@ export function useLockRoomImpl(): (
           throw AbortReason("signal")
         }
 
-        transaction.update<RoomOnFirestore>(roomDoc.ref, { lockedBy })
+        transaction.update(roomDoc.ref, {
+          lockedBy,
+        } satisfies RoomInput)
       },
       {
         maxAttempts: 1,
