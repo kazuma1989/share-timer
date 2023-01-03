@@ -4,7 +4,7 @@ import { shareRecent } from "./util/shareRecent"
 export function observeMediaQuery(mql: MediaQueryList) {
   return fromEvent<MediaQueryListEvent>(
     mql,
-    "change" as keyof MediaQueryListEventMap
+    "change" satisfies keyof MediaQueryListEventMap
   ).pipe(
     startWith(null),
     map(() => mql),

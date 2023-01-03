@@ -18,4 +18,4 @@ const timerState$ = of({
   mode: "paused",
   initialDuration: 3 * 60_000,
   restDuration: 2 * 60_000 + 47_000,
-} as TimerState)
+} satisfies TimerState)

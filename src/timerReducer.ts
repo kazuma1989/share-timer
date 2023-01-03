@@ -88,10 +88,10 @@ if (import.meta.vitest) {
       initialDuration: 0,
     })
 
-    expect(state).toStrictEqual<typeof state>({
+    expect(state).toStrictEqual({
       mode: "editing",
       initialDuration: durationSetByUser,
-    })
+    } satisfies typeof state)
   })
 
   test("start", () => {
@@ -107,12 +107,12 @@ if (import.meta.vitest) {
       }
     )
 
-    expect(state).toStrictEqual<typeof state>({
+    expect(state).toStrictEqual({
       mode: "running",
       initialDuration: 5 * 60_000,
       restDuration: 5 * 60_000,
       startedAt: _now,
-    })
+    } satisfies typeof state)
   })
 
   test("pause", () => {
@@ -129,11 +129,11 @@ if (import.meta.vitest) {
       }
     )
 
-    expect(state).toStrictEqual<typeof state>({
+    expect(state).toStrictEqual({
       mode: "paused",
       initialDuration: 5 * 60_000,
       restDuration: 4 * 60_000 - 40_000,
-    })
+    } satisfies typeof state)
   })
 
   test("resume", () => {
@@ -149,12 +149,12 @@ if (import.meta.vitest) {
       }
     )
 
-    expect(state).toStrictEqual<typeof state>({
+    expect(state).toStrictEqual({
       mode: "running",
       initialDuration: 5 * 60_000,
       restDuration: 4 * 60_000,
       startedAt: _now,
-    })
+    } satisfies typeof state)
   })
 
   test("cancel", () => {
@@ -169,10 +169,10 @@ if (import.meta.vitest) {
       }
     )
 
-    expect(state).toStrictEqual<typeof state>({
+    expect(state).toStrictEqual({
       mode: "editing",
       initialDuration: 5 * 60_000,
-    })
+    } satisfies typeof state)
   })
 
   test("multiple actions", () => {
@@ -201,10 +201,10 @@ if (import.meta.vitest) {
       initialDuration: 3 * 60_000,
     })
 
-    expect(state).toStrictEqual<typeof state>({
+    expect(state).toStrictEqual({
       mode: "paused",
       initialDuration: 7 * 60_000,
       restDuration: 6 * 60_000 + 30_000,
-    })
+    } satisfies typeof state)
   })
 }

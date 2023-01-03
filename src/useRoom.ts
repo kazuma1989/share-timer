@@ -14,6 +14,6 @@ const [ImplProvider, useImpl] = createContext<typeof useRoom>(
 )
 
 const room$ = of({
-  id: "mock-id",
+  id: "mock-id" as Room["id"],
   name: "mocked room",
-} as Room)
+} satisfies Room)
