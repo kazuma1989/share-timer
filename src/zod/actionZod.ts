@@ -10,7 +10,7 @@ const timestampToMillis = z.preprocess(
   z.instanceof(ServerTimestamp).transform((_) => _.toMillis())
 )
 
-export const actionZod = z.union([
+export const actionZod = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("start"),
     withDuration: z.number(),
