@@ -7,7 +7,7 @@ export type ActionInput = z.input<typeof actionZod>
 
 const timestampToMillis = z
   .instanceof(ServerTimestamp)
-  .transform((_) => _.toMillis())
+  .transform((_) => _.millis)
 
 export const actionZod = z.discriminatedUnion("type", [
   z.object({
