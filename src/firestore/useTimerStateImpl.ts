@@ -4,16 +4,14 @@ import {
   query,
   queryEqual,
   startAt,
-  Timestamp,
 } from "firebase/firestore"
 import { distinctUntilChanged, from, map, Observable, switchMap } from "rxjs"
-import * as z from "zod"
 import { timerReducer, TimerState } from "../timerReducer"
 import { createCache } from "../util/createCache"
-import { ServerTimestamp } from "../util/ServerTimestamp"
 import { shareRecent } from "../util/shareRecent"
 import { actionZod } from "../zod/actionZod"
 import { Room } from "../zod/roomZod"
+import { fromFirestore } from "./actionZodImpl"
 import { collection } from "./collection"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
 import { orderBy } from "./orderBy"
@@ -45,7 +43,7 @@ export function useTimerStateImpl(roomId: Room["id"]): Observable<TimerState> {
       distinctUntilChanged(queryEqual),
       switchMap((selectActions) => {
         const parseDocs = safeParseDocsWith((_) =>
-          actionZod.parse(actionZodImpl.parse(_))
+          actionZod.parse(fromFirestore.parse(_))
         )
 
         console.debug("actions listener attached")
@@ -72,12 +70,3 @@ export function useTimerStateImpl(roomId: Room["id"]): Observable<TimerState> {
 }
 
 const hardCache = createCache(true)
-
-const actionZodImpl = z
-  .object({
-    at: z
-      .instanceof(Timestamp)
-      .transform((_) => new ServerTimestamp(_.toMillis()))
-      .optional(),
-  })
-  .passthrough()

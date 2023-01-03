@@ -1,9 +1,8 @@
-import { addDoc, serverTimestamp } from "firebase/firestore"
-import * as z from "zod"
+import { addDoc } from "firebase/firestore"
 import { useAllSettled } from "../useAllSettled"
-import { ServerTimestamp } from "../util/ServerTimestamp"
 import { ActionInput } from "../zod/actionZod"
 import { Room } from "../zod/roomZod"
+import { toFirestore } from "./actionZodImpl"
 import { collection } from "./collection"
 import { useFirestore } from "./useFirestore"
 import { withMeta } from "./withMeta"
@@ -18,25 +17,12 @@ export function useDispatchImpl(
 
   return [
     pending,
-    (action) => {
-      let _action = null
-      if (action.type === "cancel") {
-        _action = action
-      } else {
-        action satisfies z.input<typeof actionZodImpl>
-
-        _action = actionZodImpl.parse(action)
-      }
-
-      return addPromise(
-        addDoc(collection(db, "rooms", roomId, "actions"), withMeta(_action))
-      )
-    },
+    (action) =>
+      addPromise(
+        addDoc(
+          collection(db, "rooms", roomId, "actions"),
+          withMeta(toFirestore.parse(action))
+        )
+      ),
   ]
 }
-
-const actionZodImpl = z
-  .object({
-    at: z.instanceof(ServerTimestamp).transform(() => serverTimestamp()),
-  })
-  .passthrough()
