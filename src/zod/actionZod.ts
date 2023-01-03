@@ -5,9 +5,10 @@ export type Action = z.output<typeof actionZod>
 
 export type ActionInput = z.input<typeof actionZod>
 
-const timestampToMillis = z
-  .instanceof(ServerTimestamp)
-  .transform((_) => _.millis)
+const timestampToMillis = z.preprocess(
+  ServerTimestamp.from,
+  z.instanceof(ServerTimestamp).transform((_) => _.toMillis())
+)
 
 export const actionZod = z.union([
   z.object({
