@@ -91,6 +91,7 @@ function Slider({
   return (
     <span
       role="slider"
+      aria-label={`${label}選択`}
       aria-orientation="vertical"
       aria-valuemin={0}
       aria-valuemax={valueMax}
