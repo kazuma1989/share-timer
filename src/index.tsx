@@ -2,6 +2,9 @@ import { StrictMode, Suspense } from "react"
 import { createRoot } from "react-dom/client"
 import { App } from "./App"
 import { ErrorBoundary } from "./ErrorBoundary"
+import { calibrateClock } from "./firestore/calibrateClock"
+import { FirestoreImplProvider } from "./firestore/FirestoreImplProvider"
+import { initializeFirestore } from "./firestore/initializeFirestore"
 import { FullViewportOops } from "./FullViewportOops"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
@@ -35,9 +38,6 @@ async function run() {
   const audio = createAudio(context, audioData)
 
   const route$ = observeHash()
-
-  const { calibrateClock, FirestoreImplProvider, initializeFirestore } =
-    await import("./firestore")
 
   const firestore = await initializeFirestore()
 
