@@ -11,6 +11,7 @@ import { createCache } from "../util/createCache"
 import { shareRecent } from "../util/shareRecent"
 import { actionZod } from "../zod/actionZod"
 import { Room } from "../zod/roomZod"
+import { fromFirestore } from "./actionZodImpl"
 import { collection } from "./collection"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
 import { orderBy } from "./orderBy"
@@ -41,7 +42,9 @@ export function useTimerStateImpl(roomId: Room["id"]): Observable<TimerState> {
     ).pipe(
       distinctUntilChanged(queryEqual),
       switchMap((selectActions) => {
-        const parseDocs = safeParseDocsWith(actionZod)
+        const parseDocs = safeParseDocsWith((_) =>
+          actionZod.parse(fromFirestore.parse(_))
+        )
 
         console.debug("actions listener attached")
 

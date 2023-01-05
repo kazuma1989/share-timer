@@ -8,7 +8,9 @@ export function observeAudioPermission(
   return fromEvent(
     document,
     // https://qiita.com/zprodev/items/7fcd8335d7e8e613a01f#解決策-1
-    (document.ontouchend ? "touchend" : "mouseup") as keyof DocumentEventMap,
+    (document.ontouchend
+      ? "touchend"
+      : "mouseup") satisfies keyof DocumentEventMap,
     {
       passive: true,
       once: true,

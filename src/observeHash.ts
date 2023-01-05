@@ -9,7 +9,7 @@ import { fromRoute, Route, toRoute } from "./toRoute"
 import { shareRecent } from "./util/shareRecent"
 
 export function observeHash(): Observable<Route> {
-  return fromEvent(window, "hashchange" as keyof WindowEventMap, {
+  return fromEvent(window, "hashchange" satisfies keyof WindowEventMap, {
     passive: true,
   }).pipe(
     startWith(null),

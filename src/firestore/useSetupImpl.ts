@@ -1,7 +1,7 @@
 import { doc, Firestore, runTransaction } from "firebase/firestore"
 import { createCache } from "../util/createCache"
-import { ActionOnFirestore } from "../zod/actionZod"
-import { Room, RoomOnFirestore } from "../zod/roomZod"
+import { ActionInput } from "../zod/actionZod"
+import { Room, RoomInput } from "../zod/roomZod"
 import { collection } from "./collection"
 import { useFirestore } from "./useFirestore"
 import { withMeta } from "./withMeta"
@@ -59,24 +59,24 @@ async function _setupRoom(
       if (signal.aborted) throw "aborted 2"
 
       if (roomDoc.exists()) {
-        transaction.update<RoomOnFirestore>(roomDoc.ref, {
+        transaction.update(roomDoc.ref, {
           name: roomName,
-        })
+        } satisfies RoomInput)
       } else {
         transaction.set(
           roomDoc.ref,
-          withMeta<RoomOnFirestore>({
+          withMeta({
             name: roomName,
-          })
+          } satisfies RoomInput)
         )
       }
 
       transaction.set(
         doc(collection(db, "rooms", roomId, "actions")),
-        withMeta<ActionOnFirestore>({
+        withMeta({
           type: "cancel",
           withDuration: DEFAULT_DURATION,
-        })
+        } satisfies ActionInput)
       )
     },
     {

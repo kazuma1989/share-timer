@@ -1,21 +1,20 @@
 import { DocumentSnapshot } from "firebase/firestore"
-import * as z from "zod"
 
 export function safeParseDocsWith<T>(
-  zod: z.ZodType<T, any, unknown>
+  parse: (raw: unknown) => T
 ): (docs: DocumentSnapshot[]) => T[] {
   return (docs) =>
-    docs.flatMap<T>((doc) => {
+    docs.flatMap((doc): T[] => {
       const rawData = doc.data({
         serverTimestamps: "estimate",
       })
 
-      const _ = zod.safeParse(rawData)
-      if (_.success) {
-        return [_.data]
-      }
+      try {
+        return [parse(rawData)]
+      } catch (reason) {
+        console.debug(rawData, reason)
 
-      console.debug(rawData, _.error)
-      return []
+        return []
+      }
     })
 }

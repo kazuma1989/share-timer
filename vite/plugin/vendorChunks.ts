@@ -20,9 +20,6 @@ export default function vendorChunks(): Plugin {
 
                   case id.includes("/node_modules/react"):
                     return "react"
-
-                  case id.includes("/node_modules/zod"):
-                    return "zod"
                 }
               },
             },

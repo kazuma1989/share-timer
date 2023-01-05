@@ -60,32 +60,32 @@ if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
 
   test("toRoute", () => {
-    expect(toRoute("")).toStrictEqual<Route>(["newRoom", ""])
+    expect(toRoute("")).toStrictEqual(["newRoom", ""] satisfies Route)
   })
 
   test("toRoute", () => {
-    expect(toRoute("new")).toStrictEqual<Route>(["newRoom", "new"])
+    expect(toRoute("new")).toStrictEqual(["newRoom", "new"] satisfies Route)
   })
 
   test("toRoute", () => {
-    expect(toRoute("aaa-bbbb-ccc/")).toStrictEqual<Route>([
+    expect(toRoute("aaa-bbbb-ccc/")).toStrictEqual([
       "unknown",
       "aaa-bbbb-ccc/",
-    ])
+    ] satisfies Route)
   })
 
   test("toRoute", () => {
-    expect(toRoute("aaa-bbbb-ccc")).toStrictEqual<Route>([
+    expect(toRoute("aaa-bbbb-ccc")).toStrictEqual([
       "room",
       "aaa-bbbb-ccc" as Room["id"],
-    ])
+    ] satisfies Route)
   })
 
   test("toRoute", () => {
-    expect(toRoute("aaa-bbbb-ccc/info")).toStrictEqual<Route>([
+    expect(toRoute("aaa-bbbb-ccc/info")).toStrictEqual([
       "info",
       "aaa-bbbb-ccc" as Room["id"],
-    ])
+    ] satisfies Route)
   })
 
   test("fromRoute", () => {

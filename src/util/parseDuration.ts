@@ -43,10 +43,10 @@ if (import.meta.vitest) {
   test("basic", () => {
     const parsed = parseDuration(2 * 3600_000 + 19 * 60_000 + 43_000)
 
-    expect(parsed).toStrictEqual<typeof parsed>({
+    expect(parsed).toStrictEqual({
       hours: 2,
       minutes: 19,
       seconds: 43,
-    })
+    } satisfies typeof parsed)
   })
 }

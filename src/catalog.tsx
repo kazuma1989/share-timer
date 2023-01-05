@@ -28,14 +28,14 @@ createRoot(root).render(
           <Suspense fallback={<FullViewportProgress />}>
             <Timer
               room$={of({
-                id: "",
+                id: "" as Room["id"],
                 name: "hello",
-              } as Room)}
+              } satisfies Room)}
               timerState$={of({
                 initialDuration: 3 * 60_000,
                 mode: "paused",
                 restDuration: 2 * 60_000,
-              } as TimerState)}
+              } satisfies TimerState)}
             />
           </Suspense>
         </MediaPermissionProvider>

@@ -5,7 +5,7 @@ export interface Room extends z.output<typeof roomZod> {
   id: z.infer<typeof roomIdZod>
 }
 
-export interface RoomOnFirestore extends z.input<typeof roomZod> {}
+export interface RoomInput extends z.input<typeof roomZod> {}
 
 export type InvalidDoc = [reason: "invalid-doc", payload: Room["id"]]
 
