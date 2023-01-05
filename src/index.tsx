@@ -14,51 +14,54 @@ import { DarkModeProvider, observeDarkMode } from "./useDarkMode"
 import { createVideoTimer, VideoTimerProvider } from "./useVideoTimer"
 import { nanoid } from "./util/nanoid"
 
-// https://neos21.net/blog/2018/08/19-01.html
-document.body.addEventListener("touchstart", () => {}, { passive: true })
+run()
 
-if (!getItem("userId")) {
-  setItem("userId", nanoid(10))
-}
+async function run() {
+  // https://neos21.net/blog/2018/08/19-01.html
+  document.body.addEventListener("touchstart", () => {}, { passive: true })
 
-const videoTimer = createVideoTimer()
-
-const darkMode$ = observeDarkMode()
-
-const context = new AudioContext()
-const permission$ = observeAudioPermission(context)
-
-const audioData = await fetch(smallAlert).then((_) => _.arrayBuffer())
-const audio = createAudio(context, audioData)
-
-const route$ = observeHash()
-
-import("./firestore").then(
-  async ({ calibrateClock, FirestoreImplProvider, initializeFirestore }) => {
-    const firestore = await initializeFirestore()
-
-    calibrateClock(firestore).catch((reason: unknown) => {
-      console.warn("calibration failed", reason)
-    })
-
-    createRoot(document.getElementById("root")!).render(
-      <StrictMode>
-        <FirestoreImplProvider firestore={firestore}>
-          <ErrorBoundary fallback={<FullViewportOops />}>
-            <VideoTimerProvider value={videoTimer}>
-              <DarkModeProvider value={darkMode$}>
-                <AudioProvider value={audio}>
-                  <MediaPermissionProvider value={permission$}>
-                    <Suspense fallback={<FullViewportProgress />}>
-                      <App route$={route$} />
-                    </Suspense>
-                  </MediaPermissionProvider>
-                </AudioProvider>
-              </DarkModeProvider>
-            </VideoTimerProvider>
-          </ErrorBoundary>
-        </FirestoreImplProvider>
-      </StrictMode>
-    )
+  if (!getItem("userId")) {
+    setItem("userId", nanoid(10))
   }
-)
+
+  const videoTimer = createVideoTimer()
+
+  const darkMode$ = observeDarkMode()
+
+  const context = new AudioContext()
+  const permission$ = observeAudioPermission(context)
+
+  const audioData = await fetch(smallAlert).then((_) => _.arrayBuffer())
+  const audio = createAudio(context, audioData)
+
+  const route$ = observeHash()
+
+  const { calibrateClock, FirestoreImplProvider, initializeFirestore } =
+    await import("./firestore")
+
+  const firestore = await initializeFirestore()
+
+  calibrateClock(firestore).catch((reason: unknown) => {
+    console.warn("calibration failed", reason)
+  })
+
+  createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+      <FirestoreImplProvider firestore={firestore}>
+        <ErrorBoundary fallback={<FullViewportOops />}>
+          <VideoTimerProvider value={videoTimer}>
+            <DarkModeProvider value={darkMode$}>
+              <AudioProvider value={audio}>
+                <MediaPermissionProvider value={permission$}>
+                  <Suspense fallback={<FullViewportProgress />}>
+                    <App route$={route$} />
+                  </Suspense>
+                </MediaPermissionProvider>
+              </AudioProvider>
+            </DarkModeProvider>
+          </VideoTimerProvider>
+        </ErrorBoundary>
+      </FirestoreImplProvider>
+    </StrictMode>
+  )
+}
