@@ -14,12 +14,11 @@ export default function vendorChunks(): Plugin {
             output: {
               manualChunks(id) {
                 switch (true) {
-                  case id.includes("/node_modules/@firebase"):
-                  case id.includes("/node_modules/firebase"):
-                    return "firebase"
-
                   case id.includes("/node_modules/react"):
                     return "react"
+
+                  case id.includes("/node_modules/rxjs"):
+                    return "rxjs"
 
                   case id.includes("/node_modules/zod"):
                     return "zod"
