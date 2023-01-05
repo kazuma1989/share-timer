@@ -40,6 +40,7 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
     build: {
       outDir: BUILD_PATH || hosting.find((_) => _.target === "app")?.public,
       sourcemap: true,
+      assetsInlineLimit: 4096 * 2,
     },
 
     preview: {
