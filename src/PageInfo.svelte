@@ -64,10 +64,7 @@
         href="#"
         target="_blank"
         class={clsx(
-          "block border border-gray-500 px-4 py-3 text-center no-underline after:content-['_↗']",
-          // FIXME TransparentButtonと同じスタイルなのでなんとかコンポーネントにまとめられないか
-          "cursor-pointer rounded-md transition-colors",
-          "hover:bg-dark/10 active:bg-dark/20 dark:hover:bg-light/20 dark:active:bg-light/30"
+          "transparent-button block border border-gray-500 px-4 py-3 text-center no-underline after:content-['_↗']"
         )}
       >
         新しいタイマーを開く
@@ -77,7 +74,7 @@
     <p>
       <button
         type="button"
-        class="block w-full border border-gray-500 px-4 py-3"
+        class="transparent-button block w-full border border-gray-500 px-4 py-3"
       >
         編集をロックする (experimental)
       </button>
@@ -99,3 +96,9 @@
     </p>
   </footer>
 </article>
+
+<style lang="postcss">
+  .transparent-button {
+    @apply cursor-pointer rounded-md transition-colors hover:bg-dark/10 active:bg-dark/20 dark:hover:bg-light/20 dark:active:bg-light/30;
+  }
+</style>
