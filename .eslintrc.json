@@ -7,6 +7,8 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/base",
     "plugin:@typescript-eslint/eslint-recommended",
+
+    // Svelte の template 内の class 属性はチェックしてくれないからあきらめる
     "plugin:tailwindcss/recommended",
 
     // Prettier の整形と衝突するルールを無効にする。
@@ -29,6 +31,10 @@
     },
 
     "svelte3/typescript": true
+  },
+
+  "env": {
+    "browser": true
   },
 
   "rules": {
