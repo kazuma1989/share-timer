@@ -1,4 +1,3 @@
-import react from "@vitejs/plugin-react"
 import { defineConfig, UserConfig } from "vite"
 import { hosting } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
@@ -49,9 +48,6 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
     },
 
     plugins: [
-      // The all-in-one Vite plugin for React projects.
-      react(),
-
       // Firebase
       firebaseReservedURL(),
       firestoreEmulatorProxy(),

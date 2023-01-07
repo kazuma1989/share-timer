@@ -17,9 +17,6 @@ export default function vendorChunks(): Plugin {
                   case id.includes("/node_modules/@firebase"):
                   case id.includes("/node_modules/firebase"):
                     return "firebase"
-
-                  case id.includes("/node_modules/react"):
-                    return "react"
                 }
               },
             },

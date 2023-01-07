@@ -8,8 +8,8 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
-  // TS, TSXファイルのみ対象とする。
-  "eslint.probe": ["typescript", "typescriptreact"],
+  // TSファイルのみ対象とする。
+  "eslint.probe": ["typescript"],
 
   // Tailwind記法を受け入れる
   "css.validate": false,

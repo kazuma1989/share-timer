@@ -5,9 +5,6 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/base",
     "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:react/recommended",
-    "plugin:react/jsx-runtime",
-    "plugin:react-hooks/recommended",
     "plugin:tailwindcss/recommended",
 
     // Prettier の整形と衝突するルールを無効にする。
@@ -21,11 +18,6 @@
   },
 
   "settings": {
-    // eslint-plugin-react からワーニングが出ないように明示的に指定。
-    "react": {
-      "version": "detect"
-    },
-
     "tailwindcss": {
       "callees": ["clsx"],
       "config": "./tailwind.config.cjs"

@@ -1,7 +1,5 @@
 // https://www.typescriptlang.org/ja/tsconfig
 {
-  "extends": "@tsconfig/vite-react/tsconfig.json",
-
   "references": [{ "path": "./tsconfig.node.json" }],
 
   "include": ["./src/**/*"],
@@ -11,10 +9,6 @@
 
     // インデックスアクセスは null チェックが必要。
     "noUncheckedIndexedAccess": true,
-
-    // <div /> を _jsx("div") に変換する。
-    // JSX を使いたいだけなら `import React` は不要。
-    "jsx": "react-jsx",
 
     // tsc コマンドは自分のソースコードの型チェックだけに用いる（パッケージ間の整合性まではチェックしない）。
     "skipLibCheck": true
