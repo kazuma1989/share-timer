@@ -35,7 +35,9 @@
     "tailwind-init": "tailwindcss init -p"
   },
   "dependencies": {
+    "@sveltejs/vite-plugin-svelte": "2.0.x",
     "@tailwindcss/typography": "0.5.x",
+    "@tsconfig/svelte": "3.0.x",
     "autoprefixer": "10.4.x",
     "clsx": "1.2.x",
     "firebase": "9.15.x",
@@ -43,6 +45,7 @@
     "postcss": "8.4.x",
     "qrcode-generator": "1.4.x",
     "rxjs": "7.8.x",
+    "svelte": "3.55.x",
     "tailwindcss": "3.2.x",
     "vite": "4.0.x",
     "zod": "3.20.x"
@@ -53,9 +56,12 @@
     "@typescript-eslint/parser": "5.47.x",
     "eslint": "8.30.x",
     "eslint-config-prettier": "8.5.x",
+    "eslint-plugin-svelte3": "4.0.x",
     "eslint-plugin-tailwindcss": "3.7.x",
     "prettier": "2.8.x",
     "prettier-plugin-organize-imports": "3.2.x",
+    "prettier-plugin-svelte": "2.9.x",
+    "svelte-check": "3.0.x",
     "typescript": "4.9.x",
     "vite-plugin-checker": "0.5.x",
     "vitest": "0.26.x"
