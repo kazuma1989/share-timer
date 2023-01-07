@@ -1,8 +1,9 @@
 <script lang="ts">
   import clsx from "clsx"
   import Icon from "./Icon.svelte"
+  import QrCode from "./QRCode.svelte"
 
-  const roomURL = "#"
+  const roomURL = "https://sharetimer.web.app/#dcc-tice-dad"
 </script>
 
 <article
@@ -17,7 +18,7 @@
   <div>
     <button
       type="button"
-      class="my-2 -ml-4 h-12 w-12 text-2xl"
+      class="transparent-button my-2 -ml-4 h-12 w-12 text-2xl"
       on:click={() => {
         console.log("back")
       }}
@@ -37,12 +38,12 @@
 
     <p class="text-center">
       <a href={roomURL} class="break-words">
-        <!-- <QRCode
+        <QrCode
           data={roomURL}
           width={160}
           height={160}
           class="mb-2 inline-block"
-        /> -->
+        />
         <br />
 
         <span>{roomURL}</span>
