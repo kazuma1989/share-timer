@@ -13,7 +13,7 @@ export default function vitest(): Plugin {
       return {
         test: {
           setupFiles: [path.join(__dirname, "../../src/test.setup.ts")],
-          includeSource: [path.join(__dirname, "../../src/**/*.{ts,tsx}")],
+          includeSource: [path.join(__dirname, "../../src/**/*.{ts,svelte}")],
         },
 
         define: {
