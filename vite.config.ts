@@ -1,3 +1,4 @@
+import { svelte } from "@sveltejs/vite-plugin-svelte"
 import { defineConfig, UserConfig } from "vite"
 import { hosting } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
@@ -48,6 +49,8 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
     },
 
     plugins: [
+      svelte(),
+
       // Firebase
       firebaseReservedURL(),
       firestoreEmulatorProxy(),

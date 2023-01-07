@@ -59,7 +59,6 @@
     "eslint-plugin-svelte3": "4.0.x",
     "eslint-plugin-tailwindcss": "3.7.x",
     "prettier": "2.8.x",
-    "prettier-plugin-organize-imports": "3.2.x",
     "prettier-plugin-svelte": "2.9.x",
     "svelte-check": "3.0.x",
     "typescript": "4.9.x",

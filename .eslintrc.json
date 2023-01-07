@@ -1,4 +1,6 @@
 {
+  "root": true,
+
   // 各プラグインのおすすめルールを適用する。
   // プラグインの読み込みも設定してくれるので、plugins オプションも不要。
   "extends": [
@@ -14,14 +16,19 @@
 
   // https://typescript-eslint.io/docs/linting/typed-linting/
   "parserOptions": {
-    "project": ["./tsconfig.json", "./tsconfig.node.json"]
+    "project": ["./tsconfig.json", "./tsconfig.node.json"],
+    "extraFileExtensions": [".svelte"]
   },
+
+  "plugins": ["svelte3"],
 
   "settings": {
     "tailwindcss": {
       "callees": ["clsx"],
       "config": "./tailwind.config.cjs"
-    }
+    },
+
+    "svelte3/typescript": true
   },
 
   "rules": {
@@ -60,7 +67,12 @@
 
   "overrides": [
     {
-      "files": ["**/*.test.ts"],
+      "files": ["*.svelte"],
+      "processor": "svelte3/svelte3"
+    },
+
+    {
+      "files": ["*.test.ts"],
       "rules": {
         "@typescript-eslint/no-unused-vars": "off"
       }

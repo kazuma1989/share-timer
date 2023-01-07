@@ -1,16 +1,13 @@
 // https://www.typescriptlang.org/ja/tsconfig
 {
+  "extends": "@tsconfig/svelte/tsconfig.json",
+
   "references": [{ "path": "./tsconfig.node.json" }],
 
   "include": ["./src/**/*"],
 
   "compilerOptions": {
-    "types": ["vite/client", "vitest/importMeta"],
-
     // インデックスアクセスは null チェックが必要。
-    "noUncheckedIndexedAccess": true,
-
-    // tsc コマンドは自分のソースコードの型チェックだけに用いる（パッケージ間の整合性まではチェックしない）。
-    "skipLibCheck": true
+    "noUncheckedIndexedAccess": true
   }
 }
