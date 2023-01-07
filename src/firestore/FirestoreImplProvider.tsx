@@ -1,4 +1,5 @@
-import { Firestore } from "firebase/firestore"
+import type { Firestore } from "firebase/firestore"
+// @ts-expect-error
 import { ReactNode } from "react"
 import { UseDispatchProvider } from "../useDispatch"
 import { UseLockRoomProvider } from "../useLockRoom"

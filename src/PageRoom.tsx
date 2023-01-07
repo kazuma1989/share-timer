@@ -6,7 +6,7 @@ import { useRoom } from "./useRoom"
 import { useTimerState } from "./useTimerState"
 import { useTitleAsTimeViewer } from "./useTitleAsTimeViewer"
 import { createCache } from "./util/createCache"
-import { isRoom, Room } from "./zod/roomZod"
+import { isRoom, type Room } from "./zod/roomZod"
 
 export function PageRoom({ roomId }: { roomId: Room["id"] }) {
   const _room$ = useRoom(roomId)

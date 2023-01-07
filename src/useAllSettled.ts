@@ -1,3 +1,4 @@
+// @ts-expect-error
 import { Reducer, useReducer } from "react"
 import { useObservable } from "./useObservable"
 
@@ -12,7 +13,12 @@ export function useAllSettled(): [allSettled: boolean, add: Add] {
       PromiseLike<unknown>
     >
   >(
-    (state, promise) => {
+    (
+      // @ts-expect-error
+      state,
+      // @ts-expect-error
+      promise
+    ) => {
       const [currentPromises] = state
       if (currentPromises.has(promise)) {
         return state

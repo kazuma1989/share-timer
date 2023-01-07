@@ -1,6 +1,6 @@
 import { createContext } from "./createContext"
-import { ActionInput } from "./zod/actionZod"
-import { Room } from "./zod/roomZod"
+import type { ActionInput } from "./zod/actionZod"
+import type { Room } from "./zod/roomZod"
 
 export function useDispatch(
   roomId: Room["id"]

@@ -1,4 +1,4 @@
-import { isRoomId, Room } from "./zod/roomZod"
+import { isRoomId, type Room } from "./zod/roomZod"
 
 export type Route =
   | [key: "room", roomId: Room["id"]]

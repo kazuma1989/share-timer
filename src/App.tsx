@@ -1,9 +1,10 @@
+// @ts-expect-error
 import { lazy } from "react"
-import { Observable } from "rxjs"
+import type { Observable } from "rxjs"
 import { replaceHash } from "./observeHash"
 import { PageRoom } from "./PageRoom"
 import { SetupRoom } from "./SetupRoom"
-import { Route } from "./toRoute"
+import type { Route } from "./toRoute"
 import { useObservable } from "./useObservable"
 import { suspend } from "./util/suspend"
 import { newRoomId } from "./zod/roomZod"

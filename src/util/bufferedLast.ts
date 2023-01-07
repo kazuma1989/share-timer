@@ -2,9 +2,9 @@ import {
   buffer,
   filter,
   map,
-  MonoTypeOperatorFunction,
   Observable,
   pipe,
+  type MonoTypeOperatorFunction,
 } from "rxjs"
 
 /**

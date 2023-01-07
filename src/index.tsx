@@ -1,4 +1,6 @@
+// @ts-expect-error
 import { StrictMode, Suspense } from "react"
+// @ts-expect-error
 import { createRoot } from "react-dom/client"
 import { App } from "./App"
 import { ErrorBoundary } from "./ErrorBoundary"

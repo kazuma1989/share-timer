@@ -1,17 +1,21 @@
 import clsx from "clsx"
+// @ts-expect-error
 import { useEffect } from "react"
 import {
   distinctUntilChanged,
   filter,
   map,
   Observable,
-  OperatorFunction,
   pipe,
   scan,
   withLatestFrom,
+  type OperatorFunction,
 } from "rxjs"
-import { CurrentDuration, mapToCurrentDuration } from "./mapToCurrentDuration"
-import { TimerState } from "./timerReducer"
+import {
+  mapToCurrentDuration,
+  type CurrentDuration,
+} from "./mapToCurrentDuration"
+import type { TimerState } from "./timerReducer"
 import { useAudio } from "./useAudio"
 import { useConfig } from "./useConfig"
 import { useObservable } from "./useObservable"

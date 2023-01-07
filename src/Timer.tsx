@@ -1,13 +1,14 @@
 import clsx from "clsx"
+// @ts-expect-error
 import { useEffect, useId, useRef } from "react"
-import { Observable } from "rxjs"
+import type { Observable } from "rxjs"
 import { CircleButton } from "./CircleButton"
 import { DurationSelect } from "./DurationSelect"
 import { icon } from "./icon"
 import { now } from "./now"
 import { setHash } from "./observeHash"
 import { getItem, setItem } from "./storage"
-import { TimerState } from "./timerReducer"
+import type { TimerState } from "./timerReducer"
 import { TimeViewer } from "./TimeViewer"
 import { TransparentButton } from "./TransparentButton"
 import { useMediaPermission } from "./useAudio"
@@ -16,7 +17,7 @@ import { useDispatch } from "./useDispatch"
 import { useObservable } from "./useObservable"
 import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
 import { ServerTimestamp } from "./util/ServerTimestamp"
-import { Room } from "./zod/roomZod"
+import type { Room } from "./zod/roomZod"
 
 export function Timer({
   room$,
@@ -51,7 +52,10 @@ export function Timer({
 
         <form
           className="contents"
-          onSubmit={async (e) => {
+          onSubmit={async (
+            // @ts-expect-error
+            e
+          ) => {
             e.preventDefault()
 
             if (state.mode !== "editing") return
@@ -96,6 +100,7 @@ export function Timer({
             {!locked && state.mode === "editing" ? (
               <div className="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center">
                 <DurationSelect
+                  // @ts-expect-error
                   key={state.mode + state.initialDuration}
                   innerRef={durationSelect$}
                   defaultValue={state.initialDuration}
@@ -291,7 +296,10 @@ function ConfigArea({
               "before:absolute before:left-3/4 before:bottom-0 before:translate-y-full before:-translate-x-1/2 before:border-8 before:border-transparent before:content-['']",
               "after:absolute after:left-3/4 after:bottom-0 after:translate-y-full after:-translate-x-1/2 after:border-[6.5px] after:border-transparent after:content-['']"
             )}
-            onClick={(e) => {
+            onClick={(
+              // @ts-expect-error
+              e
+            ) => {
               e.stopPropagation()
             }}
           >

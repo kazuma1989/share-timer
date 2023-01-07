@@ -4,11 +4,11 @@ import {
   map,
   merge,
   mergeMap as flat,
-  MonoTypeOperatorFunction,
   scan,
   share,
   startWith,
   windowToggle,
+  type MonoTypeOperatorFunction,
 } from "rxjs"
 
 export function pauseWhileLoop<T>({

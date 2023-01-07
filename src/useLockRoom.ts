@@ -1,5 +1,5 @@
 import { createContext } from "./createContext"
-import { Room } from "./zod/roomZod"
+import type { Room } from "./zod/roomZod"
 
 export type AbortReason =
   | "signal"

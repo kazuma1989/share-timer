@@ -1,6 +1,6 @@
 import { doc, runTransaction } from "firebase/firestore"
 import { AbortReason } from "../useLockRoom"
-import { Room, RoomInput, roomZod } from "../zod/roomZod"
+import { roomZod, type Room, type RoomInput } from "../zod/roomZod"
 import { collection } from "./collection"
 import { useFirestore } from "./useFirestore"
 

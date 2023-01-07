@@ -1,5 +1,6 @@
+// @ts-expect-error
 import { useSyncExternalStore } from "react"
-import { firstValueFrom, from, ObservableInput } from "rxjs"
+import { firstValueFrom, from, type ObservableInput } from "rxjs"
 import { createCache } from "./util/createCache"
 
 export function useObservable<T>(

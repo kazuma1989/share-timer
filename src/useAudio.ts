@@ -1,6 +1,6 @@
-import { Observable } from "rxjs"
+import type { Observable } from "rxjs"
 import { createContext } from "./createContext"
-import { Permission } from "./observeAudioPermission"
+import type { Permission } from "./observeAudioPermission"
 import { createAudioBufferSourceNode } from "./util/createAudioBufferSourceNode"
 
 export interface Audio {

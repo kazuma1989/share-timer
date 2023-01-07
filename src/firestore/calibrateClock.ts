@@ -7,7 +7,7 @@ import {
   Timestamp,
 } from "firebase/firestore"
 import { now, setEstimatedDiff } from "../now"
-import { Calibration, calibrationZod } from "./calibrationZod"
+import { calibrationZod, type Calibration } from "./calibrationZod"
 import { collection } from "./collection"
 import { withMeta } from "./withMeta"
 

@@ -1,4 +1,5 @@
 import clsx from "clsx"
+// @ts-expect-error
 import { Ref } from "react"
 
 export function CircleButton({
@@ -67,6 +68,7 @@ export function CircleButton({
       type={type}
       className={clsx(
         "h-20 w-20 cursor-pointer select-none rounded-full border-4 border-double transition-colors",
+        // @ts-expect-error
         colorStyle,
         "disabled:cursor-auto disabled:border-neutral-400 disabled:text-neutral-700",
         "dark:disabled:cursor-auto dark:disabled:border-neutral-700 dark:disabled:text-neutral-400",

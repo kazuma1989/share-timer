@@ -1,4 +1,4 @@
-import { DocumentSnapshot } from "firebase/firestore"
+import type { DocumentSnapshot } from "firebase/firestore"
 
 export function safeParseDocsWith<T>(
   parse: (raw: unknown) => T

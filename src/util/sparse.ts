@@ -1,4 +1,4 @@
-import { concatMap, delay, MonoTypeOperatorFunction, of } from "rxjs"
+import { concatMap, delay, of, type MonoTypeOperatorFunction } from "rxjs"
 
 /**
  * 流れをすべて拾うものの、流れの間隔を interval 以上に保ち、過剰な流入を防ぐ

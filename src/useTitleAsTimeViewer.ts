@@ -1,7 +1,8 @@
+// @ts-expect-error
 import { useEffect } from "react"
 import { distinctUntilChanged, map, Observable } from "rxjs"
 import { mapToCurrentDuration } from "./mapToCurrentDuration"
-import { TimerState } from "./timerReducer"
+import type { TimerState } from "./timerReducer"
 import { createCache } from "./util/createCache"
 import { floor } from "./util/floor"
 import { formatDuration } from "./util/formatDuration"

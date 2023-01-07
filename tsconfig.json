@@ -7,7 +7,20 @@
   "include": ["./src/**/*"],
 
   "compilerOptions": {
-    // インデックスアクセスは null チェックが必要。
-    "noUncheckedIndexedAccess": true
+    // TODO いったんエラー回避
+    "jsx": "react-jsx",
+
+    // null check 強化
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+
+    // import.meta を使いたい
+    "module": "ESNext",
+
+    // JSON を使いたい
+    "resolveJsonModule": true,
+
+    // 手軽に tsc コマンドで検査したい
+    "noEmit": true
   }
 }

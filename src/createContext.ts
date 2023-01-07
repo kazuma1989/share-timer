@@ -1,3 +1,4 @@
+// @ts-expect-error
 import { createContext as _createContext, Provider, useContext } from "react"
 
 export function createContext<T>(

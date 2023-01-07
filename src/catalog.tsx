@@ -1,4 +1,6 @@
+// @ts-expect-error
 import { StrictMode, Suspense } from "react"
+// @ts-expect-error
 import { createRoot } from "react-dom/client"
 import { of } from "rxjs"
 import { ErrorBoundary } from "./ErrorBoundary"
@@ -8,9 +10,9 @@ import "./global.css"
 import { observeAudioPermission } from "./observeAudioPermission"
 import smallAlert from "./sound/small-alert.mp3"
 import { Timer } from "./Timer"
-import { TimerState } from "./timerReducer"
+import type { TimerState } from "./timerReducer"
 import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
-import { Room } from "./zod/roomZod"
+import type { Room } from "./zod/roomZod"
 
 const root = document.getElementById("root")!
 

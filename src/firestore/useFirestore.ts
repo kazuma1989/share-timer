@@ -1,4 +1,4 @@
-import { Firestore } from "firebase/firestore"
+import type { Firestore } from "firebase/firestore"
 import { createContext } from "../createContext"
 
 export const [FirestoreProvider, useFirestore] =

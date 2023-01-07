@@ -2,11 +2,11 @@ import {
   combineLatestWith,
   map,
   Observable,
-  OperatorFunction,
   pipe,
+  type OperatorFunction,
 } from "rxjs"
 import { now } from "./now"
-import { TimerState } from "./timerReducer"
+import type { TimerState } from "./timerReducer"
 import { shareRecent } from "./util/shareRecent"
 
 export interface CurrentDuration {

@@ -1,12 +1,7 @@
 import clsx from "clsx"
-import {
-  Ref,
-  useEffect,
-  useImperativeHandle,
-  useReducer,
-  useRef,
-  useState,
-} from "react"
+// @ts-expect-error
+// prettier-ignore
+import { Ref, useEffect, useImperativeHandle, useReducer, useRef, useState } from "react"
 import { parseDuration } from "./util/parseDuration"
 
 export function DurationSelect({
@@ -100,7 +95,10 @@ function Slider({
         valueNow === undefined ? undefined : `${valueNow}${label}`
       }
       tabIndex={0}
-      onKeyDown={(e) => {
+      onKeyDown={(
+        // @ts-expect-error
+        e
+      ) => {
         import.meta.env.DEV && console.debug(e.key, e.keyCode)
 
         switch (e.key) {
@@ -135,7 +133,10 @@ function Slider({
           "-mr-12 pr-14 text-3xl",
           className
         )}
-        ref={(slider) => {
+        ref={(
+          // @ts-expect-error
+          slider
+        ) => {
           if (!slider) return
 
           createObserver({
@@ -162,7 +163,10 @@ function Slider({
               "text-right",
               value !== valueNow && "font-thin opacity-25"
             )}
-            ref={(step) => {
+            ref={(
+              // @ts-expect-error
+              step
+            ) => {
               if (!step) return
 
               observer?.observe(step)

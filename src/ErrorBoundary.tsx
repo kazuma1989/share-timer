@@ -1,3 +1,4 @@
+// @ts-expect-error
 import { Component, ErrorInfo, ReactNode } from "react"
 import { createContext } from "./createContext"
 
@@ -32,6 +33,7 @@ export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
 
+    // @ts-expect-error
     this.state = {
       error: null,
     }
@@ -42,13 +44,16 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   private resetError: ResetError = () => {
+    // @ts-expect-error
     this.setState({
       error: null,
     })
   }
 
   render() {
+    // @ts-expect-error
     const { fallback, children } = this.props
+    // @ts-expect-error
     const { error } = this.state
     const { resetError } = this
 

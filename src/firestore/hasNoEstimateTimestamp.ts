@@ -1,4 +1,4 @@
-import { SnapshotMetadata } from "firebase/firestore"
+import type { SnapshotMetadata } from "firebase/firestore"
 
 export function hasNoEstimateTimestamp(
   metadata: SnapshotMetadata | undefined

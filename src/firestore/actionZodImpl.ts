@@ -1,7 +1,7 @@
 import { serverTimestamp, Timestamp } from "firebase/firestore"
 import * as z from "zod"
 import { ServerTimestamp } from "../util/ServerTimestamp"
-import { ActionInput } from "../zod/actionZod"
+import type { ActionInput } from "../zod/actionZod"
 
 export const toFirestore = z
   .object({
