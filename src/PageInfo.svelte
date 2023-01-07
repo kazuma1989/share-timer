@@ -1,5 +1,6 @@
 <script lang="ts">
   import clsx from "clsx"
+  import Icon from "./Icon.svelte"
 
   const roomURL = "#"
 </script>
@@ -19,8 +20,10 @@
       class="my-2 -ml-4 h-12 w-12 text-2xl"
       on:click={() => {
         console.log("back")
-      }}>戻る</button
+      }}
     >
+      <Icon name="arrow-left" />
+    </button>
 
     <h1>
       <ruby>
