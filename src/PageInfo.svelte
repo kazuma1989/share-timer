@@ -3,6 +3,7 @@
   import Icon from "./Icon.svelte"
   import QrCode from "./QRCode.svelte"
 
+  // TODO 本物の動的URLにする
   const roomURL = "https://sharetimer.web.app/#dcc-tice-dad"
 </script>
 
@@ -20,6 +21,7 @@
       type="button"
       class="transparent-button my-2 -ml-4 h-12 w-12 text-2xl"
       on:click={() => {
+        // TODO 本物の戻る処理
         console.log("back")
       }}
     >
@@ -76,6 +78,9 @@
       <button
         type="button"
         class="transparent-button block w-full border border-gray-500 px-4 py-3"
+        on:click={() => {
+          // TODO 本物のロック処理
+        }}
       >
         編集をロックする (experimental)
       </button>
@@ -85,7 +90,7 @@
   <footer>
     <p class="text-center">
       <small>
-        Crafted by{" "}
+        Crafted by
         <a
           href="https://github.com/kazuma1989"
           target="_blank"
