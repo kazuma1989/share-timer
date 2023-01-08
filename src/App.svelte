@@ -2,6 +2,7 @@
   import type { Observable } from "rxjs"
   import FullViewportProgress from "./FullViewportProgress.svelte"
   import { replaceHash } from "./observeHash"
+  import PageRoom from "./PageRoom.svelte"
   import type { Route } from "./toRoute"
   import { newRoomId } from "./zod/roomZod"
 
@@ -25,8 +26,7 @@
   {:else if $route$[0] === "room"}
     {@const [, roomId] = $route$}
 
-    <!-- TODO PageRoom を表示したい -->
-    <p>room ({roomId})</p>
+    <PageRoom {roomId} />
   {:else if $route$[0] === "unknown"}
     {@const [, payload] = $route$}
 
