@@ -41,6 +41,7 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
       outDir: BUILD_PATH || hosting.find((_) => _.target === "app")?.public,
       sourcemap: true,
       assetsInlineLimit: 4096 * 2,
+      cssCodeSplit: false,
     },
 
     preview: {
