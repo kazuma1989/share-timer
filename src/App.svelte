@@ -1,12 +1,20 @@
 <script lang="ts">
-  import type { Observable } from "rxjs"
+  import { of, type Observable } from "rxjs"
   import FullViewportProgress from "./FullViewportProgress.svelte"
   import { replaceHash } from "./observeHash"
   import PageRoom from "./PageRoom.svelte"
   import type { Route } from "./toRoute"
-  import { newRoomId } from "./zod/roomZod"
+  import { provideUseRoom } from "./useRoom.1"
+  import { newRoomId, type Room } from "./zod/roomZod"
 
   export let route$: Observable<Route>
+
+  provideUseRoom((roomId) =>
+    of({
+      id: roomId,
+      name: `another mocked room (${Math.random()})`,
+    } satisfies Room)
+  )
 
   $: {
     const [route] = $route$
