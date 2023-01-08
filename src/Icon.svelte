@@ -7,7 +7,7 @@
    */
   export let name: keyof typeof icons
 
-  let className = ""
+  let className: string = ""
   export { className as class }
 </script>
 

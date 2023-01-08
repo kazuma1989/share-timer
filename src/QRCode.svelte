@@ -6,7 +6,7 @@
   export let width: number
   export let height: number
 
-  let className = ""
+  let className: string = ""
   export { className as class }
 
   const { size, d } = qrToSVG(data)
