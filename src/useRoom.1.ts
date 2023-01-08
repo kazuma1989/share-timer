@@ -7,7 +7,13 @@ export function useRoom(roomId: Room["id"]): Observable<Room | InvalidDoc> {
 }
 
 export function provideUseRoom(useRoomImpl: typeof useRoom): void {
-  setContext<typeof useRoom>(key, useRoomImpl)
+  setContext(...keyWithUseRoom(useRoomImpl))
+}
+
+export function keyWithUseRoom(
+  useRoomImpl: typeof useRoom
+): [typeof key, typeof useRoom] {
+  return [key, useRoomImpl]
 }
 
 const key = Symbol()

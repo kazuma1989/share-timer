@@ -4,8 +4,8 @@
 
   export let roomId: Room["id"]
 
-  const room$ = useRoom(roomId)
-  console.log($room$)
+  $: room$ = useRoom(roomId)
+  $: console.log($room$)
 </script>
 
 <div class="mx-auto h-screen max-w-prose">

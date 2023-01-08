@@ -1,4 +1,5 @@
 import App from "./App.svelte"
+import { firestoreImplContext } from "./firestore/firestoreImplContext"
 import "./global.css"
 import { observeHash } from "./observeHash"
 
@@ -9,4 +10,5 @@ new App({
   props: {
     route$,
   },
+  context: firestoreImplContext,
 })
