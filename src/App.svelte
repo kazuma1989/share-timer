@@ -6,7 +6,7 @@
   export let route$: Observable<Route>
 </script>
 
-<div class="peer">
+<div class="peer contents">
   {#if $route$[0] === "info"}
     {@const [, roomId] = $route$}
 
@@ -16,13 +16,13 @@
   {:else if $route$[0] === "room"}
     {@const [, roomId] = $route$}
 
-    room ({roomId})
+    <p>room ({roomId})</p>
   {:else if $route$[0] === "newRoom"}
-    newRoom
+    <p>newRoom</p>
   {:else if $route$[0] === "unknown"}
     {@const [, payload] = $route$}
 
-    404 &quot;{payload}&quot;
+    <p>404 &quot;{payload}&quot;</p>
   {/if}
 </div>
 
