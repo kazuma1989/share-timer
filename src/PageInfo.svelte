@@ -1,10 +1,15 @@
 <script lang="ts">
   import clsx from "clsx"
   import Icon from "./Icon.svelte"
+  import { setHash } from "./observeHash"
   import QrCode from "./QRCode.svelte"
+  import { fromRoute } from "./toRoute"
+  import type { Room } from "./zod/roomZod"
 
-  // TODO 本物の動的URLにする
-  const roomURL = "https://sharetimer.web.app/#dcc-tice-dad"
+  export let roomId: Room["id"]
+
+  $: roomURL =
+    location.origin + location.pathname + `#${fromRoute(["room", roomId])}`
 </script>
 
 <article
@@ -21,8 +26,7 @@
       type="button"
       class="transparent-button my-2 -ml-4 h-12 w-12 text-2xl"
       on:click={() => {
-        // TODO 本物の戻る処理
-        console.log("back")
+        setHash(["room", roomId])
       }}
     >
       <Icon name="arrow-left" />
@@ -64,7 +68,7 @@
 
     <p>
       <a
-        href="#"
+        href="#new"
         target="_blank"
         class={clsx(
           "transparent-button block border border-gray-500 px-4 py-3 text-center no-underline after:content-['_↗']"
@@ -74,7 +78,7 @@
       </a>
     </p>
 
-    <p>
+    <!-- <p>
       <button
         type="button"
         class="transparent-button block w-full border border-gray-500 px-4 py-3"
@@ -84,7 +88,7 @@
       >
         編集をロックする (experimental)
       </button>
-    </p>
+    </p> -->
   </div>
 
   <footer>
