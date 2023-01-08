@@ -1,26 +1,16 @@
-import { of } from "rxjs"
+import type { Firestore } from "firebase/firestore"
 import { keyWithUseRoom } from "../useRoom.1"
 import { keyWithUseSetup } from "../useSetup.1"
-import { setTimeout } from "../util/setTimeout"
-import type { InvalidDoc, Room } from "../zod/roomZod"
+import { keyWithFirestore } from "./useFirestore.1"
+import { useRoomImpl } from "./useRoomImpl"
+import { useSetupImpl } from "./useSetupImpl"
 
-export const firestoreImplContext = new Map<unknown, unknown>([
-  keyWithUseRoom((roomId) =>
-    // TODO 本物の実装を与える
-    Math.random() < 0.3
-      ? of({
-          id: roomId,
-          name: `another mocked room (${Math.random()})`,
-        } satisfies Room)
-      : of(["invalid-doc", roomId] satisfies InvalidDoc)
-  ),
-
-  keyWithUseSetup((roomId) =>
-    // TODO 本物の実装を与える
-    async () => {
-      await setTimeout(1_000)
-
-      console.log("setup!!", roomId)
-    }
-  ),
-])
+export function firestoreImplContext(
+  firestore: Firestore
+): Map<unknown, unknown> {
+  return new Map<unknown, unknown>([
+    keyWithFirestore(firestore),
+    keyWithUseRoom(useRoomImpl),
+    keyWithUseSetup(useSetupImpl),
+  ])
+}

@@ -1,16 +1,16 @@
-import { doc, Firestore, runTransaction } from "firebase/firestore"
+import { doc, runTransaction, type Firestore } from "firebase/firestore"
 import { createCache } from "../util/createCache"
 import type { ActionInput } from "../zod/actionZod"
 import type { Room, RoomInput } from "../zod/roomZod"
 import { collection } from "./collection"
-import { useFirestore } from "./useFirestore"
+import { useFirestore } from "./useFirestore.1"
 import { withMeta } from "./withMeta"
 
 export function useSetupImpl(roomId: Room["id"]): (() => void) | null {
   const db = useFirestore()
 
   const setup = hardCache(roomId, () => async () => {
-    import.meta.env.DEV && console.debug("setup called")
+    import.meta.env.DEV && console.debug("setup called", roomId)
 
     await setupRoom(db, roomId)
   })
