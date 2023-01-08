@@ -1,6 +1,7 @@
-<script lang="ts" context="module">
+<script lang="ts">
   import { map, merge, partition, type Observable } from "rxjs"
   import { useRoom } from "./useRoom.1"
+  import { useSetup } from "./useSetup.1"
   import { isRoom, type InvalidDoc, type Room } from "./zod/roomZod"
 
   function roomOrInvalid(_room$: Observable<Room | InvalidDoc>) {
@@ -9,21 +10,22 @@
 
     return [room$, invalid$] as const
   }
-</script>
 
-<script lang="ts">
+  function getSetup(invalid: InvalidDoc) {
+    const [, invalidRoomId] = invalid
+    return useSetup(invalidRoomId)
+  }
+
   export let roomId: Room["id"]
 
   $: [room$, invalid$] = roomOrInvalid(useRoom(roomId))
-
-  $: if ($invalid$) {
-    const [, invalidRoomId] = $invalid$
-    console.log("invalid", invalidRoomId)
-  }
+  $: setup = $invalid$ && getSetup($invalid$)
 </script>
 
-{#if $room$}
-  <div class="mx-auto h-screen max-w-prose">
-    <p>ROOM ({$room$.id})</p>
-  </div>
-{/if}
+{#await setup?.() then}
+  {#if $room$}
+    <div class="mx-auto h-screen max-w-prose">
+      <p>ROOM ({$room$.id})</p>
+    </div>
+  {/if}
+{/await}
