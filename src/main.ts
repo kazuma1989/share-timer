@@ -4,14 +4,18 @@ import { initializeFirestore } from "./firestore/initializeFirestore"
 import "./global.css"
 import { observeHash } from "./observeHash"
 
-const route$ = observeHash()
+run()
 
-const firestore = await initializeFirestore()
+async function run() {
+  const route$ = observeHash()
 
-new App({
-  target: document.getElementById("root")!,
-  props: {
-    route$,
-  },
-  context: firestoreImplContext(firestore),
-})
+  const firestore = await initializeFirestore()
+
+  new App({
+    target: document.getElementById("root")!,
+    props: {
+      route$,
+    },
+    context: firestoreImplContext(firestore),
+  })
+}
