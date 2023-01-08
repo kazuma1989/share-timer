@@ -27,8 +27,7 @@
   "settings": {
     "tailwindcss": {
       "callees": ["clsx"],
-      "config": "./tailwind.config.cjs",
-      "whitelist": ["transparent\\-button"]
+      "config": "./tailwind.config.cjs"
     },
 
     "svelte3/typescript": true

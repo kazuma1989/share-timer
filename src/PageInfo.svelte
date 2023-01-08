@@ -97,9 +97,3 @@
     </p>
   </footer>
 </article>
-
-<style lang="postcss">
-  .transparent-button {
-    @apply cursor-pointer rounded-md transition-colors hover:bg-dark/10 active:bg-dark/20 dark:hover:bg-light/20 dark:active:bg-light/30;
-  }
-</style>

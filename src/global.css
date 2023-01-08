@@ -17,6 +17,16 @@
   }
 }
 
+@layer components {
+  .circle-progress {
+    @apply progress-bar-transparent inline-block min-h-[1rem] min-w-[1rem] animate-spin rounded-full border border-solid border-transparent border-t-current bg-transparent;
+  }
+
+  .transparent-button {
+    @apply cursor-pointer rounded-md transition-colors hover:bg-dark/10 active:bg-dark/20 dark:hover:bg-light/20 dark:active:bg-light/30;
+  }
+}
+
 @layer utilities {
   .progress-bar-transparent::-moz-progress-bar {
     background-color: transparent;
