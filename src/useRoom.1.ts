@@ -1,13 +1,9 @@
 import { Observable, of } from "rxjs"
-import { getContext, setContext } from "svelte"
+import { getContext } from "svelte"
 import type { InvalidDoc, Room } from "./zod/roomZod"
 
 export function useRoom(roomId: Room["id"]): Observable<Room | InvalidDoc> {
   return (getContext<typeof useRoom | undefined>(key) ?? fallback)(roomId)
-}
-
-export function provideUseRoom(useRoomImpl: typeof useRoom): void {
-  setContext(...keyWithUseRoom(useRoomImpl))
 }
 
 export function keyWithUseRoom(
