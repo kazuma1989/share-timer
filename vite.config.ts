@@ -3,9 +3,9 @@ import { defineConfig, UserConfig } from "vite"
 import { hosting } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
+import chunkConfig from "./vite/plugin/chunkConfig"
 import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
 import firestoreEmulatorProxy from "./vite/plugin/firestoreEmulatorProxy"
-import vendorChunks from "./vite/plugin/vendorChunks"
 import vitest from "./vite/plugin/vitest"
 
 declare const process: {
@@ -40,8 +40,6 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
     build: {
       outDir: BUILD_PATH || hosting.find((_) => _.target === "app")?.public,
       sourcemap: true,
-      assetsInlineLimit: 4096 * 2,
-      cssCodeSplit: false,
     },
 
     preview: {
@@ -57,7 +55,7 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
       firestoreEmulatorProxy(),
 
       // Build config
-      vendorChunks(),
+      chunkConfig(),
 
       // Test config
       vitest(),
