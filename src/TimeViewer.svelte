@@ -41,6 +41,7 @@
     type OperatorFunction,
   } from "rxjs"
   import { onMount } from "svelte"
+  import type { Action } from "svelte/types/runtime/action"
   import {
     mapToCurrentDuration,
     type CurrentDuration,
@@ -64,10 +65,7 @@
     mapToDuration()
   )
 
-  const darkMode$ = useDarkMode()
-
   let canvas: HTMLCanvasElement | undefined
-  onMount(() => startDrawing(canvas, duration$, darkMode$))
 
   onMount(() => setLabel(video, duration$))
   onMount(() => connectVideoWithCanvas(video, canvas))
@@ -79,13 +77,10 @@
   const canvasWidth = 512
   const canvasHeight = 288
 
-  function startDrawing(
-    canvas: HTMLCanvasElement | undefined,
-    duration$: Observable<number>,
-    darkMode$: Observable<"dark" | "light">
-  ): void | (() => void) {
-    const ctx = canvas?.getContext("2d")
-    if (!canvas || !ctx) return
+  const darkMode$ = useDarkMode()
+  const startDrawing: Action<HTMLCanvasElement> = (canvas) => {
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
 
     // https://developer.mozilla.org/ja/docs/Web/API/Window/devicePixelRatio
     // 表示サイズを設定（CSS におけるピクセル数です）。
@@ -104,6 +99,7 @@
     ctx.textBaseline = "middle"
     ctx.font = "100 128px/1 system-ui,sans-serif"
 
+    // FIXME たぶん duration$ がリアクティブになってない
     const fillText$ = duration$.pipe(
       map((_) => formatDuration(_)),
       scan<string, { text: string; prevWidth: number; prevLength: number }>(
@@ -143,8 +139,10 @@
         ctx.fillText(text, x, y)
       })
 
-    return () => {
-      sub.unsubscribe()
+    return {
+      destroy() {
+        sub.unsubscribe()
+      },
     }
   }
 
@@ -233,5 +231,5 @@
 </script>
 
 <div bind:this={div} class={clsx("bg-light dark:bg-dark", className)}>
-  <canvas bind:this={canvas} class="hidden bg-inherit" />
+  <canvas bind:this={canvas} use:startDrawing class="hidden bg-inherit" />
 </div>
