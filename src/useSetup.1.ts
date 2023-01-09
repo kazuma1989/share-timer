@@ -1,18 +1,13 @@
-import { getContext } from "svelte"
+import { createContext } from "./createContext.1"
 import type { Room } from "./zod/roomZod"
 
 export function useSetup(
   roomId: Room["id"]
 ): (() => void | PromiseLike<void>) | null {
-  return (getContext<typeof useSetup | undefined>(key) ?? fallback)(roomId)
+  return _useImpl()(roomId)
 }
 
-export function keyWithUseSetup(
-  useSetupImpl: typeof useSetup
-): [typeof key, typeof useSetup] {
-  return [key, useSetupImpl]
-}
-
-const key = Symbol()
-
-const fallback = () => null
+export const [keyWithUseSetup, _useImpl] = createContext<typeof useSetup>(
+  "useSetup",
+  () => null
+)
