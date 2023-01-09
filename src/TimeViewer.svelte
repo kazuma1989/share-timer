@@ -24,15 +24,32 @@
   import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
   import { interval } from "./util/interval"
 
+  export let timerState$: Observable<TimerState>
+
+  let className: string = ""
+  export { className as class }
+
+  $: duration$ = timerState$.pipe(
+    bufferedLast(interval("worker", 400)),
+    mapToCurrentDuration(interval("worker", 100)),
+    mapToDuration()
+  )
+
+  const darkMode$ = useDarkMode()
+
+  let canvas: HTMLCanvasElement | undefined
+  onMount(() => startDrawing(canvas, duration$, darkMode$))
+
+  const video = useVideoTimer()
+  onMount(() => setLabel(video, duration$))
+  onMount(() => connectVideoWithCanvas(video, canvas))
+  onMount(() => restartVideo(video))
+
+  let div: HTMLDivElement | undefined
+  onMount(() => prependElement(div, video))
+
   const canvasWidth = 512
   const canvasHeight = 288
-
-  function mapToDuration(): OperatorFunction<CurrentDuration, number> {
-    return pipe(
-      map((_) => floor(_.duration)),
-      distinctUntilChanged()
-    )
-  }
 
   function startDrawing(
     canvas: HTMLCanvasElement | undefined,
@@ -179,29 +196,12 @@
     }
   }
 
-  export let timerState$: Observable<TimerState>
-
-  let className: string = ""
-  export { className as class }
-
-  $: duration$ = timerState$.pipe(
-    bufferedLast(interval("worker", 400)),
-    mapToCurrentDuration(interval("worker", 100)),
-    mapToDuration()
-  )
-
-  const darkMode$ = useDarkMode()
-
-  let canvas: HTMLCanvasElement | undefined
-  onMount(() => startDrawing(canvas, duration$, darkMode$))
-
-  const video = useVideoTimer()
-  onMount(() => setLabel(video, duration$))
-  onMount(() => connectVideoWithCanvas(video, canvas))
-  onMount(() => restartVideo(video))
-
-  let div: HTMLDivElement | undefined
-  onMount(() => prependElement(div, video))
+  function mapToDuration(): OperatorFunction<CurrentDuration, number> {
+    return pipe(
+      map((_) => floor(_.duration)),
+      distinctUntilChanged()
+    )
+  }
 </script>
 
 <div bind:this={div} class={clsx("bg-light dark:bg-dark", className)}>
