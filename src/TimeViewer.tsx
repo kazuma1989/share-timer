@@ -17,6 +17,7 @@ import {
 } from "./mapToCurrentDuration"
 import type { TimerState } from "./timerReducer"
 import { useDarkMode } from "./useDarkMode"
+// @ts-expect-error
 import { useVideoTimer } from "./useVideoTimer"
 import { bufferedLast } from "./util/bufferedLast"
 import { createCache } from "./util/createCache"

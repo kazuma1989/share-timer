@@ -1,3 +1,33 @@
+<script lang="ts" context="module">
+  const video = document.createElement("video")
+  video.setAttribute("role", "timer")
+
+  // フォーカス可能にしておかないと VoiceOver が読んでくれない
+  video.tabIndex = 0
+
+  // 自動再生可能なように muted, playsInline はともに true.
+  video.autoplay = true
+  video.muted = true
+  video.playsInline = true
+
+  // controls off にしておくので、扱いやすいようなイベントをあらかじめ付与
+  video.addEventListener(
+    "click",
+    () => {
+      video.play()
+    },
+    { passive: true }
+  )
+
+  video.addEventListener(
+    "dblclick",
+    () => {
+      video.requestPictureInPicture()
+    },
+    { passive: true }
+  )
+</script>
+
 <script lang="ts">
   import clsx from "clsx"
   import {
@@ -17,7 +47,6 @@
   } from "./mapToCurrentDuration"
   import type { TimerState } from "./timerReducer"
   import { useDarkMode } from "./useDarkMode"
-  import { useVideoTimer } from "./useVideoTimer"
   import { bufferedLast } from "./util/bufferedLast"
   import { floor } from "./util/floor"
   import { formatDuration } from "./util/formatDuration"
@@ -40,7 +69,6 @@
   let canvas: HTMLCanvasElement | undefined
   onMount(() => startDrawing(canvas, duration$, darkMode$))
 
-  const video = useVideoTimer()
   onMount(() => setLabel(video, duration$))
   onMount(() => connectVideoWithCanvas(video, canvas))
   onMount(() => restartVideo(video))
