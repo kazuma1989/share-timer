@@ -71,9 +71,6 @@
   onMount(() => connectVideoWithCanvas(video, canvas))
   onMount(() => restartVideo(video))
 
-  let div: HTMLDivElement | undefined
-  onMount(() => prependElement(div, video))
-
   const canvasWidth = 512
   const canvasHeight = 288
 
@@ -209,16 +206,15 @@
     }
   }
 
-  function prependElement(
-    parent: HTMLElement | undefined,
-    child: HTMLElement | undefined
-  ): void | (() => void) {
-    if (!parent || !child) return
+  const prependElement: Action<HTMLElement, HTMLElement> = (parent, child) => {
+    if (!child) return
 
     parent.prepend(child)
 
-    return () => {
-      parent.removeChild(child)
+    return {
+      destroy() {
+        parent.removeChild(child)
+      },
     }
   }
 
@@ -230,6 +226,9 @@
   }
 </script>
 
-<div bind:this={div} class={clsx("bg-light dark:bg-dark", className)}>
+<div
+  use:prependElement={video}
+  class={clsx("bg-light dark:bg-dark", className)}
+>
   <canvas bind:this={canvas} use:startDrawing class="hidden bg-inherit" />
 </div>
