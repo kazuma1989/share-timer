@@ -1,7 +1,9 @@
 <script lang="ts">
   import { map, merge, partition, type Observable } from "rxjs"
+  import Timer from "./Timer.svelte"
   import { useRoom } from "./useRoom"
   import { useSetup } from "./useSetup"
+  import { useTimerState } from "./useTimerState"
   import { isRoom, type InvalidDoc, type Room } from "./zod/roomZod"
 
   function roomOrInvalid(_room$: Observable<Room | InvalidDoc>) {
@@ -20,12 +22,11 @@
 
   $: [room$, invalid$] = roomOrInvalid(useRoom(roomId))
   $: setup = $invalid$ && getSetup($invalid$)
+  $: timerState$ = useTimerState(roomId)
 </script>
 
 {#await setup?.() then}
-  {#if $room$}
-    <div class="mx-auto h-screen max-w-prose">
-      <p>ROOM ({$room$.id})</p>
-    </div>
-  {/if}
+  <div class="mx-auto h-screen max-w-prose">
+    <Timer {room$} {timerState$} class="h-full" />
+  </div>
 {/await}

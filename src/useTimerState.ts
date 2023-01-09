@@ -4,15 +4,12 @@ import type { TimerState } from "./timerReducer"
 import type { Room } from "./zod/roomZod"
 
 export function useTimerState(roomId: Room["id"]): Observable<TimerState> {
-  return useImpl()(roomId)
+  return _useImpl()(roomId)
 }
 
-export { ImplProvider as UseTimerStateProvider }
-
-const [ImplProvider, useImpl] = createContext<typeof useTimerState>(
-  "UseTimerStateProvider",
-  () => timerState$
-)
+export const [keyWithUseTimerState, _useImpl] = createContext<
+  typeof useTimerState
+>("useTimerState", () => timerState$)
 
 const timerState$ = of({
   mode: "paused",

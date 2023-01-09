@@ -7,6 +7,7 @@ import { UseLockRoomProvider } from "../useLockRoom"
 import { UseRoomProvider } from "../useRoom"
 // @ts-expect-error
 import { UseSetupProvider } from "../useSetup"
+// @ts-expect-error
 import { UseTimerStateProvider } from "../useTimerState"
 import { useDispatchImpl } from "./useDispatchImpl"
 // @ts-expect-error
@@ -35,10 +36,7 @@ export function FirestoreImplProvider({
         >
           <UseRoomProvider value={useRoomImpl}>
             <UseSetupProvider value={useSetupImpl}>
-              <UseTimerStateProvider
-                // @ts-expect-error
-                value={useTimerStateImpl}
-              >
+              <UseTimerStateProvider value={useTimerStateImpl}>
                 {children}
               </UseTimerStateProvider>
             </UseSetupProvider>
