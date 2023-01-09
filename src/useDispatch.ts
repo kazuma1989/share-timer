@@ -4,14 +4,12 @@ import type { Room } from "./zod/roomZod"
 
 export function useDispatch(
   roomId: Room["id"]
-): [pending: boolean, dispatch: (action: ActionInput) => Promise<unknown>] {
-  return useImpl()(roomId)
+): [pending: boolean, dispatch: (action: ActionInput) => PromiseLike<unknown>] {
+  return _useImpl()(roomId)
 }
 
-export { ImplProvider as UseDispatchProvider }
-
-const [ImplProvider, useImpl] = createContext<typeof useDispatch>(
-  "UseDispatchProvider",
+export const [keyWithUseDispatch, _useImpl] = createContext<typeof useDispatch>(
+  "useDispatch",
   () => [pending, dispatch]
 )
 

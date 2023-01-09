@@ -7,6 +7,7 @@
   import { getItem } from "./storage"
   import type { TimerState } from "./timerReducer"
   import TimeViewer from "./TimeViewer.svelte"
+  import { useDispatch } from "./useDispatch"
   import { getId } from "./util/getId"
   import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
   import { ServerTimestamp } from "./util/ServerTimestamp"
@@ -23,6 +24,8 @@
 
   $: ({ id: roomId, name: roomName, lockedBy } = $room$ ?? {})
   $: locked = lockedBy && lockedBy !== getItem("userId")
+
+  $: [pending, dispatch] = useDispatch(roomId)
 
   $: label$ = timerState$.pipe(
     map((state) => {
@@ -51,12 +54,6 @@
   // TODO これでいいのか？
   let draftDuration: number
   $: draftDuration = draftDuration ?? $timerState$?.initialDuration
-
-  // TODO 本物の実装
-  const pending = false
-  function dispatch(arg: any) {
-    throw new Error("Function not implemented.")
-  }
 </script>
 
 {#if $timerState$}
@@ -72,8 +69,16 @@
     <form
       class="contents"
       on:submit|preventDefault={() => {
-        // TODO 本物の実装
-        alert("not implemented!")
+        if (state.mode !== "editing") return
+
+        dispatch({
+          type: "start",
+          withDuration: draftDuration,
+          at: new ServerTimestamp(now()),
+        })
+
+        // TODO 意図したとおりの挙動になっていないかもしれない
+        draftDuration = state.initialDuration
       }}
     >
       <p id={id("status")} role="status" class="sr-only">
