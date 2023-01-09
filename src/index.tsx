@@ -17,6 +17,7 @@ import { getItem, setItem } from "./storage"
 import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
 // @ts-expect-error
 import { DarkModeProvider, observeDarkMode } from "./useDarkMode"
+// @ts-expect-error
 import { createVideoTimer, VideoTimerProvider } from "./useVideoTimer"
 import { nanoid } from "./util/nanoid"
 
@@ -52,10 +53,7 @@ async function run() {
     <StrictMode>
       <FirestoreImplProvider firestore={firestore}>
         <ErrorBoundary fallback={<FullViewportOops />}>
-          <VideoTimerProvider
-            // @ts-expect-error
-            value={videoTimer}
-          >
+          <VideoTimerProvider value={videoTimer}>
             <DarkModeProvider value={darkMode$}>
               <AudioProvider
                 // @ts-expect-error

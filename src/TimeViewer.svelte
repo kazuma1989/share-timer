@@ -17,6 +17,7 @@
   } from "./mapToCurrentDuration"
   import type { TimerState } from "./timerReducer"
   import { useDarkMode } from "./useDarkMode"
+  import { useVideoTimer } from "./useVideoTimer"
   import { bufferedLast } from "./util/bufferedLast"
   import { floor } from "./util/floor"
   import { formatDuration } from "./util/formatDuration"
@@ -36,7 +37,7 @@
     canvas: HTMLCanvasElement | undefined,
     duration$: Observable<number>,
     darkMode$: Observable<"dark" | "light">
-  ): (() => void) | void {
+  ): void | (() => void) {
     const ctx = canvas?.getContext("2d")
     if (!canvas || !ctx) return
 
@@ -101,6 +102,31 @@
     }
   }
 
+  function connectVideoWithCanvas(
+    video: HTMLVideoElement | undefined,
+    canvas: HTMLCanvasElement | undefined
+  ): void | (() => void) {
+    if (!video || !canvas) return
+
+    video.width = canvasWidth
+    video.height = canvasHeight
+
+    video.srcObject = canvas.captureStream()
+  }
+
+  function prependElement(
+    parent: HTMLElement | undefined,
+    child: HTMLElement | undefined
+  ): void | (() => void) {
+    if (!parent || !child) return
+
+    parent.prepend(child)
+
+    return () => {
+      parent.removeChild(child)
+    }
+  }
+
   export let timerState$: Observable<TimerState>
 
   let className: string = ""
@@ -115,11 +141,15 @@
   const darkMode$ = useDarkMode()
 
   let canvas: HTMLCanvasElement | undefined
-  onMount(() => {
-    startDrawing(canvas, duration$, darkMode$)
-  })
+  onMount(() => startDrawing(canvas, duration$, darkMode$))
+
+  const video = useVideoTimer()
+  onMount(() => connectVideoWithCanvas(video, canvas))
+
+  let div: HTMLDivElement | undefined
+  onMount(() => prependElement(div, video))
 </script>
 
-<div class={clsx("bg-light dark:bg-dark", className)}>
-  <canvas bind:this={canvas} class="bg-inherit" />
+<div bind:this={div} class={clsx("bg-light dark:bg-dark", className)}>
+  <canvas bind:this={canvas} class="hidden bg-inherit" />
 </div>

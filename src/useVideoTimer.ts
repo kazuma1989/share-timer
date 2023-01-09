@@ -1,7 +1,7 @@
 import { createContext } from "./createContext"
 
-export const [VideoTimerProvider, useVideoTimer] =
-  createContext<HTMLVideoElement>("VideoTimerProvider")
+export const [keyWithVideoTimer, useVideoTimer] =
+  createContext<HTMLVideoElement>("VideoTimer")
 
 export function createVideoTimer(): HTMLVideoElement {
   const video = document.createElement("video")
