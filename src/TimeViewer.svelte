@@ -11,21 +11,19 @@
   video.playsInline = true
 
   // controls off にしておくので、扱いやすいようなイベントをあらかじめ付与
-  video.addEventListener(
-    "click",
-    () => {
-      video.play()
-    },
-    { passive: true }
-  )
+  video.addEventListener("click", play, { passive: true })
+  video.addEventListener("dblclick", requestPictureInPicture, { passive: true })
 
-  video.addEventListener(
-    "dblclick",
-    () => {
-      video.requestPictureInPicture()
-    },
-    { passive: true }
-  )
+  // なるべく再生状態を維持する（タイマーの再生・停止の概念もあってややこしくなるため）
+  video.addEventListener("leavepictureinpicture", play, { passive: true })
+  document.addEventListener("visibilitychange", play, { passive: true })
+
+  function play() {
+    video.play()
+  }
+  function requestPictureInPicture() {
+    video.requestPictureInPicture()
+  }
 </script>
 
 <script lang="ts">
@@ -66,7 +64,6 @@
   )
 
   onMount(() => setLabel(video, duration$))
-  onMount(() => restartVideo(video))
 
   const canvasWidth = 512
   const canvasHeight = 288
@@ -160,42 +157,6 @@
     video.height = canvasHeight
 
     video.srcObject = canvas.captureStream()
-  }
-
-  function restartVideo(
-    video: HTMLVideoElement | undefined
-  ): void | (() => void) {
-    if (!video) return
-
-    const abort = new AbortController()
-
-    document.addEventListener(
-      "visibilitychange",
-      () => {
-        if (document.visibilityState === "visible") {
-          video.play()
-        }
-      },
-      {
-        signal: abort.signal,
-        passive: true,
-      }
-    )
-
-    video.addEventListener(
-      "leavepictureinpicture",
-      () => {
-        video.play()
-      },
-      {
-        signal: abort.signal,
-        passive: true,
-      }
-    )
-
-    return () => {
-      abort.abort()
-    }
   }
 
   const prependElement: Action<HTMLElement, HTMLElement> = (parent, child) => {
