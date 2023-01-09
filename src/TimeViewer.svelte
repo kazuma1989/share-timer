@@ -21,6 +21,7 @@
   import { bufferedLast } from "./util/bufferedLast"
   import { floor } from "./util/floor"
   import { formatDuration } from "./util/formatDuration"
+  import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
   import { interval } from "./util/interval"
 
   const canvasWidth = 512
@@ -102,6 +103,21 @@
     }
   }
 
+  function setLabel(
+    video: HTMLVideoElement | undefined,
+    duration$: Observable<number>
+  ): void | (() => void) {
+    if (!video) return
+
+    const sub = duration$.subscribe((duration) => {
+      video.ariaLabel = humanReadableLabelOf(duration)
+    })
+
+    return () => {
+      sub.unsubscribe()
+    }
+  }
+
   function connectVideoWithCanvas(
     video: HTMLVideoElement | undefined,
     canvas: HTMLCanvasElement | undefined
@@ -112,6 +128,42 @@
     video.height = canvasHeight
 
     video.srcObject = canvas.captureStream()
+  }
+
+  function restartVideo(
+    video: HTMLVideoElement | undefined
+  ): void | (() => void) {
+    if (!video) return
+
+    const abort = new AbortController()
+
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        if (document.visibilityState === "visible") {
+          video.play()
+        }
+      },
+      {
+        signal: abort.signal,
+        passive: true,
+      }
+    )
+
+    video.addEventListener(
+      "leavepictureinpicture",
+      () => {
+        video.play()
+      },
+      {
+        signal: abort.signal,
+        passive: true,
+      }
+    )
+
+    return () => {
+      abort.abort()
+    }
   }
 
   function prependElement(
@@ -144,7 +196,9 @@
   onMount(() => startDrawing(canvas, duration$, darkMode$))
 
   const video = useVideoTimer()
+  onMount(() => setLabel(video, duration$))
   onMount(() => connectVideoWithCanvas(video, canvas))
+  onMount(() => restartVideo(video))
 
   let div: HTMLDivElement | undefined
   onMount(() => prependElement(div, video))
