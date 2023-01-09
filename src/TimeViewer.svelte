@@ -65,10 +65,7 @@
     mapToDuration()
   )
 
-  let canvas: HTMLCanvasElement | undefined
-
   onMount(() => setLabel(video, duration$))
-  onMount(() => connectVideoWithCanvas(video, canvas))
   onMount(() => restartVideo(video))
 
   const canvasWidth = 512
@@ -158,12 +155,7 @@
     }
   }
 
-  function connectVideoWithCanvas(
-    video: HTMLVideoElement | undefined,
-    canvas: HTMLCanvasElement | undefined
-  ): void | (() => void) {
-    if (!video || !canvas) return
-
+  const connectVideo: Action<HTMLCanvasElement> = (canvas) => {
     video.width = canvasWidth
     video.height = canvasHeight
 
@@ -230,5 +222,5 @@
   use:prependElement={video}
   class={clsx("bg-light dark:bg-dark", className)}
 >
-  <canvas bind:this={canvas} use:startDrawing class="hidden bg-inherit" />
+  <canvas use:startDrawing use:connectVideo class="hidden bg-inherit" />
 </div>
