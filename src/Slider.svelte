@@ -1,13 +1,13 @@
 <script lang="ts">
   export let label: string = ""
-  export let defaultValue: number | undefined = undefined
+  export let value: number = 0
   export let valueMax: number = 0
-  export let onChange: ((value: number) => void) | undefined = undefined
 
   let className: string = ""
   export { className as class }
 
-  let valueNow = 0
+  // TODO valueNow の役割ってなんだっけ
+  $: valueNow = value
 </script>
 
 <span
@@ -18,7 +18,35 @@
   aria-valuemax={valueMax}
   aria-valuenow={valueNow}
   aria-valuetext={valueNow === undefined ? undefined : `${valueNow}${label}`}
-  tabIndex={0}
+  tabindex="0"
+  class={className}
+  on:keydown={(e) => {
+    import.meta.env.DEV && console.debug(e.key, e.keyCode)
+
+    switch (e.key) {
+      case "ArrowUp":
+      case "ArrowRight": {
+        e.preventDefault()
+
+        // increment
+        value += 1
+        // const next = currentOption$.current?.nextElementSibling
+        // next?.scrollIntoView({ block: "center" })
+        break
+      }
+
+      case "ArrowDown":
+      case "ArrowLeft": {
+        e.preventDefault()
+
+        // decrement
+        value -= 1
+        // const prev = currentOption$.current?.previousElementSibling
+        // prev?.scrollIntoView({ block: "center" })
+        break
+      }
+    }
+  }}
 >
-  {defaultValue}{label}
+  {value}{label}
 </span>

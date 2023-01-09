@@ -3,39 +3,24 @@
   import Slider from "./Slider.svelte"
   import { parseDuration } from "./util/parseDuration"
 
-  export let defaultValue: number
+  export let value: number
 
   let className: string = ""
   export { className as class }
 
-  $: defaultDuration = parseDuration(defaultValue)
+  const duration = parseDuration(value)
+  let draftHours = duration.hours
+  let draftMinutes = duration.minutes
+  let draftSeconds = duration.seconds
+
+  $: value =
+    draftHours * 3600_000 + draftMinutes * 60_000 + draftSeconds * 1_000
 </script>
 
 <span class={clsx("inline-flex gap-2", className)}>
-  <Slider
-    label="時間"
-    defaultValue={defaultDuration.hours}
-    valueMax={23}
-    onChange={(value) => {
-      // duration$.current.hours = value
-    }}
-  />
+  <Slider label="時間" bind:value={draftHours} valueMax={23} />
 
-  <Slider
-    label="分"
-    defaultValue={defaultDuration.minutes}
-    valueMax={59}
-    onChange={(value) => {
-      // duration$.current.minutes = value
-    }}
-  />
+  <Slider label="分" bind:value={draftMinutes} valueMax={59} />
 
-  <Slider
-    label="秒"
-    defaultValue={defaultDuration.seconds}
-    valueMax={59}
-    onChange={(value) => {
-      // duration$.current.seconds = value
-    }}
-  />
+  <Slider label="秒" bind:value={draftSeconds} valueMax={59} />
 </span>

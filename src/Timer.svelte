@@ -16,6 +16,9 @@
   let className: string = ""
   export { className as class }
 
+  const _id = getId()
+  const id = (_: "timer" | "status") => _id + _
+
   $: ({ id: roomId, name: roomName, lockedBy } = $room$ ?? {})
   $: locked = lockedBy && lockedBy !== getItem("userId")
 
@@ -43,8 +46,9 @@
     })
   )
 
-  const _id = getId()
-  const id = (_: "timer" | "status") => _id + _
+  // TODO これでいいのか？
+  let draftDuration: number
+  $: draftDuration = draftDuration ?? $timerState$?.initialDuration
 </script>
 
 {#if $timerState$}
@@ -74,13 +78,16 @@
             class="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center"
           >
             {#key state.mode + state.initialDuration}
-              <DurationSelect defaultValue={state.initialDuration} />
+              <DurationSelect bind:value={draftDuration} />
             {/key}
           </div>
         {:else}
           <TimeViewer {timerState$} />
         {/if}
       </div>
+
+      <!-- TODO デバッグ用なので消す -->
+      <p>{draftDuration}</p>
     </form>
   </div>
 {/if}
