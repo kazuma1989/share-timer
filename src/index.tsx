@@ -15,6 +15,7 @@ import { observeHash } from "./observeHash"
 import smallAlert from "./sound/small-alert.mp3"
 import { getItem, setItem } from "./storage"
 import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
+// @ts-expect-error
 import { DarkModeProvider, observeDarkMode } from "./useDarkMode"
 import { createVideoTimer, VideoTimerProvider } from "./useVideoTimer"
 import { nanoid } from "./util/nanoid"
@@ -55,10 +56,7 @@ async function run() {
             // @ts-expect-error
             value={videoTimer}
           >
-            <DarkModeProvider
-              // @ts-expect-error
-              value={darkMode$}
-            >
+            <DarkModeProvider value={darkMode$}>
               <AudioProvider
                 // @ts-expect-error
                 value={audio}
