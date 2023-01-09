@@ -5,7 +5,7 @@ import { shareRecent } from "../util/shareRecent"
 import { roomZod, type InvalidDoc, type Room } from "../zod/roomZod"
 import { collection } from "./collection"
 import { snapshotOf } from "./snapshotOf"
-import { useFirestore } from "./useFirestore.1"
+import { useFirestore } from "./useFirestore"
 
 export function useRoomImpl(roomId: Room["id"]): Observable<Room | InvalidDoc> {
   const db = useFirestore()

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { map, merge, partition, type Observable } from "rxjs"
-  import { useRoom } from "./useRoom.1"
-  import { useSetup } from "./useSetup.1"
+  import { useRoom } from "./useRoom"
+  import { useSetup } from "./useSetup"
   import { isRoom, type InvalidDoc, type Room } from "./zod/roomZod"
 
   function roomOrInvalid(_room$: Observable<Room | InvalidDoc>) {

@@ -59,7 +59,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
     if (error) {
       return (
-        <ResetErrorProvider value={resetError}>
+        <ResetErrorProvider
+          // @ts-expect-error
+          value={resetError}
+        >
           <ErrorProvider value={error}>{fallback}</ErrorProvider>
         </ResetErrorProvider>
       )

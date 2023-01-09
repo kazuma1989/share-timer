@@ -1,7 +1,7 @@
 import type { Firestore } from "firebase/firestore"
-import { keyWithUseRoom } from "../useRoom.1"
-import { keyWithUseSetup } from "../useSetup.1"
-import { keyWithFirestore } from "./useFirestore.1"
+import { keyWithUseRoom } from "../useRoom"
+import { keyWithUseSetup } from "../useSetup"
+import { keyWithFirestore } from "./useFirestore"
 import { useRoomImpl } from "./useRoomImpl"
 import { useSetupImpl } from "./useSetupImpl"
 

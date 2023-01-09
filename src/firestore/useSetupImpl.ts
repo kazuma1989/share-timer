@@ -3,7 +3,7 @@ import { createCache } from "../util/createCache"
 import type { ActionInput } from "../zod/actionZod"
 import type { Room, RoomInput } from "../zod/roomZod"
 import { collection } from "./collection"
-import { useFirestore } from "./useFirestore.1"
+import { useFirestore } from "./useFirestore"
 import { withMeta } from "./withMeta"
 
 export function useSetupImpl(roomId: Room["id"]): (() => void) | null {

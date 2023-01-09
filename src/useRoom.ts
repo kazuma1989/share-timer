@@ -3,13 +3,11 @@ import { createContext } from "./createContext"
 import type { InvalidDoc, Room } from "./zod/roomZod"
 
 export function useRoom(roomId: Room["id"]): Observable<Room | InvalidDoc> {
-  return useImpl()(roomId)
+  return _useImpl()(roomId)
 }
 
-export { ImplProvider as UseRoomProvider }
-
-const [ImplProvider, useImpl] = createContext<typeof useRoom>(
-  "UseRoomProvider",
+export const [keyWithUseRoom, _useImpl] = createContext<typeof useRoom>(
+  "useRoom",
   () => room$
 )
 

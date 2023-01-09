@@ -51,10 +51,22 @@ async function run() {
     <StrictMode>
       <FirestoreImplProvider firestore={firestore}>
         <ErrorBoundary fallback={<FullViewportOops />}>
-          <VideoTimerProvider value={videoTimer}>
-            <DarkModeProvider value={darkMode$}>
-              <AudioProvider value={audio}>
-                <MediaPermissionProvider value={permission$}>
+          <VideoTimerProvider
+            // @ts-expect-error
+            value={videoTimer}
+          >
+            <DarkModeProvider
+              // @ts-expect-error
+              value={darkMode$}
+            >
+              <AudioProvider
+                // @ts-expect-error
+                value={audio}
+              >
+                <MediaPermissionProvider
+                  // @ts-expect-error
+                  value={permission$}
+                >
                   <Suspense fallback={<FullViewportProgress />}>
                     <App route$={route$} />
                   </Suspense>
