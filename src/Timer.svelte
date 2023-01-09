@@ -2,12 +2,14 @@
   import clsx from "clsx"
   import { map, type Observable } from "rxjs"
   import DurationSelect from "./DurationSelect.svelte"
+  import Icon from "./Icon.svelte"
   import { now } from "./now"
   import { getItem } from "./storage"
   import type { TimerState } from "./timerReducer"
   import TimeViewer from "./TimeViewer.svelte"
   import { getId } from "./util/getId"
   import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
+  import { ServerTimestamp } from "./util/ServerTimestamp"
   import type { Room } from "./zod/roomZod"
 
   export let room$: Observable<Room>
@@ -49,6 +51,12 @@
   // TODO これでいいのか？
   let draftDuration: number
   $: draftDuration = draftDuration ?? $timerState$?.initialDuration
+
+  // TODO 本物の実装
+  const pending = false
+  function dispatch(arg: any) {
+    throw new Error("Function not implemented.")
+  }
 </script>
 
 {#if $timerState$}
@@ -80,14 +88,93 @@
             {#key state.mode + state.initialDuration}
               <DurationSelect bind:value={draftDuration} />
             {/key}
+
+            <!-- TODO デバッグ用なので消す -->
+            <p>{draftDuration}</p>
           </div>
         {:else}
           <TimeViewer {timerState$} />
         {/if}
       </div>
 
-      <!-- TODO デバッグ用なので消す -->
-      <p>{draftDuration}</p>
+      {#if locked}
+        <div class="flex items-center justify-around">
+          <button
+            aria-controls={`${id("status")} ${id("timer")}`}
+            type="button"
+            disabled
+            class="circle-button circle-button-gray text-2xl"
+          >
+            <Icon name="lock-outline" />
+          </button>
+
+          <button
+            aria-controls={`${id("status")} ${id("timer")}`}
+            type="button"
+            disabled
+            class="circle-button circle-button-green text-2xl"
+            class:!circle-button-orange={state.mode === "running"}
+          >
+            <Icon name="lock-outline" />
+          </button>
+        </div>
+      {:else}
+        <div class="flex items-center justify-around">
+          <button
+            aria-controls={`${id("status")} ${id("timer")}`}
+            type="button"
+            disabled={state.mode === "editing"}
+            class="circle-button circle-button-gray text-xs"
+            on:click={() => {
+              dispatch({
+                type: "cancel",
+              })
+            }}
+          >
+            キャンセル
+          </button>
+
+          {#if state.mode === "editing"}
+            <button
+              aria-controls={`${id("status")} ${id("timer")}`}
+              type="submit"
+              class="circle-button circle-button-green"
+            >
+              開始
+            </button>
+          {:else if state.mode === "running"}
+            <button
+              aria-controls={`${id("status")} ${id("timer")}`}
+              type="button"
+              class="circle-button circle-button-orange"
+              on:click={() => {
+                dispatch({
+                  type: "pause",
+                  at: new ServerTimestamp(now()),
+                })
+              }}
+            >
+              一時停止
+            </button>
+          {:else}
+            <button
+              aria-controls={`${id("status")} ${id("timer")}`}
+              type="button"
+              class="circle-button circle-button-green"
+              on:click={() => {
+                if (pending) return
+
+                dispatch({
+                  type: "resume",
+                  at: new ServerTimestamp(now()),
+                })
+              }}
+            >
+              再開
+            </button>
+          {/if}
+        </div>
+      {/if}
     </form>
   </div>
 {/if}
