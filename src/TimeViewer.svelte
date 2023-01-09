@@ -32,24 +32,13 @@
     )
   }
 
-  export let timerState$: Observable<TimerState>
-
-  let className: string = ""
-  export { className as class }
-
-  $: duration$ = timerState$.pipe(
-    bufferedLast(interval("worker", 400)),
-    mapToCurrentDuration(interval("worker", 100)),
-    mapToDuration()
-  )
-
-  const darkMode$ = useDarkMode()
-
-  let _canvas: HTMLCanvasElement | undefined
-  onMount(() => {
-    const ctx = _canvas?.getContext("2d")
-    if (!_canvas || !ctx) return
-    const canvas = _canvas
+  function startDrawing(
+    canvas: HTMLCanvasElement | undefined,
+    duration$: Observable<number>,
+    darkMode$: Observable<"dark" | "light">
+  ): (() => void) | void {
+    const ctx = canvas?.getContext("2d")
+    if (!canvas || !ctx) return
 
     // https://developer.mozilla.org/ja/docs/Web/API/Window/devicePixelRatio
     // 表示サイズを設定（CSS におけるピクセル数です）。
@@ -110,9 +99,27 @@
     return () => {
       sub.unsubscribe()
     }
+  }
+
+  export let timerState$: Observable<TimerState>
+
+  let className: string = ""
+  export { className as class }
+
+  $: duration$ = timerState$.pipe(
+    bufferedLast(interval("worker", 400)),
+    mapToCurrentDuration(interval("worker", 100)),
+    mapToDuration()
+  )
+
+  const darkMode$ = useDarkMode()
+
+  let canvas: HTMLCanvasElement | undefined
+  onMount(() => {
+    startDrawing(canvas, duration$, darkMode$)
   })
 </script>
 
 <div class={clsx("bg-light dark:bg-dark", className)}>
-  <canvas bind:this={_canvas} class="bg-inherit" />
+  <canvas bind:this={canvas} class="bg-inherit" />
 </div>
