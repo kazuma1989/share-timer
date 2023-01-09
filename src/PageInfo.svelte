@@ -52,7 +52,9 @@
         />
         <br />
 
-        <span>{roomURL}</span>
+        <span>
+          {roomURL}
+        </span>
       </a>
     </p>
 

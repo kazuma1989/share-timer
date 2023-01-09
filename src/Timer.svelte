@@ -52,7 +52,9 @@
 
   <div class={clsx("grid grid-rows-[auto_5fr_auto_4fr]", className)}>
     <div class="pt-2 text-center">
-      <h1 aria-label={`タイマーの名前: ${roomName}`}>{roomName}</h1>
+      <h1 aria-label={`タイマーの名前: ${roomName}`}>
+        {roomName}
+      </h1>
     </div>
 
     <form
@@ -62,7 +64,9 @@
         alert("not implemented!")
       }}
     >
-      <p id={id("status")} role="status" class="sr-only">{$label$}</p>
+      <p id={id("status")} role="status" class="sr-only">
+        {$label$}
+      </p>
 
       <div id={id("timer")} class="grid place-items-center tabular-nums">
         {#if !locked && state.mode === "editing"}
