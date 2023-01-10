@@ -1,6 +1,7 @@
 <script lang="ts">
   import clsx from "clsx"
   import { map, type Observable } from "rxjs"
+  import type { HTMLButtonAttributes } from "svelte/elements"
   import DurationSelect from "./DurationSelect.svelte"
   import Icon from "./Icon.svelte"
   import { now } from "./now"
@@ -59,6 +60,52 @@
     }
 
     prev = current
+  }
+
+  let button: HTMLButtonAttributes & { label: string }
+  $: {
+    switch ($timerState$?.mode) {
+      case "editing": {
+        button = {
+          label: "開始",
+          type: "submit",
+          class: clsx("circle-button circle-button-green"),
+        }
+        break
+      }
+
+      case "running": {
+        button = {
+          label: "一時停止",
+          type: "button",
+          class: clsx("circle-button circle-button-orange"),
+          "on:click": () => {
+            dispatch({
+              type: "pause",
+              at: new ServerTimestamp(now()),
+            })
+          },
+        }
+        break
+      }
+
+      case "paused": {
+        button = {
+          label: "再開",
+          type: "button",
+          class: clsx("circle-button circle-button-green"),
+          "on:click": () => {
+            if (pending) return
+
+            dispatch({
+              type: "resume",
+              at: new ServerTimestamp(now()),
+            })
+          },
+        }
+        break
+      }
+    }
   }
 </script>
 
@@ -137,45 +184,9 @@
             キャンセル
           </button>
 
-          {#if state.mode === "editing"}
-            <button
-              aria-controls="{id('status')} {id('timer')}"
-              type="submit"
-              class="circle-button circle-button-green"
-            >
-              開始
-            </button>
-          {:else if state.mode === "running"}
-            <button
-              aria-controls="{id('status')} {id('timer')}"
-              type="button"
-              class="circle-button circle-button-orange"
-              on:click={() => {
-                dispatch({
-                  type: "pause",
-                  at: new ServerTimestamp(now()),
-                })
-              }}
-            >
-              一時停止
-            </button>
-          {:else}
-            <button
-              aria-controls="{id('status')} {id('timer')}"
-              type="button"
-              class="circle-button circle-button-green"
-              on:click={() => {
-                if (pending) return
-
-                dispatch({
-                  type: "resume",
-                  at: new ServerTimestamp(now()),
-                })
-              }}
-            >
-              再開
-            </button>
-          {/if}
+          <button {...button} on:click={button["on:click"]}>
+            {button.label}
+          </button>
         </div>
       {/if}
     </form>
