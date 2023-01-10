@@ -11,6 +11,8 @@
 
   let currentOption: HTMLElement
 
+  const initialValue = value
+
   const observe: Action<HTMLElement> = (root) => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -50,22 +52,21 @@
     }
   }
 
-  const defaultValue = value
-  const scrollIntoView: Action<HTMLElement, number> = (step, index = 0) => {
-    if (index === defaultValue) {
-      step.scrollIntoView({ block: "center" })
-    }
+  const scrollIntoView: Action<HTMLElement, boolean> = (step, enabled) => {
+    if (!enabled) return
+
+    step.scrollIntoView({ block: "center" })
   }
 </script>
 
 <span
   role="slider"
-  aria-label={`${label}選択`}
+  aria-label="{label}を選択"
   aria-orientation="vertical"
   aria-valuemin={0}
   aria-valuemax={valueMax}
   aria-valuenow={value}
-  aria-valuetext={value === undefined ? undefined : `${value}${label}`}
+  aria-valuetext="{value}{label}"
   tabindex="0"
   class={className}
   on:keydown={(e) => {
@@ -104,8 +105,6 @@
     )}
     use:observe
     on:intersect={(e) => {
-      if (!(e.detail instanceof HTMLElement)) return
-
       currentOption = e.detail
       value = Number(e.detail.dataset.value)
     }}
@@ -114,7 +113,7 @@
       <span
         data-value={index}
         class={clsx("text-right", index !== value && "font-thin opacity-25")}
-        use:scrollIntoView={index}
+        use:scrollIntoView={index === initialValue}
       >
         {index.toString(10).padStart(2, "0")}
       </span>
