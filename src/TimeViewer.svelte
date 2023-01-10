@@ -63,7 +63,16 @@
     mapToDuration()
   )
 
-  onMount(() => setLabel(video, duration$))
+  onMount(() => {
+    // FIXME たぶん duration$ がリアクティブになってない
+    const sub = duration$.subscribe((duration) => {
+      video.ariaLabel = humanReadableLabelOf(duration)
+    })
+
+    return () => {
+      sub.unsubscribe()
+    }
+  })
 
   const canvasWidth = 512
   const canvasHeight = 288
@@ -134,21 +143,6 @@
       destroy() {
         sub.unsubscribe()
       },
-    }
-  }
-
-  function setLabel(
-    video: HTMLVideoElement | undefined,
-    duration$: Observable<number>
-  ): void | (() => void) {
-    if (!video) return
-
-    const sub = duration$.subscribe((duration) => {
-      video.ariaLabel = humanReadableLabelOf(duration)
-    })
-
-    return () => {
-      sub.unsubscribe()
     }
   }
 
