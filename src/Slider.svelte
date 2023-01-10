@@ -1,6 +1,7 @@
 <script lang="ts">
   import clsx from "clsx"
-  import type { Action } from "svelte/types/runtime/action"
+  import { intersect } from "./action/intersect"
+  import { scrollIntoViewOnceIf } from "./action/scrollIntoViewOnceIf"
 
   export let label: string = ""
   export let value: number = 0
@@ -12,51 +13,6 @@
   let currentOption: HTMLElement
 
   const initialValue = value
-
-  const observe: Action<HTMLElement> = (root) => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [target] = entries
-          .filter(
-            (
-              _
-            ): _ is Omit<IntersectionObserverEntry, "target"> & {
-              target: HTMLElement
-            } => _.isIntersecting && _.target instanceof HTMLElement
-          )
-          .map((_) => _.target)
-
-        if (target) {
-          root.dispatchEvent(
-            new CustomEvent("intersect", {
-              detail: target,
-            })
-          )
-        }
-      },
-      {
-        threshold: 1,
-        rootMargin: "-32px 0px",
-        root,
-      }
-    )
-
-    Array.from(root.children).forEach((child) => {
-      observer.observe(child)
-    })
-
-    return {
-      destroy() {
-        observer.disconnect()
-      },
-    }
-  }
-
-  const scrollIntoView: Action<HTMLElement, boolean> = (step, enabled) => {
-    if (!enabled) return
-
-    step.scrollIntoView({ block: "center" })
-  }
 </script>
 
 <span
@@ -103,17 +59,17 @@
       "hover:bg-dark/10 dark:hover:bg-light/20",
       "-mr-12 pr-14 text-3xl"
     )}
-    use:observe
-    on:intersect={(e) => {
-      currentOption = e.detail
-      value = Number(e.detail.dataset.value)
+    use:intersect
+    on:intersect={({ detail: step }) => {
+      currentOption = step
+      value = Number(step.dataset.value)
     }}
   >
     {#each Array(valueMax + 1) as _, index (index)}
       <span
         data-value={index}
         class={clsx("text-right", index !== value && "font-thin opacity-25")}
-        use:scrollIntoView={index === initialValue}
+        use:scrollIntoViewOnceIf={index === initialValue}
       >
         {index.toString(10).padStart(2, "0")}
       </span>
