@@ -1,5 +1,6 @@
 <script lang="ts">
   import clsx from "clsx"
+  import type { KeyboardEventHandler } from "svelte/elements"
   import { intersect } from "./action/intersect"
   import { scrollIntoViewOnceIf } from "./action/scrollIntoViewOnceIf"
 
@@ -10,21 +11,7 @@
   let className: string = ""
 
   let currentOption: HTMLElement
-
-  const initialValue = value
-</script>
-
-<span
-  role="slider"
-  aria-label="{label}を選択"
-  aria-orientation="vertical"
-  aria-valuemin={0}
-  aria-valuemax={valueMax}
-  aria-valuenow={value}
-  aria-valuetext="{value}{label}"
-  tabindex="0"
-  class={className}
-  on:keydown={(e) => {
+  const handleKeydown: KeyboardEventHandler<HTMLElement> = (e) => {
     import.meta.env.DEV && console.debug(e.key, e.keyCode)
 
     switch (e.key) {
@@ -48,7 +35,22 @@
         break
       }
     }
-  }}
+  }
+
+  const initialValue = value
+</script>
+
+<span
+  role="slider"
+  aria-label="{label}を選択"
+  aria-orientation="vertical"
+  aria-valuemin={0}
+  aria-valuemax={valueMax}
+  aria-valuenow={value}
+  aria-valuetext="{value}{label}"
+  tabindex="0"
+  class={className}
+  on:keydown={handleKeydown}
 >
   <span
     class={clsx(
