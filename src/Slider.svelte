@@ -9,6 +9,8 @@
   let className: string = ""
   export { className as class }
 
+  let currentOption: HTMLElement
+
   const observe: Action<HTMLElement> = (root) => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -68,9 +70,8 @@
         e.preventDefault()
 
         // increment
-        value += 1
-        // const next = currentOption$.current?.nextElementSibling
-        // next?.scrollIntoView({ block: "center" })
+        const next = currentOption.nextElementSibling
+        next?.scrollIntoView({ block: "center" })
         break
       }
 
@@ -79,9 +80,8 @@
         e.preventDefault()
 
         // decrement
-        value -= 1
-        // const prev = currentOption$.current?.previousElementSibling
-        // prev?.scrollIntoView({ block: "center" })
+        const prev = currentOption.previousElementSibling
+        prev?.scrollIntoView({ block: "center" })
         break
       }
     }
@@ -99,6 +99,7 @@
     on:intersect={(e) => {
       if (!(e.detail instanceof HTMLElement)) return
 
+      currentOption = e.detail
       value = Number(e.detail.dataset.value)
     }}
   >
