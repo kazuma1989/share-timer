@@ -51,9 +51,16 @@
     })
   )
 
-  // TODO これでいいのか？
-  let draftDuration: number
-  $: draftDuration = draftDuration ?? $timerState$?.initialDuration
+  let duration: number
+  let prev: number
+  $: {
+    const current = $timerState$?.initialDuration
+    if (current !== prev) {
+      duration = current
+    }
+
+    prev = current
+  }
 </script>
 
 {#if $timerState$}
@@ -73,12 +80,9 @@
 
         dispatch({
           type: "start",
-          withDuration: draftDuration,
+          withDuration: duration,
           at: new ServerTimestamp(now()),
         })
-
-        // TODO 意図したとおりの挙動になっていないかもしれない
-        draftDuration = state.initialDuration
       }}
     >
       <p id={id("status")} role="status" class="sr-only">
@@ -90,12 +94,7 @@
           <div
             class="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center"
           >
-            {#key state.mode + state.initialDuration}
-              <DurationSelect bind:value={draftDuration} />
-            {/key}
-
-            <!-- TODO デバッグ用なので消す -->
-            <p>{draftDuration}</p>
+            <DurationSelect bind:value={duration} />
           </div>
         {:else}
           <TimeViewer {timerState$} />

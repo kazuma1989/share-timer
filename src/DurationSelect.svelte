@@ -8,19 +8,16 @@
   let className: string = ""
   export { className as class }
 
-  const duration = parseDuration(value)
-  let draftHours = duration.hours
-  let draftMinutes = duration.minutes
-  let draftSeconds = duration.seconds
+  const initialValue = value
+  let { hours, minutes, seconds } = parseDuration(initialValue)
 
-  $: value =
-    draftHours * 3600_000 + draftMinutes * 60_000 + draftSeconds * 1_000
+  $: value = hours * 3600_000 + minutes * 60_000 + seconds * 1_000
 </script>
 
 <span class={clsx("inline-flex gap-2", className)}>
-  <Slider label="時間" bind:value={draftHours} valueMax={23} />
+  <Slider label="時間" bind:value={hours} valueMax={23} />
 
-  <Slider label="分" bind:value={draftMinutes} valueMax={59} />
+  <Slider label="分" bind:value={minutes} valueMax={59} />
 
-  <Slider label="秒" bind:value={draftSeconds} valueMax={59} />
+  <Slider label="秒" bind:value={seconds} valueMax={59} />
 </span>
