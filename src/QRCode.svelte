@@ -43,7 +43,7 @@
 
 <svg
   class={clsx("bg-white text-black", className)}
-  viewBox={`0 0 ${size} ${size}`}
+  viewBox="0 0 {size} {size}"
   {width}
   {height}
 >

@@ -68,7 +68,7 @@
 
   <div class={clsx("grid grid-rows-[auto_5fr_auto_4fr]", className)}>
     <div class="pt-2 text-center">
-      <h1 aria-label={`タイマーの名前: ${roomName}`}>
+      <h1 aria-label="タイマーの名前: {roomName}">
         {roomName}
       </h1>
     </div>
@@ -104,7 +104,7 @@
       {#if locked}
         <div class="flex items-center justify-around">
           <button
-            aria-controls={`${id("status")} ${id("timer")}`}
+            aria-controls="{id('status')} {id('timer')}"
             type="button"
             disabled
             class="circle-button circle-button-gray text-2xl"
@@ -113,7 +113,7 @@
           </button>
 
           <button
-            aria-controls={`${id("status")} ${id("timer")}`}
+            aria-controls="{id('status')} {id('timer')}"
             type="button"
             disabled
             class="circle-button circle-button-green text-2xl"
@@ -125,7 +125,7 @@
       {:else}
         <div class="flex items-center justify-around">
           <button
-            aria-controls={`${id("status")} ${id("timer")}`}
+            aria-controls="{id('status')} {id('timer')}"
             type="button"
             disabled={state.mode === "editing"}
             class="circle-button circle-button-gray text-xs"
@@ -140,7 +140,7 @@
 
           {#if state.mode === "editing"}
             <button
-              aria-controls={`${id("status")} ${id("timer")}`}
+              aria-controls="{id('status')} {id('timer')}"
               type="submit"
               class="circle-button circle-button-green"
             >
@@ -148,7 +148,7 @@
             </button>
           {:else if state.mode === "running"}
             <button
-              aria-controls={`${id("status")} ${id("timer")}`}
+              aria-controls="{id('status')} {id('timer')}"
               type="button"
               class="circle-button circle-button-orange"
               on:click={() => {
@@ -162,7 +162,7 @@
             </button>
           {:else}
             <button
-              aria-controls={`${id("status")} ${id("timer")}`}
+              aria-controls="{id('status')} {id('timer')}"
               type="button"
               class="circle-button circle-button-green"
               on:click={() => {
