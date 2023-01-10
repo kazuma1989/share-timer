@@ -111,9 +111,9 @@
         {index.toString(10).padStart(2, "0")}
       </span>
     {/each}
-  </span>
-
-  <span class="pointer-events-none inline-block w-12 pr-2 text-right text-lg">
+  </span><span
+    class="pointer-events-none inline-block w-12 pr-2 text-right text-lg"
+  >
     {label}
   </span>
 </span>
