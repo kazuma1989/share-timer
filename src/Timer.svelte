@@ -120,6 +120,7 @@
     </div>
 
     <form
+      aria-label="タイマーの値を設定"
       class="contents"
       on:submit|preventDefault={() => {
         if (state.mode !== "editing") return
