@@ -49,6 +49,13 @@
       },
     }
   }
+
+  const defaultValue = value
+  const scrollIntoView: Action<HTMLElement, number> = (step, index = 0) => {
+    if (index === defaultValue) {
+      step.scrollIntoView({ block: "center" })
+    }
+  }
 </script>
 
 <span
@@ -107,6 +114,7 @@
       <span
         data-value={index}
         class={clsx("text-right", index !== value && "font-thin opacity-25")}
+        use:scrollIntoView={index}
       >
         {index.toString(10).padStart(2, "0")}
       </span>
