@@ -10,6 +10,11 @@
   export { className as class }
   let className: string = ""
 
+  let slider: HTMLElement
+  export const focus = () => {
+    slider.focus()
+  }
+
   let currentOption: HTMLElement
   const handleKeydown: KeyboardEventHandler<HTMLElement> = (e) => {
     import.meta.env.DEV && console.debug(e.key, e.keyCode)
@@ -51,6 +56,7 @@
   tabindex="0"
   class={className}
   on:keydown={handleKeydown}
+  bind:this={slider}
 >
   <span
     class={clsx(

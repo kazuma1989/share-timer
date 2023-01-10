@@ -7,6 +7,11 @@
   export { className as class }
   let className: string = ""
 
+  let slider: Slider
+  export const focus = () => {
+    slider.focus()
+  }
+
   const initialValue = value
   let { hours, minutes, seconds } = parseDuration(initialValue)
 
@@ -14,7 +19,7 @@
 </script>
 
 <span class={clsx("inline-flex gap-2", className)}>
-  <Slider label="時間" bind:value={hours} valueMax={23} />
+  <Slider label="時間" bind:value={hours} valueMax={23} bind:this={slider} />
 
   <Slider label="分" bind:value={minutes} valueMax={59} />
 

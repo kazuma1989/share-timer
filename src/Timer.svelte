@@ -107,6 +107,9 @@
       }
     }
   }
+
+  let select: DurationSelect
+  let cancel: HTMLElement
 </script>
 
 {#if $timerState$}
@@ -141,15 +144,15 @@
           <div
             class="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center"
           >
-            <DurationSelect bind:value={duration} />
+            <DurationSelect bind:value={duration} bind:this={select} />
           </div>
         {:else}
           <TimeViewer {timerState$} />
         {/if}
       </div>
 
-      {#if locked}
-        <div class="flex items-center justify-around">
+      <div class="flex items-center justify-around">
+        {#if locked}
           <button
             aria-controls="{id('status')} {id('timer')}"
             type="button"
@@ -168,19 +171,24 @@
           >
             <Icon name="lock-outline" />
           </button>
-        </div>
-      {:else}
-        <div class="flex items-center justify-around">
+        {:else}
           <button
             aria-controls="{id('status')} {id('timer')}"
             type="button"
             disabled={state.mode === "editing"}
             class="circle-button circle-button-gray text-xs"
-            on:click={() => {
-              dispatch({
+            on:click={async () => {
+              const currentFocus = document.activeElement
+
+              await dispatch({
                 type: "cancel",
               })
+
+              if (cancel === currentFocus) {
+                select.focus()
+              }
             }}
+            bind:this={cancel}
           >
             キャンセル
           </button>
@@ -188,8 +196,8 @@
           <button {...button} on:click={button["on:click"]}>
             {button.label}
           </button>
-        </div>
-      {/if}
+        {/if}
+      </div>
     </form>
   </div>
 {/if}
