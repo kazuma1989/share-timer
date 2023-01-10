@@ -15,9 +15,8 @@
 
   export let room$: Observable<Room>
   export let timerState$: Observable<TimerState>
-
-  let className: string = ""
   export { className as class }
+  let className: string = ""
 
   const _id = getId()
   const id = (_: "timer" | "status") => _id + _

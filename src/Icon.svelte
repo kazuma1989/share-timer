@@ -6,9 +6,8 @@
    * @see https://materialdesignicons.com
    */
   export let name: keyof typeof icons
-
-  let className: string = ""
   export { className as class }
+  let className: string = ""
 </script>
 
 <svg

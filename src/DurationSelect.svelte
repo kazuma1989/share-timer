@@ -4,9 +4,8 @@
   import { parseDuration } from "./util/parseDuration"
 
   export let value: number
-
-  let className: string = ""
   export { className as class }
+  let className: string = ""
 
   const initialValue = value
   let { hours, minutes, seconds } = parseDuration(initialValue)

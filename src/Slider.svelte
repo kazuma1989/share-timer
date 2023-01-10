@@ -6,9 +6,8 @@
   export let label: string = ""
   export let value: number = 0
   export let valueMax: number = 0
-
-  let className: string = ""
   export { className as class }
+  let className: string = ""
 
   let currentOption: HTMLElement
 

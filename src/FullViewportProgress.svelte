@@ -1,8 +1,8 @@
 <script lang="ts">
   import clsx from "clsx"
 
-  let className: string = ""
   export { className as class }
+  let className: string = ""
 </script>
 
 <div class={clsx("grid h-screen place-items-center", className)}>

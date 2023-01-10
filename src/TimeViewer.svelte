@@ -53,9 +53,8 @@
   import { interval } from "./util/interval"
 
   export let timerState$: Observable<TimerState>
-
-  let className: string = ""
   export { className as class }
+  let className: string = ""
 
   $: duration$ = timerState$.pipe(
     bufferedLast(interval("worker", 400)),
