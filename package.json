@@ -40,6 +40,7 @@
     "@tsconfig/svelte": "3.0.x",
     "autoprefixer": "10.4.x",
     "clsx": "1.2.x",
+    "comlink": "4.3.x",
     "firebase": "9.15.x",
     "firebase-tools": "11.19.x",
     "postcss": "8.4.x",
