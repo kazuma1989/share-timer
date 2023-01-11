@@ -8,7 +8,7 @@
   export { className as class }
   let className: string = ""
 
-  const { size, d } = qrToSVG(data)
+  $: ({ size, d } = qrToSVG(data))
 
   function qrToSVG(data: string): {
     size: number
