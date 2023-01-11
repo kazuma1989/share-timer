@@ -30,30 +30,6 @@
 
   $: [pending, dispatch] = useDispatch(roomId)
 
-  $: label$ = timerState$.pipe(
-    map((state) => {
-      switch (state.mode) {
-        case "editing": {
-          return `タイマーは編集中です。値は${humanReadableLabelOf(
-            state.initialDuration
-          )}`
-        }
-
-        case "running": {
-          return `タイマーは実行中です。残り${humanReadableLabelOf(
-            state.restDuration - (now() - state.startedAt)
-          )}`
-        }
-
-        case "paused": {
-          return `タイマーは一時停止中です。残り${humanReadableLabelOf(
-            state.restDuration
-          )}`
-        }
-      }
-    })
-  )
-
   $: duration$ = timerState$.pipe(
     map((_) => _.initialDuration),
     distinctUntilChanged()
@@ -156,7 +132,15 @@
     on:submit|preventDefault={onSubmit}
   >
     <p id={id("status")} role="status" class="sr-only">
-      {$label$}
+      {#if state?.mode === "editing"}
+        タイマーは編集中です。値は{humanReadableLabelOf(state.initialDuration)}
+      {:else if state?.mode === "running"}
+        タイマーは実行中です。残り{humanReadableLabelOf(
+          state.restDuration - (now() - state.startedAt)
+        )}
+      {:else if state?.mode === "paused"}
+        タイマーは一時停止中です。残り{humanReadableLabelOf(state.restDuration)}
+      {/if}
     </p>
 
     <div id={id("timer")} class="grid place-items-center tabular-nums">
