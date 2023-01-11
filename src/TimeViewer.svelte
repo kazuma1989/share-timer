@@ -32,17 +32,14 @@
     combineLatestWith,
     distinctUntilChanged,
     map,
-    pipe,
     scan,
     startWith,
     type Observable,
-    type OperatorFunction,
   } from "rxjs"
   import type { Action } from "svelte/types/runtime/action"
-  import {
-    mapToCurrentDuration,
-    type CurrentDuration,
-  } from "./mapToCurrentDuration"
+  import { connectStreamTo } from "./action/connectStreamTo"
+  import { prependElement } from "./action/prependElement"
+  import { mapToCurrentDuration } from "./mapToCurrentDuration"
   import type { TimerState } from "./timerReducer"
   import { useDarkMode } from "./useDarkMode"
   import { bufferedLast } from "./util/bufferedLast"
@@ -58,7 +55,8 @@
   $: duration$ = timerState$.pipe(
     bufferedLast(interval("worker", 400)),
     mapToCurrentDuration(interval("worker", 100)),
-    mapToDuration()
+    map((_) => floor(_.duration)),
+    distinctUntilChanged()
   )
 
   $: video.ariaLabel = humanReadableLabelOf($duration$)
@@ -134,37 +132,15 @@
       },
     }
   }
-
-  const connectVideo: Action<HTMLCanvasElement> = (canvas) => {
-    video.width = canvasWidth
-    video.height = canvasHeight
-
-    video.srcObject = canvas.captureStream()
-  }
-
-  const prependElement: Action<HTMLElement, HTMLElement> = (parent, child) => {
-    if (!child) return
-
-    parent.prepend(child)
-
-    return {
-      destroy() {
-        parent.removeChild(child)
-      },
-    }
-  }
-
-  function mapToDuration(): OperatorFunction<CurrentDuration, number> {
-    return pipe(
-      map((_) => floor(_.duration)),
-      distinctUntilChanged()
-    )
-  }
 </script>
 
 <div
   use:prependElement={video}
   class={clsx("bg-light dark:bg-dark", className)}
 >
-  <canvas use:startDrawing use:connectVideo class="hidden bg-inherit" />
+  <canvas
+    use:startDrawing
+    use:connectStreamTo={video}
+    class="hidden bg-inherit"
+  />
 </div>
