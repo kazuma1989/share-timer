@@ -1,3 +1,4 @@
+import { wrap } from "comlink"
 import {
   DocumentReference,
   DocumentSnapshot,
@@ -6,6 +7,8 @@ import {
   QuerySnapshot,
 } from "firebase/firestore"
 import { Observable } from "rxjs"
+import type { snapshot } from "./worker"
+import W from "./worker?worker"
 
 export function snapshotOf(
   reference: DocumentReference
@@ -22,3 +25,7 @@ export function snapshotOf(
     })
   )
 }
+
+const x = wrap<snapshot>(new W())
+
+x()
