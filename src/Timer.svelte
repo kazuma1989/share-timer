@@ -22,6 +22,9 @@
   const _id = getId()
   const id = (_: "timer" | "status") => _id + _
 
+  let state: TimerState | undefined
+  $: state = $timerState$
+
   $: ({ id: roomId, name: roomName, lockedBy } = $room$ ?? {})
   $: locked = lockedBy && lockedBy !== getItem("userId")
 
@@ -53,8 +56,8 @@
 
   let duration: number
   let prev: number
-  $: {
-    const current = $timerState$?.initialDuration
+  $: if (state) {
+    const current = state.initialDuration
     if (current !== prev) {
       duration = current
     }
@@ -62,13 +65,15 @@
     prev = current
   }
 
-  let button: {
-    label: string
-    onClick?: HTMLButtonAttributes["on:click"]
-    attr: HTMLButtonAttributes
-  }
-  $: {
-    switch ($timerState$?.mode) {
+  let button:
+    | {
+        label: string
+        onClick?: HTMLButtonAttributes["on:click"]
+        attr: HTMLButtonAttributes
+      }
+    | undefined
+  $: if (state) {
+    switch (state.mode) {
       case "editing": {
         button = {
           label: "開始",
@@ -119,7 +124,7 @@
   }
 
   const onSubmit = () => {
-    if ($timerState$.mode !== "editing") return
+    if (state?.mode !== "editing") return
 
     dispatch({
       type: "start",
@@ -143,74 +148,70 @@
   }
 </script>
 
-{#if $timerState$}
-  {@const state = $timerState$}
+<div class={clsx("grid grid-rows-[auto_5fr_auto_4fr]", className)}>
+  <div class="pt-2 text-center">
+    <h1 aria-label="タイマーの名前: {roomName}">
+      {roomName}
+    </h1>
+  </div>
 
-  <div class={clsx("grid grid-rows-[auto_5fr_auto_4fr]", className)}>
-    <div class="pt-2 text-center">
-      <h1 aria-label="タイマーの名前: {roomName}">
-        {roomName}
-      </h1>
+  <form
+    aria-label="タイマーの値を設定"
+    class="contents"
+    on:submit|preventDefault={onSubmit}
+  >
+    <p id={id("status")} role="status" class="sr-only">
+      {$label$}
+    </p>
+
+    <div id={id("timer")} class="grid place-items-center tabular-nums">
+      {#if !locked && state?.mode === "editing"}
+        <div
+          class="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center"
+        >
+          <DurationSelect bind:value={duration} bind:this={select} />
+        </div>
+      {:else}
+        <TimeViewer {timerState$} />
+      {/if}
     </div>
 
-    <form
-      aria-label="タイマーの値を設定"
-      class="contents"
-      on:submit|preventDefault={onSubmit}
-    >
-      <p id={id("status")} role="status" class="sr-only">
-        {$label$}
-      </p>
+    <div class="flex items-center justify-around">
+      {#if locked}
+        <button
+          aria-controls="{id('status')} {id('timer')}"
+          type="button"
+          disabled
+          class="circle-button circle-button-gray text-2xl"
+        >
+          <Icon name="lock-outline" />
+        </button>
 
-      <div id={id("timer")} class="grid place-items-center tabular-nums">
-        {#if !locked && state.mode === "editing"}
-          <div
-            class="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center"
-          >
-            <DurationSelect bind:value={duration} bind:this={select} />
-          </div>
-        {:else}
-          <TimeViewer {timerState$} />
-        {/if}
-      </div>
+        <button
+          aria-controls="{id('status')} {id('timer')}"
+          type="button"
+          disabled
+          class="circle-button circle-button-green text-2xl"
+          class:!circle-button-orange={state?.mode === "running"}
+        >
+          <Icon name="lock-outline" />
+        </button>
+      {:else}
+        <button
+          aria-controls="{id('status')} {id('timer')}"
+          type="button"
+          disabled={state?.mode === "editing"}
+          class="circle-button circle-button-gray text-xs"
+          on:click={onCancel}
+          bind:this={cancel}
+        >
+          キャンセル
+        </button>
 
-      <div class="flex items-center justify-around">
-        {#if locked}
-          <button
-            aria-controls="{id('status')} {id('timer')}"
-            type="button"
-            disabled
-            class="circle-button circle-button-gray text-2xl"
-          >
-            <Icon name="lock-outline" />
-          </button>
-
-          <button
-            aria-controls="{id('status')} {id('timer')}"
-            type="button"
-            disabled
-            class="circle-button circle-button-green text-2xl"
-            class:!circle-button-orange={state.mode === "running"}
-          >
-            <Icon name="lock-outline" />
-          </button>
-        {:else}
-          <button
-            aria-controls="{id('status')} {id('timer')}"
-            type="button"
-            disabled={state.mode === "editing"}
-            class="circle-button circle-button-gray text-xs"
-            on:click={onCancel}
-            bind:this={cancel}
-          >
-            キャンセル
-          </button>
-
-          <button {...button.attr} on:click={button.onClick}>
-            {button.label}
-          </button>
-        {/if}
-      </div>
-    </form>
-  </div>
-{/if}
+        <button {...button?.attr} on:click={button?.onClick}>
+          {button?.label}
+        </button>
+      {/if}
+    </div>
+  </form>
+</div>
