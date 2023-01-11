@@ -38,6 +38,7 @@
   import { mapToCurrentDuration } from "./mapToCurrentDuration"
   import type { TimerState } from "./timerReducer"
   import { useDarkMode } from "./useDarkMode"
+  import { assertNonNullable } from "./util/assertNonNullable"
   import { bufferedLast } from "./util/bufferedLast"
   import { floor } from "./util/floor"
   import { formatDuration } from "./util/formatDuration"
@@ -55,36 +56,56 @@
     distinctUntilChanged()
   )
 
+  $: durationText$ = duration$.pipe(map((_) => formatDuration(_)))
+
   $: video.ariaLabel = humanReadableLabelOf($duration$)
 
-  const canvasWidth = 512
-  const canvasHeight = 288
+  const setStyle: Action<
+    HTMLCanvasElement,
+    {
+      width: number
+      height: number
+    }
+  > = (canvas, params) => {
+    assertNonNullable(params)
 
-  const darkMode$ = useDarkMode()
-  const startDrawing: Action<HTMLCanvasElement> = (canvas) => {
     const ctx = canvas.getContext("2d")
-    if (!ctx) return
+    assertNonNullable(ctx)
+
+    const { width, height } = params
 
     // https://developer.mozilla.org/ja/docs/Web/API/Window/devicePixelRatio
     // 表示サイズを設定（CSS におけるピクセル数です）。
-    canvas.style.width = `${canvasWidth}px`
-    canvas.style.height = `${canvasHeight}px`
+    canvas.style.width = `${width}px`
+    canvas.style.height = `${height}px`
 
     // レティナでこの値を 1 にするとぼやけた canvas になります
     const scale = window.devicePixelRatio
 
     // メモリ上における実際のサイズを設定（ピクセル密度の分だけ倍増させます）。
-    canvas.width = Math.floor(canvasWidth * scale)
-    canvas.height = Math.floor(canvasHeight * scale)
+    canvas.width = Math.floor(width * scale)
+    canvas.height = Math.floor(height * scale)
     ctx.scale(scale, scale)
 
     ctx.textAlign = "left"
     ctx.textBaseline = "middle"
     ctx.font = "100 128px/1 system-ui,sans-serif"
+  }
 
-    // FIXME たぶん duration$ がリアクティブになってない
-    const fillText$ = duration$.pipe(
-      map((_) => formatDuration(_)),
+  const darkMode$ = useDarkMode()
+  const drawText: Action<HTMLCanvasElement, Observable<string>> = (
+    canvas,
+    text$
+  ) => {
+    assertNonNullable(text$)
+
+    const ctx = canvas.getContext("2d")
+    assertNonNullable(ctx)
+
+    const canvasWidth = parseInt(canvas.style.width)
+    const canvasHeight = parseInt(canvas.style.height)
+
+    const fillText$ = text$.pipe(
       scan<string, { text: string; prevWidth: number; prevLength: number }>(
         ({ prevWidth, prevLength }, text, i) => {
           const firstTime = i === 0
@@ -131,12 +152,13 @@
 </script>
 
 <div
-  use:prependElement={video}
   class={clsx("bg-light dark:bg-dark", className)}
+  use:prependElement={video}
 >
   <canvas
-    use:startDrawing
-    use:connectStreamTo={video}
     class="hidden bg-inherit"
+    use:setStyle={{ width: 512, height: 288 }}
+    use:drawText={durationText$}
+    use:connectStreamTo={video}
   />
 </div>
