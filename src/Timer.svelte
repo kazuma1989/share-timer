@@ -1,6 +1,6 @@
 <script lang="ts">
   import clsx from "clsx"
-  import { map, type Observable } from "rxjs"
+  import { distinctUntilChanged, map, type Observable } from "rxjs"
   import type { HTMLButtonAttributes } from "svelte/elements"
   import DurationSelect from "./DurationSelect.svelte"
   import Icon from "./Icon.svelte"
@@ -54,16 +54,11 @@
     })
   )
 
-  let duration: number
-  let prev: number
-  $: if (state) {
-    const current = state.initialDuration
-    if (current !== prev) {
-      duration = current
-    }
-
-    prev = current
-  }
+  $: duration$ = timerState$.pipe(
+    map((_) => _.initialDuration),
+    distinctUntilChanged()
+  )
+  $: duration = $duration$
 
   let button:
     | {
