@@ -22,13 +22,8 @@
   const _id = getId()
   const id = (_: "timer" | "status") => _id + _
 
-  let state: TimerState | undefined
   $: state = $timerState$
-
-  $: ({ id: roomId, name: roomName, lockedBy } = $room$ ?? {})
-  $: locked = lockedBy && lockedBy !== getItem("userId")
-
-  $: [pending, dispatch] = useDispatch(roomId)
+  $: ({ id: roomId, name: roomName, lockedBy } = $room$)
 
   $: duration$ = timerState$.pipe(
     map((_) => _.initialDuration),
@@ -36,14 +31,15 @@
   )
   $: duration = $duration$
 
-  let button:
-    | {
-        label: string
-        onClick?: HTMLButtonAttributes["on:click"]
-        attr: HTMLButtonAttributes
-      }
-    | undefined
-  $: if (state) {
+  $: locked = lockedBy && lockedBy !== getItem("userId")
+  $: [pending, dispatch] = useDispatch(roomId)
+
+  let button: {
+    label: string
+    onClick?: HTMLButtonAttributes["on:click"]
+    attr: HTMLButtonAttributes
+  }
+  $: {
     switch (state.mode) {
       case "editing": {
         button = {
@@ -95,7 +91,7 @@
   }
 
   const onSubmit = () => {
-    if (state?.mode !== "editing") return
+    if (state.mode !== "editing") return
 
     dispatch({
       type: "start",
@@ -132,19 +128,19 @@
     on:submit|preventDefault={onSubmit}
   >
     <p id={id("status")} role="status" class="sr-only">
-      {#if state?.mode === "editing"}
+      {#if state.mode === "editing"}
         タイマーは編集中です。値は{humanReadableLabelOf(state.initialDuration)}
-      {:else if state?.mode === "running"}
+      {:else if state.mode === "running"}
         タイマーは実行中です。残り{humanReadableLabelOf(
           state.restDuration - (now() - state.startedAt)
         )}
-      {:else if state?.mode === "paused"}
+      {:else if state.mode === "paused"}
         タイマーは一時停止中です。残り{humanReadableLabelOf(state.restDuration)}
       {/if}
     </p>
 
     <div id={id("timer")} class="grid place-items-center tabular-nums">
-      {#if !locked && state?.mode === "editing"}
+      {#if !locked && state.mode === "editing"}
         <div
           class="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center"
         >
@@ -173,7 +169,7 @@
           type="button"
           disabled
           class="circle-button circle-button-green text-2xl"
-          class:!circle-button-orange={state?.mode === "running"}
+          class:!circle-button-orange={state.mode === "running"}
         >
           <Icon name="lock-outline" />
         </button>
@@ -181,7 +177,7 @@
         <button
           aria-controls="{id('status')} {id('timer')}"
           type="button"
-          disabled={state?.mode === "editing"}
+          disabled={state.mode === "editing"}
           class="circle-button circle-button-gray text-xs"
           on:click={onCancel}
           bind:this={cancel}
@@ -189,8 +185,8 @@
           キャンセル
         </button>
 
-        <button {...button?.attr} on:click={button?.onClick}>
-          {button?.label}
+        <button {...button.attr} on:click={button.onClick}>
+          {button.label}
         </button>
       {/if}
     </div>
