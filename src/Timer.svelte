@@ -148,7 +148,9 @@
         <div
           class="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center"
         >
-          <DurationSelect bind:value={duration} bind:this={select} />
+          {#key state.mode + state.initialDuration}
+            <DurationSelect bind:value={duration} bind:this={select} />
+          {/key}
         </div>
       {:else}
         <TimeViewer {timerState$} />
