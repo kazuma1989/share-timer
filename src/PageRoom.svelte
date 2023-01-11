@@ -1,5 +1,6 @@
 <script lang="ts">
   import { firstValueFrom, map, merge, partition, type Observable } from "rxjs"
+  import FlashCover from "./FlashCover.svelte"
   import Timer from "./Timer.svelte"
   import { useRoom } from "./useRoom"
   import { useSetup } from "./useSetup"
@@ -28,5 +29,7 @@
 {#await Promise.all( [setup$, firstValueFrom(room$), firstValueFrom(timerState$)] ) then}
   <div class="mx-auto h-screen max-w-prose">
     <Timer {room$} {timerState$} class="h-full" />
+
+    <FlashCover {timerState$} />
   </div>
 {/await}
