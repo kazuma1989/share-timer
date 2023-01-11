@@ -4,7 +4,7 @@ export function createContext<T>(
   name?: string,
   defaultValue?: T
 ): [keyWithContext: (value: T) => [typeof key, T], useContextValue: () => T] {
-  const key = Symbol()
+  const key = Symbol(name)
 
   return [
     (value) => [key, value],
@@ -19,7 +19,7 @@ export function createContext<T>(
         return defaultValue
       }
 
-      throw new Error(`Context (${name}) を設定できていないようです`)
+      throw new Error(`Context (${key.description}) を設定できていないようです`)
     },
   ]
 }
