@@ -38,7 +38,6 @@
     type Observable,
     type OperatorFunction,
   } from "rxjs"
-  import { onMount } from "svelte"
   import type { Action } from "svelte/types/runtime/action"
   import {
     mapToCurrentDuration,
@@ -62,16 +61,7 @@
     mapToDuration()
   )
 
-  onMount(() => {
-    // FIXME たぶん duration$ がリアクティブになってない
-    const sub = duration$.subscribe((duration) => {
-      video.ariaLabel = humanReadableLabelOf(duration)
-    })
-
-    return () => {
-      sub.unsubscribe()
-    }
-  })
+  $: video.ariaLabel = humanReadableLabelOf($duration$)
 
   const canvasWidth = 512
   const canvasHeight = 288
