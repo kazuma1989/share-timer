@@ -11,6 +11,7 @@ import { observeAudioPermission } from "./observeAudioPermission"
 import smallAlert from "./sound/small-alert.mp3"
 import { Timer } from "./Timer"
 import type { TimerState } from "./timerReducer"
+// @ts-expect-error
 import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
 import type { Room } from "./zod/roomZod"
 
@@ -29,10 +30,7 @@ createRoot(root).render(
         // @ts-expect-error
         value={audio}
       >
-        <MediaPermissionProvider
-          // @ts-expect-error
-          value={permission$}
-        >
+        <MediaPermissionProvider value={permission$}>
           <Suspense fallback={<FullViewportProgress />}>
             <Timer
               room$={of({

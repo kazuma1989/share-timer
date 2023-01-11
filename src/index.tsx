@@ -14,6 +14,7 @@ import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
 import smallAlert from "./sound/small-alert.mp3"
 import { getItem, setItem } from "./storage"
+// @ts-expect-error
 import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
 // @ts-expect-error
 import { DarkModeProvider, observeDarkMode } from "./useDarkMode"
@@ -59,10 +60,7 @@ async function run() {
                 // @ts-expect-error
                 value={audio}
               >
-                <MediaPermissionProvider
-                  // @ts-expect-error
-                  value={permission$}
-                >
+                <MediaPermissionProvider value={permission$}>
                   <Suspense fallback={<FullViewportProgress />}>
                     <App route$={route$} />
                   </Suspense>

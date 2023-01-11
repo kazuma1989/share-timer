@@ -2,9 +2,11 @@
   import clsx from "clsx"
   import { distinctUntilChanged, map, type Observable } from "rxjs"
   import type { HTMLButtonAttributes } from "svelte/elements"
+  import ConfigArea from "./ConfigArea.svelte"
   import DurationSelect from "./DurationSelect.svelte"
   import Icon from "./Icon.svelte"
   import { now } from "./now"
+  import { setHash } from "./observeHash"
   import { getItem } from "./storage"
   import type { TimerState } from "./timerReducer"
   import TimeViewer from "./TimeViewer.svelte"
@@ -191,4 +193,11 @@
       {/if}
     </div>
   </form>
+
+  <ConfigArea
+    class="flex items-center justify-evenly px-6"
+    on:click={() => {
+      setHash(["info", roomId])
+    }}
+  />
 </div>

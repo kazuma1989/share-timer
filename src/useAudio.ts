@@ -9,9 +9,8 @@ export interface Audio {
 
 export const [AudioProvider, useAudio] = createContext<Audio>("AudioProvider")
 
-export const [MediaPermissionProvider, useMediaPermission] = createContext<
-  Observable<Permission>
->("MediaPermissionProvider")
+export const [keyWithMediaPermission, useMediaPermission] =
+  createContext<Observable<Permission>>("MediaPermission")
 
 export function createAudio(
   context: BaseAudioContext,
