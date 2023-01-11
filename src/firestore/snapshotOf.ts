@@ -7,7 +7,7 @@ import {
   QuerySnapshot,
 } from "firebase/firestore"
 import { Observable } from "rxjs"
-import type { snapshot } from "./worker"
+import type { Firestore } from "./worker"
 import W from "./worker?worker"
 
 export function snapshotOf(
@@ -26,6 +26,8 @@ export function snapshotOf(
   )
 }
 
-const x = wrap<snapshot>(new W())
+const F = wrap<typeof Firestore>(new W())
 
-x()
+const f = await new F()
+
+f.snapshot()
