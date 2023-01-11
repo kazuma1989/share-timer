@@ -62,14 +62,20 @@
     prev = current
   }
 
-  let button: HTMLButtonAttributes & { label: string }
+  let button: {
+    label: string
+    onClick?: HTMLButtonAttributes["on:click"]
+    attr: HTMLButtonAttributes
+  }
   $: {
     switch ($timerState$?.mode) {
       case "editing": {
         button = {
           label: "開始",
-          type: "submit",
-          class: clsx("circle-button circle-button-green"),
+          attr: {
+            type: "submit",
+            class: clsx("circle-button circle-button-green"),
+          },
         }
         break
       }
@@ -77,13 +83,15 @@
       case "running": {
         button = {
           label: "一時停止",
-          type: "button",
-          class: clsx("circle-button circle-button-orange"),
-          "on:click": () => {
+          onClick: () => {
             dispatch({
               type: "pause",
               at: new ServerTimestamp(now()),
             })
+          },
+          attr: {
+            type: "button",
+            class: clsx("circle-button circle-button-orange"),
           },
         }
         break
@@ -92,15 +100,17 @@
       case "paused": {
         button = {
           label: "再開",
-          type: "button",
-          class: clsx("circle-button circle-button-green"),
-          "on:click": () => {
+          onClick: () => {
             if (pending) return
 
             dispatch({
               type: "resume",
               at: new ServerTimestamp(now()),
             })
+          },
+          attr: {
+            type: "button",
+            class: clsx("circle-button circle-button-green"),
           },
         }
         break
@@ -196,7 +206,7 @@
             キャンセル
           </button>
 
-          <button {...button} on:click={button["on:click"]}>
+          <button {...button.attr} on:click={button.onClick}>
             {button.label}
           </button>
         {/if}
