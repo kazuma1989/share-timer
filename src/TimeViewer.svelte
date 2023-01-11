@@ -10,6 +10,9 @@
   video.muted = true
   video.playsInline = true
 
+  const play = video.play.bind(video)
+  const requestPictureInPicture = video.requestPictureInPicture.bind(video)
+
   // controls off にしておくので、扱いやすいようなイベントをあらかじめ付与
   video.addEventListener("click", play, { passive: true })
   video.addEventListener("dblclick", requestPictureInPicture, { passive: true })
@@ -17,13 +20,6 @@
   // なるべく再生状態を維持する（タイマーの再生・停止の概念もあってややこしくなるため）
   video.addEventListener("leavepictureinpicture", play, { passive: true })
   document.addEventListener("visibilitychange", play, { passive: true })
-
-  function play() {
-    video.play()
-  }
-  function requestPictureInPicture() {
-    video.requestPictureInPicture()
-  }
 </script>
 
 <script lang="ts">
