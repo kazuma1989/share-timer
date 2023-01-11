@@ -16,7 +16,7 @@
   }
 
   let currentOption: HTMLElement
-  const handleKeydown: KeyboardEventHandler<HTMLElement> = (e) => {
+  const onKeydown: KeyboardEventHandler<HTMLElement> = (e) => {
     import.meta.env.DEV && console.debug(e.key, e.keyCode)
 
     switch (e.key) {
@@ -55,7 +55,7 @@
   aria-valuetext="{value}{label}"
   tabindex="0"
   class={className}
-  on:keydown={handleKeydown}
+  on:keydown={onKeydown}
   bind:this={slider}
 >
   <span

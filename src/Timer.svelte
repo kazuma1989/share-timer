@@ -108,8 +108,29 @@
     }
   }
 
-  let select: DurationSelect
+  const onSubmit = () => {
+    if ($timerState$.mode !== "editing") return
+
+    dispatch({
+      type: "start",
+      withDuration: duration,
+      at: new ServerTimestamp(now()),
+    })
+  }
+
   let cancel: HTMLElement
+  let select: DurationSelect
+  const onCancel = async () => {
+    const currentFocus = document.activeElement
+
+    await dispatch({
+      type: "cancel",
+    })
+
+    if (cancel === currentFocus) {
+      select.focus()
+    }
+  }
 </script>
 
 {#if $timerState$}
@@ -125,15 +146,7 @@
     <form
       aria-label="タイマーの値を設定"
       class="contents"
-      on:submit|preventDefault={() => {
-        if (state.mode !== "editing") return
-
-        dispatch({
-          type: "start",
-          withDuration: duration,
-          at: new ServerTimestamp(now()),
-        })
-      }}
+      on:submit|preventDefault={onSubmit}
     >
       <p id={id("status")} role="status" class="sr-only">
         {$label$}
@@ -177,17 +190,7 @@
             type="button"
             disabled={state.mode === "editing"}
             class="circle-button circle-button-gray text-xs"
-            on:click={async () => {
-              const currentFocus = document.activeElement
-
-              await dispatch({
-                type: "cancel",
-              })
-
-              if (cancel === currentFocus) {
-                select.focus()
-              }
-            }}
+            on:click={onCancel}
             bind:this={cancel}
           >
             キャンセル
