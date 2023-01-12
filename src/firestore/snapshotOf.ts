@@ -1,4 +1,4 @@
-import { wrap } from "comlink"
+import { proxy, wrap } from "comlink"
 import {
   DocumentReference,
   DocumentSnapshot,
@@ -32,4 +32,9 @@ const f = await new F(
   await fetch("/__/firebase/init.json").then((_) => _.json())
 )
 
-f.log()
+f.onSnapshotRoom(
+  "gin-tzhe-whi" as any,
+  proxy((data) => {
+    console.log(data)
+  })
+)

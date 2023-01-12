@@ -2,9 +2,14 @@ import { expose } from "comlink"
 import { initializeApp, type FirebaseOptions } from "firebase/app"
 import {
   connectFirestoreEmulator,
-  Firestore,
+  doc,
   getFirestore,
+  onSnapshot,
+  type DocumentData,
+  type Firestore,
 } from "firebase/firestore"
+import type { Room } from "../zod/roomZod"
+import { collection } from "./collection"
 
 export class RemoteFirestore {
   readonly firestore: Firestore
@@ -25,12 +30,15 @@ export class RemoteFirestore {
     this.firestore = firestore
   }
 
-  log() {
-    console.log(this.firestore)
-  }
+  onSnapshotRoom(
+    roomId: Room["id"],
+    onNext: (data: DocumentData | undefined) => void
+  ) {
+    const reference = doc(collection(this.firestore, "rooms"), roomId)
 
-  snapshot() {
-    console.log("snapshot from worker")
+    onSnapshot(reference, (snapshot) => {
+      onNext(snapshot.data({ serverTimestamps: "estimate" }))
+    })
   }
 }
 
