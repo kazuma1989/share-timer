@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore"
 import { Observable } from "rxjs"
 import type { RemoteFirestore } from "./worker"
-import W from "./worker?worker"
+import FirestoreWorker from "./worker?worker"
 
 export function snapshotOf(
   reference: DocumentReference
@@ -26,8 +26,10 @@ export function snapshotOf(
   )
 }
 
-const F = wrap<typeof RemoteFirestore>(new W())
+const F = wrap<typeof RemoteFirestore>(new FirestoreWorker())
 
-const f = await new F()
+const f = await new F(
+  await fetch("/__/firebase/init.json").then((_) => _.json())
+)
 
-f.init()
+f.log()

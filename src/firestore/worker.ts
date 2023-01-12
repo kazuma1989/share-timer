@@ -1,5 +1,5 @@
 import { expose } from "comlink"
-import { initializeApp } from "firebase/app"
+import { initializeApp, type FirebaseOptions } from "firebase/app"
 import {
   connectFirestoreEmulator,
   Firestore,
@@ -7,12 +7,10 @@ import {
 } from "firebase/firestore"
 
 export class RemoteFirestore {
-  firestore: Firestore | undefined
+  readonly firestore: Firestore
 
-  async init() {
-    const firebaseApp = initializeApp(
-      await fetch("/__/firebase/init.json").then((_) => _.json())
-    )
+  constructor(options: FirebaseOptions) {
+    const firebaseApp = initializeApp(options)
 
     const firestore = getFirestore(firebaseApp)
 
@@ -25,6 +23,10 @@ export class RemoteFirestore {
     }
 
     this.firestore = firestore
+  }
+
+  log() {
+    console.log(this.firestore)
   }
 
   snapshot() {
