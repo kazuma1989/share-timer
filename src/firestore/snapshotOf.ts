@@ -7,6 +7,7 @@ import {
   QuerySnapshot,
 } from "firebase/firestore"
 import { Observable } from "rxjs"
+import { actionZod } from "../zod/actionZod"
 import type { RemoteFirestore } from "./worker"
 import FirestoreWorker from "./worker?worker"
 
@@ -35,7 +36,7 @@ const f = await new F(
 const x = await f.onSnapshotTimerState(
   "gin-tzhe-whi" as any,
   proxy((data) => {
-    console.log(data)
+    console.log(data.map((_) => actionZod.parse(_)))
   })
 )
 

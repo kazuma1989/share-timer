@@ -6,8 +6,12 @@ export type Action = z.output<typeof actionZod>
 export type ActionInput = z.input<typeof actionZod>
 
 const timestampToMillis = z
-  .instanceof(ServerTimestamp)
-  .transform((_) => _.millis)
+  .object({
+    seconds: z.number(),
+    nanoseconds: z.number(),
+  })
+  .or(z.instanceof(ServerTimestamp))
+  .transform(ServerTimestamp.toMillis)
 
 export const actionZod = z.discriminatedUnion("type", [
   z.object({
