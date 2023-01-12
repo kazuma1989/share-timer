@@ -1,4 +1,4 @@
-import { expose } from "comlink"
+import { expose, proxy } from "comlink"
 import { initializeApp, type FirebaseOptions } from "firebase/app"
 import {
   connectFirestoreEmulator,
@@ -7,6 +7,7 @@ import {
   onSnapshot,
   type DocumentData,
   type Firestore,
+  type Unsubscribe,
 } from "firebase/firestore"
 import type { Room } from "../zod/roomZod"
 import { collection } from "./collection"
@@ -33,12 +34,14 @@ export class RemoteFirestore {
   onSnapshotRoom(
     roomId: Room["id"],
     onNext: (data: DocumentData | undefined) => void
-  ) {
+  ): Unsubscribe {
     const reference = doc(collection(this.firestore, "rooms"), roomId)
 
-    onSnapshot(reference, (snapshot) => {
+    const unsubscribe = onSnapshot(reference, (snapshot) => {
       onNext(snapshot.data({ serverTimestamps: "estimate" }))
     })
+
+    return proxy(unsubscribe)
   }
 }
 
