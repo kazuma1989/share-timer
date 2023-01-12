@@ -7,6 +7,8 @@ import {
   QuerySnapshot,
 } from "firebase/firestore"
 import { Observable } from "rxjs"
+import { now } from "../now"
+import { ServerTimestamp } from "../util/ServerTimestamp"
 import { actionZod } from "../zod/actionZod"
 import { newRoomId } from "../zod/roomZod"
 import type { RemoteFirestore } from "./worker"
@@ -33,6 +35,12 @@ const F = wrap<typeof RemoteFirestore>(new FirestoreWorker())
 const f = await new F(
   await fetch("/__/firebase/init.json").then((_) => _.json())
 )
+
+f.dispatch("gin-tzhe-whi" as any, {
+  type: "start",
+  at: new ServerTimestamp(now()),
+  withDuration: 10 * 60_000,
+})
 
 const abort = new AbortController()
 

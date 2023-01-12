@@ -6,7 +6,10 @@ export class ServerTimestamp implements Timestamp {
   readonly seconds: number
   readonly nanoseconds: number
 
-  constructor(milliseconds: number) {
+  constructor(
+    milliseconds: number,
+    public readonly type: "client-estimate" | "server-fixed" = "client-estimate"
+  ) {
     const seconds = Math.floor(milliseconds / 1000)
     const nanos = Math.floor((milliseconds - seconds * 1000) * MS_TO_NANOS)
 

@@ -1,6 +1,7 @@
 import { expose, proxy } from "comlink"
 import { initializeApp, type FirebaseOptions } from "firebase/app"
 import {
+  addDoc,
   connectFirestoreEmulator,
   doc,
   getDocs,
@@ -16,6 +17,7 @@ import {
 } from "firebase/firestore"
 import type { ActionInput } from "../zod/actionZod"
 import type { Room, RoomInput } from "../zod/roomZod"
+import { toFirestore } from "./actionZodImpl"
 import { collection } from "./collection"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
 import { orderBy } from "./orderBy"
@@ -80,6 +82,13 @@ export class RemoteFirestore {
     })
 
     return proxy(unsubscribe)
+  }
+
+  async dispatch(roomId: Room["id"], action: ActionInput): Promise<void> {
+    await addDoc(
+      collection(this.firestore, "rooms", roomId, "actions"),
+      withMeta(toFirestore.parse(action))
+    )
   }
 
   async setupRoom(
