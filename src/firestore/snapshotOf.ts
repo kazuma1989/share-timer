@@ -8,6 +8,7 @@ import {
 } from "firebase/firestore"
 import { Observable } from "rxjs"
 import { actionZod } from "../zod/actionZod"
+import { newRoomId } from "../zod/roomZod"
 import type { RemoteFirestore } from "./worker"
 import FirestoreWorker from "./worker?worker"
 
@@ -32,6 +33,15 @@ const F = wrap<typeof RemoteFirestore>(new FirestoreWorker())
 const f = await new F(
   await fetch("/__/firebase/init.json").then((_) => _.json())
 )
+
+const abort = new AbortController()
+
+f.setupRoom(
+  newRoomId(),
+  proxy(() => abort.signal.aborted)
+)
+
+abort.abort()
 
 const x = await f.onSnapshotTimerState(
   "gin-tzhe-whi" as any,

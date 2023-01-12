@@ -8,16 +8,19 @@ import {
   limitToLast,
   onSnapshot,
   query,
+  runTransaction,
   startAt,
   type DocumentData,
   type Firestore,
   type Unsubscribe,
 } from "firebase/firestore"
-import type { Room } from "../zod/roomZod"
+import type { ActionInput } from "../zod/actionZod"
+import type { Room, RoomInput } from "../zod/roomZod"
 import { collection } from "./collection"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
 import { orderBy } from "./orderBy"
 import { where } from "./where"
+import { withMeta } from "./withMeta"
 
 export class RemoteFirestore {
   readonly firestore: Firestore
@@ -78,6 +81,55 @@ export class RemoteFirestore {
 
     return proxy(unsubscribe)
   }
+
+  async setupRoom(
+    roomId: string,
+    aborted: () => PromiseLike<boolean> | boolean
+  ): Promise<void> {
+    const emoji = await import("../emoji/Animals & Nature.json").then(
+      (_) => _.default
+    )
+    if (await aborted()) throw "aborted 1"
+
+    const e = emoji[(Math.random() * emoji.length) | 0]!
+    const roomName = `${e.value} ${e.name}`
+
+    await runTransaction(
+      this.firestore,
+      async (transaction) => {
+        const roomDoc = await transaction.get(
+          doc(collection(this.firestore, "rooms"), roomId)
+        )
+        if (await aborted()) throw "aborted 2"
+
+        if (roomDoc.exists()) {
+          transaction.update(roomDoc.ref, {
+            name: roomName,
+          } satisfies RoomInput)
+        } else {
+          transaction.set(
+            roomDoc.ref,
+            withMeta({
+              name: roomName,
+            } satisfies RoomInput)
+          )
+        }
+
+        transaction.set(
+          doc(collection(this.firestore, "rooms", roomId, "actions")),
+          withMeta({
+            type: "cancel",
+            withDuration: DEFAULT_DURATION,
+          } satisfies ActionInput)
+        )
+      },
+      {
+        maxAttempts: 1,
+      }
+    )
+  }
 }
 
 expose(RemoteFirestore)
+
+const DEFAULT_DURATION = 3 * 60000
