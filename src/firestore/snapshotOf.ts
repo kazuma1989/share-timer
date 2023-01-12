@@ -32,7 +32,7 @@ const f = await new F(
   await fetch("/__/firebase/init.json").then((_) => _.json())
 )
 
-const x = await f.onSnapshotRoom(
+const x = await f.onSnapshotTimerState(
   "gin-tzhe-whi" as any,
   proxy((data) => {
     console.log(data)

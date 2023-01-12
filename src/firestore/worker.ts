@@ -3,14 +3,21 @@ import { initializeApp, type FirebaseOptions } from "firebase/app"
 import {
   connectFirestoreEmulator,
   doc,
+  getDocs,
   getFirestore,
+  limitToLast,
   onSnapshot,
+  query,
+  startAt,
   type DocumentData,
   type Firestore,
   type Unsubscribe,
 } from "firebase/firestore"
 import type { Room } from "../zod/roomZod"
 import { collection } from "./collection"
+import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
+import { orderBy } from "./orderBy"
+import { where } from "./where"
 
 export class RemoteFirestore {
   readonly firestore: Firestore
@@ -35,10 +42,38 @@ export class RemoteFirestore {
     roomId: Room["id"],
     onNext: (data: DocumentData | undefined) => void
   ): Unsubscribe {
-    const reference = doc(collection(this.firestore, "rooms"), roomId)
+    const referenceRoom = doc(collection(this.firestore, "rooms"), roomId)
 
-    const unsubscribe = onSnapshot(reference, (snapshot) => {
+    const unsubscribe = onSnapshot(referenceRoom, (snapshot) => {
       onNext(snapshot.data({ serverTimestamps: "estimate" }))
+    })
+
+    return proxy(unsubscribe)
+  }
+
+  async onSnapshotTimerState(
+    roomId: Room["id"],
+    onNext: (data: DocumentData[]) => void
+  ): Promise<Unsubscribe> {
+    const selectActions = await getDocs(
+      query(
+        collection(this.firestore, "rooms", roomId, "actions"),
+        where("type", "==", "start"),
+        orderBy("createdAt", "asc"),
+        limitToLast(1)
+      )
+    ).then(({ docs: [doc] }) =>
+      query(
+        collection(this.firestore, "rooms", roomId, "actions"),
+        orderBy("createdAt", "asc"),
+        ...(hasNoEstimateTimestamp(doc?.metadata) ? [startAt(doc)] : [])
+      )
+    )
+
+    const unsubscribe = onSnapshot(selectActions, (snapshot) => {
+      onNext(
+        snapshot.docs.map((doc) => doc.data({ serverTimestamps: "estimate" }))
+      )
     })
 
     return proxy(unsubscribe)
