@@ -95,9 +95,9 @@ export class RemoteFirestore {
     roomId: string,
     aborted: (() => PromiseLike<boolean> | boolean) & ProxyMarked
   ): Promise<void> {
-    const emoji = await import("../emoji/Animals & Nature.json").then(
-      (_) => _.default
-    )
+    const emoji = await fetch(
+      new URL("../emoji/Animals & Nature.json", import.meta.url)
+    ).then<typeof import("../emoji/Animals & Nature.json")>((_) => _.json())
     if (await aborted()) throw "aborted 1"
 
     const e = emoji[(Math.random() * emoji.length) | 0]!
