@@ -1,10 +1,6 @@
-import { addDoc } from "firebase/firestore"
 import type { ActionInput } from "../zod/actionZod"
 import type { Room } from "../zod/roomZod"
-import { toFirestore } from "./actionZodImpl"
-import { collection } from "./collection"
 import { useFirestore } from "./useFirestore"
-import { withMeta } from "./withMeta"
 
 export function useDispatchImpl(
   roomId: Room["id"]
@@ -12,14 +8,7 @@ export function useDispatchImpl(
   // TODO 本物の値
   const dummyPending = false
 
-  const db = useFirestore()
+  const firestore = useFirestore()
 
-  return [
-    dummyPending,
-    (action) =>
-      addDoc(
-        collection(db, "rooms", roomId, "actions"),
-        withMeta(toFirestore.parse(action))
-      ),
-  ]
+  return [dummyPending, (action) => firestore.dispatch(roomId, action)]
 }

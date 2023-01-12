@@ -1,4 +1,4 @@
-import { expose, proxy } from "comlink"
+import { expose, proxy, type ProxyMarked } from "comlink"
 import { initializeApp, type FirebaseOptions } from "firebase/app"
 import {
   addDoc,
@@ -45,7 +45,7 @@ export class RemoteFirestore {
 
   onSnapshotRoom(
     roomId: Room["id"],
-    onNext: (data: DocumentData | undefined) => void
+    onNext: ((data: DocumentData | undefined) => void) & ProxyMarked
   ): Unsubscribe {
     const referenceRoom = doc(collection(this.firestore, "rooms"), roomId)
 
@@ -58,7 +58,7 @@ export class RemoteFirestore {
 
   async onSnapshotTimerState(
     roomId: Room["id"],
-    onNext: (data: DocumentData[]) => void
+    onNext: ((data: DocumentData[]) => void) & ProxyMarked
   ): Promise<Unsubscribe> {
     const selectActions = await getDocs(
       query(
@@ -93,7 +93,7 @@ export class RemoteFirestore {
 
   async setupRoom(
     roomId: string,
-    aborted: () => PromiseLike<boolean> | boolean
+    aborted: (() => PromiseLike<boolean> | boolean) & ProxyMarked
   ): Promise<void> {
     const emoji = await import("../emoji/Animals & Nature.json").then(
       (_) => _.default
@@ -136,6 +136,18 @@ export class RemoteFirestore {
         maxAttempts: 1,
       }
     )
+  }
+
+  async lockRoom(
+    roomId: Room["id"],
+    lockedBy: string,
+    options?: {
+      aborted?: () => boolean | PromiseLike<boolean>
+      onBeforeUpdate?: () => void | PromiseLike<void>
+    }
+  ): Promise<void> {
+    // TODO 本物の実装
+    console.log(roomId, lockedBy, options)
   }
 }
 

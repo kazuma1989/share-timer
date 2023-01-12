@@ -1,65 +1,42 @@
-import {
-  getDocs,
-  limitToLast,
-  query,
-  queryEqual,
-  startAt,
-} from "firebase/firestore"
-import { distinctUntilChanged, from, map, Observable, switchMap } from "rxjs"
+import { proxy } from "comlink"
+import type { DocumentData } from "firebase/firestore"
+import { map, Observable } from "rxjs"
 import { timerReducer, type TimerState } from "../timerReducer"
 import { createCache } from "../util/createCache"
 import { shareRecent } from "../util/shareRecent"
-import { actionZod } from "../zod/actionZod"
+import { actionZod, type Action } from "../zod/actionZod"
 import type { Room } from "../zod/roomZod"
-import { fromFirestore } from "./actionZodImpl"
-import { collection } from "./collection"
-import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
-import { orderBy } from "./orderBy"
-import { safeParseDocsWith } from "./safeParseDocsWith"
-import { snapshotOf } from "./snapshotOf"
 import { useFirestore } from "./useFirestore"
-import { where } from "./where"
 
 export function useTimerStateImpl(roomId: Room["id"]): Observable<TimerState> {
-  const db = useFirestore()
+  const firestore = useFirestore()
 
   const timerState$ = hardCache(roomId, () =>
-    from(
-      getDocs(
-        query(
-          collection(db, "rooms", roomId, "actions"),
-          where("type", "==", "start"),
-          orderBy("createdAt", "asc"),
-          limitToLast(1)
-        )
-      ).then(({ docs: [doc] }) =>
-        query(
-          collection(db, "rooms", roomId, "actions"),
-          orderBy("createdAt", "asc"),
-          ...(hasNoEstimateTimestamp(doc?.metadata) ? [startAt(doc)] : [])
-        )
+    new Observable<DocumentData[]>((subscriber) => {
+      console.debug("actions listener attached")
+
+      const unsubscribe$ = firestore.onSnapshotTimerState(
+        roomId,
+        proxy((data) => {
+          subscriber.next(data)
+        })
       )
-    ).pipe(
-      distinctUntilChanged(queryEqual),
-      switchMap((selectActions) => {
-        const parseDocs = safeParseDocsWith((_) =>
-          actionZod.parse(fromFirestore.parse(_))
-        )
 
-        console.debug("actions listener attached")
+      return async () => {
+        const unsubscribe = await unsubscribe$
+        unsubscribe()
+      }
+    }).pipe(
+      map((docs) => {
+        const actions = docs.flatMap((doc): Action[] => {
+          const _ = actionZod.safeParse(doc)
+          return _.success ? [_.data] : []
+        })
 
-        return snapshotOf(selectActions).pipe(
-          map((snapshot) => {
-            console.debug("listen %d docChanges", snapshot.docChanges().length)
-
-            const actions = parseDocs(snapshot.docs)
-
-            return actions.reduce(timerReducer, {
-              mode: "editing",
-              initialDuration: 0,
-            })
-          })
-        )
+        return actions.reduce(timerReducer, {
+          mode: "editing",
+          initialDuration: 0,
+        })
       }),
 
       shareRecent(30_000)

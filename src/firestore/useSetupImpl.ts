@@ -1,18 +1,16 @@
-import { doc, runTransaction, type Firestore } from "firebase/firestore"
+import { proxy, type Remote } from "comlink"
 import { createCache } from "../util/createCache"
-import type { ActionInput } from "../zod/actionZod"
-import type { Room, RoomInput } from "../zod/roomZod"
-import { collection } from "./collection"
+import type { Room } from "../zod/roomZod"
 import { useFirestore } from "./useFirestore"
-import { withMeta } from "./withMeta"
+import type { RemoteFirestore } from "./worker"
 
 export function useSetupImpl(roomId: Room["id"]): (() => void) | null {
-  const db = useFirestore()
+  const firestore = useFirestore()
 
   const setup = hardCache(roomId, () => async () => {
     import.meta.env.DEV && console.debug("setup called", roomId)
 
-    await setupRoom(db, roomId)
+    await setupRoom(firestore, roomId)
   })
 
   return setup
@@ -26,63 +24,21 @@ const hardCache = createCache(true)
  * roomIdが同じであっても異なっても。
  * 1つのJSプロセスで複数roomIdセットアップする使い方を想定しないため。
  */
-async function setupRoom(db: Firestore, roomId: string): Promise<void> {
+async function setupRoom(
+  firestore: Remote<RemoteFirestore>,
+  roomId: string
+): Promise<void> {
   abort.abort()
   abort = new AbortController()
 
-  await _setupRoom(db, roomId, abort.signal).catch((_: unknown) => {
-    console.debug("aborted setup room", _)
-  })
+  await firestore
+    .setupRoom(
+      roomId,
+      proxy(() => abort.signal.aborted)
+    )
+    .catch((_: unknown) => {
+      console.debug("aborted setup room", _)
+    })
 }
 
 let abort = new AbortController()
-
-async function _setupRoom(
-  db: Firestore,
-  roomId: string,
-  signal: AbortSignal
-): Promise<void> {
-  const emoji = await import("../emoji/Animals & Nature.json").then(
-    (_) => _.default
-  )
-  if (signal.aborted) throw "aborted 1"
-
-  const e = emoji[(Math.random() * emoji.length) | 0]!
-  const roomName = `${e.value} ${e.name}`
-
-  await runTransaction(
-    db,
-    async (transaction) => {
-      const roomDoc = await transaction.get(
-        doc(collection(db, "rooms"), roomId)
-      )
-      if (signal.aborted) throw "aborted 2"
-
-      if (roomDoc.exists()) {
-        transaction.update(roomDoc.ref, {
-          name: roomName,
-        } satisfies RoomInput)
-      } else {
-        transaction.set(
-          roomDoc.ref,
-          withMeta({
-            name: roomName,
-          } satisfies RoomInput)
-        )
-      }
-
-      transaction.set(
-        doc(collection(db, "rooms", roomId, "actions")),
-        withMeta({
-          type: "cancel",
-          withDuration: DEFAULT_DURATION,
-        } satisfies ActionInput)
-      )
-    },
-    {
-      maxAttempts: 1,
-    }
-  )
-}
-
-const DEFAULT_DURATION = 3 * 60000

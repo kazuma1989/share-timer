@@ -1,5 +1,6 @@
-import type { Firestore } from "firebase/firestore"
+import type { Remote } from "comlink"
 import { createContext } from "../createContext"
+import type { RemoteFirestore } from "./worker"
 
 export const [keyWithFirestore, useFirestore] =
-  createContext<Firestore>("Firestore")
+  createContext<Remote<RemoteFirestore>>("RemoteFirestore")

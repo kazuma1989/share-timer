@@ -25,9 +25,11 @@ export function useLockRoomImpl(): (
     const { signal, onBeforeUpdate } = options ?? {}
 
     await runTransaction(
+      // @ts-expect-error
       db,
       async (transaction) => {
         const roomDoc = await transaction.get(
+          // @ts-expect-error
           doc(collection(db, "rooms"), roomId)
         )
         if (signal?.aborted) {

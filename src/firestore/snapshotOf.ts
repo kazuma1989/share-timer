@@ -1,4 +1,3 @@
-import { proxy, wrap } from "comlink"
 import {
   DocumentReference,
   DocumentSnapshot,
@@ -7,12 +6,6 @@ import {
   QuerySnapshot,
 } from "firebase/firestore"
 import { Observable } from "rxjs"
-import { now } from "../now"
-import { ServerTimestamp } from "../util/ServerTimestamp"
-import { actionZod } from "../zod/actionZod"
-import { newRoomId } from "../zod/roomZod"
-import type { RemoteFirestore } from "./worker"
-import FirestoreWorker from "./worker?worker"
 
 export function snapshotOf(
   reference: DocumentReference
@@ -29,33 +22,3 @@ export function snapshotOf(
     })
   )
 }
-
-const F = wrap<typeof RemoteFirestore>(new FirestoreWorker())
-
-const f = await new F(
-  await fetch("/__/firebase/init.json").then((_) => _.json())
-)
-
-f.dispatch("gin-tzhe-whi" as any, {
-  type: "start",
-  at: new ServerTimestamp(now()),
-  withDuration: 10 * 60_000,
-})
-
-const abort = new AbortController()
-
-f.setupRoom(
-  newRoomId(),
-  proxy(() => abort.signal.aborted)
-)
-
-abort.abort()
-
-const x = await f.onSnapshotTimerState(
-  "gin-tzhe-whi" as any,
-  proxy((data) => {
-    console.log(data.map((_) => actionZod.parse(_)))
-  })
-)
-
-setTimeout(x, 3_000)

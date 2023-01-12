@@ -1,19 +1,29 @@
-import { doc } from "firebase/firestore"
-import { map, type Observable } from "rxjs"
+import { proxy } from "comlink"
+import type { DocumentData } from "firebase/firestore"
+import { map, Observable } from "rxjs"
 import { createCache } from "../util/createCache"
 import { shareRecent } from "../util/shareRecent"
 import { roomZod, type InvalidDoc, type Room } from "../zod/roomZod"
-import { collection } from "./collection"
-import { snapshotOf } from "./snapshotOf"
 import { useFirestore } from "./useFirestore"
 
 export function useRoomImpl(roomId: Room["id"]): Observable<Room | InvalidDoc> {
-  const db = useFirestore()
+  const firestore = useFirestore()
 
   const room$ = hardCache(roomId, () =>
-    snapshotOf(doc(collection(db, "rooms"), roomId)).pipe(
-      map((doc): Room | InvalidDoc => {
-        const rawData = doc.data()
+    new Observable<DocumentData>((subscriber) => {
+      const unsubscribe$ = firestore.onSnapshotRoom(
+        roomId,
+        proxy((data) => {
+          subscriber.next(data)
+        })
+      )
+
+      return async () => {
+        const unsubscribe = await unsubscribe$
+        unsubscribe()
+      }
+    }).pipe(
+      map((rawData): Room | InvalidDoc => {
         const _ = roomZod.safeParse(rawData)
         if (!_.success) {
           if (rawData) {
