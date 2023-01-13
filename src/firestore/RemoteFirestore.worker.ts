@@ -17,7 +17,12 @@ import {
 } from "firebase/firestore"
 import { setTransferHandlers } from "../setTransferHandlers"
 import type { ActionInput } from "../zod/actionZod"
-import type { Room, RoomInput } from "../zod/roomZod"
+import {
+  roomZod,
+  type InvalidDoc,
+  type Room,
+  type RoomInput,
+} from "../zod/roomZod"
 import { toFirestore } from "./actionZodImpl"
 import { collection } from "./collection"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
@@ -52,12 +57,28 @@ export class RemoteFirestore {
 
   onSnapshotRoom(
     roomId: Room["id"],
-    onNext: ((data: DocumentData | undefined) => void) & ProxyMarked
+    onNext: ((data: Room | InvalidDoc) => void) & ProxyMarked
   ): Unsubscribe {
     const referenceRoom = doc(collection(this.firestore, "rooms"), roomId)
 
     const unsubscribe = onSnapshot(referenceRoom, (snapshot) => {
-      onNext(snapshot.data({ serverTimestamps: "estimate" }))
+      const rawData = snapshot.data({
+        serverTimestamps: "estimate",
+      })
+
+      const _ = roomZod.safeParse(rawData)
+      if (!_.success) {
+        if (rawData) {
+          console.debug(rawData, _.error)
+        }
+
+        onNext(["invalid-doc", roomId])
+      } else {
+        onNext({
+          ..._.data,
+          id: roomId,
+        })
+      }
     })
 
     return proxy(unsubscribe)
