@@ -1,9 +1,10 @@
 import { Timestamp } from "firebase/firestore"
-import * as z from "zod"
+import * as s from "superstruct"
 
-export interface Calibration extends z.infer<typeof calibrationZod> {}
+export interface Calibration extends s.Infer<typeof calibrationZod> {}
 
-export const calibrationZod = z.object({
-  clientTime: z.instanceof(Timestamp),
-  serverTime: z.instanceof(Timestamp),
-})
+export const calibrationZod = /*@__PURE__*/ (() =>
+  s.type({
+    clientTime: s.instance(Timestamp),
+    serverTime: s.instance(Timestamp),
+  }))()

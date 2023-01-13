@@ -6,6 +6,7 @@ import {
   setDoc,
   Timestamp,
 } from "firebase/firestore"
+import * as s from "superstruct"
 import { now, setEstimatedDiff } from "../now"
 import { calibrationZod, type Calibration } from "./calibrationZod"
 import { collection } from "./collection"
@@ -22,7 +23,7 @@ export async function calibrateClock(db: Firestore): Promise<void> {
   )
 
   const serverDoc = await getDocFromServer(clientDoc)
-  const { clientTime, serverTime } = calibrationZod.parse(serverDoc.data())
+  const { clientTime, serverTime } = s.mask(serverDoc.data(), calibrationZod)
 
   setEstimatedDiff(serverTime.toMillis() - clientTime.toMillis())
 }
