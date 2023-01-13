@@ -2,7 +2,7 @@ import * as s from "superstruct"
 import { nanoid } from "../util/nanoid"
 
 export interface Room extends s.Infer<typeof roomZod> {
-  id: s.Infer<typeof roomIdZod>
+  id: string & { readonly roomId: unique symbol }
 }
 
 export interface RoomInput extends s.Infer<typeof roomZod> {}
@@ -20,12 +20,10 @@ export const roomZod = /*@__PURE__*/ (() =>
   }))()
 
 const roomIdZod = /*@__PURE__*/ (() =>
-  s.pattern(
-    s.string(),
-    /^[a-z]{3}-[a-z]{4}-[a-z]{3}$/
-  ) satisfies s.Describe<string> as unknown as s.Describe<
-    string & { readonly roomId: unique symbol }
-  >)()
+  s.define<Room["id"]>(
+    "Room.id",
+    (_) => typeof _ === "string" && isRoomId(_)
+  ))()
 
 export function isRoomId(id: string): id is Room["id"] {
   return /^[a-z]{3}-[a-z]{4}-[a-z]{3}$/.test(id)
