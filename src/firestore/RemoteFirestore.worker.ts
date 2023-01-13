@@ -17,21 +17,21 @@ import {
   type Unsubscribe,
 } from "firebase/firestore"
 import * as s from "superstruct"
-import { setTransferHandlers } from "../setTransferHandlers"
-import { timerReducer, type TimerState } from "../timerReducer"
-import { serverTimestamp } from "../util/ServerTimestamp"
 import {
-  actionZod,
+  actionSchema,
   coerceTimestamp,
   type Action,
   type ActionInput,
-} from "../zod/actionZod"
+} from "../schema/actionSchema"
 import {
-  roomZod,
+  roomSchema,
   type InvalidDoc,
   type Room,
   type RoomInput,
-} from "../zod/roomZod"
+} from "../schema/roomSchema"
+import { setTransferHandlers } from "../setTransferHandlers"
+import { timerReducer, type TimerState } from "../timerReducer"
+import { serverTimestamp } from "../util/ServerTimestamp"
 import { collection } from "./collection"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
 import { orderBy } from "./orderBy"
@@ -74,7 +74,7 @@ export class RemoteFirestore {
         serverTimestamps: "estimate",
       })
 
-      const [error, data] = s.validate(rawData, roomZod)
+      const [error, data] = s.validate(rawData, roomSchema)
       if (error) {
         if (rawData) {
           console.warn(rawData, error)
@@ -117,7 +117,7 @@ export class RemoteFirestore {
           serverTimestamps: "estimate",
         })
 
-        const [error, data] = s.validate(rawData, actionZod)
+        const [error, data] = s.validate(rawData, actionSchema)
         if (error) {
           console.debug(rawData, error)
           return []

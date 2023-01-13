@@ -7,6 +7,7 @@ import { DurationSelect } from "./DurationSelect"
 import { icon } from "./icon"
 import { now } from "./now"
 import { setHash } from "./observeHash"
+import type { Room } from "./schema/roomSchema"
 import { getItem, setItem } from "./storage"
 import type { TimerState } from "./timerReducer"
 import { TimeViewer } from "./TimeViewer"
@@ -17,7 +18,6 @@ import { useDispatch } from "./useDispatch"
 import { useObservable } from "./useObservable"
 import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
 import { ServerTimestamp } from "./util/ServerTimestamp"
-import type { Room } from "./zod/roomZod"
 
 export function Timer({
   room$,

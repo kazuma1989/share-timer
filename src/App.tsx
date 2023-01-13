@@ -3,11 +3,11 @@ import { lazy } from "react"
 import type { Observable } from "rxjs"
 import { replaceHash } from "./observeHash"
 import { PageRoom } from "./PageRoom"
+import { newRoomId } from "./schema/roomSchema"
 import { SetupRoom } from "./SetupRoom"
 import type { Route } from "./toRoute"
 import { useObservable } from "./useObservable"
 import { suspend } from "./util/suspend"
-import { newRoomId } from "./zod/roomZod"
 
 const PageInfo = lazy(() =>
   import("./PageInfo").then((_) => ({ default: _.PageInfo }))

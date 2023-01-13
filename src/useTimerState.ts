@@ -1,7 +1,7 @@
 import { Observable, of } from "rxjs"
 import { createContext } from "./createContext"
+import type { Room } from "./schema/roomSchema"
 import type { TimerState } from "./timerReducer"
-import type { Room } from "./zod/roomZod"
 
 export function useTimerState(roomId: Room["id"]): Observable<TimerState> {
   return _useImpl()(roomId)

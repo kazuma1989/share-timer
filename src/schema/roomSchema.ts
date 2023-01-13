@@ -1,11 +1,11 @@
 import * as s from "superstruct"
 import { nanoid } from "../util/nanoid"
 
-export interface Room extends s.Infer<typeof roomZod> {
+export interface Room extends s.Infer<typeof roomSchema> {
   id: string & { readonly roomId: unique symbol }
 }
 
-export interface RoomInput extends s.Infer<typeof roomZod> {}
+export interface RoomInput extends s.Infer<typeof roomSchema> {}
 
 export type InvalidDoc = [reason: "invalid-doc", payload: Room["id"]]
 
@@ -13,13 +13,13 @@ export function isRoom(value: Room | InvalidDoc): value is Room {
   return !Array.isArray(value)
 }
 
-export const roomZod = /*@__PURE__*/ (() =>
+export const roomSchema = /*@__PURE__*/ (() =>
   s.type({
     name: s.optional(s.size(s.string(), 0, 1_000)),
     lockedBy: s.optional(s.size(s.string(), 10)),
   }))()
 
-const roomIdZod = /*@__PURE__*/ (() =>
+const roomIdSchema = /*@__PURE__*/ (() =>
   s.define<Room["id"]>(
     "Room.id",
     (_) => typeof _ === "string" && isRoomId(_)
@@ -37,17 +37,17 @@ if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
 
   test("room id", () => {
-    expect(s.validate("cnz-some-fmy", roomIdZod)[1]).toBe("cnz-some-fmy")
+    expect(s.validate("cnz-some-fmy", roomIdSchema)[1]).toBe("cnz-some-fmy")
   })
 
   test("generate valid room id", () => {
     const id = newRoomId()
 
-    expect(s.validate(id, roomIdZod)[1]).toBe(id)
+    expect(s.validate(id, roomIdSchema)[1]).toBe(id)
   })
 
   test("invalid room id", () => {
-    expect(() => s.assert("-cnz-some-fmy", roomIdZod)).toThrow(s.StructError)
+    expect(() => s.assert("-cnz-some-fmy", roomIdSchema)).toThrow(s.StructError)
   })
 
   test("room name", () => {
@@ -55,7 +55,7 @@ if (import.meta.vitest) {
       name: "彅瀉".repeat(1_000 / 2),
     }
 
-    expect(s.validate(room, roomZod)[1]).toStrictEqual(room)
+    expect(s.validate(room, roomSchema)[1]).toStrictEqual(room)
   })
 
   test("invalid room name", () => {
@@ -64,7 +64,7 @@ if (import.meta.vitest) {
         {
           name: "𩸽".repeat(501),
         },
-        roomZod
+        roomSchema
       )
     ).toThrow(s.StructError)
   })

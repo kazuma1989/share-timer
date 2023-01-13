@@ -1,9 +1,9 @@
 import { proxy } from "comlink"
 import { Observable } from "rxjs"
+import type { Room } from "../schema/roomSchema"
 import type { TimerState } from "../timerReducer"
 import { createCache } from "../util/createCache"
 import { shareRecent } from "../util/shareRecent"
-import type { Room } from "../zod/roomZod"
 import { useFirestore } from "./useFirestore"
 
 export function useTimerStateImpl(roomId: Room["id"]): Observable<TimerState> {

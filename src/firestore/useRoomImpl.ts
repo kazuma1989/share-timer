@@ -1,8 +1,8 @@
 import { proxy } from "comlink"
 import { Observable } from "rxjs"
+import type { InvalidDoc, Room } from "../schema/roomSchema"
 import { createCache } from "../util/createCache"
 import { shareRecent } from "../util/shareRecent"
-import type { InvalidDoc, Room } from "../zod/roomZod"
 import { useFirestore } from "./useFirestore"
 
 export function useRoomImpl(roomId: Room["id"]): Observable<Room | InvalidDoc> {

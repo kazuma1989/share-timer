@@ -1,5 +1,5 @@
 import { createContext } from "./createContext"
-import type { Room } from "./zod/roomZod"
+import type { Room } from "./schema/roomSchema"
 
 export function useSetup(
   roomId: Room["id"]

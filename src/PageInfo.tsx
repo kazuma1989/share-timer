@@ -2,11 +2,11 @@ import clsx from "clsx"
 import { icon } from "./icon"
 import { setHash } from "./observeHash"
 import { QRCode } from "./QRCode"
+import type { Room } from "./schema/roomSchema"
 import { getItem } from "./storage"
 import { fromRoute } from "./toRoute"
 import { TransparentButton } from "./TransparentButton"
 import { AbortReason, useLockRoom } from "./useLockRoom"
-import type { Room } from "./zod/roomZod"
 
 export function PageInfo({ roomId }: { roomId: Room["id"] }) {
   const roomURL =

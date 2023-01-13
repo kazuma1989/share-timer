@@ -1,4 +1,4 @@
-import type { Action } from "./zod/actionZod"
+import type { Action } from "./schema/actionSchema"
 
 export type TimerState =
   | {

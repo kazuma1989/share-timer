@@ -1,6 +1,6 @@
 import { doc, runTransaction } from "firebase/firestore"
+import { roomSchema, type Room, type RoomInput } from "../schema/roomSchema"
 import { AbortReason } from "../useLockRoom"
-import { roomZod, type Room, type RoomInput } from "../zod/roomZod"
 import { collection } from "./collection"
 import { useFirestore } from "./useFirestore"
 
@@ -41,7 +41,7 @@ export function useLockRoomImpl(): (
         }
 
         // @ts-expect-error
-        const room = roomZod.parse(roomDoc.data())
+        const room = roomSchema.parse(roomDoc.data())
         if (room.lockedBy) {
           throw AbortReason("already-locked")
         }

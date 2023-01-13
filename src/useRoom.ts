@@ -1,6 +1,6 @@
 import { Observable, of } from "rxjs"
 import { createContext } from "./createContext"
-import type { InvalidDoc, Room } from "./zod/roomZod"
+import type { InvalidDoc, Room } from "./schema/roomSchema"
 
 export function useRoom(roomId: Room["id"]): Observable<Room | InvalidDoc> {
   return _useImpl()(roomId)

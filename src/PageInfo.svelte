@@ -3,8 +3,8 @@
   import Icon from "./Icon.svelte"
   import { setHash } from "./observeHash"
   import QrCode from "./QRCode.svelte"
+  import type { Room } from "./schema/roomSchema"
   import { fromRoute } from "./toRoute"
-  import type { Room } from "./zod/roomZod"
 
   export let roomId: Room["id"]
 

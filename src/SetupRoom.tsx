@@ -1,9 +1,9 @@
 // @ts-expect-error
 import { ReactNode, useEffect } from "react"
 import { ErrorBoundary, useError, useResetError } from "./ErrorBoundary"
+import type { InvalidDoc } from "./schema/roomSchema"
 import { useSetup } from "./useSetup"
 import { suspend } from "./util/suspend"
-import type { InvalidDoc } from "./zod/roomZod"
 
 export function SetupRoom({ children }: { children?: ReactNode }) {
   return (

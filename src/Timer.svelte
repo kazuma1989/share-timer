@@ -7,6 +7,7 @@
   import Icon from "./Icon.svelte"
   import { now } from "./now"
   import { setHash } from "./observeHash"
+  import type { Room } from "./schema/roomSchema"
   import { getItem } from "./storage"
   import type { TimerState } from "./timerReducer"
   import TimeViewer from "./TimeViewer.svelte"
@@ -14,7 +15,6 @@
   import { getId } from "./util/getId"
   import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
   import { serverTimestamp } from "./util/ServerTimestamp"
-  import type { Room } from "./zod/roomZod"
 
   export let room$: Observable<Room>
   export let timerState$: Observable<TimerState>

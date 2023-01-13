@@ -1,5 +1,5 @@
-import type { ActionInput } from "../zod/actionZod"
-import type { Room } from "../zod/roomZod"
+import type { ActionInput } from "../schema/actionSchema"
+import type { Room } from "../schema/roomSchema"
 import { useFirestore } from "./useFirestore"
 
 export function useDispatchImpl(

@@ -3,8 +3,8 @@
   import FullViewportProgress from "./FullViewportProgress.svelte"
   import { replaceHash } from "./observeHash"
   import PageRoom from "./PageRoom.svelte"
+  import { newRoomId } from "./schema/roomSchema"
   import type { Route } from "./toRoute"
-  import { newRoomId } from "./zod/roomZod"
 
   export let route$: Observable<Route>
 

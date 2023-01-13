@@ -1,11 +1,11 @@
 <script lang="ts">
   import { firstValueFrom, map, merge, partition, type Observable } from "rxjs"
   import FlashCover from "./FlashCover.svelte"
+  import { isRoom, type InvalidDoc, type Room } from "./schema/roomSchema"
   import Timer from "./Timer.svelte"
   import { useRoom } from "./useRoom"
   import { useSetup } from "./useSetup"
   import { useTimerState } from "./useTimerState"
-  import { isRoom, type InvalidDoc, type Room } from "./zod/roomZod"
 
   export let roomId: Room["id"]
 

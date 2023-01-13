@@ -7,7 +7,7 @@ import {
 
 export type Action = TimestampFieldToMillis<ActionInput>
 
-export type ActionInput = s.Infer<typeof actionZod>
+export type ActionInput = s.Infer<typeof actionSchema>
 
 type TimestampFieldToMillis<T> = {
   [P in keyof T]: TimestampToMillis<T[P]>
@@ -42,7 +42,7 @@ const timestamp = () =>
     }) satisfies s.Describe<Timestamp> as s.Describe<Timestamp>,
   ])
 
-export const actionZod = /*@__PURE__*/ (() =>
+export const actionSchema = /*@__PURE__*/ (() =>
   s.union([
     s.type({
       type: s.literal("start"),

@@ -1,6 +1,6 @@
 import { proxy, type Remote } from "comlink"
+import type { Room } from "../schema/roomSchema"
 import { createCache } from "../util/createCache"
-import type { Room } from "../zod/roomZod"
 import type { RemoteFirestore } from "./RemoteFirestore.worker"
 import { useFirestore } from "./useFirestore"
 

@@ -8,12 +8,12 @@ import { FullViewportOops } from "./FullViewportOops"
 import { FullViewportProgress } from "./FullViewportProgress"
 import "./global.css"
 import { observeAudioPermission } from "./observeAudioPermission"
+import type { Room } from "./schema/roomSchema"
 import smallAlert from "./sound/small-alert.mp3"
 import { Timer } from "./Timer"
 import type { TimerState } from "./timerReducer"
 // @ts-expect-error
 import { AudioProvider, createAudio, MediaPermissionProvider } from "./useAudio"
-import type { Room } from "./zod/roomZod"
 
 const root = document.getElementById("root")!
 
