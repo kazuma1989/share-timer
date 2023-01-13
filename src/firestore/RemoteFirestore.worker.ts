@@ -35,7 +35,7 @@ setTransferHandlers()
 export class RemoteFirestore {
   readonly firestore: Firestore
 
-  log(x: symbol): void {
+  log(x: unknown): void {
     console.log(x, x === Symbol.for("serverTimestamp"))
   }
 

@@ -1,21 +1,129 @@
 import { transferHandlers, type TransferHandler } from "comlink"
-import { serverTimestamp } from "./util/ServerTimestamp"
 
 export function setTransferHandlers(): void {
-  const symbolKey = Symbol.keyFor(serverTimestamp) ?? "serverTimestamp"
-  const symbolValue = serverTimestamp
-
-  transferHandlers.set(symbolKey, {
-    canHandle(value): value is typeof symbolValue {
-      return value === symbolValue
+  transferHandlers.set("serializeSymbol", {
+    canHandle(value): value is Record<string, unknown> {
+      return hasSymbol(value)
     },
 
-    serialize() {
-      return [symbolKey, []]
+    serialize(value) {
+      return [serializeSymbol(value), []]
     },
 
-    deserialize() {
-      return symbolValue
+    deserialize(value) {
+      return deserializeSymbol(value)
     },
-  } satisfies TransferHandler<typeof symbolValue, typeof symbolKey>)
+  } satisfies TransferHandler<Record<string, unknown>, Record<string, unknown>>)
+}
+
+type SerializedSymbol = ["__symbol__", string | undefined]
+
+function isSerializedSymbol(value: unknown): value is SerializedSymbol {
+  if (Array.isArray(value) && value.length === 2) {
+    const [identifier, payload] = value
+
+    if (identifier === ("__symbol__" satisfies SerializedSymbol[0])) {
+      return typeof payload === "string" || typeof payload === "undefined"
+    }
+  }
+
+  return false
+}
+
+function hasSymbol(value: unknown): boolean {
+  if (value === null || value === undefined) {
+    return false
+  }
+
+  return Object.values(value).some((_) => typeof _ === "symbol")
+}
+
+function serializeSymbol<T extends Record<string, unknown>>(
+  value: T
+): Record<keyof T, Exclude<T[keyof T], symbol> | SerializedSymbol> {
+  return Object.fromEntries(
+    Object.entries(value).map(([key, value]) => [
+      key,
+      typeof value === "symbol"
+        ? (["__symbol__", Symbol.keyFor(value)] satisfies SerializedSymbol)
+        : value,
+    ])
+  ) as any
+}
+
+function deserializeSymbol<T extends Record<string, unknown>>(
+  value: T
+): Record<keyof T, Exclude<T[keyof T], SerializedSymbol> | symbol> {
+  return Object.fromEntries(
+    Object.entries(value).map(([key, value]) => [
+      key,
+      isSerializedSymbol(value)
+        ? typeof value[1] === "undefined"
+          ? Symbol()
+          : Symbol.for(value[1])
+        : value,
+    ])
+  ) as any
+}
+
+if (import.meta.vitest) {
+  const { test, expect } = import.meta.vitest
+
+  test("isSerializedSymbol", () => {
+    expect(
+      isSerializedSymbol(["__symbol__", ""] satisfies SerializedSymbol)
+    ).toBeTruthy()
+
+    expect(
+      isSerializedSymbol(["__symbol__", undefined] satisfies SerializedSymbol)
+    ).toBeTruthy()
+
+    expect(
+      isSerializedSymbol(
+        // @ts-expect-error
+        ["__symbol__"] satisfies SerializedSymbol
+      )
+    ).toBeFalsy()
+  })
+
+  test("hasSymbol", () => {
+    expect(
+      hasSymbol({
+        x: "X",
+        y: Symbol.for("Y"),
+      })
+    ).toBeTruthy()
+
+    expect(
+      hasSymbol({
+        z: "Z",
+      })
+    ).toBeFalsy()
+
+    expect(hasSymbol(null)).toBeFalsy()
+  })
+
+  test("serializeSymbol", () => {
+    const x = serializeSymbol({
+      a: "A",
+      b: Symbol.for("B"),
+    })
+
+    expect(x).toStrictEqual({
+      a: "A",
+      b: ["__symbol__", "B"],
+    } satisfies typeof x)
+  })
+
+  test("deserializeSymbol", () => {
+    const x = deserializeSymbol({
+      c: "C",
+      d: ["__symbol__", "D"] satisfies SerializedSymbol,
+    })
+
+    expect(x).toStrictEqual({
+      c: "C",
+      d: Symbol.for("D"),
+    } satisfies typeof x)
+  })
 }
