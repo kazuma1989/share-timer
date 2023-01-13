@@ -35,30 +35,30 @@ export function coerceTimestamp<T extends Record<string, unknown>>(
 
 const timestamp = s.union([
   s.literal(serverTimestamp),
-  s.object({
+  s.type({
     seconds: s.number(),
     nanoseconds: s.number(),
   }) satisfies s.Describe<Timestamp> as s.Describe<Timestamp>,
 ])
 
 export const actionZod = s.union([
-  s.object({
+  s.type({
     type: s.literal("start"),
     withDuration: s.number(),
     at: timestamp,
   }),
 
-  s.object({
+  s.type({
     type: s.literal("pause"),
     at: timestamp,
   }),
 
-  s.object({
+  s.type({
     type: s.literal("resume"),
     at: timestamp,
   }),
 
-  s.object({
+  s.type({
     type: s.literal("cancel"),
     withDuration: s.optional(s.number()),
   }),

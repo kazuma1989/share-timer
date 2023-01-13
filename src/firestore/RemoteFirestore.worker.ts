@@ -77,7 +77,7 @@ export class RemoteFirestore {
       const [error, data] = s.validate(rawData, roomZod)
       if (error) {
         if (rawData) {
-          console.debug(rawData, error)
+          console.warn(rawData, error)
         }
 
         onNext(["invalid-doc", roomId])
@@ -117,7 +117,13 @@ export class RemoteFirestore {
           serverTimestamps: "estimate",
         })
 
-        return s.is(rawData, actionZod) ? [coerceTimestamp(rawData)] : []
+        const [error, data] = s.validate(rawData, actionZod)
+        if (error) {
+          console.debug(rawData, error)
+          return []
+        }
+
+        return [coerceTimestamp(data)]
       })
 
       onNext(

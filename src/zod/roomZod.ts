@@ -13,7 +13,7 @@ export function isRoom(value: Room | InvalidDoc): value is Room {
   return !Array.isArray(value)
 }
 
-export const roomZod = s.object({
+export const roomZod = s.type({
   name: s.optional(s.size(s.string(), 0, 1_000)),
   lockedBy: s.optional(s.size(s.string(), 10)),
 })
