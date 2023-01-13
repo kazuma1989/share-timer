@@ -1,39 +1,65 @@
-import * as z from "zod"
-import { serverTimestamp, toMillis } from "../util/ServerTimestamp"
+import * as s from "superstruct"
+import {
+  serverTimestamp,
+  toMillis,
+  type Timestamp,
+} from "../util/ServerTimestamp"
 
-export type Action = z.output<typeof actionZod>
+export type Action = TimestampFieldToMillis<ActionInput>
 
-export type ActionInput = z.input<typeof actionZod>
+export type ActionInput = s.Infer<typeof actionZod>
 
-const timestampToMillis = z
-  .literal(serverTimestamp)
-  .or(
-    z.object({
-      seconds: z.number(),
-      nanoseconds: z.number(),
-    })
-  )
-  .transform((_): number => (_ === serverTimestamp ? NaN : toMillis(_)))
+type TimestampFieldToMillis<T> = {
+  [P in keyof T]: TimestampToMillis<T[P]>
+}
 
-export const actionZod = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("start"),
-    withDuration: z.number(),
-    at: timestampToMillis,
+type TimestampToMillis<T> = T extends typeof serverTimestamp | Timestamp
+  ? number
+  : T
+
+export function coerceTimestamp<T extends Record<string, unknown>>(
+  value: T
+): TimestampFieldToMillis<T> {
+  return Object.fromEntries(
+    Object.entries(value).map(([key, value]) => [
+      key,
+      s.is(value, timestamp)
+        ? value === serverTimestamp
+          ? // eslint-disable-next-line no-restricted-globals
+            Date.now()
+          : toMillis(value)
+        : value,
+    ])
+  ) as any
+}
+
+const timestamp = s.union([
+  s.literal(serverTimestamp),
+  s.object({
+    seconds: s.number(),
+    nanoseconds: s.number(),
+  }) satisfies s.Describe<Timestamp> as s.Describe<Timestamp>,
+])
+
+export const actionZod = s.union([
+  s.object({
+    type: s.literal("start"),
+    withDuration: s.number(),
+    at: timestamp,
   }),
 
-  z.object({
-    type: z.literal("pause"),
-    at: timestampToMillis,
+  s.object({
+    type: s.literal("pause"),
+    at: timestamp,
   }),
 
-  z.object({
-    type: z.literal("resume"),
-    at: timestampToMillis,
+  s.object({
+    type: s.literal("resume"),
+    at: timestamp,
   }),
 
-  z.object({
-    type: z.literal("cancel"),
-    withDuration: z.number().optional(),
+  s.object({
+    type: s.literal("cancel"),
+    withDuration: s.optional(s.number()),
   }),
 ])

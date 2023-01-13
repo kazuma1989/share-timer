@@ -16,10 +16,16 @@ import {
   type Firestore,
   type Unsubscribe,
 } from "firebase/firestore"
+import * as s from "superstruct"
 import { setTransferHandlers } from "../setTransferHandlers"
 import { timerReducer, type TimerState } from "../timerReducer"
 import { serverTimestamp } from "../util/ServerTimestamp"
-import { actionZod, type Action, type ActionInput } from "../zod/actionZod"
+import {
+  actionZod,
+  coerceTimestamp,
+  type Action,
+  type ActionInput,
+} from "../zod/actionZod"
 import {
   roomZod,
   type InvalidDoc,
@@ -111,8 +117,7 @@ export class RemoteFirestore {
           serverTimestamps: "estimate",
         })
 
-        const _ = actionZod.safeParse(rawData)
-        return _.success ? [_.data] : []
+        return s.is(rawData, actionZod) ? [coerceTimestamp(rawData)] : []
       })
 
       onNext(
