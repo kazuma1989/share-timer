@@ -1,11 +1,11 @@
-import * as z from "zod"
+import * as s from "superstruct"
 import { nanoid } from "../util/nanoid"
 
-export interface Room extends z.output<typeof roomZod> {
-  id: z.infer<typeof roomIdZod>
+export interface Room extends s.Infer<typeof roomZod> {
+  id: s.Infer<typeof roomIdZod>
 }
 
-export interface RoomInput extends z.input<typeof roomZod> {}
+export interface RoomInput extends s.Infer<typeof roomZod> {}
 
 export type InvalidDoc = [reason: "invalid-doc", payload: Room["id"]]
 
@@ -13,18 +13,20 @@ export function isRoom(value: Room | InvalidDoc): value is Room {
   return !Array.isArray(value)
 }
 
-export const roomZod = z.object({
-  name: z.string().max(1_000).optional(),
-  lockedBy: z.string().max(10).optional(),
+export const roomZod = s.object({
+  name: s.optional(s.size(s.string(), 0, 1_000)),
+  lockedBy: s.optional(s.size(s.string(), 10)),
 })
 
-export const roomIdZod = z
-  .string()
-  .regex(/^[a-z]{3}-[a-z]{4}-[a-z]{3}$/)
-  .brand()
+export const roomIdZod = s.pattern(
+  s.string(),
+  /^[a-z]{3}-[a-z]{4}-[a-z]{3}$/
+) satisfies s.Describe<string> as unknown as s.Describe<
+  string & { readonly roomId: unique symbol }
+>
 
 export function isRoomId(id: string): id is Room["id"] {
-  return roomIdZod.safeParse(id).success
+  return s.is(id, roomIdZod)
 }
 
 export function newRoomId(): Room["id"] {
@@ -35,17 +37,17 @@ if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
 
   test("room id", () => {
-    expect(roomIdZod.parse("cnz-some-fmy")).toBe("cnz-some-fmy")
+    expect(s.validate("cnz-some-fmy", roomIdZod)[1]).toBe("cnz-some-fmy")
   })
 
   test("generate valid room id", () => {
     const id = newRoomId()
 
-    expect(roomIdZod.parse(id)).toBe(id)
+    expect(s.validate(id, roomIdZod)[1]).toBe(id)
   })
 
   test("invalid room id", () => {
-    expect(() => roomIdZod.parse("-cnz-some-fmy")).toThrow(z.ZodError)
+    expect(() => s.assert("-cnz-some-fmy", roomIdZod)).toThrow(s.StructError)
   })
 
   test("room name", () => {
@@ -53,14 +55,17 @@ if (import.meta.vitest) {
       name: "彅瀉".repeat(1_000 / 2),
     }
 
-    expect(roomZod.parse(room)).toStrictEqual(room)
+    expect(s.validate(room, roomZod)[1]).toStrictEqual(room)
   })
 
   test("invalid room name", () => {
     expect(() =>
-      roomZod.parse({
-        name: "𩸽".repeat(501),
-      })
-    ).toThrow(z.ZodError)
+      s.assert(
+        {
+          name: "𩸽".repeat(501),
+        },
+        roomZod
+      )
+    ).toThrow(s.StructError)
   })
 }

@@ -40,6 +40,7 @@ export function useLockRoomImpl(): (
           throw AbortReason("room-not-exists")
         }
 
+        // @ts-expect-error
         const room = roomZod.parse(roomDoc.data())
         if (room.lockedBy) {
           throw AbortReason("already-locked")

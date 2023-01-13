@@ -74,16 +74,16 @@ export class RemoteFirestore {
         serverTimestamps: "estimate",
       })
 
-      const _ = roomZod.safeParse(rawData)
-      if (!_.success) {
+      const [error, data] = s.validate(rawData, roomZod)
+      if (error) {
         if (rawData) {
-          console.debug(rawData, _.error)
+          console.debug(rawData, error)
         }
 
         onNext(["invalid-doc", roomId])
       } else {
         onNext({
-          ..._.data,
+          ...data,
           id: roomId,
         })
       }
