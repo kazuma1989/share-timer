@@ -1,17 +1,19 @@
 import * as z from "zod"
-import { ServerTimestamp } from "../util/ServerTimestamp"
+import { serverTimestamp, toMillis } from "../util/ServerTimestamp"
 
 export type Action = z.output<typeof actionZod>
 
 export type ActionInput = z.input<typeof actionZod>
 
 const timestampToMillis = z
-  .object({
-    seconds: z.number(),
-    nanoseconds: z.number(),
-  })
-  .or(z.instanceof(ServerTimestamp))
-  .transform(ServerTimestamp.toMillis)
+  .literal(serverTimestamp)
+  .or(
+    z.object({
+      seconds: z.number(),
+      nanoseconds: z.number(),
+    })
+  )
+  .transform((_): number => (_ === serverTimestamp ? NaN : toMillis(_)))
 
 export const actionZod = z.discriminatedUnion("type", [
   z.object({

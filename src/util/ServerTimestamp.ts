@@ -1,6 +1,12 @@
+export const serverTimestamp = Symbol.for("serverTimestamp")
+
+export function toMillis(timestamp: Timestamp): number {
+  return timestamp.seconds * 1000 + timestamp.nanoseconds / MS_TO_NANOS
+}
+
 export class ServerTimestamp implements Timestamp {
   static toMillis(timestamp: Timestamp): number {
-    return timestamp.seconds * 1000 + timestamp.nanoseconds / MS_TO_NANOS
+    return toMillis(timestamp)
   }
 
   readonly seconds: number

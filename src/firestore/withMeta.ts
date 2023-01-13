@@ -1,4 +1,7 @@
-import { FieldValue, serverTimestamp } from "firebase/firestore"
+import {
+  FieldValue,
+  serverTimestamp as firestoreServerTimestamp,
+} from "firebase/firestore"
 
 interface Meta {
   createdAt: FieldValue
@@ -7,6 +10,6 @@ interface Meta {
 export function withMeta<T>(docData: T): T & Meta {
   return {
     ...docData,
-    createdAt: serverTimestamp(),
+    createdAt: firestoreServerTimestamp(),
   }
 }

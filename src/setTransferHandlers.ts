@@ -1,8 +1,9 @@
 import { transferHandlers, type TransferHandler } from "comlink"
+import { serverTimestamp } from "./util/ServerTimestamp"
 
 export function setTransferHandlers(): void {
-  const symbolKey = "serverTimestamp"
-  const symbolValue = Symbol.for(symbolKey)
+  const symbolKey = Symbol.keyFor(serverTimestamp) ?? "serverTimestamp"
+  const symbolValue = serverTimestamp
 
   transferHandlers.set(symbolKey, {
     canHandle(value): value is typeof symbolValue {

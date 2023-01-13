@@ -1,18 +1,16 @@
-import { serverTimestamp, Timestamp } from "firebase/firestore"
+import {
+  serverTimestamp as firestoreServerTimestamp,
+  Timestamp,
+} from "firebase/firestore"
 import * as z from "zod"
-import { ServerTimestamp } from "../util/ServerTimestamp"
+import { serverTimestamp, ServerTimestamp } from "../util/ServerTimestamp"
 import type { ActionInput } from "../zod/actionZod"
 
 export const toFirestore = z
   .object({
     at: z
-      .instanceof(ServerTimestamp)
-      .or(
-        z.object({
-          type: z.literal("client-estimate"),
-        })
-      )
-      .transform(() => serverTimestamp())
+      .literal(serverTimestamp)
+      .transform(() => firestoreServerTimestamp())
       .optional(),
   })
   .passthrough()
@@ -32,7 +30,7 @@ if (import.meta.vitest) {
   test("toFirestore", () => {
     const action: ActionInput = {
       type: "start",
-      at: new ServerTimestamp(Math.random()),
+      at: serverTimestamp,
       withDuration: 60_000 * 3,
     }
 

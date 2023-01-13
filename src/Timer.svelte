@@ -13,7 +13,7 @@
   import { useDispatch } from "./useDispatch"
   import { getId } from "./util/getId"
   import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
-  import { ServerTimestamp } from "./util/ServerTimestamp"
+  import { serverTimestamp } from "./util/ServerTimestamp"
   import type { Room } from "./zod/roomZod"
 
   export let room$: Observable<Room>
@@ -60,7 +60,7 @@
           onClick: () => {
             dispatch({
               type: "pause",
-              at: new ServerTimestamp(now()),
+              at: serverTimestamp,
             })
           },
           attr: {
@@ -79,7 +79,7 @@
 
             dispatch({
               type: "resume",
-              at: new ServerTimestamp(now()),
+              at: serverTimestamp,
             })
           },
           attr: {
@@ -98,7 +98,7 @@
     dispatch({
       type: "start",
       withDuration: duration,
-      at: new ServerTimestamp(now()),
+      at: serverTimestamp,
     })
   }
 
