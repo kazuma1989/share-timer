@@ -1,8 +1,8 @@
 import { proxy, type Remote } from "comlink"
 import { createCache } from "../util/createCache"
 import type { Room } from "../zod/roomZod"
+import type { RemoteFirestore } from "./RemoteFirestore.worker"
 import { useFirestore } from "./useFirestore"
-import type { RemoteFirestore } from "./worker"
 
 export function useSetupImpl(roomId: Room["id"]): (() => void) | null {
   const firestore = useFirestore()

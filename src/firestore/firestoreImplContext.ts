@@ -3,12 +3,12 @@ import { keyWithUseDispatch } from "../useDispatch"
 import { keyWithUseRoom } from "../useRoom"
 import { keyWithUseSetup } from "../useSetup"
 import { keyWithUseTimerState } from "../useTimerState"
+import type { RemoteFirestore } from "./RemoteFirestore.worker"
 import { useDispatchImpl } from "./useDispatchImpl"
 import { keyWithFirestore } from "./useFirestore"
 import { useRoomImpl } from "./useRoomImpl"
 import { useSetupImpl } from "./useSetupImpl"
 import { useTimerStateImpl } from "./useTimerStateImpl"
-import type { RemoteFirestore } from "./worker"
 
 export function firestoreImplContext(
   firestore: Remote<RemoteFirestore>

@@ -1,8 +1,8 @@
 import { wrap } from "comlink"
 import App from "./App.svelte"
 import { firestoreImplContext } from "./firestore/firestoreImplContext"
-import type { RemoteFirestore } from "./firestore/worker"
-import FirestoreWorker from "./firestore/worker?worker"
+import type { RemoteFirestore } from "./firestore/RemoteFirestore.worker"
+import RemoteFirestoreWorker from "./firestore/RemoteFirestore.worker?worker"
 import "./global.css"
 import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
@@ -22,7 +22,7 @@ async function run() {
 
   const route$ = observeHash()
 
-  const Firestore = wrap<typeof RemoteFirestore>(new FirestoreWorker())
+  const Firestore = wrap<typeof RemoteFirestore>(new RemoteFirestoreWorker())
   const firestore = await new Firestore(
     await fetch("/__/firebase/init.json").then((_) => _.json())
   )
