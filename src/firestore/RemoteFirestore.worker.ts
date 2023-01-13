@@ -11,12 +11,12 @@ import {
   query,
   runTransaction,
   startAt,
-  type DocumentData,
   type Firestore,
   type Unsubscribe,
 } from "firebase/firestore"
 import { setTransferHandlers } from "../setTransferHandlers"
-import type { ActionInput } from "../zod/actionZod"
+import { timerReducer, type TimerState } from "../timerReducer"
+import { actionZod, type Action, type ActionInput } from "../zod/actionZod"
 import {
   roomZod,
   type InvalidDoc,
@@ -86,7 +86,7 @@ export class RemoteFirestore {
 
   async onSnapshotTimerState(
     roomId: Room["id"],
-    onNext: ((data: DocumentData[]) => void) & ProxyMarked
+    onNext: ((data: TimerState) => void) & ProxyMarked
   ): Promise<Unsubscribe> {
     const selectActions = await getDocs(
       query(
@@ -104,8 +104,20 @@ export class RemoteFirestore {
     )
 
     const unsubscribe = onSnapshot(selectActions, (snapshot) => {
+      const actions = snapshot.docs.flatMap((doc): Action[] => {
+        const rawData = doc.data({
+          serverTimestamps: "estimate",
+        })
+
+        const _ = actionZod.safeParse(rawData)
+        return _.success ? [_.data] : []
+      })
+
       onNext(
-        snapshot.docs.map((doc) => doc.data({ serverTimestamps: "estimate" }))
+        actions.reduce(timerReducer, {
+          mode: "editing",
+          initialDuration: 0,
+        })
       )
     })
 
