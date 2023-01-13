@@ -33,33 +33,33 @@ export function coerceTimestamp<T extends Record<string, unknown>>(
   ) as any
 }
 
-const timestamp = s.union([
-  s.literal(serverTimestamp),
-  s.type({
-    seconds: s.number(),
-    nanoseconds: s.number(),
+const timestamp = /*@__PURE__*/ s.union([
+  /*@__PURE__*/ s.literal(serverTimestamp),
+  /*@__PURE__*/ s.type({
+    seconds: /*@__PURE__*/ s.number(),
+    nanoseconds: /*@__PURE__*/ s.number(),
   }) satisfies s.Describe<Timestamp> as s.Describe<Timestamp>,
 ])
 
-export const actionZod = s.union([
-  s.type({
-    type: s.literal("start"),
-    withDuration: s.number(),
+export const actionZod = /*@__PURE__*/ s.union([
+  /*@__PURE__*/ s.type({
+    type: /*@__PURE__*/ s.literal("start"),
+    withDuration: /*@__PURE__*/ s.number(),
     at: timestamp,
   }),
 
-  s.type({
-    type: s.literal("pause"),
+  /*@__PURE__*/ s.type({
+    type: /*@__PURE__*/ s.literal("pause"),
     at: timestamp,
   }),
 
-  s.type({
-    type: s.literal("resume"),
+  /*@__PURE__*/ s.type({
+    type: /*@__PURE__*/ s.literal("resume"),
     at: timestamp,
   }),
 
-  s.type({
-    type: s.literal("cancel"),
-    withDuration: s.optional(s.number()),
+  /*@__PURE__*/ s.type({
+    type: /*@__PURE__*/ s.literal("cancel"),
+    withDuration: /*@__PURE__*/ s.optional(/*@__PURE__*/ s.number()),
   }),
 ])

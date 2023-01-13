@@ -13,20 +13,24 @@ export function isRoom(value: Room | InvalidDoc): value is Room {
   return !Array.isArray(value)
 }
 
-export const roomZod = s.type({
-  name: s.optional(s.size(s.string(), 0, 1_000)),
-  lockedBy: s.optional(s.size(s.string(), 10)),
+export const roomZod = /*@__PURE__*/ s.type({
+  name: /*@__PURE__*/ s.optional(
+    /*@__PURE__*/ s.size(/*@__PURE__*/ s.string(), 0, 1_000)
+  ),
+  lockedBy: /*@__PURE__*/ s.optional(
+    /*@__PURE__*/ s.size(/*@__PURE__*/ s.string(), 10)
+  ),
 })
 
-export const roomIdZod = s.pattern(
-  s.string(),
+const roomIdZod = /*@__PURE__*/ s.pattern(
+  /*@__PURE__*/ s.string(),
   /^[a-z]{3}-[a-z]{4}-[a-z]{3}$/
 ) satisfies s.Describe<string> as unknown as s.Describe<
   string & { readonly roomId: unique symbol }
 >
 
 export function isRoomId(id: string): id is Room["id"] {
-  return s.is(id, roomIdZod)
+  return /^[a-z]{3}-[a-z]{4}-[a-z]{3}$/.test(id)
 }
 
 export function newRoomId(): Room["id"] {
