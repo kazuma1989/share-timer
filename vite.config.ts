@@ -42,6 +42,10 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
       sourcemap: true,
     },
 
+    esbuild: {
+      legalComments: "external",
+    },
+
     preview: {
       // ポートが衝突したら自動でインクリメントしてくれる
       port: (PREVIEW_PORT && parseInt(PREVIEW_PORT)) || 3000,
