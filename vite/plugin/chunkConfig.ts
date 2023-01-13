@@ -1,7 +1,7 @@
 import { Plugin, PluginOption } from "vite"
 
 export default function chunkConfig(): PluginOption[] {
-  return [alignGranularity(), vendorChunks()]
+  return [alignGranularity()]
 }
 
 /**
@@ -19,33 +19,6 @@ function alignGranularity(): Plugin {
 
           // CSS が細かくなりすぎるのでまとめる
           cssCodeSplit: false,
-        },
-      }
-    },
-  }
-}
-
-/**
- * node_modules 内の JS をある程度のかたまり（キャッシュヒットが期待でき、アセットリクエスト数が過剰にならない粒度）でチャンクにまとめる
- */
-function vendorChunks(): Plugin {
-  return {
-    name: "vendorChunks",
-
-    config() {
-      return {
-        build: {
-          rollupOptions: {
-            output: {
-              manualChunks(id) {
-                switch (true) {
-                  case id.includes("/node_modules/@firebase"):
-                  case id.includes("/node_modules/firebase"):
-                    return "firebase"
-                }
-              },
-            },
-          },
         },
       }
     },
