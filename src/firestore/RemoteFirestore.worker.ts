@@ -15,6 +15,7 @@ import {
   type Firestore,
   type Unsubscribe,
 } from "firebase/firestore"
+import { setTransferHandlers } from "../setTransferHandlers"
 import type { ActionInput } from "../zod/actionZod"
 import type { Room, RoomInput } from "../zod/roomZod"
 import { toFirestore } from "./actionZodImpl"
@@ -24,8 +25,14 @@ import { orderBy } from "./orderBy"
 import { where } from "./where"
 import { withMeta } from "./withMeta"
 
+setTransferHandlers()
+
 export class RemoteFirestore {
   readonly firestore: Firestore
+
+  log(x: symbol): void {
+    console.log(x, x === Symbol.for("serverTimestamp"))
+  }
 
   constructor(options: FirebaseOptions) {
     const firebaseApp = initializeApp(options)

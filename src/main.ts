@@ -6,6 +6,7 @@ import RemoteFirestoreWorker from "./firestore/RemoteFirestore.worker?worker"
 import "./global.css"
 import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
+import { setTransferHandlers } from "./setTransferHandlers"
 import { keyWithMediaPermission } from "./useAudio"
 import { keyWithDarkMode, observeDarkMode } from "./useDarkMode"
 
@@ -22,10 +23,14 @@ async function run() {
 
   const route$ = observeHash()
 
+  setTransferHandlers()
+
   const Firestore = wrap<typeof RemoteFirestore>(new RemoteFirestoreWorker())
   const firestore = await new Firestore(
     await fetch("/__/firebase/init.json").then((_) => _.json())
   )
+
+  firestore.log(Symbol.for("serverTimestamp"))
 
   new App({
     target: document.getElementById("root")!,
