@@ -4,18 +4,21 @@ import {
   addDoc,
   connectFirestoreEmulator,
   doc,
+  FieldValue,
   getDocs,
   getFirestore,
   limitToLast,
   onSnapshot,
   query,
   runTransaction,
+  serverTimestamp as firestoreServerTimestamp,
   startAt,
   type Firestore,
   type Unsubscribe,
 } from "firebase/firestore"
 import { setTransferHandlers } from "../setTransferHandlers"
 import { timerReducer, type TimerState } from "../timerReducer"
+import { serverTimestamp } from "../util/ServerTimestamp"
 import { actionZod, type Action, type ActionInput } from "../zod/actionZod"
 import {
   roomZod,
@@ -23,7 +26,6 @@ import {
   type Room,
   type RoomInput,
 } from "../zod/roomZod"
-import { toFirestore } from "./actionZodImpl"
 import { collection } from "./collection"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
 import { orderBy } from "./orderBy"
@@ -127,7 +129,7 @@ export class RemoteFirestore {
   async dispatch(roomId: Room["id"], action: ActionInput): Promise<void> {
     await addDoc(
       collection(this.firestore, "rooms", roomId, "actions"),
-      withMeta(toFirestore.parse(action))
+      withMeta(convertServerTimestamp(action))
     )
   }
 
@@ -191,6 +193,35 @@ export class RemoteFirestore {
   }
 }
 
-expose(RemoteFirestore)
+if (!import.meta.vitest) {
+  expose(RemoteFirestore)
+}
 
 const DEFAULT_DURATION = 3 * 60000
+
+function convertServerTimestamp<T extends Record<string, unknown>>(
+  value: T
+): Record<keyof T, Exclude<T[keyof T], typeof serverTimestamp> | FieldValue> {
+  return Object.fromEntries(
+    Object.entries(value).map(([key, value]) => [
+      key,
+      value === serverTimestamp ? firestoreServerTimestamp() : value,
+    ])
+  ) as any
+}
+
+if (import.meta.vitest) {
+  const { test, expect } = import.meta.vitest
+
+  test("isSerializedSymbol", () => {
+    const x = convertServerTimestamp({
+      a: "A",
+      b: serverTimestamp,
+    })
+
+    expect(x).toMatchObject({
+      a: "A",
+      b: expect.any(FieldValue),
+    } satisfies typeof x)
+  })
+}
