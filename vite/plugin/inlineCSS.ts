@@ -20,12 +20,22 @@ export default function inlineCSS(): Plugin {
       )
       if (!cssAsset) return
 
-      const { fileName, source } = cssAsset
+      const linkTagRE =
+        /<link\b[^>]+rel\s*=\s*(?:"stylesheet"|'stylesheet')[^>]*>/gis
 
-      return html.replace(
-        `<link rel="stylesheet" href="/${fileName}">`,
-        `<style>\n${source}\n</style>`
-      )
+      return html.replace(linkTagRE, (linkTag) => {
+        const hrefRE = /\bhref\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s'">]+))/i
+
+        const [, doubleQuoted, singleQuoted, noQuoted] =
+          linkTag.match(hrefRE) ?? []
+        const href = doubleQuoted ?? singleQuoted ?? noQuoted
+
+        if (href === `/${cssAsset.fileName}`) {
+          return `<style>\n${cssAsset.source}\n</style>`
+        } else {
+          return linkTag
+        }
+      })
     },
   }
 }
