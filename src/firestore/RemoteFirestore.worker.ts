@@ -38,8 +38,6 @@ import { orderBy } from "./orderBy"
 import { where } from "./where"
 import { withMeta } from "./withMeta"
 
-setTransferHandlers()
-
 export class RemoteFirestore {
   readonly firestore: Firestore
 
@@ -61,6 +59,8 @@ export class RemoteFirestore {
     }
 
     this.firestore = firestore
+
+    setTransferHandlers()
   }
 
   onSnapshotRoom(
