@@ -1,8 +1,12 @@
 import { Plugin } from "vite"
 
 export default function inlineCSS(): Plugin {
+  let inlinedCssFileName: string | undefined
+
   return {
     name: "inlineCSS",
+    apply: "build",
+    enforce: "post",
 
     config() {
       return {
@@ -31,11 +35,19 @@ export default function inlineCSS(): Plugin {
         const href = doubleQuoted ?? singleQuoted ?? noQuoted
 
         if (href === `/${cssAsset.fileName}`) {
+          inlinedCssFileName = cssAsset.fileName
+
           return `<style>\n${cssAsset.source}\n</style>`
         } else {
           return linkTag
         }
       })
+    },
+
+    generateBundle(_, bundle) {
+      if (inlinedCssFileName) {
+        delete bundle[inlinedCssFileName]
+      }
     },
   }
 }
