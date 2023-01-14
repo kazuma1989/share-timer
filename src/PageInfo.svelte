@@ -1,15 +1,14 @@
 <script lang="ts">
   import clsx from "clsx"
   import Icon from "./Icon.svelte"
-  import { setHash } from "./observeHash"
   import QrCode from "./QRCode.svelte"
   import type { Room } from "./schema/roomSchema"
   import { fromRoute } from "./toRoute"
 
   export let roomId: Room["id"]
 
-  $: roomURL =
-    location.origin + location.pathname + `#${fromRoute(["room", roomId])}`
+  $: roomHash = `#${fromRoute(["room", roomId])}`
+  $: roomURL = location.origin + location.pathname + roomHash
 </script>
 
 <article
@@ -22,15 +21,12 @@
   )}
 >
   <div>
-    <button
-      type="button"
-      class="transparent-button my-2 -ml-4 h-12 w-12 text-2xl"
-      on:click={() => {
-        setHash(["room", roomId])
-      }}
+    <a
+      href={roomHash}
+      class={"transparent-button my-2 -ml-4 inline-grid h-12 w-12 place-items-center text-2xl !text-inherit"}
     >
       <Icon name="arrow-left" />
-    </button>
+    </a>
 
     <h1>
       <ruby>
