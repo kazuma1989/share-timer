@@ -212,7 +212,7 @@ const DEFAULT_DURATION = 3 * 60000
 
 function convertServerTimestamp<T extends Record<string, unknown>>(
   value: T
-): Record<keyof T, Exclude<T[keyof T], typeof serverTimestamp> | FieldValue> {
+): { [P in keyof T]: T[P] extends typeof serverTimestamp ? FieldValue : T[P] } {
   return Object.fromEntries(
     Object.entries(value).map(([key, value]) => [
       key,

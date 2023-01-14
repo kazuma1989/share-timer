@@ -40,7 +40,7 @@ function hasSymbol(value: unknown): boolean {
 
 function serializeSymbol<T extends Record<string, unknown>>(
   value: T
-): Record<keyof T, Exclude<T[keyof T], symbol> | SerializedSymbol> {
+): { [P in keyof T]: T[P] extends symbol ? SerializedSymbol : T[P] } {
   return Object.fromEntries(
     Object.entries(value).map(([key, value]) => [
       key,
@@ -53,7 +53,7 @@ function serializeSymbol<T extends Record<string, unknown>>(
 
 function deserializeSymbol<T extends Record<string, unknown>>(
   value: T
-): Record<keyof T, Exclude<T[keyof T], SerializedSymbol> | symbol> {
+): { [P in keyof T]: T[P] extends SerializedSymbol ? symbol : T[P] } {
   return Object.fromEntries(
     Object.entries(value).map(([key, value]) => [
       key,
