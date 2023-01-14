@@ -6,18 +6,12 @@ export default function prefetchWorker(): Plugin {
 
     transformIndexHtml(_, { bundle }): HtmlTagDescriptor[] {
       const workerFileNames = Object.values(bundle ?? {}).flatMap(
-        (assetOrChunk): string[] => {
-          if (assetOrChunk.type !== "asset") {
-            return []
-          }
-
-          const { fileName } = assetOrChunk
-          if (fileName.endsWith(".js") && fileName.includes(".worker-")) {
-            return [fileName]
-          }
-
-          return []
-        }
+        ({ type, fileName }): string[] =>
+          type === "asset" &&
+          fileName.endsWith(".js") &&
+          fileName.includes(".worker-")
+            ? [fileName]
+            : []
       )
 
       return workerFileNames.map((fileName) => ({
