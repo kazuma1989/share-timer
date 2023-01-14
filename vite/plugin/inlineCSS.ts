@@ -4,29 +4,30 @@ export default function inlineCSS(): Plugin {
   return {
     name: "inlineCSS",
 
-    transformIndexHtml(html, { bundle }): string {
-      const cssFiles = Object.values(bundle ?? {}).flatMap(
-        (_): { fileName: string; source: string }[] =>
-          _.type === "asset" &&
-          _.fileName.endsWith(".css") &&
-          typeof _.source === "string"
-            ? [
-                {
-                  fileName: _.fileName,
-                  source: _.source,
-                },
-              ]
-            : []
+    config() {
+      return {
+        build: {
+          // CSS が細かくなりすぎるのでまとめる
+          cssCodeSplit: false,
+        },
+      }
+    },
+
+    transformIndexHtml(html, { bundle }): string | void {
+      const cssAsset = Object.values(bundle ?? {}).find(
+        (_): _ is Narrow<typeof _, { type: "asset" }> =>
+          _.type === "asset" && _.name === "style.css"
       )
+      if (!cssAsset) return
 
-      cssFiles.forEach(({ fileName, source }) => {
-        html = html.replace(
-          `<link rel="stylesheet" href="/${fileName}">`,
-          `<style>\n${source}\n</style>`
-        )
-      })
+      const { fileName, source } = cssAsset
 
-      return html
+      return html.replace(
+        `<link rel="stylesheet" href="/${fileName}">`,
+        `<style>\n${source}\n</style>`
+      )
     },
   }
 }
+
+type Narrow<T, U> = T extends U ? T : never

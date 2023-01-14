@@ -16,9 +16,6 @@ function alignGranularity(): Plugin {
         build: {
           // モジュールサイズが小さすぎると TTFB が律速するので、ある程度のかたまりを維持できるようにアセットをまとめる
           assetsInlineLimit: 4096 * 2,
-
-          // CSS が細かくなりすぎるのでまとめる
-          cssCodeSplit: false,
         },
       }
     },
