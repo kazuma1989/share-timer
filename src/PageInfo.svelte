@@ -3,12 +3,49 @@
   import Icon from "./Icon.svelte"
   import QrCode from "./QRCode.svelte"
   import type { Room } from "./schema/roomSchema"
+  import { getItem } from "./storage"
   import { fromRoute } from "./toRoute"
+  import { AbortReason, useLockRoom } from "./useLockRoom"
 
   export let roomId: Room["id"]
 
   $: roomHash = `#${fromRoute(["room", roomId])}`
   $: roomURL = location.origin + location.pathname + roomHash
+
+  const _lockRoom = useLockRoom()
+  const lockRoom = async () => {
+    const userId = getItem("userId")
+    if (!userId) return
+
+    const abort = new AbortController()
+
+    await _lockRoom(roomId, userId, {
+      signal: abort.signal,
+      onBeforeUpdate() {
+        const confirmed = confirm(
+          "解除の方法はありませんが、本当にロックしますか？"
+        )
+        if (!confirmed) {
+          throw AbortReason("user-deny")
+        }
+      },
+    }).catch((reason: AbortReason) => {
+      switch (reason) {
+        case "already-locked": {
+          alert("already locked by another user")
+          break
+        }
+
+        case "user-deny": {
+          break
+        }
+
+        default: {
+          throw reason
+        }
+      }
+    })
+  }
 </script>
 
 <article
@@ -76,17 +113,15 @@
       </a>
     </p>
 
-    <!-- <p>
+    <p>
       <button
         type="button"
         class="transparent-button block w-full border border-gray-500 px-4 py-3"
-        on:click={() => {
-          // TODO 本物のロック処理
-        }}
+        on:click={lockRoom}
       >
         編集をロックする (experimental)
       </button>
-    </p> -->
+    </p>
   </div>
 
   <footer>

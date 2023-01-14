@@ -20,9 +20,7 @@ export function useLockRoom(): (
   return useImpl()()
 }
 
-export { ImplProvider as UseLockRoomProvider }
-
-const [ImplProvider, useImpl] = createContext<typeof useLockRoom>(
+export const [keyWithUseLockRoom, useImpl] = createContext<typeof useLockRoom>(
   "UseLockRoomProvider",
   () => async () => {}
 )

@@ -3,6 +3,7 @@ import type { Firestore } from "firebase/firestore"
 import { ReactNode } from "react"
 // @ts-expect-error
 import { UseDispatchProvider } from "../useDispatch"
+// @ts-expect-error
 import { UseLockRoomProvider } from "../useLockRoom"
 // @ts-expect-error
 import { UseRoomProvider } from "../useRoom"
@@ -28,10 +29,7 @@ export function FirestoreImplProvider({
   return (
     <FirestoreProvider value={firestore}>
       <UseDispatchProvider value={useDispatchImpl}>
-        <UseLockRoomProvider
-          // @ts-expect-error
-          value={useLockRoomImpl}
-        >
+        <UseLockRoomProvider value={useLockRoomImpl}>
           <UseRoomProvider value={useRoomImpl}>
             <UseSetupProvider value={useSetupImpl}>
               <UseTimerStateProvider value={useTimerStateImpl}>
