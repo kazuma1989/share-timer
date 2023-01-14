@@ -41,10 +41,6 @@ import { withMeta } from "./withMeta"
 export class RemoteFirestore {
   readonly firestore: Firestore
 
-  log(x: unknown): void {
-    console.log(x, x === Symbol.for("serverTimestamp"))
-  }
-
   constructor(options: FirebaseOptions) {
     const firebaseApp = initializeApp(options)
 

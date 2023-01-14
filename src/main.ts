@@ -29,10 +29,6 @@ async function run() {
     await fetch("/__/firebase/init.json").then((_) => _.json())
   )
 
-  firestore.log({
-    x: Symbol.for("serverTimestamp"),
-  })
-
   new App({
     target: document.getElementById("root")!,
     props: {
