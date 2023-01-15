@@ -18,7 +18,7 @@
     mapToCurrentDuration(interval("ui"), now),
     notifyFirstZero(),
     withLatestFrom(config$),
-    map(([_, config]) => config.flash === "on" && _)
+    map(([notified, config]) => config.flash === "on" && notified)
   )
 </script>
 

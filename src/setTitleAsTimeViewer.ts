@@ -1,4 +1,4 @@
-import { distinctUntilChanged, map, Observable } from "rxjs"
+import { distinctUntilChanged, map, type Observable } from "rxjs"
 import { mapToCurrentDuration } from "./mapToCurrentDuration"
 import { now } from "./now"
 import type { TimerState } from "./timerReducer"
