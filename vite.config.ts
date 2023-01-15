@@ -1,11 +1,13 @@
-import react from "@vitejs/plugin-react"
+import { svelte } from "@sveltejs/vite-plugin-svelte"
 import { defineConfig, UserConfig } from "vite"
 import { hosting } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
+import chunkConfig from "./vite/plugin/chunkConfig"
 import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
 import firestoreEmulatorProxy from "./vite/plugin/firestoreEmulatorProxy"
-import vendorChunks from "./vite/plugin/vendorChunks"
+import inlineCSS from "./vite/plugin/inlineCSS"
+import prefetchWorker from "./vite/plugin/prefetchWorker"
 import vitest from "./vite/plugin/vitest"
 
 declare const process: {
@@ -40,7 +42,10 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
     build: {
       outDir: BUILD_PATH || hosting.find((_) => _.target === "app")?.public,
       sourcemap: true,
-      assetsInlineLimit: 4096 * 2,
+    },
+
+    esbuild: {
+      legalComments: "external",
     },
 
     preview: {
@@ -49,15 +54,16 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
     },
 
     plugins: [
-      // The all-in-one Vite plugin for React projects.
-      react(),
+      svelte(),
 
       // Firebase
       firebaseReservedURL(),
       firestoreEmulatorProxy(),
 
       // Build config
-      vendorChunks(),
+      chunkConfig(),
+      prefetchWorker(),
+      inlineCSS(),
 
       // Test config
       vitest(),

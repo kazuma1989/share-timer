@@ -1,17 +1,16 @@
-import { Observable } from "rxjs"
+import type { Observable } from "rxjs"
 import { createContext } from "./createContext"
-import { Permission } from "./observeAudioPermission"
+import type { Permission } from "./observeAudioPermission"
 import { createAudioBufferSourceNode } from "./util/createAudioBufferSourceNode"
 
 export interface Audio {
   play(): PromiseLike<void>
 }
 
-export const [AudioProvider, useAudio] = createContext<Audio>("AudioProvider")
+export const [keyWithAudio, useAudio] = createContext<Audio>("Audio")
 
-export const [MediaPermissionProvider, useMediaPermission] = createContext<
-  Observable<Permission>
->("MediaPermissionProvider")
+export const [keyWithMediaPermission, useMediaPermission] =
+  createContext<Observable<Permission>>("MediaPermission")
 
 export function createAudio(
   context: BaseAudioContext,

@@ -9,11 +9,14 @@
 
     <title>share-timer</title>
 
-    <link rel="preload" href="/__/firebase/init.json" as="fetch" />
-    <script type="module" src="/src/index.tsx"></script>
+    <link rel="preload" crossorigin href="/__/firebase/init.json" as="fetch" />
+
+    <script type="module" src="/src/main.ts"></script>
+
+    <link rel="stylesheet" href="/src/global.css" />
   </head>
 
   <body>
-    <div id="root" style="display: contents"></div>
+    <div id="root" class="contents"></div>
   </body>
 </html>

@@ -1,5 +1,5 @@
 import { createContext } from "./createContext"
-import { Room } from "./zod/roomZod"
+import type { Room } from "./schema/roomSchema"
 
 export type AbortReason =
   | "signal"
@@ -20,9 +20,7 @@ export function useLockRoom(): (
   return useImpl()()
 }
 
-export { ImplProvider as UseLockRoomProvider }
-
-const [ImplProvider, useImpl] = createContext<typeof useLockRoom>(
+export const [keyWithUseLockRoom, useImpl] = createContext<typeof useLockRoom>(
   "UseLockRoomProvider",
   () => async () => {}
 )

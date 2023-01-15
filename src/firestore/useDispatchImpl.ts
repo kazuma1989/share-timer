@@ -1,28 +1,14 @@
-import { addDoc } from "firebase/firestore"
-import { useAllSettled } from "../useAllSettled"
-import { ActionInput } from "../zod/actionZod"
-import { Room } from "../zod/roomZod"
-import { toFirestore } from "./actionZodImpl"
-import { collection } from "./collection"
+import type { ActionInput } from "../schema/actionSchema"
+import type { Room } from "../schema/roomSchema"
 import { useFirestore } from "./useFirestore"
-import { withMeta } from "./withMeta"
 
 export function useDispatchImpl(
   roomId: Room["id"]
-): [pending: boolean, dispatch: (action: ActionInput) => Promise<unknown>] {
-  const [_allSettled, addPromise] = useAllSettled()
-  const pending = !_allSettled
+): [pending: boolean, dispatch: (action: ActionInput) => PromiseLike<unknown>] {
+  // TODO 本物の値
+  const dummyPending = false
 
-  const db = useFirestore()
+  const firestore = useFirestore()
 
-  return [
-    pending,
-    (action) =>
-      addPromise(
-        addDoc(
-          collection(db, "rooms", roomId, "actions"),
-          withMeta(toFirestore.parse(action))
-        )
-      ),
-  ]
+  return [dummyPending, (action) => firestore.dispatch(roomId, action)]
 }

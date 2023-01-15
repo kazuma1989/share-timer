@@ -1,15 +1,13 @@
 import { Observable, of } from "rxjs"
 import { createContext } from "./createContext"
-import { InvalidDoc, Room } from "./zod/roomZod"
+import type { InvalidDoc, Room } from "./schema/roomSchema"
 
 export function useRoom(roomId: Room["id"]): Observable<Room | InvalidDoc> {
-  return useImpl()(roomId)
+  return _useImpl()(roomId)
 }
 
-export { ImplProvider as UseRoomProvider }
-
-const [ImplProvider, useImpl] = createContext<typeof useRoom>(
-  "UseRoomProvider",
+export const [keyWithUseRoom, _useImpl] = createContext<typeof useRoom>(
+  "useRoom",
   () => room$
 )
 

@@ -1,22 +1,23 @@
 // https://www.typescriptlang.org/ja/tsconfig
 {
-  "extends": "@tsconfig/vite-react/tsconfig.json",
+  "extends": "@tsconfig/svelte/tsconfig.json",
 
   "references": [{ "path": "./tsconfig.node.json" }],
 
   "include": ["./src/**/*"],
 
   "compilerOptions": {
-    "types": ["vite/client", "vitest/importMeta"],
-
-    // インデックスアクセスは null チェックが必要。
+    // null check 強化
+    "strict": true,
     "noUncheckedIndexedAccess": true,
 
-    // <div /> を _jsx("div") に変換する。
-    // JSX を使いたいだけなら `import React` は不要。
-    "jsx": "react-jsx",
+    // import.meta を使いたい
+    "module": "ESNext",
 
-    // tsc コマンドは自分のソースコードの型チェックだけに用いる（パッケージ間の整合性まではチェックしない）。
-    "skipLibCheck": true
+    // JSON を使いたい
+    "resolveJsonModule": true,
+
+    // 手軽に tsc コマンドで検査したい
+    "noEmit": true
   }
 }

@@ -1,4 +1,4 @@
-import { MonoTypeOperatorFunction, shareReplay, timer } from "rxjs"
+import { shareReplay, timer, type MonoTypeOperatorFunction } from "rxjs"
 
 export function shareRecent<T>(
   resetAfter: number | boolean = true

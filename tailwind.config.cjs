@@ -19,7 +19,7 @@ function config() {
   }
 
   return {
-    content: ["./src/**/*.{ts,tsx}"],
+    content: ["./*.html", "./src/**/*.{ts,svelte}"],
 
     theme: {
       colors: {

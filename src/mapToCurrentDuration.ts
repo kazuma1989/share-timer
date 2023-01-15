@@ -2,11 +2,10 @@ import {
   combineLatestWith,
   map,
   Observable,
-  OperatorFunction,
   pipe,
+  type OperatorFunction,
 } from "rxjs"
-import { now } from "./now"
-import { TimerState } from "./timerReducer"
+import type { TimerState } from "./schema/timerReducer"
 import { shareRecent } from "./util/shareRecent"
 
 export interface CurrentDuration {
@@ -16,7 +15,7 @@ export interface CurrentDuration {
 
 export function mapToCurrentDuration(
   interval$: Observable<void>,
-  _now: () => number = now
+  now: () => number
 ): OperatorFunction<TimerState, CurrentDuration> {
   return pipe(
     combineLatestWith(interval$),
@@ -32,7 +31,7 @@ export function mapToCurrentDuration(
         case "running": {
           return {
             mode: state.mode,
-            duration: state.restDuration - (_now() - state.startedAt),
+            duration: state.restDuration - (now() - state.startedAt),
           }
         }
 

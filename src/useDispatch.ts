@@ -1,17 +1,15 @@
 import { createContext } from "./createContext"
-import { ActionInput } from "./zod/actionZod"
-import { Room } from "./zod/roomZod"
+import type { ActionInput } from "./schema/actionSchema"
+import type { Room } from "./schema/roomSchema"
 
 export function useDispatch(
   roomId: Room["id"]
-): [pending: boolean, dispatch: (action: ActionInput) => Promise<unknown>] {
-  return useImpl()(roomId)
+): [pending: boolean, dispatch: (action: ActionInput) => PromiseLike<unknown>] {
+  return _useImpl()(roomId)
 }
 
-export { ImplProvider as UseDispatchProvider }
-
-const [ImplProvider, useImpl] = createContext<typeof useDispatch>(
-  "UseDispatchProvider",
+export const [keyWithUseDispatch, _useImpl] = createContext<typeof useDispatch>(
+  "useDispatch",
   () => [pending, dispatch]
 )
 

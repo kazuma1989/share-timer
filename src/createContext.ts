@@ -1,21 +1,25 @@
-import { createContext as _createContext, Provider, useContext } from "react"
+import { getContext } from "svelte"
 
 export function createContext<T>(
   name?: string,
   defaultValue?: T
-): [Provider: Provider<T | null>, useContextValue: () => T] {
-  const context = _createContext<T | null>(defaultValue ?? null)
+): [keyWithContext: (value: T) => [typeof key, T], useContextValue: () => T] {
+  const key = Symbol(name)
 
   return [
-    context.Provider,
+    (value) => [key, value],
 
     () => {
-      const value = useContext(context)
-      if (!value) {
-        throw new Error(`${name ?? "Provider"}で囲んでいないかvalueがnullです`)
+      const value = getContext<T | undefined>(key)
+      if (value !== undefined) {
+        return value
       }
 
-      return value
+      if (defaultValue !== undefined) {
+        return defaultValue
+      }
+
+      throw new Error(`Context (${key.description}) を設定できていないようです`)
     },
   ]
 }

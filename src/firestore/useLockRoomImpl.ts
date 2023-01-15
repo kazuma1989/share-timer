@@ -1,7 +1,5 @@
-import { doc, runTransaction } from "firebase/firestore"
-import { AbortReason } from "../useLockRoom"
-import { Room, RoomInput, roomZod } from "../zod/roomZod"
-import { collection } from "./collection"
+import { proxy } from "comlink"
+import type { Room } from "../schema/roomSchema"
 import { useFirestore } from "./useFirestore"
 
 export function useLockRoomImpl(): (
@@ -12,7 +10,7 @@ export function useLockRoomImpl(): (
     onBeforeUpdate?(): void | PromiseLike<void>
   }
 ) => Promise<void> {
-  const db = useFirestore()
+  const firestore = useFirestore()
 
   return async (
     roomId: Room["id"],
@@ -24,37 +22,13 @@ export function useLockRoomImpl(): (
   ) => {
     const { signal, onBeforeUpdate } = options ?? {}
 
-    await runTransaction(
-      db,
-      async (transaction) => {
-        const roomDoc = await transaction.get(
-          doc(collection(db, "rooms"), roomId)
-        )
-        if (signal?.aborted) {
-          throw AbortReason("signal")
-        }
-
-        if (!roomDoc.exists()) {
-          throw AbortReason("room-not-exists")
-        }
-
-        const room = roomZod.parse(roomDoc.data())
-        if (room.lockedBy) {
-          throw AbortReason("already-locked")
-        }
-
-        await onBeforeUpdate?.()
-        if (signal?.aborted) {
-          throw AbortReason("signal")
-        }
-
-        transaction.update(roomDoc.ref, {
-          lockedBy,
-        } satisfies RoomInput)
-      },
-      {
-        maxAttempts: 1,
-      }
+    await firestore.lockRoom(
+      roomId,
+      lockedBy,
+      proxy({
+        aborted: () => signal?.aborted ?? false,
+        onBeforeUpdate,
+      })
     )
   }
 }

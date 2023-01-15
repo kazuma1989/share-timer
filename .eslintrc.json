@@ -1,13 +1,14 @@
 {
+  "root": true,
+
   // 各プラグインのおすすめルールを適用する。
   // プラグインの読み込みも設定してくれるので、plugins オプションも不要。
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/base",
     "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:react/recommended",
-    "plugin:react/jsx-runtime",
-    "plugin:react-hooks/recommended",
+
+    // Svelte の template 内の class 属性はチェックしてくれないからあきらめる
     "plugin:tailwindcss/recommended",
 
     // Prettier の整形と衝突するルールを無効にする。
@@ -17,19 +18,23 @@
 
   // https://typescript-eslint.io/docs/linting/typed-linting/
   "parserOptions": {
-    "project": ["./tsconfig.json", "./tsconfig.node.json"]
+    "project": ["./tsconfig.json", "./tsconfig.node.json"],
+    "extraFileExtensions": [".svelte"]
   },
 
-  "settings": {
-    // eslint-plugin-react からワーニングが出ないように明示的に指定。
-    "react": {
-      "version": "detect"
-    },
+  "plugins": ["svelte3"],
 
+  "settings": {
     "tailwindcss": {
       "callees": ["clsx"],
       "config": "./tailwind.config.cjs"
-    }
+    },
+
+    "svelte3/typescript": true
+  },
+
+  "env": {
+    "browser": true
   },
 
   "rules": {
@@ -68,7 +73,12 @@
 
   "overrides": [
     {
-      "files": ["**/*.test.ts"],
+      "files": ["*.svelte"],
+      "processor": "svelte3/svelte3"
+    },
+
+    {
+      "files": ["*.test.ts"],
       "rules": {
         "@typescript-eslint/no-unused-vars": "off"
       }
