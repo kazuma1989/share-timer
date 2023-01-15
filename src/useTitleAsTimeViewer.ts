@@ -2,6 +2,7 @@
 import { useEffect } from "react"
 import { distinctUntilChanged, map, Observable } from "rxjs"
 import { mapToCurrentDuration } from "./mapToCurrentDuration"
+import { now } from "./now"
 import type { TimerState } from "./timerReducer"
 import { createCache } from "./util/createCache"
 import { floor } from "./util/floor"
@@ -13,7 +14,7 @@ export function useTitleAsTimeViewer(
 ): void {
   const duration$ = cache(timerState$, () =>
     timerState$.pipe(
-      mapToCurrentDuration(interval("worker", 500)),
+      mapToCurrentDuration(interval("worker", 500), now),
       map((_) => floor(_.duration)),
       distinctUntilChanged()
     )

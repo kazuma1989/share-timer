@@ -15,6 +15,7 @@ import {
   mapToCurrentDuration,
   type CurrentDuration,
 } from "./mapToCurrentDuration"
+import { now } from "./now"
 import type { TimerState } from "./timerReducer"
 import { useDarkMode } from "./useDarkMode"
 // @ts-expect-error
@@ -39,7 +40,7 @@ export function TimeViewer({
   const duration$ = cache(timerState$, () =>
     timerState$.pipe(
       bufferedLast(interval("worker", 400)),
-      mapToCurrentDuration(interval("worker", 100)),
+      mapToCurrentDuration(interval("worker", 100), now),
       mapToDuration()
     )
   )

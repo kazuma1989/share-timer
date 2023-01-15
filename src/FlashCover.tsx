@@ -15,6 +15,7 @@ import {
   mapToCurrentDuration,
   type CurrentDuration,
 } from "./mapToCurrentDuration"
+import { now } from "./now"
 import type { TimerState } from "./timerReducer"
 import { useAudio } from "./useAudio"
 import { useConfig } from "./useConfig"
@@ -35,14 +36,14 @@ export function FlashCover({
     timerState$,
     () => [
       timerState$.pipe(
-        mapToCurrentDuration(interval("ui")),
+        mapToCurrentDuration(interval("ui"), now),
         notifyFirstZero(),
         withLatestFrom(config$),
         map(([_, config]) => config.flash === "on" && _)
       ),
 
       timerState$.pipe(
-        mapToCurrentDuration(interval("worker", 100)),
+        mapToCurrentDuration(interval("worker", 100), now),
         notifyFirstZero(),
         withLatestFrom(config$),
         map(([_, config]) => config.sound === "on" && _)
