@@ -3,6 +3,7 @@ import App from "./App.svelte"
 import { firestoreImplContext } from "./firestore/firestoreImplContext"
 import type { RemoteFirestore } from "./firestore/RemoteFirestore.worker"
 import RemoteFirestoreWorker from "./firestore/RemoteFirestore.worker?worker"
+import { setEstimatedDiff } from "./now"
 import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
 import { setTransferHandlers } from "./setTransferHandlers"
@@ -26,14 +27,18 @@ async function run() {
   const context = new AudioContext()
   const permission$ = observeAudioPermission(context)
 
-  const route$ = observeHash()
+  // const audioData = await fetch(smallAlert).then((_) => _.arrayBuffer())
+  // const audio = createAudio(context, audioData)
 
-  setTransferHandlers()
+  const route$ = observeHash()
 
   const Firestore = wrap<typeof RemoteFirestore>(new RemoteFirestoreWorker())
   const firestore = await new Firestore(
     await fetch("/__/firebase/init.json").then((_) => _.json())
   )
+
+  setTransferHandlers()
+  firestore.getEstimatedDiff().then(setEstimatedDiff)
 
   new App({
     target: document.getElementById("root")!,
