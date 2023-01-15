@@ -32,7 +32,7 @@
     }).catch((reason: AbortReason) => {
       switch (reason) {
         case "already-locked": {
-          alert("already locked by another user")
+          alert("すでにロックされています")
           break
         }
 

@@ -31,6 +31,7 @@ import {
 } from "../schema/roomSchema"
 import { setTransferHandlers } from "../setTransferHandlers"
 import { timerReducer, type TimerState } from "../timerReducer"
+import { AbortReason } from "../useLockRoom"
 import { serverTimestamp } from "../util/ServerTimestamp"
 import { collection } from "./collection"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
@@ -193,10 +194,42 @@ export class RemoteFirestore {
     options?: {
       aborted?: () => boolean | PromiseLike<boolean>
       onBeforeUpdate?: () => void | PromiseLike<void>
-    }
+    } & ProxyMarked
   ): Promise<void> {
-    // TODO 本物の実装
-    console.log(roomId, lockedBy, options)
+    const { aborted, onBeforeUpdate } = options ?? {}
+
+    await runTransaction(
+      this.firestore,
+      async (transaction) => {
+        const roomDoc = await transaction.get(
+          doc(collection(this.firestore, "rooms"), roomId)
+        )
+        if (await aborted?.()) {
+          throw AbortReason("signal")
+        }
+
+        if (!roomDoc.exists()) {
+          throw AbortReason("room-not-exists")
+        }
+
+        const room = s.create(roomDoc.data(), roomSchema)
+        if (room.lockedBy) {
+          throw AbortReason("already-locked")
+        }
+
+        await onBeforeUpdate?.()
+        if (await aborted?.()) {
+          throw AbortReason("signal")
+        }
+
+        transaction.update(roomDoc.ref, {
+          lockedBy,
+        } satisfies RoomInput)
+      },
+      {
+        maxAttempts: 1,
+      }
+    )
   }
 }
 
