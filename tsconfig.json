@@ -7,9 +7,6 @@
   "include": ["./src/**/*"],
 
   "compilerOptions": {
-    // TODO いったんエラー回避
-    "jsx": "react-jsx",
-
     // null check 強化
     "strict": true,
     "noUncheckedIndexedAccess": true,
