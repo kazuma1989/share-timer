@@ -1,7 +1,9 @@
 <script lang="ts">
   import { firstValueFrom, map, merge, partition, type Observable } from "rxjs"
+  import { onMount } from "svelte"
   import FlashCover from "./FlashCover.svelte"
   import { isRoom, type InvalidDoc, type Room } from "./schema/roomSchema"
+  import { setTitleAsTimeViewer } from "./setTitleAsTimeViewer"
   import Timer from "./Timer.svelte"
   import { useRoom } from "./useRoom"
   import { useSetup } from "./useSetup"
@@ -12,6 +14,8 @@
   $: [room$, invalidRoomId$] = roomOrInvalid(useRoom(roomId))
   $: setup$ = $invalidRoomId$ && useSetup($invalidRoomId$)?.()
   $: timerState$ = useTimerState(roomId)
+
+  onMount(() => setTitleAsTimeViewer(timerState$))
 
   function roomOrInvalid(_room$: Observable<Room | InvalidDoc>) {
     const [room$, _invalid$] = partition(_room$, isRoom)
