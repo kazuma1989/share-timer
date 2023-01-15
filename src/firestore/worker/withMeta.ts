@@ -1,6 +1,6 @@
 import {
-  FieldValue,
   serverTimestamp as firestoreServerTimestamp,
+  type FieldValue,
 } from "firebase/firestore"
 
 interface Meta {

@@ -1,7 +1,7 @@
 import { distinctUntilChanged, map, type Observable } from "rxjs"
 import { mapToCurrentDuration } from "./mapToCurrentDuration"
 import { now } from "./now"
-import type { TimerState } from "./timerReducer"
+import type { TimerState } from "./schema/timerReducer"
 import { floor } from "./util/floor"
 import { formatDuration } from "./util/formatDuration"
 import { interval } from "./util/interval"

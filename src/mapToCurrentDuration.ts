@@ -5,7 +5,7 @@ import {
   pipe,
   type OperatorFunction,
 } from "rxjs"
-import type { TimerState } from "./timerReducer"
+import type { TimerState } from "./schema/timerReducer"
 import { shareRecent } from "./util/shareRecent"
 
 export interface CurrentDuration {

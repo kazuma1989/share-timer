@@ -4,7 +4,7 @@
   import { mapToCurrentDuration } from "./mapToCurrentDuration"
   import { notifyFirstZero } from "./notifyFirstZero"
   import { now } from "./now"
-  import type { TimerState } from "./timerReducer"
+  import type { TimerState } from "./schema/timerReducer"
   import { useConfig } from "./useConfig"
   import { interval } from "./util/interval"
 

@@ -37,7 +37,7 @@
   import { prependElement } from "./action/prependElement"
   import { mapToCurrentDuration } from "./mapToCurrentDuration"
   import { now } from "./now"
-  import type { TimerState } from "./timerReducer"
+  import type { TimerState } from "./schema/timerReducer"
   import { useDarkMode } from "./useDarkMode"
   import { assertNonNullable } from "./util/assertNonNullable"
   import { bufferedLast } from "./util/bufferedLast"

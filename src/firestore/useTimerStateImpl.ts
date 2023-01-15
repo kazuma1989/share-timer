@@ -1,7 +1,7 @@
 import { proxy } from "comlink"
 import { Observable } from "rxjs"
 import type { Room } from "../schema/roomSchema"
-import type { TimerState } from "../timerReducer"
+import type { TimerState } from "../schema/timerReducer"
 import { createCache } from "../util/createCache"
 import { shareRecent } from "../util/shareRecent"
 import { useFirestore } from "./useFirestore"

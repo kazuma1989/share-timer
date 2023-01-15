@@ -4,7 +4,6 @@ import {
   addDoc,
   connectFirestoreEmulator,
   doc,
-  FieldValue,
   getDocFromServer,
   getDocs,
   getFirestore,
@@ -16,6 +15,7 @@ import {
   setDoc,
   startAt,
   Timestamp,
+  type FieldValue,
   type Firestore,
   type Unsubscribe,
 } from "firebase/firestore"
@@ -25,17 +25,17 @@ import {
   coerceTimestamp,
   type Action,
   type ActionInput,
-} from "../schema/actionSchema"
+} from "../../schema/actionSchema"
 import {
   roomSchema,
   type InvalidDoc,
   type Room,
   type RoomInput,
-} from "../schema/roomSchema"
-import { setTransferHandlers } from "../setTransferHandlers"
-import { timerReducer, type TimerState } from "../timerReducer"
-import { AbortReason } from "../useLockRoom"
-import { serverTimestamp } from "../util/ServerTimestamp"
+} from "../../schema/roomSchema"
+import { timerReducer, type TimerState } from "../../schema/timerReducer"
+import { setTransferHandlers } from "../../setTransferHandlers"
+import { AbortReason } from "../../useLockRoom"
+import { serverTimestamp } from "../../util/ServerTimestamp"
 import { calibrationSchema, type Calibration } from "./calibrationSchema"
 import { collection } from "./collection"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
@@ -150,8 +150,8 @@ export class RemoteFirestore {
     aborted: (() => PromiseLike<boolean> | boolean) & ProxyMarked
   ): Promise<void> {
     const emoji = await fetch(
-      new URL("../emoji/Animals & Nature.json", import.meta.url)
-    ).then<typeof import("../emoji/Animals & Nature.json")>((_) => _.json())
+      new URL("../../emoji/Animals & Nature.json", import.meta.url)
+    ).then<typeof import("../../emoji/Animals & Nature.json")>((_) => _.json())
     if (await aborted()) throw "aborted 1"
 
     const e = emoji[(Math.random() * emoji.length) | 0]!
@@ -282,7 +282,9 @@ function convertServerTimestamp<T extends Record<string, unknown>>(
 if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
 
-  test("isSerializedSymbol", () => {
+  test("isSerializedSymbol", async () => {
+    const { FieldValue } = await import("firebase/firestore")
+
     const x = convertServerTimestamp({
       a: "A",
       b: serverTimestamp,

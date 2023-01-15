@@ -1,8 +1,8 @@
 /* eslint-disable no-restricted-imports */
 import {
   collection as _collection,
-  CollectionReference,
-  Firestore,
+  type CollectionReference,
+  type Firestore,
 } from "firebase/firestore"
 
 export function collection(
