@@ -7,7 +7,7 @@ export interface Audio {
   play(): PromiseLike<void>
 }
 
-export const [AudioProvider, useAudio] = createContext<Audio>("AudioProvider")
+export const [keyWithAudio, useAudio] = createContext<Audio>("Audio")
 
 export const [keyWithMediaPermission, useMediaPermission] =
   createContext<Observable<Permission>>("MediaPermission")

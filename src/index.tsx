@@ -56,10 +56,7 @@ async function run() {
         <ErrorBoundary fallback={<FullViewportOops />}>
           <VideoTimerProvider value={videoTimer}>
             <DarkModeProvider value={darkMode$}>
-              <AudioProvider
-                // @ts-expect-error
-                value={audio}
-              >
+              <AudioProvider value={audio}>
                 <MediaPermissionProvider value={permission$}>
                   <Suspense fallback={<FullViewportProgress />}>
                     <App route$={route$} />

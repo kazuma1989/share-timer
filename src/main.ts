@@ -7,8 +7,9 @@ import { setEstimatedDiff } from "./now"
 import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
 import { setTransferHandlers } from "./setTransferHandlers"
+import smallAlert from "./sound/small-alert.mp3"
 import { getItem, setItem } from "./storage"
-import { keyWithMediaPermission } from "./useAudio"
+import { createAudio, keyWithAudio, keyWithMediaPermission } from "./useAudio"
 import { keyWithDarkMode, observeDarkMode } from "./useDarkMode"
 import { nanoid } from "./util/nanoid"
 
@@ -27,8 +28,8 @@ async function run() {
   const context = new AudioContext()
   const permission$ = observeAudioPermission(context)
 
-  // const audioData = await fetch(smallAlert).then((_) => _.arrayBuffer())
-  // const audio = createAudio(context, audioData)
+  const audioData = await fetch(smallAlert).then((_) => _.arrayBuffer())
+  const audio = createAudio(context, audioData)
 
   const route$ = observeHash()
 
@@ -47,8 +48,9 @@ async function run() {
     },
     context: new Map([
       ...firestoreImplContext(firestore),
-      keyWithDarkMode(darkMode$),
+      keyWithAudio(audio),
       keyWithMediaPermission(permission$),
+      keyWithDarkMode(darkMode$),
     ]),
   })
 }

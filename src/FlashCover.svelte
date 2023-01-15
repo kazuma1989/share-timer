@@ -1,10 +1,12 @@
 <script lang="ts">
   import clsx from "clsx"
-  import { map, Observable, withLatestFrom } from "rxjs"
+  import { filter, map, Observable, withLatestFrom } from "rxjs"
+  import { onMount } from "svelte"
   import { mapToCurrentDuration } from "./mapToCurrentDuration"
   import { notifyFirstZero } from "./notifyFirstZero"
   import { now } from "./now"
   import type { TimerState } from "./timerReducer"
+  import { useAudio } from "./useAudio"
   import { useConfig } from "./useConfig"
   import { interval } from "./util/interval"
 
@@ -20,6 +22,26 @@
     withLatestFrom(config$),
     map(([_, config]) => config.flash === "on" && _)
   )
+
+  $: sounding$ = timerState$.pipe(
+    mapToCurrentDuration(interval("worker", 100), now),
+    notifyFirstZero(),
+    withLatestFrom(config$),
+    map(([_, config]) => config.sound === "on" && _)
+  )
+
+  const audio = useAudio()
+
+  onMount(() => {
+    const sub = sounding$.pipe(filter((_) => _ === true)).subscribe(() => {
+      console.debug("audio.play()")
+      audio.play()
+    })
+
+    return () => {
+      sub.unsubscribe()
+    }
+  })
 </script>
 
 <div

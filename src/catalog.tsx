@@ -26,10 +26,7 @@ const audio = createAudio(context, audioData)
 createRoot(root).render(
   <StrictMode>
     <ErrorBoundary fallback={<FullViewportOops />}>
-      <AudioProvider
-        // @ts-expect-error
-        value={audio}
-      >
+      <AudioProvider value={audio}>
         <MediaPermissionProvider value={permission$}>
           <Suspense fallback={<FullViewportProgress />}>
             <Timer
