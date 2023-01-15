@@ -33,9 +33,9 @@ import {
   type RoomInput,
 } from "../../schema/roomSchema"
 import { timerReducer, type TimerState } from "../../schema/timerReducer"
+import { serverTimestamp } from "../../serverTimestamp"
 import { setTransferHandlers } from "../../setTransferHandlers"
 import { AbortReason } from "../../useLockRoom"
-import { serverTimestamp } from "../../util/ServerTimestamp"
 import { calibrationSchema, type Calibration } from "./calibrationSchema"
 import { collection } from "./collection"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"

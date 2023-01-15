@@ -9,12 +9,12 @@
   import { setHash } from "./observeHash"
   import type { Room } from "./schema/roomSchema"
   import type { TimerState } from "./schema/timerReducer"
+  import { serverTimestamp } from "./serverTimestamp"
   import { getItem } from "./storage"
   import TimeViewer from "./TimeViewer.svelte"
   import { useDispatch } from "./useDispatch"
   import { getId } from "./util/getId"
   import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
-  import { serverTimestamp } from "./util/ServerTimestamp"
 
   export let room$: Observable<Room>
   export let timerState$: Observable<TimerState>
