@@ -1,7 +1,9 @@
-import { fromEvent, map, startWith } from "rxjs"
+import { fromEvent, map, startWith, type Observable } from "rxjs"
 import { shareRecent } from "./util/shareRecent"
 
-export function observeMediaQuery(mql: MediaQueryList) {
+export function observeMediaQuery(
+  mql: MediaQueryList
+): Observable<MediaQueryList> {
   return fromEvent<MediaQueryListEvent>(
     mql,
     "change" satisfies keyof MediaQueryListEventMap
