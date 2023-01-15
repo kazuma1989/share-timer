@@ -11,25 +11,6 @@ export function fromMillis(milliseconds: number): Timestamp {
   return { seconds, nanoseconds }
 }
 
-export class ServerTimestamp implements Timestamp {
-  static toMillis(timestamp: Timestamp): number {
-    return toMillis(timestamp)
-  }
-
-  readonly seconds: number
-  readonly nanoseconds: number
-
-  constructor(
-    milliseconds: number,
-    public readonly type: "client-estimate" | "server-fixed" = "client-estimate"
-  ) {
-    const _ = fromMillis(milliseconds)
-
-    this.seconds = _.seconds
-    this.nanoseconds = _.nanoseconds
-  }
-}
-
 export interface Timestamp {
   seconds: number
   nanoseconds: number
