@@ -80,7 +80,7 @@ if (import.meta.vitest) {
 
     expect(
       isSerializedSymbol(
-        // @ts-expect-error
+        // @ts-expect-error satisfies していないことをたしかめている
         ["__symbol__"] satisfies SerializedSymbol
       )
     ).toBeFalsy()
