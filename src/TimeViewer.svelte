@@ -36,6 +36,7 @@
   import { connectStreamTo } from "./action/connectStreamTo"
   import { prependElement } from "./action/prependElement"
   import { mapToCurrentDuration } from "./mapToCurrentDuration"
+  import { now } from "./now"
   import type { TimerState } from "./timerReducer"
   import { useDarkMode } from "./useDarkMode"
   import { assertNonNullable } from "./util/assertNonNullable"
@@ -51,7 +52,7 @@
 
   $: duration$ = timerState$.pipe(
     bufferedLast(interval("worker", 400)),
-    mapToCurrentDuration(interval("worker", 100)),
+    mapToCurrentDuration(interval("worker", 100), now),
     map((_) => floor(_.duration)),
     distinctUntilChanged()
   )

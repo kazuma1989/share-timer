@@ -21,6 +21,7 @@
     "format": "prettier --write \"./src/**/*.{css,html,js,ts,svelte}\"",
     "lint": "eslint \"./src/**/*.{ts,svelte}\"",
     "lint:unused": "npx -y ts-unused-exports ./tsconfig.json",
+    "check": "tsc --project ./tsconfig.json && svelte-check --tsconfig ./tsconfig.json",
     "upgrade": "npx -y npm-check-updates --upgrade",
     "deploy": "firebase deploy",
     "deploy:firestore": "firebase deploy --only firestore",
