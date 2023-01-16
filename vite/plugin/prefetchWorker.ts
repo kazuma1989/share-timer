@@ -3,6 +3,7 @@ import { HtmlTagDescriptor, Plugin } from "vite"
 export default function prefetchWorker(): Plugin {
   return {
     name: "prefetchWorker",
+    apply: "build",
 
     transformIndexHtml(_, { bundle }): HtmlTagDescriptor[] {
       const workerFileNames = Object.values(bundle ?? {}).flatMap(
