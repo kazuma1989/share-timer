@@ -20,20 +20,37 @@
     <div id="root" class="peer contents"></div>
 
     <div class="hidden peer-empty:contents">
-      <div class="mx-auto h-screen max-w-prose prose-theme-base p-6 pt-10">
-        <h1 class="text-center">
-          <ruby>
-            Share Timer <rp>(</rp>
-            <rt class="text-xs">シェア タイマー</rt>
-            <rp>)</rp>
-          </ruby>
-        </h1>
+      <div class="mx-auto h-screen max-w-prose pointer-events-none select-none">
+        <div
+          class="grid grid-rows-[auto_5fr_auto_4fr] h-full text-dark/20 dark:text-white/30 animate-pulse"
+        >
+          <div class="pt-2 text-center">
+            <span class="inline-block w-4 h-2 rounded bg-current"></span>
+            <span class="inline-block w-24 h-2 rounded bg-current"></span>
+          </div>
 
-        <p class="text-center">URL でタイマーを簡単共有！</p>
+          <div
+            class="grid place-items-center tabular-nums -mt-3"
+            style="font-size: min(100vw, 512px)"
+          >
+            <span
+              style="
+                font: 100 25%/1 system-ui, sans-serif;
+                font-variant-numeric: inherit;
+              "
+            >
+              00:00
+            </span>
+          </div>
 
-        <div class="text-green-400 w-96 max-w-full mx-auto mt-16">
-          <!-- prettier-ignore -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 642 608"><path fill="#f1f1f1" d="M232 116a116 116 0 0 1-50 95 114 114 0 0 1-13 8 103 103 0 0 1-9 4 116 116 0 0 1-58 8l-10-1v-1a113 113 0 0 1-20-6 116 116 0 1 1 160-107Z"/><path fill="#2f2e41" d="M137 94a33 33 0 0 0-47 0 33 33 0 0 0-10 24v21a5 5 0 0 0 4 4h58a5 5 0 0 0 5-4v-21a33 33 0 0 0-10-24Z"/><circle cx="114.6" cy="118.3" r="24.6" fill="#ffb7b7"/><path fill="#2f2e41" d="m140 116-2-20a3 3 0 0 0-1-2 3 3 0 0 0-1 0c-15-7-30-7-45 0v1a3 3 0 0 0-1 1l-2 20a3 3 0 0 0 1 2 2 2 0 0 0 1 1h5a3 3 0 0 0 3-1l2-5a1 1 0 0 1 3 1v3a3 3 0 0 0 3 2h32a2 2 0 0 0 1 0 3 3 0 0 0 1-1 3 3 0 0 0 0-2Z"/><path fill="#ffb7b7" d="m175 188 7 23a114 114 0 0 1-13 8l-5 3-7-31-3-12 18-2Zm-82-4-1 32v13a113 113 0 0 1-20-6l2-30 1-7Z"/><path fill="#2f2e41" d="m175 188-18 3v3l3 29a116 116 0 0 1-58 8l-10-1c2-7 3-12 1-13a12 12 0 0 1-1-1c-7-8-5-23-5-23H74l-5 1s2-32 11-32h11l53-5s15-5 19 2l9 18 5 11Z"/><path fill="#f1f1f1" d="M642 117a116 116 0 0 1-49 94 138 138 0 0 0-2 1l-5 3-7 4-5 3h-1l-9 4-7 2a114 114 0 0 1-16 3 116 116 0 0 1-14 1h-1a116 116 0 0 1-24-2v-1l-10-2-8-3a81 81 0 0 1-8-3l-1-1-5-2-6-4-7-5A116 116 0 0 1 528 0c63 1 115 54 114 117Z"/><path fill="#cbcbcb" d="m502 229-10-2 11-66h11l20-1h10l13 68a114 114 0 0 1-16 3 116 116 0 0 1-14 1h-1a116 116 0 0 1-24-2v-1Z"/><path fill="#2f2e41" d="M502 230v-1l-10-2-8-3a81 81 0 0 1-8-3l-1-1-1-49 27-12 13 2c2 8-12 69-12 69Zm81-61-5 26 1 24-5 3h-1l-9 4-7 2a114 114 0 0 1-16 3 116 116 0 0 1-14 1v-43c-2-14 2-23 7-29l23-3 26 11Z"/><path fill="#2f2e41" d="m485 175-1 49a81 81 0 0 1-8-3l-1-1-5-2-6-4 10-43Zm108 36a138 138 0 0 0-2 1l-5 3-7 4-5 3-2-50 11-3 1-1Z"/><ellipse cx="805.2" cy="260.5" fill="#9f616a" rx="28.6" ry="28.5" transform="rotate(-74 568 374)"/><path fill="#2f2e41" d="M497 122v-11s-8-11 1-13c0 0 3-27 26-15 0 0 33-5 29 14 0 0 8-5 6 7l-6 20s3-13-5-15l-5-2s-12 12-31-3c0 0-8-2-7 6s-8 12-8 12Z"/><path fill="#f1f1f1" d="M437 466a116 116 0 0 1-50 95l-1 1-5 3-7 4-5 3h-1l-9 4a114 114 0 0 1-23 5 116 116 0 0 1-15 1 116 116 0 0 1-24-2v-1a113 113 0 0 1-20-6l-6-2-6-3a116 116 0 1 1 172-102Z"/><circle cx="317.8" cy="468.7" r="25.9" fill="#ffb8b8"/><path fill="#cbcbcb" d="m307 581-10-2 3-70 1-1 6-7h21l7 8h1l16 16 7 51a114 114 0 0 1-23 5 116 116 0 0 1-15 1 116 116 0 0 1-14-1Z"/><path fill="#2f2e41" d="m271 571-6-3v-32l2-2 28-17 6-9 1 20a347 347 0 0 1 12 54 113 113 0 0 1-17-2v-1a113 113 0 0 1-20-6l-6-2Zm88 5a114 114 0 0 1-23 5 91 91 0 0 1-1-19c2-35-3-54-1-54l1 1 14 10 18 7 12 4 2 1v34l-7 4-5 3h-1l-9 4Zm-66-99s3-4 2-17 19-6 36-7 13 22 13 22l3-13c2-11-3-22-3-22-2-11-11-7-11-7 5 1 4 5 4 5-4-7-13-3-13-3-12-8-25 3-25 3-14 3-6 15-6 15-15 7 0 24 0 24Z"/><path fill="#2f2e41" d="m252 559 1-15c-1-4 13-9 14-10l3 2 1 35-6-3a115 115 0 0 1-13-9Zm129 6-7 4-5 3h-1l-5-44 3-2h1l12 4a8 8 0 0 1 2 2 2 2 0 0 1 1 2c-1 1 1 12 4 28l-5 3Z"/><path fill="#f1f1f1" d="M158 490h-43V297h2v191h41v2zm369 0h-43v-2h41V295h2v195z"/><circle cx="526" cy="227.9" r="26.4" fill="currentColor"/><path fill="#fff" d="m523 239-7-10 4-4 4 5 13-13 4 4-18 18z"/><circle cx="116" cy="230" r="26.4" fill="currentColor"/><path fill="#fff" d="m113 241-7-10 4-4 4 5 13-13 4 4-18 18z"/><circle cx="321" cy="582" r="26.4" fill="currentColor"/><path fill="#fff" d="m318 593-7-10 4-4 4 5 13-13 4 4-18 18z"/></svg>
+          <div class="flex items-center justify-around">
+            <span
+              class="inline-block h-20 w-20 rounded-full bg-gray-100 dark:bg-gray-800"
+            ></span>
+            <span
+              class="inline-block h-20 w-20 rounded-full bg-green-100 dark:bg-green-800"
+            ></span>
+          </div>
         </div>
       </div>
     </div>
