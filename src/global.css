@@ -64,6 +64,11 @@
     @apply dark:active:border-orange-300 dark:active:bg-orange-800;
     @apply dark:disabled:bg-orange-900;
   }
+
+  .prose-theme-base {
+    @apply prose prose-headings:text-dark/70 prose-a:text-azure-700 dark:prose-headings:text-light/70 dark:prose-a:text-azure-300;
+    @apply text-dark/90 dark:text-light/90;
+  }
 }
 
 @layer utilities {

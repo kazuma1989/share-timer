@@ -111,8 +111,7 @@
       <article
         class={clsx(
           "max-w-prose overscroll-contain rounded border px-6 py-4 pt-8",
-          "text-dark/90 dark:text-light/90",
-          "prose prose-headings:text-dark/70 prose-a:text-azure-700 dark:prose-headings:text-light/70 dark:prose-a:text-azure-300",
+          "prose-theme-base",
           "absolute right-0 bottom-0 w-80 translate-x-14 -translate-y-14",
           "border-gray-500 bg-light before:border-t-gray-500 after:border-t-light dark:bg-dark dark:after:border-t-dark",
           "before:absolute before:left-3/4 before:bottom-0 before:translate-y-full before:-translate-x-1/2 before:border-8 before:border-transparent before:content-['']",

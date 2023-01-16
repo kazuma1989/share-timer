@@ -51,8 +51,7 @@
 <article
   class={clsx(
     "mx-auto h-screen max-w-prose",
-    "text-dark/90 dark:text-light/90",
-    "prose prose-headings:text-dark/70 prose-a:text-azure-700 dark:prose-headings:text-light/70 dark:prose-a:text-azure-300",
+    "prose-theme-base",
     "grid grid-rows-[1fr_auto]",
     "px-6"
   )}
@@ -60,7 +59,7 @@
   <div>
     <a
       href={roomHash}
-      class={"transparent-button my-2 -ml-4 inline-grid h-12 w-12 place-items-center text-2xl !text-inherit"}
+      class="transparent-button my-2 -ml-4 inline-grid h-12 w-12 place-items-center text-2xl !text-inherit"
     >
       <Icon name="arrow-left" />
     </a>
