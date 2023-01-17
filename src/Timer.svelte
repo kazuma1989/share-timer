@@ -33,25 +33,6 @@
   )
   $: duration = $duration$
 
-  $: timeViewerInitialDuration$ = timerState$.pipe(
-    map((state) => {
-      switch (state.mode) {
-        case "editing": {
-          return state.initialDuration
-        }
-
-        case "running": {
-          return state.restDuration - (now() - state.startedAt)
-        }
-
-        case "paused": {
-          return state.restDuration
-        }
-      }
-    }),
-    distinctUntilChanged()
-  )
-
   $: locked = lockedBy && lockedBy !== getItem("userId")
   $: [pending, dispatch] = useDispatch(roomId)
 
@@ -170,10 +151,7 @@
           {/key}
         </div>
       {:else}
-        <TimeViewer
-          initialDuration={$timeViewerInitialDuration$}
-          {timerState$}
-        />
+        <TimeViewer {timerState$} />
       {/if}
     </div>
 
