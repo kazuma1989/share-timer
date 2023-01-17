@@ -51,7 +51,7 @@
   let className: string = ""
 
   $: duration$ = timerState$.pipe(
-    bufferedLast(interval("worker", 400)),
+    bufferedLast(interval("worker", 400).pipe(startWith(undefined))),
     mapToCurrentDuration(interval("worker", 100), now),
     map((_) => floor(_.duration)),
     distinctUntilChanged()
