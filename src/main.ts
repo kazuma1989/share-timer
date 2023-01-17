@@ -1,5 +1,6 @@
 import { wrap } from "comlink"
 import App from "./App.svelte"
+import AppSkeleton from "./AppSkeleton.svelte"
 import { firestoreImplContext } from "./firestore/firestoreImplContext"
 import type { RemoteFirestore } from "./firestore/worker/RemoteFirestore.worker"
 import RemoteFirestoreWorker from "./firestore/worker/RemoteFirestore.worker?worker"
@@ -15,7 +16,11 @@ import { nanoid } from "./util/nanoid"
 
 run()
 
-async function run() {
+async function run(): Promise<void> {
+  const skeleton = new AppSkeleton({
+    target: document.body,
+  })
+
   // https://neos21.net/blog/2018/08/19-01.html
   document.body.addEventListener("touchstart", () => {}, { passive: true })
 
@@ -42,7 +47,7 @@ async function run() {
   firestore.getEstimatedDiff().then(setEstimatedDiff)
 
   new App({
-    target: document.getElementById("root")!,
+    target: skeleton.appRoot!,
     props: {
       route$,
     },
