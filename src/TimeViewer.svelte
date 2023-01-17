@@ -46,6 +46,7 @@
   import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
   import { interval } from "./util/interval"
 
+  export let initialDuration: number
   export let timerState$: Observable<TimerState>
   export { className as class }
   let className: string = ""
@@ -57,7 +58,10 @@
     distinctUntilChanged()
   )
 
-  $: durationText$ = duration$.pipe(map((_) => formatDuration(_)))
+  $: durationText$ = duration$.pipe(
+    startWith(initialDuration),
+    map((_) => formatDuration(_))
+  )
 
   $: video.ariaLabel = humanReadableLabelOf($duration$)
 
@@ -134,6 +138,7 @@
       )
     )
 
+    let first = true
     const sub = fillText$
       .pipe(combineLatestWith(style$))
       .subscribe(([[text, x, y], { color, backgroundColor }]) => {
@@ -142,6 +147,11 @@
 
         ctx.fillStyle = color
         ctx.fillText(text, x, y)
+
+        if (first) {
+          video.poster = canvas.toDataURL()
+          first = false
+        }
       })
 
     return {
