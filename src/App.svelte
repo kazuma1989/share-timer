@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { Observable } from "rxjs"
-  import FullViewportProgress from "./FullViewportProgress.svelte"
   import { replaceHash } from "./observeHash"
   import PageRoom from "./PageRoom.svelte"
+  import PageRoomSkeleton from "./PageRoomSkeleton.svelte"
   import { newRoomId } from "./schema/roomSchema"
   import type { Route } from "./toRoute"
 
@@ -35,5 +35,5 @@
 </div>
 
 <div class="hidden peer-empty:contents">
-  <FullViewportProgress />
+  <PageRoomSkeleton />
 </div>
