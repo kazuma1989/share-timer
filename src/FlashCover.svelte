@@ -15,7 +15,7 @@
   const config$ = useConfig()
 
   $: flashing$ = timerState$.pipe(
-    mapToCurrentDuration(interval("ui"), now),
+    mapToCurrentDuration(interval("ui").pipe(map(now))),
     notifyFirstZero(),
     withLatestFrom(config$),
     map(([notified, config]) => config.flash === "on" && notified)

@@ -10,7 +10,7 @@ export function setTitleAsTimeViewer(
   timerState$: Observable<TimerState>
 ): () => void {
   const duration$ = timerState$.pipe(
-    mapToCurrentDuration(interval("worker", 500), now),
+    mapToCurrentDuration(interval("worker", 500).pipe(map(now))),
     map((_) => floor(_.duration)),
     distinctUntilChanged()
   )
