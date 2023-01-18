@@ -1,14 +1,13 @@
+import { proxy, wrap } from "comlink"
 import { Observable, share } from "rxjs"
-import IntervalWorker from "./interval.worker?worker&inline"
+import type { RemoteInterval } from "./RemoteInterval.worker"
+import RemoteIntervalWorker from "./RemoteInterval.worker?worker&inline"
 
 export function interval(type: "ui"): Observable<void>
 
 export function interval(type: "worker", timeout: number): Observable<void>
 
-export function interval(
-  type: "ui" | "worker",
-  timeout?: number
-): Observable<void> {
+export function interval(type: "ui" | "worker", ms?: number): Observable<void> {
   return new Observable<void>((subscriber) => {
     switch (type) {
       case "ui": {
@@ -18,14 +17,20 @@ export function interval(
       }
 
       case "worker": {
-        const worker = new IntervalWorker()
-        worker.addEventListener("message", () => {
-          subscriber.next()
-        })
-        worker.postMessage(["start", timeout ?? 500])
+        const Interval = wrap<typeof RemoteInterval>(new RemoteIntervalWorker())
 
-        return () => {
-          worker.terminate()
+        const unsubscribe$ = new Interval().then((interval) =>
+          interval.setInterval(
+            proxy(() => {
+              subscriber.next()
+            }),
+            ms ?? 500
+          )
+        )
+
+        return async () => {
+          const unsubscribe = await unsubscribe$
+          unsubscribe()
         }
       }
     }
