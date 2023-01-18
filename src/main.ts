@@ -17,7 +17,7 @@ run()
 
 async function run(): Promise<void> {
   const skeleton = new AppSkeleton({
-    target: document.body,
+    target: document.getElementById("root")!,
   })
 
   // https://neos21.net/blog/2018/08/19-01.html
