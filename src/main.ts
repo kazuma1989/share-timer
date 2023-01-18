@@ -4,7 +4,6 @@ import AppSkeleton from "./AppSkeleton.svelte"
 import { firestoreImplContext } from "./firestore/firestoreImplContext"
 import type { RemoteFirestore } from "./firestore/worker/RemoteFirestore.worker"
 import RemoteFirestoreWorker from "./firestore/worker/RemoteFirestore.worker?worker"
-import { setEstimatedDiff } from "./now"
 import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
 import { setTransferHandlers } from "./setTransferHandlers"
@@ -18,7 +17,7 @@ run()
 
 async function run(): Promise<void> {
   const skeleton = new AppSkeleton({
-    target: document.body,
+    target: document.getElementById("root")!,
   })
 
   // https://neos21.net/blog/2018/08/19-01.html
@@ -44,7 +43,7 @@ async function run(): Promise<void> {
   )
 
   setTransferHandlers()
-  firestore.getEstimatedDiff().then(setEstimatedDiff)
+  // firestore.getEstimatedDiff().then(setEstimatedDiff)
 
   new App({
     target: skeleton.appRoot!,

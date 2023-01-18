@@ -1,14 +1,13 @@
+import { proxy, wrap } from "comlink"
 import { Observable, share } from "rxjs"
+import type { setInterval as setIntervalType } from "./interval.worker"
 import IntervalWorker from "./interval.worker?worker&inline"
 
 export function interval(type: "ui"): Observable<void>
 
 export function interval(type: "worker", timeout: number): Observable<void>
 
-export function interval(
-  type: "ui" | "worker",
-  timeout?: number
-): Observable<void> {
+export function interval(type: "ui" | "worker", ms?: number): Observable<void> {
   return new Observable<void>((subscriber) => {
     switch (type) {
       case "ui": {
@@ -18,14 +17,16 @@ export function interval(
       }
 
       case "worker": {
-        const worker = new IntervalWorker()
-        worker.addEventListener("message", () => {
-          subscriber.next()
-        })
-        worker.postMessage(["start", timeout ?? 500])
+        const unsubscribe$ = setInterval(
+          proxy(() => {
+            subscriber.next()
+          }),
+          ms ?? 500
+        )
 
-        return () => {
-          worker.terminate()
+        return async () => {
+          const unsubscribe = await unsubscribe$
+          unsubscribe()
         }
       }
     }
@@ -35,6 +36,8 @@ export function interval(
     })
   )
 }
+
+const setInterval = wrap<typeof setIntervalType>(new IntervalWorker())
 
 function subscribeAnimationFrame(next: () => void): () => void {
   const abort = new AbortController()

@@ -67,7 +67,7 @@ export class RemoteFirestore {
   onSnapshotRoom(
     roomId: Room["id"],
     onNext: ((data: Room | InvalidDoc) => void) & ProxyMarked
-  ): Unsubscribe {
+  ): Unsubscribe & ProxyMarked {
     const referenceRoom = doc(collection(this.firestore, "rooms"), roomId)
 
     const unsubscribe = onSnapshot(referenceRoom, (snapshot) => {
@@ -96,7 +96,7 @@ export class RemoteFirestore {
   async onSnapshotTimerState(
     roomId: Room["id"],
     onNext: ((data: TimerState) => void) & ProxyMarked
-  ): Promise<Unsubscribe> {
+  ): Promise<Unsubscribe & ProxyMarked> {
     const selectActions = await getDocs(
       query(
         collection(this.firestore, "rooms", roomId, "actions"),

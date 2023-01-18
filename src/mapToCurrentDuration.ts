@@ -14,12 +14,11 @@ export interface CurrentDuration {
 }
 
 export function mapToCurrentDuration(
-  interval$: Observable<void>,
-  now: () => number
+  now$: Observable<number>
 ): OperatorFunction<TimerState, CurrentDuration> {
   return pipe(
-    combineLatestWith(interval$),
-    map(([state]) => {
+    combineLatestWith(now$),
+    map(([state, now]) => {
       switch (state.mode) {
         case "editing": {
           return {
@@ -31,7 +30,7 @@ export function mapToCurrentDuration(
         case "running": {
           return {
             mode: state.mode,
-            duration: state.restDuration - (now() - state.startedAt),
+            duration: state.restDuration - (now - state.startedAt),
           }
         }
 
@@ -75,7 +74,9 @@ if (import.meta.vitest) {
       })
       const interval$ = cold<void>("-1-2-3|")
 
-      const actual$ = base$.pipe(mapToCurrentDuration(interval$, nowMock))
+      const actual$ = base$.pipe(
+        mapToCurrentDuration(interval$.pipe(map(nowMock)))
+      )
 
       expectObservable(actual$).toBe("--12-3|", {
         1: {

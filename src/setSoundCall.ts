@@ -11,7 +11,7 @@ export function setSoundCall(
   play: () => void
 ): () => void {
   const sounding$ = timerState$.pipe(
-    mapToCurrentDuration(interval("worker", 100), now),
+    mapToCurrentDuration(interval("worker", 100).pipe(map(now))),
     notifyFirstZero(),
     withLatestFrom(enabled$),
     map(([notified, enabled]) => enabled && notified)
