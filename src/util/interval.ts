@@ -1,7 +1,7 @@
 import { proxy, wrap } from "comlink"
 import { Observable, share } from "rxjs"
-import type { RemoteInterval } from "./RemoteInterval.worker"
-import RemoteIntervalWorker from "./RemoteInterval.worker?worker&inline"
+import type { setInterval as setIntervalType } from "./interval.worker"
+import IntervalWorker from "./interval.worker?worker&inline"
 
 export function interval(type: "ui"): Observable<void>
 
@@ -17,15 +17,11 @@ export function interval(type: "ui" | "worker", ms?: number): Observable<void> {
       }
 
       case "worker": {
-        const Interval = wrap<typeof RemoteInterval>(new RemoteIntervalWorker())
-
-        const unsubscribe$ = new Interval().then((interval) =>
-          interval.setInterval(
-            proxy(() => {
-              subscriber.next()
-            }),
-            ms ?? 500
-          )
+        const unsubscribe$ = setInterval(
+          proxy(() => {
+            subscriber.next()
+          }),
+          ms ?? 500
         )
 
         return async () => {
@@ -40,6 +36,8 @@ export function interval(type: "ui" | "worker", ms?: number): Observable<void> {
     })
   )
 }
+
+const setInterval = wrap<typeof setIntervalType>(new IntervalWorker())
 
 function subscribeAnimationFrame(next: () => void): () => void {
   const abort = new AbortController()
