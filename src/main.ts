@@ -4,7 +4,6 @@ import AppSkeleton from "./AppSkeleton.svelte"
 import { firestoreImplContext } from "./firestore/firestoreImplContext"
 import type { RemoteFirestore } from "./firestore/worker/RemoteFirestore.worker"
 import RemoteFirestoreWorker from "./firestore/worker/RemoteFirestore.worker?worker"
-import { setEstimatedDiff } from "./now"
 import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
 import { setTransferHandlers } from "./setTransferHandlers"
@@ -44,7 +43,7 @@ async function run(): Promise<void> {
   )
 
   setTransferHandlers()
-  firestore.getEstimatedDiff().then(setEstimatedDiff)
+  // firestore.getEstimatedDiff().then(setEstimatedDiff)
 
   new App({
     target: skeleton.appRoot!,
