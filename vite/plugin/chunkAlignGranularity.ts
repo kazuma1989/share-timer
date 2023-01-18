@@ -1,15 +1,11 @@
-import { Plugin, PluginOption } from "vite"
-
-export default function chunkConfig(): PluginOption[] {
-  return [alignGranularity()]
-}
+import { Plugin } from "vite"
 
 /**
  * チャンク粒度をある程度のファイルサイズに揃える
  */
-function alignGranularity(): Plugin {
+export default function chunkAlignGranularity(): Plugin {
   return {
-    name: "alignGranularity",
+    name: "chunkAlignGranularity",
 
     config() {
       return {
@@ -17,7 +13,8 @@ function alignGranularity(): Plugin {
           // モジュールサイズが小さすぎると TTFB が律速するので、ある程度のかたまりを維持できるようにアセットをまとめる
           assetsInlineLimit: 4096 * 2,
 
-          // CSS が細かくなりすぎるのでまとめる
+          // CSS が細かくなりすぎないようまとめる
+          // Tailwind を使っているとどっちにしろチャンク分割が起きない可能性があるが、明示的に設定しておく
           cssCodeSplit: false,
         },
       }

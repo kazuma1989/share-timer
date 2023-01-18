@@ -3,7 +3,7 @@ import { defineConfig, UserConfig } from "vite"
 import { hosting } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
-import chunkConfig from "./vite/plugin/chunkConfig"
+import chunkAlignGranularity from "./vite/plugin/chunkAlignGranularity"
 import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
 import firestoreEmulatorProxy from "./vite/plugin/firestoreEmulatorProxy"
 import prefetchWorker from "./vite/plugin/prefetchWorker"
@@ -60,7 +60,7 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
       firestoreEmulatorProxy(),
 
       // Build config
-      chunkConfig(),
+      chunkAlignGranularity(),
       prefetchWorker(),
 
       // Test config
