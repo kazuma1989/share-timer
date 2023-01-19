@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Observable } from "rxjs"
   import { replaceHash } from "./observeHash"
+  import PageInfoSkeleton from "./PageInfoSkeleton.svelte"
   import PageRoom from "./PageRoom.svelte"
   import { newRoomId } from "./schema/roomSchema"
   import type { Route } from "./toRoute"
@@ -18,7 +19,9 @@
 {#if $route$[0] === "info"}
   {@const [, roomId] = $route$}
 
-  {#await import("./PageInfo.svelte") then { default: PageInfo }}
+  {#await import("./PageInfo.svelte")}
+    <PageInfoSkeleton />
+  {:then { default: PageInfo }}
     <PageInfo {roomId} />
   {/await}
 {:else if $route$[0] === "room"}
