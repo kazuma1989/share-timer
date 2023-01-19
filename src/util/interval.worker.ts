@@ -7,10 +7,8 @@ export function setInterval(
   const timer = globalThis.setInterval(onInterval, ms)
 
   return proxy(() => {
-    clearInterval(timer)
+    globalThis.clearInterval(timer)
   })
 }
 
-if (!import.meta.vitest) {
-  expose(setInterval)
-}
+expose(setInterval)

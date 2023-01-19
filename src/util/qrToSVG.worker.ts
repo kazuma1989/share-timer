@@ -30,6 +30,4 @@ export function qrToSVG(data: string): {
   }
 }
 
-if (!import.meta.vitest) {
-  expose(qrToSVG)
-}
+expose(qrToSVG)
