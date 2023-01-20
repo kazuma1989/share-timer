@@ -23,6 +23,10 @@
   let infoButton: HTMLButtonElement
 
   const isTutorialDone = getItem("tutorial") === "done"
+  let tutorialOpen = false
+  setTimeout(() => {
+    tutorialOpen = !isTutorialDone
+  }, 20)
   const doneTutorial = () => {
     setItem("tutorial", "done")
   }
@@ -92,13 +96,13 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <dialog
     class={clsx(
-      "transition-[box-shadow,opacity,visibility] [&:not([open])]:opacity-0",
+      "transition-[box-shadow,opacity,visibility] duration-300 [&:not([open])]:opacity-0",
       "overflow-visible rounded-sm bg-transparent text-inherit",
-      "open:shadow-screen open:shadow-dark/10 dark:open:shadow-light/20",
+      "shadow-screen open:shadow-dark/10 dark:open:shadow-light/20",
       // override default dialog style
       "fixed inset-0 m-0 max-h-full max-w-full p-0 backdrop:bg-transparent open:visible [&:not([open])]:invisible [&:not([open])]:block"
     )}
-    use:showModal={!isTutorialDone}
+    use:showModal={tutorialOpen}
     use:placeDialog={infoButton}
     on:close={doneTutorial}
     on:click={({ target, currentTarget: dialog }) => {
