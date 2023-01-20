@@ -1,7 +1,9 @@
 <script lang="ts">
   import clsx from "clsx"
   import { distinctUntilChanged, map, type Observable } from "rxjs"
+  import { quadOut } from "svelte/easing"
   import type { HTMLButtonAttributes } from "svelte/elements"
+  import { fade } from "svelte/transition"
   import ConfigArea from "./ConfigArea.svelte"
   import DurationSelect from "./DurationSelect.svelte"
   import Icon from "./Icon.svelte"
@@ -151,7 +153,9 @@
           {/key}
         </div>
       {:else}
-        <TimeViewer {timerState$} />
+        <div in:fade={{ easing: quadOut }}>
+          <TimeViewer {timerState$} />
+        </div>
       {/if}
     </div>
 
