@@ -1,9 +1,7 @@
 <script lang="ts">
   import clsx from "clsx"
   import { distinctUntilChanged, map, type Observable } from "rxjs"
-  import { quadOut } from "svelte/easing"
   import type { HTMLButtonAttributes } from "svelte/elements"
-  import { fade } from "svelte/transition"
   import ConfigArea from "./ConfigArea.svelte"
   import DurationSelect from "./DurationSelect.svelte"
   import Icon from "./Icon.svelte"
@@ -37,6 +35,8 @@
 
   $: locked = lockedBy && lockedBy !== getItem("userId")
   $: [pending, dispatch] = useDispatch(roomId)
+
+  $: editing = !locked && state.mode === "editing"
 
   let button: {
     label: string
@@ -143,20 +143,31 @@
       {/if}
     </p>
 
-    <div id={id("timer")} class="grid place-items-center tabular-nums">
-      {#if !locked && state.mode === "editing"}
-        <div
-          class="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center"
-        >
-          {#key state.mode + state.initialDuration}
-            <DurationSelect bind:value={duration} bind:this={select} />
-          {/key}
-        </div>
-      {:else}
-        <div in:fade={{ easing: quadOut }}>
+    <div id={id("timer")} class="relative grid place-items-center tabular-nums">
+      <div
+        class={clsx(
+          "grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center",
+          "transition-[visibility]",
+          !editing && "invisible"
+        )}
+      >
+        {#key state.mode + state.initialDuration}
+          <DurationSelect bind:value={duration} bind:this={select} />
+        {/key}
+      </div>
+
+      <div
+        class={clsx(
+          "absolute",
+          !editing
+            ? "transition-[opacity,visibility] duration-300 ease-out"
+            : "invisible opacity-0"
+        )}
+      >
+        {#if !editing}
           <TimeViewer {timerState$} />
-        </div>
-      {/if}
+        {/if}
+      </div>
     </div>
 
     <div class="flex items-center justify-around">
