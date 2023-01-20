@@ -38,8 +38,6 @@
   $: locked = lockedBy && lockedBy !== getItem("userId")
   $: [pending, dispatch] = useDispatch(roomId)
 
-  $: editing = !locked && state.mode === "editing"
-
   let button: {
     label: string
     onClick?: HTMLButtonAttributes["on:click"]
@@ -146,19 +144,16 @@
     </p>
 
     <div id={id("timer")} class="relative grid place-items-center tabular-nums">
-      <div
-        class={clsx(
-          "grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center",
-          "transition-[visibility]",
-          !editing && "invisible"
-        )}
-      >
-        {#key state.mode + state.initialDuration}
-          <DurationSelect bind:value={duration} bind:this={select} />
-        {/key}
-      </div>
-
-      {#if !editing}
+      {#if !locked && state.mode === "editing"}
+        <div
+          class="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center"
+          out:fade|local={{ easing: sineOut }}
+        >
+          {#key state.mode + state.initialDuration}
+            <DurationSelect bind:value={duration} bind:this={select} />
+          {/key}
+        </div>
+      {:else}
         <div class="absolute" in:fade|local={{ easing: sineOut }}>
           <TimeViewer {timerState$} />
         </div>
