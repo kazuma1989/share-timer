@@ -1,7 +1,9 @@
 <script lang="ts">
   import clsx from "clsx"
   import { distinctUntilChanged, map, type Observable } from "rxjs"
+  import { sineOut } from "svelte/easing"
   import type { HTMLButtonAttributes } from "svelte/elements"
+  import { fade } from "svelte/transition"
   import ConfigArea from "./ConfigArea.svelte"
   import DurationSelect from "./DurationSelect.svelte"
   import Icon from "./Icon.svelte"
@@ -156,18 +158,11 @@
         {/key}
       </div>
 
-      <div
-        class={clsx(
-          "absolute",
-          !editing
-            ? "transition-[opacity,visibility] duration-300 ease-out"
-            : "invisible opacity-0"
-        )}
-      >
-        {#if !editing}
+      {#if !editing}
+        <div class="absolute" in:fade|local={{ easing: sineOut }}>
           <TimeViewer {timerState$} />
-        {/if}
-      </div>
+        </div>
+      {/if}
     </div>
 
     <div class="flex items-center justify-around">
