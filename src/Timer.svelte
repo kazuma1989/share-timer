@@ -179,8 +179,12 @@
           aria-controls="{id('status')} {id('timer')}"
           type="button"
           disabled
-          class="circle-button circle-button-green text-2xl"
-          class:!circle-button-orange={state.mode === "running"}
+          class={clsx(
+            "circle-button text-2xl",
+            state.mode === "running"
+              ? "circle-button-orange"
+              : "circle-button-green"
+          )}
         >
           <Icon name="lock-outline" />
         </button>
