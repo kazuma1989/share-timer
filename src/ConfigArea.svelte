@@ -12,7 +12,7 @@
   let className: string = ""
 
   const _id = getId()
-  const id = (_: "status") => _id + _
+  const id = (_: "label" | "status") => _id + _
 
   const config$ = useConfig()
   $: config = $config$
@@ -32,10 +32,10 @@
   }
 </script>
 
-<div class={className}>
-  <div id={id("status")} role="status" aria-atomic="false" class="sr-only">
-    <h2>タイマーの設定</h2>
+<div aria-labelledby={id("label")} class={className}>
+  <h2 id={id("label")} class="sr-only">タイマーの設定</h2>
 
+  <div id={id("status")} role="status" aria-atomic="false" class="sr-only">
     <p>
       {config.flash === "on" ? "フラッシュはオンです" : "フラッシュはオフです"}
     </p>
