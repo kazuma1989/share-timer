@@ -133,13 +133,17 @@
   >
     <p id={id("status")} role="status" class="sr-only">
       {#if state.mode === "editing"}
-        タイマーは編集中です。値は{humanReadableLabelOf(state.initialDuration)}
+        {`タイマーは編集中です。値は${humanReadableLabelOf(
+          state.initialDuration
+        )}`}
       {:else if state.mode === "running"}
-        タイマーは実行中です。残り{humanReadableLabelOf(
+        {`タイマーは実行中です。残り${humanReadableLabelOf(
           state.restDuration - (now() - state.startedAt)
-        )}
+        )}`}
       {:else if state.mode === "paused"}
-        タイマーは一時停止中です。残り{humanReadableLabelOf(state.restDuration)}
+        {`タイマーは一時停止中です。残り${humanReadableLabelOf(
+          state.restDuration
+        )}`}
       {/if}
     </p>
 
