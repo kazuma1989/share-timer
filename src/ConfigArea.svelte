@@ -12,7 +12,7 @@
   let className: string = ""
 
   const _id = getId()
-  const id = (_: "flash" | "sound") => _id + _
+  const id = (_: "status") => _id + _
 
   const config$ = useConfig()
   $: config = $config$
@@ -33,16 +33,21 @@
 </script>
 
 <div class={className}>
-  <span id={id("flash")} role="status" class="sr-only">
-    {#if config.flash === "on"}
-      フラッシュはオンです
-    {:else}
-      フラッシュはオフです
-    {/if}
-  </span>
+  <div id={id("status")} role="status" aria-atomic="false" class="sr-only">
+    <h2>タイマーの設定</h2>
+
+    <p>
+      {config.flash === "on" ? "フラッシュはオンです" : "フラッシュはオフです"}
+    </p>
+    <p>
+      {config.sound === "on" && permission === "canplay"
+        ? "音はオンです"
+        : "音はオフです"}
+    </p>
+  </div>
 
   <button
-    aria-controls={id("flash")}
+    aria-controls={id("status")}
     type="button"
     title="フラッシュを切り替える"
     class="transparent-button h-12 w-12 text-2xl"
@@ -57,16 +62,8 @@
     {/if}
   </button>
 
-  <span id={id("sound")} role="status" class="sr-only">
-    {#if config.sound === "on" && permission === "canplay"}
-      音はオンです
-    {:else}
-      音はオフです
-    {/if}
-  </span>
-
   <button
-    aria-controls={id("sound")}
+    aria-controls={id("status")}
     type="button"
     title="音を切り替える"
     class="transparent-button h-12 w-12 text-2xl"
