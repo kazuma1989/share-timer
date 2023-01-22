@@ -45,6 +45,8 @@ async function run(): Promise<void> {
   setTransferHandlers()
   // firestore.getEstimatedDiff().then(setEstimatedDiff)
 
+  firestore.signIn()
+
   new App({
     target: skeleton.appRoot!,
     props: {

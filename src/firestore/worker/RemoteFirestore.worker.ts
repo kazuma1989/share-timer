@@ -1,6 +1,12 @@
 import { expose, proxy, type ProxyMarked } from "comlink"
 import { initializeApp, type FirebaseOptions } from "firebase/app"
 import {
+  connectAuthEmulator,
+  getAuth,
+  signInAnonymously,
+  type Auth,
+} from "firebase/auth"
+import {
   addDoc,
   connectFirestoreEmulator,
   doc,
@@ -44,24 +50,39 @@ import { where } from "./where"
 import { withMeta } from "./withMeta"
 
 export class RemoteFirestore {
+  readonly auth: Auth
+
   readonly firestore: Firestore
 
   constructor(options: FirebaseOptions) {
     const firebaseApp = initializeApp(options)
 
-    const firestore = getFirestore(firebaseApp)
+    this.auth = getAuth(firebaseApp)
+
+    // TODO VITE_FIRESTORE_EMULATOR を間借りするのではなく専用の定数を用意するべき
+    if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
+      const protocol = location.protocol
+      const host = location.hostname
+
+      connectAuthEmulator(this.auth, `${protocol}//${host}:9099`)
+    }
+
+    this.firestore = getFirestore(firebaseApp)
 
     if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
       const host = location.hostname
       const port = Number(location.port)
       console.info(`using emulator (${host}:${port})`)
 
-      connectFirestoreEmulator(firestore, host, port)
+      connectFirestoreEmulator(this.firestore, host, port)
     }
 
-    this.firestore = firestore
-
     setTransferHandlers()
+  }
+
+  async signIn(): Promise<void> {
+    const x = await signInAnonymously(this.auth)
+    console.log(x.user)
   }
 
   onSnapshotRoom(
