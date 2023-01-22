@@ -1,8 +1,10 @@
 import { initializeApp } from "firebase/app"
 import {
+  browserPopupRedirectResolver,
   connectAuthEmulator,
-  getAuth,
   GoogleAuthProvider,
+  indexedDBLocalPersistence,
+  initializeAuth,
   signInWithPopup,
 } from "firebase/auth"
 
@@ -16,7 +18,10 @@ async function run(): Promise<void> {
     await fetch("/__/firebase/init.json").then((_) => _.json())
   )
 
-  const auth = getAuth(firebaseApp)
+  const auth = initializeAuth(firebaseApp, {
+    persistence: indexedDBLocalPersistence,
+    popupRedirectResolver: browserPopupRedirectResolver,
+  })
 
   // TODO VITE_FIRESTORE_EMULATOR を間借りするのではなく専用の定数を用意するべき
   if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
