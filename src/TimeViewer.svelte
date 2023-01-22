@@ -18,8 +18,7 @@
   video.addEventListener("dblclick", requestPictureInPicture, { passive: true })
 
   // なるべく再生状態を維持する（タイマーの再生・停止の概念もあってややこしくなるため）
-  video.addEventListener("leavepictureinpicture", play, { passive: true })
-  document.addEventListener("visibilitychange", play, { passive: true })
+  video.addEventListener("pause", play, { passive: true })
 </script>
 
 <script lang="ts">

@@ -12,7 +12,7 @@
   let className: string = ""
 
   const _id = getId()
-  const id = (_: "flash" | "sound") => _id + _
+  const id = (_: "label" | "status") => _id + _
 
   const config$ = useConfig()
   $: config = $config$
@@ -23,22 +23,31 @@
   let infoButton: HTMLButtonElement
 
   const isTutorialDone = getItem("tutorial") === "done"
+  let tutorialOpen = false
+  setTimeout(() => {
+    tutorialOpen = !isTutorialDone
+  }, 20)
   const doneTutorial = () => {
     setItem("tutorial", "done")
   }
 </script>
 
-<div class={className}>
-  <span id={id("flash")} role="status" class="sr-only">
-    {#if config.flash === "on"}
-      フラッシュはオンです
-    {:else}
-      フラッシュはオフです
-    {/if}
-  </span>
+<div aria-labelledby={id("label")} class={className}>
+  <h2 id={id("label")} class="sr-only">タイマーの設定</h2>
+
+  <div id={id("status")} role="status" aria-atomic="false" class="sr-only">
+    <p>
+      {config.flash === "on" ? "フラッシュはオンです" : "フラッシュはオフです"}
+    </p>
+    <p>
+      {config.sound === "on" && permission === "canplay"
+        ? "音はオンです"
+        : "音はオフです"}
+    </p>
+  </div>
 
   <button
-    aria-controls={id("flash")}
+    aria-controls={id("status")}
     type="button"
     title="フラッシュを切り替える"
     class="transparent-button h-12 w-12 text-2xl"
@@ -53,16 +62,8 @@
     {/if}
   </button>
 
-  <span id={id("sound")} role="status" class="sr-only">
-    {#if config.sound === "on" && permission === "canplay"}
-      音はオンです
-    {:else}
-      音はオフです
-    {/if}
-  </span>
-
   <button
-    aria-controls={id("sound")}
+    aria-controls={id("status")}
     type="button"
     title="音を切り替える"
     class="transparent-button h-12 w-12 text-2xl"
@@ -92,13 +93,13 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <dialog
     class={clsx(
-      "transition-[box-shadow,opacity,visibility] [&:not([open])]:opacity-0",
+      "transition-[box-shadow,opacity,visibility] duration-300 [&:not([open])]:opacity-0",
       "overflow-visible rounded-sm bg-transparent text-inherit",
-      "open:shadow-screen open:shadow-dark/10 dark:open:shadow-light/20",
+      "shadow-screen open:shadow-dark/10 dark:open:shadow-light/20",
       // override default dialog style
       "fixed inset-0 m-0 max-h-full max-w-full p-0 backdrop:bg-transparent open:visible [&:not([open])]:invisible [&:not([open])]:block"
     )}
-    use:showModal={!isTutorialDone}
+    use:showModal={tutorialOpen}
     use:placeDialog={infoButton}
     on:close={doneTutorial}
     on:click={({ target, currentTarget: dialog }) => {

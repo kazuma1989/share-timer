@@ -1,7 +1,9 @@
 <script lang="ts">
   import clsx from "clsx"
   import { distinctUntilChanged, map, type Observable } from "rxjs"
+  import { sineOut } from "svelte/easing"
   import type { HTMLButtonAttributes } from "svelte/elements"
+  import { fade } from "svelte/transition"
   import ConfigArea from "./ConfigArea.svelte"
   import DurationSelect from "./DurationSelect.svelte"
   import Icon from "./Icon.svelte"
@@ -131,29 +133,36 @@
   >
     <p id={id("status")} role="status" class="sr-only">
       {#if state.mode === "editing"}
-        タイマーは編集中です。値は{humanReadableLabelOf(state.initialDuration)}
+        {`タイマーは編集中、値は${humanReadableLabelOf(state.initialDuration)}`}
       {:else if state.mode === "running"}
-        タイマーは実行中です。残り{humanReadableLabelOf(
+        {`タイマーは実行中、残り${humanReadableLabelOf(
           state.restDuration - (now() - state.startedAt)
-        )}
+        )}`}
       {:else if state.mode === "paused"}
-        タイマーは一時停止中です。残り{humanReadableLabelOf(state.restDuration)}
+        {`タイマーは一時停止中、残り${humanReadableLabelOf(
+          state.restDuration
+        )}`}
       {/if}
     </p>
 
-    <div id={id("timer")} class="grid place-items-center tabular-nums">
+    <div id={id("timer")} class="relative grid place-items-center tabular-nums">
       {#if !locked && state.mode === "editing"}
         <div
           class="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center"
+          out:fade|local={{ easing: sineOut }}
         >
           {#key state.mode + state.initialDuration}
             <DurationSelect bind:value={duration} bind:this={select} />
           {/key}
         </div>
       {:else}
-        <TimeViewer {timerState$} />
+        <div class="absolute" in:fade|local={{ easing: sineOut }}>
+          <TimeViewer {timerState$} />
+        </div>
       {/if}
     </div>
+
+    <h2 class="sr-only">タイマーの操作</h2>
 
     <div class="flex items-center justify-around">
       {#if locked}
@@ -170,8 +179,12 @@
           aria-controls="{id('status')} {id('timer')}"
           type="button"
           disabled
-          class="circle-button circle-button-green text-2xl"
-          class:!circle-button-orange={state.mode === "running"}
+          class={clsx(
+            "circle-button text-2xl",
+            state.mode === "running"
+              ? "circle-button-orange"
+              : "circle-button-green"
+          )}
         >
           <Icon name="lock-outline" />
         </button>
