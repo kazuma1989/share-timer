@@ -2,11 +2,10 @@ import { initializeApp } from "firebase/app"
 import {
   browserPopupRedirectResolver,
   connectAuthEmulator,
-  GoogleAuthProvider,
   indexedDBLocalPersistence,
   initializeAuth,
-  signInWithPopup,
 } from "firebase/auth"
+import PageSignIn from "./PageSignIn.svelte"
 
 run()
 
@@ -31,8 +30,10 @@ async function run(): Promise<void> {
     connectAuthEmulator(auth, `${protocol}//${host}:9099`)
   }
 
-  const provider = new GoogleAuthProvider()
-  const x = await signInWithPopup(auth, provider)
-
-  console.log(x.operationType, x.user)
+  new PageSignIn({
+    target: document.getElementById("root")!,
+    props: {
+      auth,
+    },
+  })
 }
