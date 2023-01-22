@@ -2,8 +2,9 @@ import { expose, proxy, type ProxyMarked } from "comlink"
 import { initializeApp, type FirebaseOptions } from "firebase/app"
 import {
   connectAuthEmulator,
-  getAuth,
-  signInAnonymously,
+  indexedDBLocalPersistence,
+  initializeAuth,
+  onAuthStateChanged,
   type Auth,
 } from "firebase/auth"
 import {
@@ -57,7 +58,10 @@ export class RemoteFirestore {
   constructor(options: FirebaseOptions) {
     const firebaseApp = initializeApp(options)
 
-    this.auth = getAuth(firebaseApp)
+    this.auth = initializeAuth(firebaseApp, {
+      persistence: indexedDBLocalPersistence,
+      // No popupRedirectResolver defined
+    })
 
     // TODO VITE_FIRESTORE_EMULATOR を間借りするのではなく専用の定数を用意するべき
     if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
@@ -78,12 +82,25 @@ export class RemoteFirestore {
     }
 
     setTransferHandlers()
+
+    onAuthStateChanged(this.auth, (user) => {
+      console.log("onAuthStateChanged", user)
+    })
   }
 
-  async signIn(): Promise<void> {
-    const x = await signInAnonymously(this.auth)
-    console.log(x.user)
-  }
+  // async signIn(): Promise<void> {
+  //   const provider = new GoogleAuthProvider()
+
+  //   // console.log(new browserPopupRedirectResolver())
+  //   const x = await signInWithPopup(
+  //     this.auth,
+  //     provider,
+  //     browserPopupRedirectResolver
+  //   )
+  //   // const x = await signInAnonymously(this.auth)
+
+  //   console.log(x.user)
+  // }
 
   onSnapshotRoom(
     roomId: Room["id"],
