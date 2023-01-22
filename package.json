@@ -31,7 +31,7 @@
     "firebase-target-apply": "firebase target:apply hosting app sharetimer",
     "firebase-indexes-export": "firebase firestore:indexes > firestore.indexes.json",
     "firebase-emulators-init": "firebase init emulators",
-    "firebase-emulators-start": "firebase emulators:start --only firestore",
+    "firebase-emulators-start": "firebase emulators:start --only auth,firestore",
     "log-build": "npm run build | tee build_$(date +%s).log",
     "tailwind-init": "tailwindcss init -p"
   },
