@@ -1,8 +1,12 @@
 import { wrap } from "comlink"
+import { firstValueFrom } from "rxjs"
 import App from "./App.svelte"
 import AppSkeleton from "./AppSkeleton.svelte"
 import { firestoreImplContext } from "./firestore/firestoreImplContext"
-import type { RemoteFirestore } from "./firestore/worker/RemoteFirestore.worker"
+import type {
+  RemoteFirestore,
+  SignInState,
+} from "./firestore/worker/RemoteFirestore.worker"
 import RemoteFirestoreWorker from "./firestore/worker/RemoteFirestore.worker?worker"
 import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
@@ -12,6 +16,7 @@ import { getItem, setItem } from "./storage"
 import { createAudio, keyWithAudio, keyWithMediaPermission } from "./useAudio"
 import { keyWithDarkMode, observeDarkMode } from "./useDarkMode"
 import { nanoid } from "./util/nanoid"
+import { observeWorker } from "./util/observeWorker"
 
 run()
 
@@ -44,6 +49,18 @@ async function run(): Promise<void> {
 
   setTransferHandlers()
   // firestore.getEstimatedDiff().then(setEstimatedDiff)
+
+  const authUser$ = observeWorker<SignInState>((onNext) =>
+    firestore.onAuthStateChanged(onNext)
+  )
+
+  if ((await firstValueFrom(authUser$)) === "not-signed-in") {
+    location.assign(
+      "/sign-in.html" +
+        (import.meta.env.VITE_FIRESTORE_EMULATOR ? "?emulator" : "")
+    )
+    return
+  }
 
   new App({
     target: skeleton.appRoot!,
