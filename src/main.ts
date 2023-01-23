@@ -1,8 +1,12 @@
-import { wrap } from "comlink"
+import { proxy, wrap } from "comlink"
+import { firstValueFrom, Observable } from "rxjs"
 import App from "./App.svelte"
 import AppSkeleton from "./AppSkeleton.svelte"
 import { firestoreImplContext } from "./firestore/firestoreImplContext"
-import type { RemoteFirestore } from "./firestore/worker/RemoteFirestore.worker"
+import type {
+  RemoteFirestore,
+  SignInState,
+} from "./firestore/worker/RemoteFirestore.worker"
 import RemoteFirestoreWorker from "./firestore/worker/RemoteFirestore.worker?worker"
 import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
@@ -45,7 +49,20 @@ async function run(): Promise<void> {
   setTransferHandlers()
   // firestore.getEstimatedDiff().then(setEstimatedDiff)
 
-  if ((await firestore.authUser$) === "not-signed-in") {
+  const authUser$ = new Observable<SignInState>((subscriber) => {
+    const unsubscribe$ = firestore.onAuthStateChanged(
+      proxy((data) => {
+        subscriber.next(data)
+      })
+    )
+
+    return async () => {
+      const unsubscribe = await unsubscribe$
+      unsubscribe()
+    }
+  })
+
+  if ((await firstValueFrom(authUser$)) === "not-signed-in") {
     location.assign(
       "/sign-in.html" +
         (import.meta.env.VITE_FIRESTORE_EMULATOR ? "?emulator" : "")

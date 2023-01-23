@@ -51,9 +51,10 @@ import { orderBy } from "./orderBy"
 import { where } from "./where"
 import { withMeta } from "./withMeta"
 
+export type SignInState = AuthUser | "not-signed-in"
+
 export class RemoteFirestore {
   readonly auth: Auth
-  readonly authUser$: Promise<AuthUser | "not-signed-in">
 
   readonly firestore: Firestore
 
@@ -84,13 +85,16 @@ export class RemoteFirestore {
     }
 
     setTransferHandlers()
+  }
 
-    this.authUser$ = new Promise((resolve) => {
-      const unsubscribe = onAuthStateChanged(this.auth, (user) => {
-        resolve((user?.toJSON() as AuthUser) ?? "not-signed-in")
-        unsubscribe()
-      })
+  onAuthStateChanged(
+    onNext: ((state: SignInState) => void) & ProxyMarked
+  ): Unsubscribe & ProxyMarked {
+    const unsubscribe = onAuthStateChanged(this.auth, (user) => {
+      onNext(user === null ? "not-signed-in" : (user.toJSON() as AuthUser))
     })
+
+    return proxy(unsubscribe)
   }
 
   onSnapshotRoom(
