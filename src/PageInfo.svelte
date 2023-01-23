@@ -58,6 +58,7 @@
 >
   <div>
     <a
+      title="タイマーに戻る"
       href={roomHash}
       class="transparent-button my-2 -ml-4 inline-grid h-12 w-12 place-items-center text-2xl !text-inherit"
     >

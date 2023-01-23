@@ -8,6 +8,7 @@
   import { toggleConfig, useConfig } from "./useConfig"
   import { getId } from "./util/getId"
 
+  export let infoHash: string
   export { className as class }
   let className: string = ""
 
@@ -20,7 +21,7 @@
   const permission$ = useMediaPermission()
   $: permission = $permission$
 
-  let infoButton: HTMLButtonElement
+  let infoButton: HTMLAnchorElement
 
   const isTutorialDone = getItem("tutorial") === "done"
   let tutorialOpen = false
@@ -80,21 +81,20 @@
     {/if}
   </button>
 
-  <button
-    type="button"
+  <a
+    href={infoHash}
     title="情報を開く"
-    class="transparent-button h-12 w-12 text-2xl"
-    on:click
+    class="transparent-button inline-grid h-12 w-12 place-items-center text-2xl"
     bind:this={infoButton}
   >
     <Icon name="information" />
-  </button>
+  </a>
 
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <dialog
     class={clsx(
       "transition-[box-shadow,opacity,visibility] duration-300 [&:not([open])]:opacity-0",
-      "overflow-visible rounded-sm bg-transparent text-inherit",
+      "overflow-visible rounded-full bg-transparent text-inherit",
       "shadow-screen open:shadow-dark/10 dark:open:shadow-light/20",
       // override default dialog style
       "fixed inset-0 m-0 max-h-full max-w-full p-0 backdrop:bg-transparent open:visible [&:not([open])]:invisible [&:not([open])]:block"

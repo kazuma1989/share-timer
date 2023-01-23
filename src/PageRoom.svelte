@@ -2,11 +2,11 @@
   import { firstValueFrom, map, merge, partition, type Observable } from "rxjs"
   import ConfigArea from "./ConfigArea.svelte"
   import FlashCover from "./FlashCover.svelte"
-  import { setHash } from "./observeHash"
   import { isRoom, type InvalidDoc, type Room } from "./schema/roomSchema"
   import { setSoundCall } from "./setSoundCall"
   import { setTitleAsTimeViewer } from "./setTitleAsTimeViewer"
   import Timer from "./Timer.svelte"
+  import { fromRoute } from "./toRoute"
   import { useAudio } from "./useAudio"
   import { useConfig } from "./useConfig"
   import { useRoom } from "./useRoom"
@@ -64,10 +64,8 @@
       </div>
 
       <ConfigArea
+        infoHash="#{fromRoute(['info', roomId])}"
         class="flex items-center justify-evenly px-6"
-        on:click={() => {
-          setHash(["info", roomId])
-        }}
       />
     </Timer>
 
