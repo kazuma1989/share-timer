@@ -1,5 +1,4 @@
 import { svelte } from "@sveltejs/vite-plugin-svelte"
-import * as path from "node:path"
 import { defineConfig, UserConfig } from "vite"
 import { hosting } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
@@ -42,13 +41,6 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
     build: {
       outDir: BUILD_PATH || hosting.find((_) => _.target === "app")?.public,
       sourcemap: true,
-
-      rollupOptions: {
-        input: {
-          index: path.resolve(__dirname, "index.html"),
-          "sign-in": path.resolve(__dirname, "sign-in.html"),
-        },
-      },
     },
 
     esbuild: {
