@@ -1,14 +1,6 @@
 import { expose, proxy, type ProxyMarked } from "comlink"
 import { initializeApp, type FirebaseOptions } from "firebase/app"
 import {
-  connectAuthEmulator,
-  indexedDBLocalPersistence,
-  initializeAuth,
-  onAuthStateChanged,
-  type Auth,
-  type User as AuthUser,
-} from "firebase/auth"
-import {
   addDoc,
   connectFirestoreEmulator,
   doc,
@@ -51,50 +43,25 @@ import { orderBy } from "./orderBy"
 import { where } from "./where"
 import { withMeta } from "./withMeta"
 
-export type SignInState = AuthUser | "not-signed-in"
-
 export class RemoteFirestore {
-  readonly auth: Auth
-
   readonly firestore: Firestore
 
   constructor(options: FirebaseOptions) {
     const firebaseApp = initializeApp(options)
 
-    this.auth = initializeAuth(firebaseApp, {
-      persistence: indexedDBLocalPersistence,
-      // No popupRedirectResolver defined
-    })
-
-    // TODO VITE_FIRESTORE_EMULATOR を間借りするのではなく専用の定数を用意するべき
-    if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
-      const protocol = location.protocol
-      const host = location.hostname
-
-      connectAuthEmulator(this.auth, `${protocol}//${host}:9099`)
-    }
-
-    this.firestore = getFirestore(firebaseApp)
+    const firestore = getFirestore(firebaseApp)
 
     if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
       const host = location.hostname
       const port = Number(location.port)
       console.info(`using emulator (${host}:${port})`)
 
-      connectFirestoreEmulator(this.firestore, host, port)
+      connectFirestoreEmulator(firestore, host, port)
     }
 
+    this.firestore = firestore
+
     setTransferHandlers()
-  }
-
-  onAuthStateChanged(
-    onNext: ((state: SignInState) => void) & ProxyMarked
-  ): Unsubscribe & ProxyMarked {
-    const unsubscribe = onAuthStateChanged(this.auth, (user) => {
-      onNext(user === null ? "not-signed-in" : (user.toJSON() as AuthUser))
-    })
-
-    return proxy(unsubscribe)
   }
 
   onSnapshotRoom(

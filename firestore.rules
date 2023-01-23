@@ -16,7 +16,7 @@ service cloud.firestore {
 
       match /actions/{action} {
         allow list;
-        allow create: if hasCreatedAt() && request.auth != null;
+        allow create: if hasCreatedAt();
       }
     }
 
