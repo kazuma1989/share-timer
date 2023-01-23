@@ -1,6 +1,8 @@
 <script lang="ts">
   import { firstValueFrom, map, merge, partition, type Observable } from "rxjs"
+  import ConfigArea from "./ConfigArea.svelte"
   import FlashCover from "./FlashCover.svelte"
+  import { setHash } from "./observeHash"
   import { isRoom, type InvalidDoc, type Room } from "./schema/roomSchema"
   import { setSoundCall } from "./setSoundCall"
   import { setTitleAsTimeViewer } from "./setTitleAsTimeViewer"
@@ -54,7 +56,20 @@
 
 {#await Promise.all( [setup$, firstValueFrom(room$), firstValueFrom(timerState$)] ) then}
   <div class="mx-auto h-screen max-w-prose">
-    <Timer {room$} {timerState$} class="h-full" />
+    <Timer {room$} {timerState$} class="h-full">
+      <div slot="header" class="pt-2 text-center">
+        <h1 aria-label="タイマーの名前: {$room$.name}">
+          {$room$.name}
+        </h1>
+      </div>
+
+      <ConfigArea
+        class="flex items-center justify-evenly px-6"
+        on:click={() => {
+          setHash(["info", roomId])
+        }}
+      />
+    </Timer>
 
     <FlashCover {timerState$} />
   </div>
