@@ -142,7 +142,9 @@
         <div
           class="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center"
         >
-          <DurationSelect bind:value={duration} bind:this={select} />
+          {#key $initialDuration$}
+            <DurationSelect bind:value={duration} bind:this={select} />
+          {/key}
         </div>
       {:else}
         <div class="absolute">
