@@ -45,6 +45,14 @@ async function run(): Promise<void> {
   setTransferHandlers()
   // firestore.getEstimatedDiff().then(setEstimatedDiff)
 
+  if ((await firestore.authUser$) === "not-signed-in") {
+    location.assign(
+      "/sign-in.html" +
+        (import.meta.env.VITE_FIRESTORE_EMULATOR ? "?emulator" : "")
+    )
+    return
+  }
+
   new App({
     target: skeleton.appRoot!,
     props: {

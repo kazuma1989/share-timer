@@ -6,6 +6,7 @@ import {
   initializeAuth,
   onAuthStateChanged,
   type Auth,
+  type User as AuthUser,
 } from "firebase/auth"
 import {
   addDoc,
@@ -52,6 +53,7 @@ import { withMeta } from "./withMeta"
 
 export class RemoteFirestore {
   readonly auth: Auth
+  readonly authUser$: Promise<AuthUser | "not-signed-in">
 
   readonly firestore: Firestore
 
@@ -83,24 +85,13 @@ export class RemoteFirestore {
 
     setTransferHandlers()
 
-    onAuthStateChanged(this.auth, (user) => {
-      console.log("onAuthStateChanged", user)
+    this.authUser$ = new Promise((resolve) => {
+      const unsubscribe = onAuthStateChanged(this.auth, (user) => {
+        resolve((user?.toJSON() as AuthUser) ?? "not-signed-in")
+        unsubscribe()
+      })
     })
   }
-
-  // async signIn(): Promise<void> {
-  //   const provider = new GoogleAuthProvider()
-
-  //   // console.log(new browserPopupRedirectResolver())
-  //   const x = await signInWithPopup(
-  //     this.auth,
-  //     provider,
-  //     browserPopupRedirectResolver
-  //   )
-  //   // const x = await signInAnonymously(this.auth)
-
-  //   console.log(x.user)
-  // }
 
   onSnapshotRoom(
     roomId: Room["id"],
