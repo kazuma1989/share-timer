@@ -1,5 +1,5 @@
-import { proxy, wrap } from "comlink"
-import { firstValueFrom, Observable } from "rxjs"
+import { wrap } from "comlink"
+import { firstValueFrom } from "rxjs"
 import App from "./App.svelte"
 import AppSkeleton from "./AppSkeleton.svelte"
 import { firestoreImplContext } from "./firestore/firestoreImplContext"
@@ -16,6 +16,7 @@ import { getItem, setItem } from "./storage"
 import { createAudio, keyWithAudio, keyWithMediaPermission } from "./useAudio"
 import { keyWithDarkMode, observeDarkMode } from "./useDarkMode"
 import { nanoid } from "./util/nanoid"
+import { observeWorker } from "./util/observeWorker"
 
 run()
 
@@ -49,18 +50,9 @@ async function run(): Promise<void> {
   setTransferHandlers()
   // firestore.getEstimatedDiff().then(setEstimatedDiff)
 
-  const authUser$ = new Observable<SignInState>((subscriber) => {
-    const unsubscribe$ = firestore.onAuthStateChanged(
-      proxy((data) => {
-        subscriber.next(data)
-      })
-    )
-
-    return async () => {
-      const unsubscribe = await unsubscribe$
-      unsubscribe()
-    }
-  })
+  const authUser$ = observeWorker<SignInState>((onNext) =>
+    firestore.onAuthStateChanged(onNext)
+  )
 
   if ((await firstValueFrom(authUser$)) === "not-signed-in") {
     location.assign(

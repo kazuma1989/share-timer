@@ -1,36 +1,29 @@
-import { proxy, wrap } from "comlink"
+import { wrap } from "comlink"
 import { Observable, share } from "rxjs"
 import type { setInterval as setIntervalType } from "./interval.worker"
 import IntervalWorker from "./interval.worker?worker&inline"
+import { observeWorker } from "./observeWorker"
 
 export function interval(type: "ui"): Observable<void>
 
 export function interval(type: "worker", timeout: number): Observable<void>
 
 export function interval(type: "ui" | "worker", ms?: number): Observable<void> {
-  return new Observable<void>((subscriber) => {
+  return (() => {
     switch (type) {
       case "ui": {
-        return subscribeAnimationFrame(() => {
-          subscriber.next()
-        })
+        return new Observable<void>((subscriber) =>
+          subscribeAnimationFrame(() => {
+            subscriber.next()
+          })
+        )
       }
 
       case "worker": {
-        const unsubscribe$ = setInterval(
-          proxy(() => {
-            subscriber.next()
-          }),
-          ms ?? 500
-        )
-
-        return async () => {
-          const unsubscribe = await unsubscribe$
-          unsubscribe()
-        }
+        return observeWorker<void>((onNext) => setInterval(onNext, ms ?? 500))
       }
     }
-  }).pipe(
+  })().pipe(
     share({
       resetOnRefCountZero: true,
     })
