@@ -1,9 +1,7 @@
 <script lang="ts">
   import clsx from "clsx"
   import { distinctUntilChanged, map, type Observable } from "rxjs"
-  import { sineOut } from "svelte/easing"
   import type { HTMLButtonAttributes } from "svelte/elements"
-  import { fade } from "svelte/transition"
   import DurationSelect from "./DurationSelect.svelte"
   import Icon from "./Icon.svelte"
   import { now } from "./now"
@@ -27,11 +25,11 @@
   $: state = $timerState$
   $: ({ id: roomId, lockedBy } = $room$)
 
-  $: duration$ = timerState$.pipe(
+  $: initialDuration$ = timerState$.pipe(
     map((_) => _.initialDuration),
     distinctUntilChanged()
   )
-  $: duration = $duration$
+  $: duration = $initialDuration$
 
   $: locked = lockedBy && lockedBy !== getItem("userId")
   $: [pending, dispatch] = useDispatch(roomId)
@@ -143,14 +141,11 @@
       {#if !locked && state.mode === "editing"}
         <div
           class="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center"
-          out:fade|local={{ easing: sineOut }}
         >
-          {#key state.mode + state.initialDuration}
-            <DurationSelect bind:value={duration} bind:this={select} />
-          {/key}
+          <DurationSelect bind:value={duration} bind:this={select} />
         </div>
       {:else}
-        <div class="absolute" in:fade|local={{ easing: sineOut }}>
+        <div class="absolute">
           <TimeViewer {timerState$} />
         </div>
       {/if}
