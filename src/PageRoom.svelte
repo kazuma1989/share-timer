@@ -1,10 +1,12 @@
 <script lang="ts">
   import { firstValueFrom, map, merge, partition, type Observable } from "rxjs"
+  import ConfigArea from "./ConfigArea.svelte"
   import FlashCover from "./FlashCover.svelte"
   import { isRoom, type InvalidDoc, type Room } from "./schema/roomSchema"
   import { setSoundCall } from "./setSoundCall"
   import { setTitleAsTimeViewer } from "./setTitleAsTimeViewer"
   import Timer from "./Timer.svelte"
+  import { fromRoute } from "./toRoute"
   import { useAudio } from "./useAudio"
   import { useConfig } from "./useConfig"
   import { useRoom } from "./useRoom"
@@ -54,7 +56,18 @@
 
 {#await Promise.all( [setup$, firstValueFrom(room$), firstValueFrom(timerState$)] ) then}
   <div class="mx-auto h-screen max-w-prose">
-    <Timer {room$} {timerState$} class="h-full" />
+    <Timer {room$} {timerState$} class="h-full">
+      <div slot="header" class="pt-2 text-center">
+        <h1 aria-label="タイマーの名前: {$room$.name}">
+          {$room$.name}
+        </h1>
+      </div>
+
+      <ConfigArea
+        infoHash="#{fromRoute(['info', roomId])}"
+        class="flex items-center justify-evenly px-6"
+      />
+    </Timer>
 
     <FlashCover {timerState$} />
   </div>

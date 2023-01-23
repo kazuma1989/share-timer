@@ -1,14 +1,10 @@
 <script lang="ts">
   import clsx from "clsx"
   import { distinctUntilChanged, map, type Observable } from "rxjs"
-  import { sineOut } from "svelte/easing"
   import type { HTMLButtonAttributes } from "svelte/elements"
-  import { fade } from "svelte/transition"
-  import ConfigArea from "./ConfigArea.svelte"
   import DurationSelect from "./DurationSelect.svelte"
   import Icon from "./Icon.svelte"
   import { now } from "./now"
-  import { setHash } from "./observeHash"
   import type { Room } from "./schema/roomSchema"
   import type { TimerState } from "./schema/timerReducer"
   import { serverTimestamp } from "./serverTimestamp"
@@ -27,13 +23,13 @@
   const id = (_: "timer" | "status") => _id + _
 
   $: state = $timerState$
-  $: ({ id: roomId, name: roomName, lockedBy } = $room$)
+  $: ({ id: roomId, lockedBy } = $room$)
 
-  $: duration$ = timerState$.pipe(
+  $: initialDuration$ = timerState$.pipe(
     map((_) => _.initialDuration),
     distinctUntilChanged()
   )
-  $: duration = $duration$
+  $: duration = $initialDuration$
 
   $: locked = lockedBy && lockedBy !== getItem("userId")
   $: [pending, dispatch] = useDispatch(roomId)
@@ -120,11 +116,7 @@
 </script>
 
 <div class={clsx("grid grid-rows-[auto_5fr_auto_4fr]", className)}>
-  <div class="pt-2 text-center">
-    <h1 aria-label="タイマーの名前: {roomName}">
-      {roomName}
-    </h1>
-  </div>
+  <slot name="header"><div /></slot>
 
   <form
     aria-label="タイマーの値を設定"
@@ -149,14 +141,13 @@
       {#if !locked && state.mode === "editing"}
         <div
           class="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center"
-          out:fade|local={{ easing: sineOut }}
         >
-          {#key state.mode + state.initialDuration}
+          {#key $initialDuration$}
             <DurationSelect bind:value={duration} bind:this={select} />
           {/key}
         </div>
       {:else}
-        <div class="absolute" in:fade|local={{ easing: sineOut }}>
+        <div class="absolute">
           <TimeViewer {timerState$} />
         </div>
       {/if}
@@ -207,10 +198,5 @@
     </div>
   </form>
 
-  <ConfigArea
-    class="flex items-center justify-evenly px-6"
-    on:click={() => {
-      setHash(["info", roomId])
-    }}
-  />
+  <slot />
 </div>
