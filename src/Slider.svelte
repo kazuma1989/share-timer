@@ -15,11 +15,35 @@
     import.meta.env.DEV && console.debug(e.key, e.keyCode)
 
     switch (e.key) {
-      case "End": {
+      case "Home": {
         e.preventDefault()
 
-        const last = currentStep.parentElement?.lastElementChild
-        last?.scrollIntoView({ block: "center" })
+        // decrement
+        const first = currentStep.parentElement?.firstElementChild
+        first?.scrollIntoView({ block: "center" })
+        break
+      }
+
+      case "PageDown": {
+        e.preventDefault()
+
+        // decrement
+        const prev5 =
+          currentStep.previousElementSibling?.previousElementSibling
+            ?.previousElementSibling?.previousElementSibling
+            ?.previousElementSibling ??
+          currentStep.parentElement?.firstElementChild
+        prev5?.scrollIntoView({ block: "center" })
+        break
+      }
+
+      case "ArrowDown":
+      case "ArrowLeft": {
+        e.preventDefault()
+
+        // decrement
+        const prev = currentStep.previousElementSibling
+        prev?.scrollIntoView({ block: "center" })
         break
       }
 
@@ -36,6 +60,7 @@
       case "PageUp": {
         e.preventDefault()
 
+        // increment
         const next5 =
           currentStep.nextElementSibling?.nextElementSibling?.nextElementSibling
             ?.nextElementSibling?.nextElementSibling ??
@@ -44,33 +69,12 @@
         break
       }
 
-      case "ArrowDown":
-      case "ArrowLeft": {
+      case "End": {
         e.preventDefault()
 
-        // decrement
-        const prev = currentStep.previousElementSibling
-        prev?.scrollIntoView({ block: "center" })
-        break
-      }
-
-      case "PageDown": {
-        e.preventDefault()
-
-        const prev5 =
-          currentStep.previousElementSibling?.previousElementSibling
-            ?.previousElementSibling?.previousElementSibling
-            ?.previousElementSibling ??
-          currentStep.parentElement?.firstElementChild
-        prev5?.scrollIntoView({ block: "center" })
-        break
-      }
-
-      case "Home": {
-        e.preventDefault()
-
-        const first = currentStep.parentElement?.firstElementChild
-        first?.scrollIntoView({ block: "center" })
+        // increment
+        const last = currentStep.parentElement?.lastElementChild
+        last?.scrollIntoView({ block: "center" })
         break
       }
     }
