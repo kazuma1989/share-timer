@@ -10,7 +10,7 @@
   export { className as class }
   let className: string = ""
 
-  let currentOption: HTMLElement
+  let currentStep: HTMLElement
   const onKeydown: KeyboardEventHandler<HTMLElement> = (e) => {
     import.meta.env.DEV && console.debug(e.key, e.keyCode)
 
@@ -20,7 +20,7 @@
         e.preventDefault()
 
         // increment
-        const next = currentOption.nextElementSibling
+        const next = currentStep.nextElementSibling
         next?.scrollIntoView({ block: "center" })
         break
       }
@@ -30,7 +30,7 @@
         e.preventDefault()
 
         // decrement
-        const prev = currentOption.previousElementSibling
+        const prev = currentStep.previousElementSibling
         prev?.scrollIntoView({ block: "center" })
         break
       }
@@ -62,7 +62,8 @@
     )}
     use:intersect
     on:intersect={({ detail: step }) => {
-      currentOption = step
+      currentStep = step
+      // Reference [data-value]
       value = Number(step.dataset.value)
     }}
   >
