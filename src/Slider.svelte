@@ -15,6 +15,17 @@
     import.meta.env.DEV && console.debug(e.key, e.keyCode)
 
     switch (e.key) {
+      case "Enter": {
+        e.preventDefault()
+
+        // submit
+        const form = e.currentTarget.closest("form")
+        form?.dispatchEvent(
+          new SubmitEvent("submit", { submitter: e.currentTarget })
+        )
+        break
+      }
+
       case "Home": {
         e.preventDefault()
 
