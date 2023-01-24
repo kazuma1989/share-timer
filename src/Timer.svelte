@@ -100,18 +100,10 @@
     })
   }
 
-  let cancel: HTMLElement
-  let select: DurationSelect
   const onCancel = async () => {
-    const currentFocus = document.activeElement
-
     await dispatch({
       type: "cancel",
     })
-
-    if (cancel === currentFocus) {
-      select.focus()
-    }
   }
 </script>
 
@@ -143,7 +135,7 @@
           class="grid aspect-video w-[512px] max-w-[100vw] touch-pinch-zoom place-items-center"
         >
           {#key $initialDuration$}
-            <DurationSelect bind:value={duration} bind:this={select} />
+            <DurationSelect bind:value={duration} />
           {/key}
         </div>
       {:else}
@@ -186,7 +178,6 @@
           disabled={state.mode === "editing"}
           class="circle-button circle-button-gray text-xs"
           on:click={onCancel}
-          bind:this={cancel}
         >
           キャンセル
         </button>
