@@ -31,6 +31,9 @@
         signInSuccessUrl: location.origin,
         signInOptions: [
           firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          // "apple.com",
+          // "microsoft.com",
+          // "yahoo.com",
           // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
           // firebase.auth.TwitterAuthProvider.PROVIDER_ID,
           // firebase.auth.GithubAuthProvider.PROVIDER_ID,
@@ -43,6 +46,25 @@
       const ui = new firebaseui.auth.AuthUI(firebase.auth())
       ui.start("#firebaseui-auth-container", uiConfig)
     </script>
+
+    <style>
+      button:focus {
+        /* https://css-tricks.com/copy-the-browsers-native-focus-styles/ */
+        outline: Highlight auto medium;
+        outline: -webkit-focus-ring-color auto medium;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background-color: black;
+          color: white;
+        }
+
+        .mdl-button--raised {
+          border: solid 1px rgb(255 255 255 / 0.5);
+        }
+      }
+    </style>
   </head>
 
   <body>
