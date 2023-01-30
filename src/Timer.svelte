@@ -91,6 +91,10 @@
   }
 
   const onSubmit = () => {
+    Notification.requestPermission().then((permission) => {
+      console.debug("Notification request permission", permission)
+    })
+
     if (state.mode !== "editing") return
 
     dispatch({
