@@ -51,7 +51,9 @@ import { orderBy } from "./orderBy"
 import { where } from "./where"
 import { withMeta } from "./withMeta"
 
-export type SignInState = AuthUser | "not-signed-in"
+export type SignInState = User | "not-signed-in"
+
+type User = WithoutMethods<AuthUser>
 
 export class RemoteFirestore {
   readonly auth: Auth
@@ -91,7 +93,12 @@ export class RemoteFirestore {
     onNext: ((state: SignInState) => void) & ProxyMarked
   ): Unsubscribe & ProxyMarked {
     const unsubscribe = onAuthStateChanged(this.auth, (user) => {
-      onNext(user === null ? "not-signed-in" : (user.toJSON() as AuthUser))
+      if (user === null) {
+        onNext("not-signed-in")
+        return
+      }
+
+      onNext(user.toJSON() as User)
     })
 
     return proxy(unsubscribe)
