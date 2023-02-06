@@ -1,5 +1,5 @@
 import { wrap } from "comlink"
-import { firstValueFrom } from "rxjs"
+import { filter, firstValueFrom } from "rxjs"
 import App from "./App.svelte"
 import AppSkeleton from "./AppSkeleton.svelte"
 import { firestoreImplContext } from "./firestore/firestoreImplContext"
@@ -54,13 +54,15 @@ async function run(): Promise<void> {
     firestore.onAuthStateChanged(onNext)
   )
 
-  if ((await firstValueFrom(authUser$)) === "not-signed-in") {
+  const notSignedIn$ = authUser$.pipe(filter((_) => _ === "not-signed-in"))
+  notSignedIn$.subscribe(() => {
     location.assign(
       "/sign-in.html" +
         (import.meta.env.VITE_FIRESTORE_EMULATOR ? "?emulator" : "")
     )
-    return
-  }
+  })
+
+  await firstValueFrom(authUser$)
 
   new App({
     target: skeleton.appRoot!,
