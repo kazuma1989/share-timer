@@ -29,6 +29,7 @@ import {
   type Firestore,
   type Unsubscribe,
 } from "firebase/firestore"
+import { Subject } from "rxjs"
 import * as s from "superstruct"
 import {
   actionSchema,
@@ -53,14 +54,16 @@ import { orderBy } from "./orderBy"
 import { where } from "./where"
 import { withMeta } from "./withMeta"
 
-export type SignInState = User | "not-signed-in"
+export type SignInState = UserInfo | "not-signed-in"
 
-type User = WithoutMethods<AuthUser> & {
+type UserInfo = WithoutMethods<AuthUser> & {
   claims: ParsedToken
 }
 
 export class RemoteFirestore {
   readonly auth: Auth
+
+  readonly signInState$: Subject<SignInState>
 
   readonly firestore: Firestore
 
@@ -80,6 +83,14 @@ export class RemoteFirestore {
       connectAuthEmulator(this.auth, `${protocol}//${host}:9099`)
     }
 
+    this.signInState$ = new Subject()
+
+    onAuthStateChanged(this.auth, async (user) => {
+      this.signInState$.next(
+        user === null ? "not-signed-in" : await getUserInfo(user)
+      )
+    })
+
     this.firestore = getFirestore(firebaseApp)
 
     if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
@@ -96,28 +107,18 @@ export class RemoteFirestore {
   onAuthStateChanged(
     onNext: ((state: SignInState) => void) & ProxyMarked
   ): Unsubscribe & ProxyMarked {
-    const unsubscribe = onAuthStateChanged(this.auth, async (user) => {
-      if (user === null) {
-        onNext("not-signed-in")
-        return
-      }
+    const subscription = this.signInState$.subscribe(onNext)
 
-      const userJSON = user.toJSON() as WithoutMethods<AuthUser>
-
-      const { claims } = await user.getIdTokenResult()
-
-      onNext({
-        ...userJSON,
-        claims,
-      })
+    return proxy(() => {
+      subscription.unsubscribe()
     })
-
-    return proxy(unsubscribe)
   }
 
   async authRefreshToken(): Promise<void> {
-    // サイレントにリフレッシュが失敗しないようにした
-    await this.auth.currentUser!.getIdToken(true)
+    // リフレッシュタイミングが悪いときは明示的にクラッシュさせたいので non-null assertion を使う
+    const user = this.auth.currentUser!
+
+    this.signInState$.next(await getUserInfo(user, true))
   }
 
   async signOut(): Promise<void> {
@@ -355,4 +356,18 @@ if (import.meta.vitest) {
       b: expect.any(FieldValue),
     } satisfies typeof x)
   })
+}
+
+async function getUserInfo(
+  user: AuthUser,
+  forceRefresh?: boolean
+): Promise<UserInfo> {
+  const { claims } = await user.getIdTokenResult(forceRefresh)
+
+  const userJSON = user.toJSON() as WithoutMethods<AuthUser>
+
+  return {
+    ...userJSON,
+    claims,
+  }
 }
