@@ -17,6 +17,7 @@ import { createAudio, keyWithAudio, keyWithMediaPermission } from "./useAudio"
 import { keyWithDarkMode, observeDarkMode } from "./useDarkMode"
 import { nanoid } from "./util/nanoid"
 import { observeWorker } from "./util/observeWorker"
+import { shareRecent } from "./util/shareRecent"
 
 run()
 
@@ -52,7 +53,7 @@ async function run(): Promise<void> {
 
   const authUser$ = observeWorker<SignInState>((onNext) =>
     firestore.onAuthStateChanged(onNext)
-  )
+  ).pipe(shareRecent())
 
   const notSignedIn$ = authUser$.pipe(filter((_) => _ === "not-signed-in"))
   notSignedIn$.subscribe(() => {
