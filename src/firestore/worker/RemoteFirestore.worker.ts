@@ -61,11 +61,11 @@ type UserInfo = WithoutMethods<AuthUser> & {
 }
 
 export class RemoteFirestore {
-  readonly auth: Auth
+  private readonly auth: Auth
 
-  readonly signInState$: Subject<SignInState>
+  private readonly signInState$: Subject<SignInState>
 
-  readonly firestore: Firestore
+  private readonly firestore: Firestore
 
   constructor(options: FirebaseOptions) {
     const firebaseApp = initializeApp(options)
