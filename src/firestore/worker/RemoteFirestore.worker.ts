@@ -6,6 +6,7 @@ import {
   initializeAuth,
   onAuthStateChanged,
   type Auth,
+  type ParsedToken,
   type User as AuthUser,
 } from "firebase/auth"
 import {
@@ -53,7 +54,9 @@ import { withMeta } from "./withMeta"
 
 export type SignInState = User | "not-signed-in"
 
-type User = WithoutMethods<AuthUser>
+type User = WithoutMethods<AuthUser> & {
+  claims: ParsedToken
+}
 
 export class RemoteFirestore {
   readonly auth: Auth
@@ -92,13 +95,20 @@ export class RemoteFirestore {
   onAuthStateChanged(
     onNext: ((state: SignInState) => void) & ProxyMarked
   ): Unsubscribe & ProxyMarked {
-    const unsubscribe = onAuthStateChanged(this.auth, (user) => {
+    const unsubscribe = onAuthStateChanged(this.auth, async (user) => {
       if (user === null) {
         onNext("not-signed-in")
         return
       }
 
-      onNext(user.toJSON() as User)
+      const userJSON = user.toJSON() as WithoutMethods<AuthUser>
+
+      const { claims } = await user.getIdTokenResult()
+
+      onNext({
+        ...userJSON,
+        claims,
+      })
     })
 
     return proxy(unsubscribe)
