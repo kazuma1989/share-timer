@@ -5,6 +5,7 @@ import {
   indexedDBLocalPersistence,
   initializeAuth,
   onAuthStateChanged,
+  signOut,
   type Auth,
   type ParsedToken,
   type User as AuthUser,
@@ -112,6 +113,15 @@ export class RemoteFirestore {
     })
 
     return proxy(unsubscribe)
+  }
+
+  async authRefreshToken(): Promise<void> {
+    // サイレントにリフレッシュが失敗しないようにした
+    await this.auth.currentUser!.getIdToken(true)
+  }
+
+  async signOut(): Promise<void> {
+    await signOut(this.auth)
   }
 
   onSnapshotRoom(
