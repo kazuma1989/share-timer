@@ -15,7 +15,22 @@ export const checkoutSessionCompleted = functions.https.onRequest(
       return
     }
 
-    res.send("OK")
+    try {
+      // TODO req.body の検証をしないと危ない
+      const id = req.body.id
+
+      await firestore
+        .collection("checkout-sessions-v1")
+        .doc(id)
+        // TODO req.body の検証をしないと危ない
+        .create(req.body)
+
+      // TODO req.body の検証をしないと危ない
+      res.json(req.body)
+    } catch {
+      // TODO req.body の検証をしないと危ない
+      res.status(409).json(req.body)
+    }
   }
 )
 
