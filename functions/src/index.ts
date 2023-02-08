@@ -52,31 +52,29 @@ export const checkoutSessionCompleted = functions
       apiVersion: "2022-11-15",
     })
 
+    // TODO try-catch して 400 エラーを返したい
     const event = stripe.webhooks.constructEvent(
       req.rawBody,
       req.headers["stripe-signature"],
       STRIPE_ENDPOINT_SECRET$.value()
     )
 
-    functions.logger.debug(event.type)
-
-    const [error, data] = s.validate(req.body, checkoutSessionSchema)
-    if (error) {
-      res.status(400).json(error)
+    if (event.type !== "checkout.session.completed") {
+      res.status(200).send()
       return
     }
 
-    try {
-      const { id } = data
+    const session = event.data.object as Stripe.Checkout.Session
 
+    try {
       await firestore
         .collection(collection("checkout-sessions-v1"))
-        .doc(id)
-        .create(data)
+        .doc(session.id)
+        .create(session)
 
-      res.json(data)
+      res.status(200).json(session)
     } catch {
-      res.status(409).json(data)
+      res.status(409).json(session)
     }
   })
 
