@@ -16,10 +16,6 @@ const checkoutSessionSchema = s.type({
   uid: s.string(),
 })
 
-const stripeHeadersSchema = s.type({
-  "stripe-signature": s.string(),
-})
-
 const app = initializeApp()
 const auth = getAuth(app)
 const firestore = getFirestore(app)
@@ -43,8 +39,10 @@ export const stripeWebhook = functions
       return
     }
 
-    if (!s.is(req.headers, stripeHeadersSchema)) {
-      res.status(400).send()
+    if (req.headers["stripe-signature"] === undefined) {
+      functions.logger.warn("missing stripe-signature header")
+
+      res.status(400).send("missing stripe-signature header")
       return
     }
 
@@ -52,12 +50,19 @@ export const stripeWebhook = functions
       apiVersion: "2022-11-15",
     })
 
-    // TODO try-catch して 400 エラーを返したい
-    const event = stripe.webhooks.constructEvent(
-      req.rawBody,
-      req.headers["stripe-signature"],
-      STRIPE_ENDPOINT_SECRET$.value()
-    )
+    let event: Stripe.Event
+    try {
+      event = stripe.webhooks.constructEvent(
+        req.rawBody,
+        req.headers["stripe-signature"],
+        STRIPE_ENDPOINT_SECRET$.value()
+      )
+    } catch (error) {
+      functions.logger.warn(error)
+
+      res.status(400).send()
+      return
+    }
 
     if (event.type !== "checkout.session.completed") {
       res.status(200).send()
