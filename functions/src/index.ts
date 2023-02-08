@@ -25,6 +25,37 @@ function document<T extends "checkout-sessions-v1/{id}">(path: T): T {
   return path
 }
 
+export const createCheckoutSession = functions
+  .runWith({
+    secrets: [STRIPE_API_KEY$],
+  })
+  .https.onRequest(async (req, res) => {
+    if (req.method !== "POST") {
+      res.setHeader("Allow", "POST")
+      res.status(405).send()
+      return
+    }
+
+    const stripe = new Stripe(STRIPE_API_KEY$.value(), {
+      apiVersion: "2022-11-15",
+    })
+
+    const session = await stripe.checkout.sessions.create({
+      line_items: [
+        {
+          price: "price_1MZ8M1GVtjqV2UHuz3wUfODe",
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: "http://localhost:3000/success.html",
+      cancel_url: "http://localhost:3000/cancel.html",
+      client_reference_id: "hello-kazuma1989",
+    })
+
+    res.redirect(303, session.url!)
+  })
+
 export const stripeWebhook = functions
   .runWith({
     secrets: [STRIPE_API_KEY$, STRIPE_ENDPOINT_SECRET$],
