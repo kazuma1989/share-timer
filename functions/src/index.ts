@@ -3,6 +3,18 @@ import * as functions from "firebase-functions"
 
 const app = admin.initializeApp()
 
+export const checkoutSessionCompleted = functions.https.onRequest(
+  async (req, res) => {
+    if (req.method !== "POST") {
+      res.setHeader("Allow", "POST")
+      res.status(405).send()
+      return
+    }
+
+    res.send("OK")
+  }
+)
+
 // http://127.0.0.1:5001/share-timer-2b51a/us-central1/addCustomClaims?uid=xxx
 export const addCustomClaims = functions.https.onRequest(async (req, res) => {
   const { uid } = req.query
