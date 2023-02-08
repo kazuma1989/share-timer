@@ -1,7 +1,11 @@
-import * as admin from "firebase-admin"
+import { initializeApp } from "firebase-admin/app"
+import { getAuth } from "firebase-admin/auth"
+import { getFirestore } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
 
-const app = admin.initializeApp()
+const app = initializeApp()
+const auth = getAuth(app)
+const firestore = getFirestore(app)
 
 export const checkoutSessionCompleted = functions.https.onRequest(
   async (req, res) => {
@@ -23,19 +27,16 @@ export const addCustomClaims = functions.https.onRequest(async (req, res) => {
     return
   }
 
-  functions.logger.info(
-    "customClaims",
-    (await app.auth().getUser(uid)).customClaims
-  )
+  functions.logger.info("customClaims", (await auth.getUser(uid)).customClaims)
 
-  await app.auth().setCustomUserClaims(uid, {
+  await auth.setCustomUserClaims(uid, {
     app_v1: {
       id: "kazuma1989",
       plan: "premium",
     },
   })
 
-  res.status(200).json((await app.auth().getUser(uid)).customClaims)
+  res.status(200).json((await auth.getUser(uid)).customClaims)
 })
 
 // Start writing functions
@@ -51,8 +52,7 @@ export const addMessage = functions.https.onRequest(async (req, res) => {
   const original = req.query.text
 
   // Push the new message into Firestore using the Firebase Admin SDK.
-  const writeResult = await app
-    .firestore()
+  const writeResult = await firestore
     .collection("messages")
     .add({ original: original })
 
