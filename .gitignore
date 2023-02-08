@@ -1,7 +1,7 @@
 /.firebase
 /build
 /coverage
-/.env*.local
 
+.env*.local
 node_modules
 *.log
