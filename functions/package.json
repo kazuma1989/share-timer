@@ -12,6 +12,7 @@
   "dependencies": {
     "firebase-admin": "11.5.x",
     "firebase-functions": "4.2.x",
+    "stripe": "11.9.x",
     "superstruct": "1.0.x"
   },
   "devDependencies": {
