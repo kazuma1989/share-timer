@@ -42,12 +42,34 @@ export const checkoutSessionCompleted = functions.https.onRequest(
   }
 )
 
-export const onCheckoutSessionCreated = functions.firestore
+export const onWriteCheckoutSession = functions.firestore
   .document(document("checkout-sessions-v1/{id}"))
-  .onCreate(async (snapshot, context) => {
-    const newValue = snapshot.data()
+  .onWrite(async (change, context) => {
+    /**
+     * | Operation   | before.exists | after.exists |
+     * | ----------- | :-----------: | :----------: |
+     * | create      |     false     |     true     |
+     * | update      |     true      |     true     |
+     * | delete      |     true      |    false     |
+     * | (undefined) |     false     |    false     |
+     */
+    const changeType = !change.after.exists
+      ? "delete"
+      : !change.before.exists
+      ? "create"
+      : "update"
 
-    functions.logger.info(context.params.id, newValue)
+    switch (changeType) {
+      case "create":
+      case "update": {
+        functions.logger.info(context.params.id, change.after.data())
+        break
+      }
+
+      case "delete": {
+        break
+      }
+    }
   })
 
 // http://127.0.0.1:5001/share-timer-2b51a/us-central1/addCustomClaims?uid=xxx
