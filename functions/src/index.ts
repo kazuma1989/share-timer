@@ -7,6 +7,10 @@ const app = initializeApp()
 const auth = getAuth(app)
 const firestore = getFirestore(app)
 
+function collection<T extends "checkout-sessions-v1">(path: T): T {
+  return path
+}
+
 export const checkoutSessionCompleted = functions.https.onRequest(
   async (req, res) => {
     if (req.method !== "POST") {
@@ -20,7 +24,7 @@ export const checkoutSessionCompleted = functions.https.onRequest(
       const id = req.body.id
 
       await firestore
-        .collection("checkout-sessions-v1")
+        .collection(collection("checkout-sessions-v1"))
         .doc(id)
         // TODO req.body の検証をしないと危ない
         .create(req.body)
