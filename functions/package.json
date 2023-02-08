@@ -3,6 +3,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
+    "stripe": "stripe listen --forward-to localhost:5001/share-timer-2b51a/us-central1/checkoutSessionCompleted",
     "logs": "firebase functions:log"
   },
   "engines": {
