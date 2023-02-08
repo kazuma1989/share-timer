@@ -32,7 +32,7 @@ function document<T extends "checkout-sessions-v1/{id}">(path: T): T {
   return path
 }
 
-export const checkoutSessionCompleted = functions
+export const stripeWebhook = functions
   .runWith({
     secrets: [STRIPE_API_KEY$, STRIPE_ENDPOINT_SECRET$],
   })
