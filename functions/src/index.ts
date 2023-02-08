@@ -72,7 +72,28 @@ export const onWriteCheckoutSession = functions.firestore
     switch (changeType) {
       case "create":
       case "update": {
-        functions.logger.info(context.params.id, change.after.data())
+        const [error, data] = s.validate(
+          change.after.data(),
+          checkoutSessionSchema
+        )
+        if (error) {
+          functions.logger.error(error)
+          break
+        }
+
+        const { uid } = data
+
+        functions.logger.info(
+          "customClaims",
+          (await auth.getUser(uid)).customClaims
+        )
+
+        await auth.setCustomUserClaims(uid, {
+          app_v1: {
+            plan: "premium",
+          },
+        })
+
         break
       }
 
