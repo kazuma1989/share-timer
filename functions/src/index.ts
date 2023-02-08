@@ -11,6 +11,10 @@ function collection<T extends "checkout-sessions-v1">(path: T): T {
   return path
 }
 
+function document<T extends "checkout-sessions-v1/{id}">(path: T): T {
+  return path
+}
+
 export const checkoutSessionCompleted = functions.https.onRequest(
   async (req, res) => {
     if (req.method !== "POST") {
@@ -37,6 +41,14 @@ export const checkoutSessionCompleted = functions.https.onRequest(
     }
   }
 )
+
+export const onCheckoutSessionCreated = functions.firestore
+  .document(document("checkout-sessions-v1/{id}"))
+  .onCreate(async (snapshot, context) => {
+    const newValue = snapshot.data()
+
+    functions.logger.info(context.params.id, newValue)
+  })
 
 // http://127.0.0.1:5001/share-timer-2b51a/us-central1/addCustomClaims?uid=xxx
 export const addCustomClaims = functions.https.onRequest(async (req, res) => {
