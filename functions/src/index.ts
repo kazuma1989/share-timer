@@ -9,11 +9,8 @@ import * as s from "superstruct"
 const STRIPE_API_KEY$ = defineSecret("STRIPE_API_KEY")
 const STRIPE_ENDPOINT_SECRET$ = defineSecret("STRIPE_ENDPOINT_SECRET")
 
-interface CheckoutSession extends s.Infer<typeof checkoutSessionSchema> {}
-
 const checkoutSessionSchema = s.type({
-  id: s.string(),
-  uid: s.string(),
+  client_reference_id: s.string(),
 })
 
 const app = initializeApp()
@@ -112,7 +109,7 @@ export const onWriteCheckoutSession = functions.firestore
           break
         }
 
-        const { uid } = data
+        const { client_reference_id: uid } = data
 
         functions.logger.info(
           "customClaims",
