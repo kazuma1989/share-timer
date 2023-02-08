@@ -2,6 +2,14 @@ import { initializeApp } from "firebase-admin/app"
 import { getAuth } from "firebase-admin/auth"
 import { getFirestore } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
+import * as s from "superstruct"
+
+interface CheckoutSession extends s.Infer<typeof checkoutSessionSchema> {}
+
+const checkoutSessionSchema = s.type({
+  id: s.string(),
+  uid: s.string(),
+})
 
 const app = initializeApp()
 const auth = getAuth(app)
@@ -23,21 +31,23 @@ export const checkoutSessionCompleted = functions.https.onRequest(
       return
     }
 
+    const [error, data] = s.validate(req.body, checkoutSessionSchema)
+    if (error) {
+      res.status(400).json(error)
+      return
+    }
+
     try {
-      // TODO req.body の検証をしないと危ない
-      const id = req.body.id
+      const { id } = data
 
       await firestore
         .collection(collection("checkout-sessions-v1"))
         .doc(id)
-        // TODO req.body の検証をしないと危ない
-        .create(req.body)
+        .create(data)
 
-      // TODO req.body の検証をしないと危ない
-      res.json(req.body)
+      res.json(data)
     } catch {
-      // TODO req.body の検証をしないと危ない
-      res.status(409).json(req.body)
+      res.status(409).json(data)
     }
   }
 )
