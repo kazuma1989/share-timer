@@ -3,5 +3,6 @@
 /coverage
 
 .env*.local
+.secret.local
 node_modules
 *.log

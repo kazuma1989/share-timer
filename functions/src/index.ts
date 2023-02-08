@@ -2,24 +2,12 @@ import { initializeApp } from "firebase-admin/app"
 import { getAuth } from "firebase-admin/auth"
 import { getFirestore } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
+import { defineSecret } from "firebase-functions/params"
 import Stripe from "stripe"
 import * as s from "superstruct"
 
-declare const process: {
-  env: {
-    STRIPE_API_KEY: string
-    STRIPE_ENDPOINT_SECRET: string
-  }
-}
-
-const secrets = [
-  "STRIPE_API_KEY",
-  "STRIPE_ENDPOINT_SECRET",
-] satisfies (keyof typeof process.env)[]
-
-const stripe = new Stripe(process.env.STRIPE_API_KEY, {
-  apiVersion: "2022-11-15",
-})
+const STRIPE_API_KEY$ = defineSecret("STRIPE_API_KEY")
+const STRIPE_ENDPOINT_SECRET$ = defineSecret("STRIPE_ENDPOINT_SECRET")
 
 interface CheckoutSession extends s.Infer<typeof checkoutSessionSchema> {}
 
@@ -45,7 +33,9 @@ function document<T extends "checkout-sessions-v1/{id}">(path: T): T {
 }
 
 export const checkoutSessionCompleted = functions
-  .runWith({ secrets })
+  .runWith({
+    secrets: [STRIPE_API_KEY$, STRIPE_ENDPOINT_SECRET$],
+  })
   .https.onRequest(async (req, res) => {
     if (req.method !== "POST") {
       res.setHeader("Allow", "POST")
@@ -58,10 +48,14 @@ export const checkoutSessionCompleted = functions
       return
     }
 
+    const stripe = new Stripe(STRIPE_API_KEY$.value(), {
+      apiVersion: "2022-11-15",
+    })
+
     const event = stripe.webhooks.constructEvent(
       req.rawBody,
       req.headers["stripe-signature"],
-      process.env.STRIPE_ENDPOINT_SECRET
+      STRIPE_ENDPOINT_SECRET$.value()
     )
 
     functions.logger.debug(event.type)
