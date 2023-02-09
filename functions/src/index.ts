@@ -56,6 +56,7 @@ export const createCheckoutSession = functions
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
+          // spell-checker:disable-next-line
           price: "price_1MZ8M1GVtjqV2UHuz3wUfODe",
           quantity: 1,
         },
