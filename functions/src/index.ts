@@ -9,6 +9,19 @@ import * as s from "superstruct"
 const STRIPE_API_KEY$ = defineSecret("STRIPE_API_KEY")
 const STRIPE_ENDPOINT_SECRET$ = defineSecret("STRIPE_ENDPOINT_SECRET")
 
+const checkoutSessionEventSchema = s.type({
+  // https://stripe.com/docs/api/events/types
+  type: s.enums([
+    "checkout.session.async_payment_failed",
+    "checkout.session.async_payment_succeeded",
+    "checkout.session.completed",
+    "checkout.session.expired",
+  ]),
+  data: s.type({
+    object: s.any() as unknown as s.Describe<Stripe.Checkout.Session>,
+  }),
+})
+
 const checkoutSessionSchema = s.type({
   client_reference_id: s.string(),
 })
@@ -92,12 +105,12 @@ export const stripeWebhook = functions
       return
     }
 
-    if (event.type !== "checkout.session.completed") {
+    if (!s.is(event, checkoutSessionEventSchema)) {
       res.status(200).send()
       return
     }
 
-    const session = event.data.object as Stripe.Checkout.Session
+    const session = event.data.object
 
     try {
       await firestore
