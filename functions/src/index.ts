@@ -5,6 +5,7 @@ import * as functions from "firebase-functions"
 import { defineString } from "firebase-functions/params"
 import Stripe from "stripe"
 import * as s from "superstruct"
+import { collection, document } from "./firestorePath"
 import { getEndpointSecret, getStripe } from "./getStripe"
 import { checkoutSessionEventSchema, checkoutSessionSchema } from "./schema"
 
@@ -14,14 +15,6 @@ const HOSTING_ORIGIN$ = defineString("HOSTING_ORIGIN")
 const app = initializeApp()
 const auth = getAuth(app)
 const firestore = getFirestore(app)
-
-function collection<T extends "checkout-sessions-v1">(path: T): T {
-  return path
-}
-
-function document<T extends "checkout-sessions-v1/{id}">(path: T): T {
-  return path
-}
 
 export const createCheckoutSession = functions
   .runWith({
