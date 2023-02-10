@@ -2,12 +2,15 @@ import { initializeApp } from "firebase-admin/app"
 import { getAuth } from "firebase-admin/auth"
 import { getFirestore } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
-import { defineSecret } from "firebase-functions/params"
+import { defineSecret, defineString } from "firebase-functions/params"
 import Stripe from "stripe"
 import * as s from "superstruct"
 
 const STRIPE_API_KEY$ = defineSecret("STRIPE_API_KEY")
 const STRIPE_ENDPOINT_SECRET$ = defineSecret("STRIPE_ENDPOINT_SECRET")
+
+const STRIPE_PRICE_API_ID$ = defineString("STRIPE_PRICE_API_ID")
+const HOSTING_ORIGIN$ = defineString("HOSTING_ORIGIN")
 
 const checkoutSessionEventSchema = s.type({
   // https://stripe.com/docs/api/events/types
@@ -56,14 +59,13 @@ export const createCheckoutSession = functions
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
-          // spell-checker:disable-next-line
-          price: "price_1MZ8M1GVtjqV2UHuz3wUfODe",
+          price: STRIPE_PRICE_API_ID$.value(),
           quantity: 1,
         },
       ],
       mode: "payment",
-      success_url: "http://localhost:3000/success.html",
-      cancel_url: "http://localhost:3000/cancel.html",
+      success_url: HOSTING_ORIGIN$.value() + "/checkout.html",
+      cancel_url: HOSTING_ORIGIN$.value() + "/checkout.html",
       client_reference_id: "hello-kazuma1989",
     })
 
