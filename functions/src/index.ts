@@ -6,26 +6,10 @@ import { defineString } from "firebase-functions/params"
 import Stripe from "stripe"
 import * as s from "superstruct"
 import { getEndpointSecret, getStripe } from "./getStripe"
+import { checkoutSessionEventSchema, checkoutSessionSchema } from "./schema"
 
 const STRIPE_PRICE_API_ID$ = defineString("STRIPE_PRICE_API_ID")
 const HOSTING_ORIGIN$ = defineString("HOSTING_ORIGIN")
-
-const checkoutSessionEventSchema = s.type({
-  // https://stripe.com/docs/api/events/types
-  type: s.enums([
-    "checkout.session.async_payment_failed",
-    "checkout.session.async_payment_succeeded",
-    "checkout.session.completed",
-    "checkout.session.expired",
-  ]),
-  data: s.type({
-    object: s.any() as unknown as s.Describe<Stripe.Checkout.Session>,
-  }),
-})
-
-const checkoutSessionSchema = s.type({
-  client_reference_id: s.string(),
-})
 
 const app = initializeApp()
 const auth = getAuth(app)
