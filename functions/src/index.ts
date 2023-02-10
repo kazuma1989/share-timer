@@ -2,12 +2,10 @@ import { initializeApp } from "firebase-admin/app"
 import { getAuth } from "firebase-admin/auth"
 import { getFirestore } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
-import { defineSecret, defineString } from "firebase-functions/params"
+import { defineString } from "firebase-functions/params"
 import Stripe from "stripe"
 import * as s from "superstruct"
-
-const STRIPE_API_KEY$ = defineSecret("STRIPE_API_KEY")
-const STRIPE_ENDPOINT_SECRET$ = defineSecret("STRIPE_ENDPOINT_SECRET")
+import { getEndpointSecret, getStripe } from "./getStripe"
 
 const STRIPE_PRICE_API_ID$ = defineString("STRIPE_PRICE_API_ID")
 const HOSTING_ORIGIN$ = defineString("HOSTING_ORIGIN")
@@ -43,7 +41,7 @@ function document<T extends "checkout-sessions-v1/{id}">(path: T): T {
 
 export const createCheckoutSession = functions
   .runWith({
-    secrets: [STRIPE_API_KEY$],
+    secrets: [...getStripe.secrets],
   })
   .https.onRequest(async (req, res) => {
     if (req.method !== "POST") {
@@ -52,9 +50,7 @@ export const createCheckoutSession = functions
       return
     }
 
-    const stripe = new Stripe(STRIPE_API_KEY$.value(), {
-      apiVersion: "2022-11-15",
-    })
+    const stripe = getStripe()
 
     const session = await stripe.checkout.sessions.create({
       line_items: [
@@ -74,7 +70,7 @@ export const createCheckoutSession = functions
 
 export const stripeWebhook = functions
   .runWith({
-    secrets: [STRIPE_API_KEY$, STRIPE_ENDPOINT_SECRET$],
+    secrets: [...getStripe.secrets, ...getEndpointSecret.secrets],
   })
   .https.onRequest(async (req, res) => {
     if (req.method !== "POST") {
@@ -90,16 +86,14 @@ export const stripeWebhook = functions
       return
     }
 
-    const stripe = new Stripe(STRIPE_API_KEY$.value(), {
-      apiVersion: "2022-11-15",
-    })
+    const stripe = getStripe()
 
     let event: Stripe.Event
     try {
       event = stripe.webhooks.constructEvent(
         req.rawBody,
         req.headers["stripe-signature"],
-        STRIPE_ENDPOINT_SECRET$.value()
+        getEndpointSecret()
       )
     } catch (error) {
       functions.logger.warn(error)
