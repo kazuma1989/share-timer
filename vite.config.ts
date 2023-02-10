@@ -4,6 +4,7 @@ import { emulators, hosting } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
 import chunkAlignGranularity from "./vite/plugin/chunkAlignGranularity"
+import firebaseHostingRewrite from "./vite/plugin/firebaseHostingRewrite"
 import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
 import prefetchWorker from "./vite/plugin/prefetchWorker"
 import vitest from "./vite/plugin/vitest"
@@ -59,6 +60,7 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
       svelte(),
 
       // Firebase
+      firebaseHostingRewrite(),
       firebaseReservedURL(),
 
       // Build config
