@@ -1,25 +1,10 @@
-import * as fs from "node:fs/promises"
-import * as path from "node:path"
 import { Plugin } from "vite"
-
-interface Firebaserc {
-  projects: {
-    default: string
-  }
-}
+import { getFirebaserc } from "../getFirebaserc"
 
 /**
  * firebase.json の hosting.rewrites をできるだけエミュレートする
  */
 export default function firebaseHostingRewrite(): Plugin {
-  const getFirebaserc = () =>
-    fs
-      .readFile(path.join(__dirname, "../../.firebaserc"), {
-        encoding: "utf-8",
-      })
-      .then<Firebaserc>(JSON.parse)
-      .catch(() => null)
-
   return {
     name: "firebaseHostingRewrite",
 
