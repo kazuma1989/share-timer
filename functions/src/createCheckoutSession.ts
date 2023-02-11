@@ -14,7 +14,15 @@ export const createCheckoutSession = functions
     }
 
     // CSRF 対策
-    if (req.headers["sec-fetch-site"] !== "same-origin") {
+    // Safari は sec-fetch-site に未対応
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Sec-Fetch-Site
+    const validForSafari =
+      req.headers["sec-fetch-site"] === undefined &&
+      req.headers["origin"] === HOSTING_ORIGIN$.value()
+    const validForOtherBrowsers =
+      req.headers["sec-fetch-site"] === "same-origin"
+
+    if (!validForSafari && !validForOtherBrowsers) {
       functions.logger.debug(req.headers)
 
       res
