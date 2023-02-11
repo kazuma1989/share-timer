@@ -48,7 +48,19 @@ export const createCheckoutSession = functions
 
     const { idToken } = data
 
-    const { uid } = await getAuth().verifyIdToken(idToken)
+    const uid = await getAuth()
+      .verifyIdToken(idToken)
+      .then(
+        (_) => _.uid,
+        (reason) => {
+          functions.logger.debug("verify id token failed", { ...reason })
+          return null
+        }
+      )
+    if (!uid) {
+      res.status(401).send("Could not confirm that you are signed in.")
+      return
+    }
 
     const stripe = getStripe()
 
