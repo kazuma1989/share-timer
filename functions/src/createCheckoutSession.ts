@@ -1,10 +1,11 @@
+import { getAuth } from "firebase-admin/auth"
 import * as functions from "firebase-functions"
 import * as s from "superstruct"
 import { getStripe } from "./getStripe"
 import { HOSTING_ORIGIN$, STRIPE_PRICE_API_ID$ } from "./params"
 
 const reqBodySchema = s.type({
-  client_reference_id: s.string(),
+  idToken: s.string(),
 })
 
 export const createCheckoutSession = functions
@@ -45,7 +46,9 @@ export const createCheckoutSession = functions
       return
     }
 
-    const { client_reference_id } = data
+    const { idToken } = data
+
+    const { uid } = await getAuth().verifyIdToken(idToken)
 
     const stripe = getStripe()
 
@@ -59,7 +62,7 @@ export const createCheckoutSession = functions
       mode: "payment",
       success_url: HOSTING_ORIGIN$.value() + "/checkout.html",
       cancel_url: HOSTING_ORIGIN$.value() + "/checkout.html",
-      client_reference_id,
+      client_reference_id: uid,
     })
 
     res.redirect(303, session.url!)
