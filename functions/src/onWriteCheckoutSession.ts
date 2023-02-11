@@ -35,15 +35,18 @@ export const onWriteCheckoutSession = functions.firestore
 
         const { client_reference_id: uid } = data
 
-        functions.logger.info(
-          "customClaims",
-          (await getAuth().getUser(uid)).customClaims
-        )
+        functions.logger.debug("customClaims (before)", {
+          customClaims: (await getAuth().getUser(uid)).customClaims,
+        })
 
         await getAuth().setCustomUserClaims(uid, {
           app_v1: {
             plan: "premium",
           },
+        })
+
+        functions.logger.debug("customClaims (after)", {
+          customClaims: (await getAuth().getUser(uid)).customClaims,
         })
 
         break

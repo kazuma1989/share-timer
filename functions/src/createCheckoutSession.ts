@@ -15,7 +15,7 @@ export const createCheckoutSession = functions
   .https.onRequest(async (req, res) => {
     if (req.method !== "POST") {
       res.setHeader("Allow", "POST")
-      res.status(405).send()
+      res.status(405).send("Method Not Allowed")
       return
     }
 
@@ -29,7 +29,7 @@ export const createCheckoutSession = functions
       req.headers["sec-fetch-site"] === "same-origin"
 
     if (!validForSafari && !validForOtherBrowsers) {
-      functions.logger.debug(req.headers)
+      functions.logger.debug("CSRF check failed", { headers: req.headers })
 
       res
         .status(400)
@@ -39,6 +39,11 @@ export const createCheckoutSession = functions
 
     const [error, data] = s.validate(req.body, reqBodySchema)
     if (error) {
+      functions.logger.debug("invalid request body form", {
+        body: req.body,
+        error,
+      })
+
       res.status(400).json({
         message: "The shape of the request body is unexpected.",
         reason: error,
@@ -48,16 +53,13 @@ export const createCheckoutSession = functions
 
     const { idToken } = data
 
-    const uid = await getAuth()
-      .verifyIdToken(idToken)
-      .then(
-        (_) => _.uid,
-        (reason) => {
-          functions.logger.debug("verify id token failed", { ...reason })
-          return null
-        }
-      )
-    if (!uid) {
+    let uid: string
+    try {
+      const _ = await getAuth().verifyIdToken(idToken)
+      uid = _.uid
+    } catch (error: any) {
+      functions.logger.debug("verify id token failed", { ...error })
+
       res.status(401).send("Could not confirm that you are signed in.")
       return
     }
@@ -76,6 +78,8 @@ export const createCheckoutSession = functions
       cancel_url: HOSTING_ORIGIN$.value() + "/checkout.html",
       client_reference_id: uid,
     })
+
+    functions.logger.info("create session success", { id: session.id })
 
     res.redirect(303, session.url!)
   })

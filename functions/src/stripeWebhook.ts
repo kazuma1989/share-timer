@@ -13,12 +13,14 @@ export const stripeWebhook = functions
   .https.onRequest(async (req, res) => {
     if (req.method !== "POST") {
       res.setHeader("Allow", "POST")
-      res.status(405).send()
+      res.status(405).send("Method Not Allowed")
       return
     }
 
     if (req.headers["stripe-signature"] === undefined) {
-      functions.logger.warn("missing stripe-signature header")
+      functions.logger.warn("missing stripe-signature header", {
+        headers: req.headers,
+      })
 
       res.status(400).send("missing stripe-signature header")
       return
@@ -34,13 +36,17 @@ export const stripeWebhook = functions
         getEndpointSecret()
       )
     } catch (error) {
-      functions.logger.warn(error)
+      functions.logger.warn("failed to verify the signature of an Event", {
+        error,
+      })
 
       res.status(400).send()
       return
     }
 
     if (!s.is(event, checkoutSessionEventSchema)) {
+      functions.logger.debug("ignore a valid Event", { event })
+
       res.status(200).send()
       return
     }
@@ -53,8 +59,12 @@ export const stripeWebhook = functions
         .doc(session.id)
         .create(session)
 
+      functions.logger.info("save session success", { id: session.id })
+
       res.status(200).json(session)
-    } catch {
+    } catch (error) {
+      functions.logger.info("session already exists", { id: session.id })
+
       res.status(409).json(session)
     }
   })
