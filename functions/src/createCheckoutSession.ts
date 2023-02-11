@@ -13,6 +13,16 @@ export const createCheckoutSession = functions
       return
     }
 
+    // CSRF 対策
+    if (req.headers["sec-fetch-site"] !== "same-origin") {
+      functions.logger.debug(req.headers)
+
+      res
+        .status(400)
+        .send("We could not verify that it was a legitimate request.")
+      return
+    }
+
     const stripe = getStripe()
 
     const session = await stripe.checkout.sessions.create({
