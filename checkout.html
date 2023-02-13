@@ -7,21 +7,12 @@
 
     <title>Checkout</title>
 
+    <script type="module" src="/src/main-checkout.ts"></script>
+
     <link rel="stylesheet" href="/src/global.css" />
   </head>
 
   <body>
-    <script type="module">
-      import("https://js.stripe.com/v3/pricing-table.js")
-
-      const table = document.createElement("stripe-pricing-table")
-      document.body.append(table)
-
-      table.setAttribute("pricing-table-id", "prctbl_1MapS3GVtjqV2UHuZe0qNP7l")
-      table.setAttribute(
-        "publishable-key",
-        import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
-      )
-    </script>
+    <div id="root"></div>
   </body>
 </html>
