@@ -1,11 +1,10 @@
 import { svelte } from "@sveltejs/vite-plugin-svelte"
 import { defineConfig, UserConfig } from "vite"
-import { hosting } from "./firebase.json"
+import { emulators, hosting } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
 import chunkAlignGranularity from "./vite/plugin/chunkAlignGranularity"
 import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
-import firestoreEmulatorProxy from "./vite/plugin/firestoreEmulatorProxy"
 import prefetchWorker from "./vite/plugin/prefetchWorker"
 import vitest from "./vite/plugin/vitest"
 
@@ -32,6 +31,10 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
   return {
     appType: "mpa",
 
+    define: {
+      "import.meta.env.FIREBASE_EMULATORS": JSON.stringify(emulators),
+    },
+
     server: {
       host: HOST || "localhost",
       port: (PORT && Number.parseInt(PORT)) || 3000,
@@ -57,7 +60,6 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
 
       // Firebase
       firebaseReservedURL(),
-      firestoreEmulatorProxy(),
 
       // Build config
       chunkAlignGranularity(),

@@ -10,23 +10,41 @@
   export { className as class }
   let className: string = ""
 
-  let slider: HTMLElement
-  export const focus = () => {
-    slider.focus()
-  }
-
-  let currentOption: HTMLElement
+  let currentStep: HTMLElement
   const onKeydown: KeyboardEventHandler<HTMLElement> = (e) => {
     import.meta.env.DEV && console.debug(e.key, e.keyCode)
 
     switch (e.key) {
-      case "ArrowUp":
-      case "ArrowRight": {
+      case "Enter": {
         e.preventDefault()
 
-        // increment
-        const next = currentOption.nextElementSibling
-        next?.scrollIntoView({ block: "center" })
+        // submit
+        const form = e.currentTarget.closest("form")
+        form?.dispatchEvent(
+          new SubmitEvent("submit", { submitter: e.currentTarget })
+        )
+        break
+      }
+
+      case "Home": {
+        e.preventDefault()
+
+        // decrement
+        const first = currentStep.parentElement?.firstElementChild
+        first?.scrollIntoView({ block: "center" })
+        break
+      }
+
+      case "PageDown": {
+        e.preventDefault()
+
+        // decrement
+        const prev5 =
+          currentStep.previousElementSibling?.previousElementSibling
+            ?.previousElementSibling?.previousElementSibling
+            ?.previousElementSibling ??
+          currentStep.parentElement?.firstElementChild
+        prev5?.scrollIntoView({ block: "center" })
         break
       }
 
@@ -35,8 +53,39 @@
         e.preventDefault()
 
         // decrement
-        const prev = currentOption.previousElementSibling
+        const prev = currentStep.previousElementSibling
         prev?.scrollIntoView({ block: "center" })
+        break
+      }
+
+      case "ArrowUp":
+      case "ArrowRight": {
+        e.preventDefault()
+
+        // increment
+        const next = currentStep.nextElementSibling
+        next?.scrollIntoView({ block: "center" })
+        break
+      }
+
+      case "PageUp": {
+        e.preventDefault()
+
+        // increment
+        const next5 =
+          currentStep.nextElementSibling?.nextElementSibling?.nextElementSibling
+            ?.nextElementSibling?.nextElementSibling ??
+          currentStep.parentElement?.lastElementChild
+        next5?.scrollIntoView({ block: "center" })
+        break
+      }
+
+      case "End": {
+        e.preventDefault()
+
+        // increment
+        const last = currentStep.parentElement?.lastElementChild
+        last?.scrollIntoView({ block: "center" })
         break
       }
     }
@@ -56,7 +105,6 @@
   tabindex="0"
   class={className}
   on:keydown={onKeydown}
-  bind:this={slider}
 >
   <span
     class={clsx(
@@ -68,7 +116,8 @@
     )}
     use:intersect
     on:intersect={({ detail: step }) => {
-      currentOption = step
+      currentStep = step
+      // Reference [data-value]
       value = Number(step.dataset.value)
     }}
   >

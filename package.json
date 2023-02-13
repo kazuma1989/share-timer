@@ -13,10 +13,10 @@
   },
   "type": "module",
   "scripts": {
-    "start": "vite serve",
+    "start": "vite serve --host 0.0.0.0",
     "build": "vite build --mode=production",
     "build:preview": "vite build --mode=preview",
-    "preview": "vite preview",
+    "preview": "vite preview --host 0.0.0.0",
     "test": "vitest",
     "format": "prettier --write \"./src/**/*.{css,html,js,ts,svelte}\"",
     "lint": "eslint \"./src/**/*.{ts,svelte}\"",
