@@ -53,7 +53,7 @@ export class RemoteFirestore {
 
     if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
       const host = location.hostname
-      const port = Number(location.port)
+      const port = 8080
       console.info(`using emulator (${host}:${port})`)
 
       connectFirestoreEmulator(firestore, host, port)

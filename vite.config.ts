@@ -5,7 +5,6 @@ import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
 import chunkAlignGranularity from "./vite/plugin/chunkAlignGranularity"
 import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
-import firestoreEmulatorProxy from "./vite/plugin/firestoreEmulatorProxy"
 import prefetchWorker from "./vite/plugin/prefetchWorker"
 import vitest from "./vite/plugin/vitest"
 
@@ -57,7 +56,6 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
 
       // Firebase
       firebaseReservedURL(),
-      firestoreEmulatorProxy(),
 
       // Build config
       chunkAlignGranularity(),
