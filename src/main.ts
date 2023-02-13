@@ -4,9 +4,11 @@ import App from "./App.svelte"
 import AppSkeleton from "./AppSkeleton.svelte"
 import { firestoreImplContext } from "./firestore/firestoreImplContext"
 import type {
-  RemoteFirestore,
+  RemoteAuth,
   SignInState,
-} from "./firestore/worker/RemoteFirestore.worker"
+} from "./firestore/worker/RemoteAuth.worker"
+import RemoteAuthWorker from "./firestore/worker/RemoteAuth.worker?worker"
+import type { RemoteFirestore } from "./firestore/worker/RemoteFirestore.worker"
 import RemoteFirestoreWorker from "./firestore/worker/RemoteFirestore.worker?worker"
 import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
@@ -48,11 +50,16 @@ async function run(): Promise<void> {
     await fetch("/__/firebase/init.json").then((_) => _.json())
   )
 
+  const Auth = wrap<typeof RemoteAuth>(new RemoteAuthWorker())
+  const auth = await new Auth(
+    await fetch("/__/firebase/init.json").then((_) => _.json())
+  )
+
   setTransferHandlers()
   // firestore.getEstimatedDiff().then(setEstimatedDiff)
 
   const authUser$ = observeWorker<SignInState>((onNext) =>
-    firestore.onAuthStateChanged(onNext)
+    auth.onAuthStateChanged(onNext)
   ).pipe(shareRecent())
 
   const notSignedIn$ = authUser$.pipe(filter((_) => _ === "not-signed-in"))

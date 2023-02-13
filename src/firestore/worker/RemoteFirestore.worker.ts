@@ -4,11 +4,6 @@ import {
   connectAuthEmulator,
   indexedDBLocalPersistence,
   initializeAuth,
-  onAuthStateChanged,
-  signOut,
-  type Auth,
-  type ParsedToken,
-  type User as AuthUser,
 } from "firebase/auth"
 import {
   addDoc,
@@ -29,7 +24,6 @@ import {
   type Firestore,
   type Unsubscribe,
 } from "firebase/firestore"
-import { Subject } from "rxjs"
 import * as s from "superstruct"
 import {
   actionSchema,
@@ -54,47 +48,11 @@ import { orderBy } from "./orderBy"
 import { where } from "./where"
 import { withMeta } from "./withMeta"
 
-export type SignInState = UserInfo | "not-signed-in"
-
-type UserInfo = WithoutMethods<AuthUser> & {
-  claims: ParsedToken
-}
-
 export class RemoteFirestore {
-  private readonly auth: Auth
-
-  private readonly signInState$: Subject<SignInState>
-
   private readonly firestore: Firestore
 
   constructor(options: FirebaseOptions) {
-    const firebaseApp = initializeApp(options)
-
-    this.auth = initializeAuth(firebaseApp, {
-      persistence: indexedDBLocalPersistence,
-      // No popupRedirectResolver defined
-    })
-
-    // TODO VITE_FIRESTORE_EMULATOR を間借りするのではなく専用の定数を用意するべき
-    if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
-      const protocol = location.protocol
-      const host = location.hostname
-
-      connectAuthEmulator(
-        this.auth,
-        `${protocol}//${host}:${import.meta.env.FIREBASE_EMULATORS.auth.port}`
-      )
-    }
-
-    this.signInState$ = new Subject()
-
-    onAuthStateChanged(this.auth, async (user) => {
-      this.signInState$.next(
-        user === null ? "not-signed-in" : await getUserInfo(user)
-      )
-    })
-
-    this.firestore = getFirestore(firebaseApp)
+    this.firestore = getFirestore(initializeApp(options))
 
     if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
       const host = location.hostname
@@ -105,27 +63,19 @@ export class RemoteFirestore {
     }
 
     setTransferHandlers()
-  }
 
-  onAuthStateChanged(
-    onNext: ((state: SignInState) => void) & ProxyMarked
-  ): Unsubscribe & ProxyMarked {
-    const subscription = this.signInState$.subscribe(onNext)
-
-    return proxy(() => {
-      subscription.unsubscribe()
+    const auth = initializeAuth(this.firestore.app, {
+      persistence: indexedDBLocalPersistence,
+      // No popupRedirectResolver defined
     })
-  }
 
-  async authRefreshToken(): Promise<void> {
-    // リフレッシュタイミングが悪いときは明示的にクラッシュさせたいので non-null assertion を使う
-    const user = this.auth.currentUser!
+    if (import.meta.env.VITE_AUTH_EMULATOR) {
+      const protocol = location.protocol
+      const host = location.hostname
+      const port = import.meta.env.FIREBASE_EMULATORS.auth.port
 
-    this.signInState$.next(await getUserInfo(user, true))
-  }
-
-  async signOut(): Promise<void> {
-    await signOut(this.auth)
+      connectAuthEmulator(auth, `${protocol}//${host}:${port}`)
+    }
   }
 
   onSnapshotRoom(
@@ -359,18 +309,4 @@ if (import.meta.vitest) {
       b: expect.any(FieldValue),
     } satisfies typeof x)
   })
-}
-
-async function getUserInfo(
-  user: AuthUser,
-  forceRefresh?: boolean
-): Promise<UserInfo> {
-  const { claims } = await user.getIdTokenResult(forceRefresh)
-
-  const userJSON = user.toJSON() as WithoutMethods<AuthUser>
-
-  return {
-    ...userJSON,
-    claims,
-  }
 }
