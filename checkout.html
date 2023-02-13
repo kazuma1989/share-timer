@@ -6,8 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Checkout</title>
-
-    <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
   </head>
 
   <body>
@@ -15,6 +13,8 @@
     </stripe-pricing-table>
 
     <script type="module">
+      import "https://js.stripe.com/v3/pricing-table.js"
+
       const table = document.body.querySelector("stripe-pricing-table")
       table.setAttribute(
         "publishable-key",
