@@ -19,12 +19,6 @@
             }
           ]
         }
-      ],
-      "rewrites": [
-        {
-          "source": "/createCheckoutSession",
-          "function": "createCheckoutSession"
-        }
       ]
     }
   ],
