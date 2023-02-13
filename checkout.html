@@ -9,13 +9,13 @@
   </head>
 
   <body>
-    <stripe-pricing-table pricing-table-id="prctbl_1MapS3GVtjqV2UHuZe0qNP7l">
-    </stripe-pricing-table>
-
     <script type="module">
-      import "https://js.stripe.com/v3/pricing-table.js"
+      import("https://js.stripe.com/v3/pricing-table.js")
 
-      const table = document.body.querySelector("stripe-pricing-table")
+      const table = document.createElement("stripe-pricing-table")
+      document.body.append(table)
+
+      table.setAttribute("pricing-table-id", "prctbl_1MapS3GVtjqV2UHuZe0qNP7l")
       table.setAttribute(
         "publishable-key",
         import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
