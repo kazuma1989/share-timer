@@ -1,6 +1,6 @@
 import { svelte } from "@sveltejs/vite-plugin-svelte"
 import { defineConfig, UserConfig } from "vite"
-import { hosting } from "./firebase.json"
+import { emulators, hosting } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
 import chunkAlignGranularity from "./vite/plugin/chunkAlignGranularity"
@@ -30,6 +30,10 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
 
   return {
     appType: "mpa",
+
+    define: {
+      "import.meta.env.FIREBASE_EMULATORS": JSON.stringify(emulators),
+    },
 
     server: {
       host: HOST || "localhost",
