@@ -1,13 +1,7 @@
 import { wrap } from "comlink"
-import { filter, firstValueFrom } from "rxjs"
 import App from "./App.svelte"
 import AppSkeleton from "./AppSkeleton.svelte"
 import { firestoreImplContext } from "./firestore/firestoreImplContext"
-import type {
-  RemoteAuth,
-  SignInState,
-} from "./firestore/worker/RemoteAuth.worker"
-import RemoteAuthWorker from "./firestore/worker/RemoteAuth.worker?worker"
 import type { RemoteFirestore } from "./firestore/worker/RemoteFirestore.worker"
 import RemoteFirestoreWorker from "./firestore/worker/RemoteFirestore.worker?worker"
 import { observeAudioPermission } from "./observeAudioPermission"
@@ -18,8 +12,6 @@ import { getItem, setItem } from "./storage"
 import { createAudio, keyWithAudio, keyWithMediaPermission } from "./useAudio"
 import { keyWithDarkMode, observeDarkMode } from "./useDarkMode"
 import { nanoid } from "./util/nanoid"
-import { observeWorker } from "./util/observeWorker"
-import { shareRecent } from "./util/shareRecent"
 
 run()
 
@@ -50,29 +42,8 @@ async function run(): Promise<void> {
     await fetch("/__/firebase/init.json").then((_) => _.json())
   )
 
-  const Auth = wrap<typeof RemoteAuth>(new RemoteAuthWorker())
-  const auth = await new Auth(
-    await fetch("/__/firebase/init.json").then((_) => _.json())
-  )
-
   setTransferHandlers()
   // firestore.getEstimatedDiff().then(setEstimatedDiff)
-
-  const authUser$ = observeWorker<SignInState>((onNext) =>
-    auth.onAuthStateChanged(onNext)
-  ).pipe(shareRecent())
-
-  const notSignedIn$ = authUser$.pipe(filter((_) => _ === "not-signed-in"))
-  notSignedIn$.subscribe(() => {
-    location.assign(
-      "/sign-in.html" +
-        (import.meta.env.VITE_FIRESTORE_EMULATOR
-          ? `?emulator=${import.meta.env.FIREBASE_EMULATORS.auth.port}`
-          : "")
-    )
-  })
-
-  await firstValueFrom(authUser$)
 
   new App({
     target: skeleton.appRoot!,
