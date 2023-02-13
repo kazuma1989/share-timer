@@ -59,7 +59,9 @@ async function run(): Promise<void> {
   notSignedIn$.subscribe(() => {
     location.assign(
       "/sign-in.html" +
-        (import.meta.env.VITE_FIRESTORE_EMULATOR ? "?emulator" : "")
+        (import.meta.env.VITE_FIRESTORE_EMULATOR
+          ? `?emulator=${import.meta.env.FIREBASE_EMULATORS.auth.port}`
+          : "")
     )
   })
 

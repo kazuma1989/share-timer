@@ -80,7 +80,10 @@ export class RemoteFirestore {
       const protocol = location.protocol
       const host = location.hostname
 
-      connectAuthEmulator(this.auth, `${protocol}//${host}:9099`)
+      connectAuthEmulator(
+        this.auth,
+        `${protocol}//${host}:${import.meta.env.FIREBASE_EMULATORS.auth.port}`
+      )
     }
 
     this.signInState$ = new Subject()
