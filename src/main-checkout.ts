@@ -32,9 +32,19 @@ async function run(): Promise<void> {
     )
   })
 
-  await firstValueFrom(authUser$)
+  const signInState = await firstValueFrom(authUser$)
+  if (signInState === "not-signed-in") return
+
+  const { uid, email } = signInState
 
   new Checkout({
     target: document.getElementById("root")!,
+    props: {
+      uid,
+      email,
+      signOut() {
+        firestore.signOut()
+      },
+    },
   })
 }
