@@ -37,6 +37,14 @@ async function run(): Promise<void> {
 
   const { uid, email } = signInState
 
+  // TODO デバッグしてるだけなので消したい
+  const x$ = observeWorker((onNext) =>
+    firestore.onSnapshotCheckoutSession(uid, onNext)
+  )
+  x$.subscribe((_) => {
+    console.log(_)
+  })
+
   new Checkout({
     target: document.getElementById("root")!,
     props: {

@@ -14,6 +14,7 @@ export function collection(
     | ["owners", string, "rooms", string, "actions"]
     | ["room-owners"]
     | ["calibrations"]
+    | ["checkout-sessions"]
 ): CollectionReference {
   return _collection(db, ...withVersionSuffix(paths))
 }

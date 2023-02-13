@@ -318,6 +318,36 @@ export class RemoteFirestore {
     )
   }
 
+  onSnapshotCheckoutSession(
+    uid: string,
+    onNext: ((data: unknown) => void) & ProxyMarked
+  ): (() => void) & ProxyMarked {
+    const sessions$ = snapshotOf(
+      query(
+        collection(this.firestore, "checkout-sessions"),
+        where("client_reference_id", "==", uid)
+      )
+    ).pipe(
+      map((snapshot) =>
+        snapshot.docs.flatMap((doc) => {
+          const rawData = doc.data({
+            serverTimestamps: "estimate",
+          })
+
+          return [rawData]
+        })
+      )
+    )
+
+    const sub = sessions$.subscribe((_) => {
+      onNext(_)
+    })
+
+    return proxy(() => {
+      sub.unsubscribe()
+    })
+  }
+
   /**
    * serverTimestamp() - Timestamp.now()
    */
