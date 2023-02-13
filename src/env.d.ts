@@ -5,4 +5,5 @@ interface ImportMetaEnv {
   VITE_AUTH_EMULATOR: string
   VITE_DB_VERSION: string
   VITE_FIRESTORE_EMULATOR: string
+  VITE_STRIPE_PUBLISHABLE_KEY: string
 }
