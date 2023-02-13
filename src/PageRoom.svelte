@@ -1,12 +1,5 @@
 <script lang="ts">
-  import {
-    firstValueFrom,
-    map,
-    merge,
-    of,
-    partition,
-    type Observable,
-  } from "rxjs"
+  import { firstValueFrom, map, merge, partition, type Observable } from "rxjs"
   import ConfigArea from "./ConfigArea.svelte"
   import FlashCover from "./FlashCover.svelte"
   import { isRoom, type InvalidDoc, type Room } from "./schema/roomSchema"
@@ -44,27 +37,6 @@
       () => {
         console.debug("audio.play()")
         audio.play()
-      }
-    )
-  }
-
-  let unsubscribeNotification: (() => void) | undefined
-  $: {
-    unsubscribeNotification?.()
-    unsubscribeNotification = setSoundCall(
-      timerState$,
-      // FIXME Notification.permission の変化をここで監視できないか？
-      of(true),
-      () => {
-        if (Notification.permission !== "granted") return
-
-        console.debug("new Notification")
-
-        // TODO タイマーキャンセルしたら close しないと
-        const notification = new Notification("時間になりました")
-        notification.addEventListener("error", (_) => {
-          console.warn(_)
-        })
       }
     )
   }
