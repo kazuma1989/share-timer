@@ -61,8 +61,6 @@
     "eslint-config-prettier": "8.5.x",
     "eslint-plugin-svelte3": "4.0.x",
     "eslint-plugin-tailwindcss": "3.7.x",
-    "firebase-admin": "11.5.x",
-    "firebase-functions": "4.2.x",
     "prettier": "2.8.x",
     "prettier-plugin-svelte": "2.9.x",
     "svelte-check": "3.0.x",
