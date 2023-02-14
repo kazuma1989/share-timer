@@ -53,18 +53,12 @@ export const stripeWebhook = functions
 
     const session = event.data.object
 
-    try {
-      await getFirestore()
-        .collection(collection("checkout-sessions-dev"))
-        .doc(session.id)
-        .create(session)
+    await getFirestore()
+      .collection(collection("checkout-sessions-dev"))
+      .doc(session.id)
+      .set(session)
 
-      functions.logger.info("save session success", { id: session.id })
+    functions.logger.info("save session success", { id: session.id })
 
-      res.status(200).json(session)
-    } catch (error) {
-      functions.logger.info("session already exists", { id: session.id })
-
-      res.status(409).json(session)
-    }
+    res.status(200).json(session)
   })
