@@ -35,7 +35,7 @@ service cloud.firestore {
       }
     }
 
-    match /checkout-sessions-v1/{session} {
+    match /checkout-sessions-dev/{session} {
       allow list: if request.auth != null && request.auth.uid == resource.data.client_reference_id;
     }
 

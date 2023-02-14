@@ -55,7 +55,7 @@ export const stripeWebhook = functions
 
     try {
       await getFirestore()
-        .collection(collection("checkout-sessions-v1"))
+        .collection(collection("checkout-sessions-dev"))
         .doc(session.id)
         .create(session)
 

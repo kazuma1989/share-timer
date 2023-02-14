@@ -1,7 +1,7 @@
-export function collection<T extends "checkout-sessions-v1">(path: T): T {
+export function collection<T extends "checkout-sessions-dev">(path: T): T {
   return path
 }
 
-export function document<T extends "checkout-sessions-v1/{id}">(path: T): T {
+export function document<T extends "checkout-sessions-dev/{id}">(path: T): T {
   return path
 }

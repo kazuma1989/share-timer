@@ -2,9 +2,11 @@ import { wrap } from "comlink"
 import { filter, firstValueFrom } from "rxjs"
 import Checkout from "./Checkout.svelte"
 import type {
-  RemoteFirestore,
+  RemoteAuth,
   SignInState,
-} from "./firestore/worker/RemoteFirestore.worker"
+} from "./firestore/worker/RemoteAuth.worker"
+import RemoteAuthWorker from "./firestore/worker/RemoteAuth.worker?worker"
+import type { RemoteFirestore } from "./firestore/worker/RemoteFirestore.worker"
 import RemoteFirestoreWorker from "./firestore/worker/RemoteFirestore.worker?worker"
 import { setTransferHandlers } from "./setTransferHandlers"
 import { observeWorker } from "./util/observeWorker"
@@ -20,15 +22,22 @@ async function run(): Promise<void> {
 
   setTransferHandlers()
 
+  const Auth = wrap<typeof RemoteAuth>(new RemoteAuthWorker())
+  const auth = await new Auth(
+    await fetch("/__/firebase/init.json").then((_) => _.json())
+  )
+
   const authUser$ = observeWorker<SignInState>((onNext) =>
-    firestore.onAuthStateChanged(onNext)
+    auth.onAuthStateChanged(onNext)
   ).pipe(shareRecent())
 
   const notSignedIn$ = authUser$.pipe(filter((_) => _ === "not-signed-in"))
   notSignedIn$.subscribe(() => {
     location.assign(
       "/sign-in.html" +
-        (import.meta.env.VITE_FIRESTORE_EMULATOR ? "?emulator" : "")
+        (import.meta.env.VITE_FIRESTORE_EMULATOR
+          ? `?emulator=${import.meta.env.FIREBASE_EMULATORS.auth.port}`
+          : "")
     )
   })
 
@@ -51,7 +60,7 @@ async function run(): Promise<void> {
       uid,
       email,
       signOut() {
-        firestore.signOut()
+        auth.signOut()
       },
     },
   })

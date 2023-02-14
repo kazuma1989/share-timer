@@ -95,6 +95,17 @@
     </p>
 
     <p>
+      <a
+        href="/checkout.html"
+        class={clsx(
+          "transparent-button block border border-gray-500 px-4 py-3 text-center no-underline"
+        )}
+      >
+        購入画面を開く (experimental)
+      </a>
+    </p>
+
+    <p>
       <button
         type="button"
         class="transparent-button block w-full border border-gray-500 px-4 py-3"
