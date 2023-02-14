@@ -33,13 +33,22 @@ export const onWriteCheckoutSession = functions.firestore
           break
         }
 
-        const { client_reference_id: uid } = data
+        const { client_reference_id, payment_status } = data
+        if (payment_status !== "paid") break
 
-        functions.logger.debug("customClaims (before)", {
-          customClaims: (await getAuth().getUser(uid)).customClaims,
-        })
+        if (!client_reference_id) {
+          functions.logger.error("no client_reference_id exists", { data })
+          break
+        }
+
+        const uid = client_reference_id
+
+        const { customClaims } = await getAuth().getUser(uid)
+
+        functions.logger.debug("customClaims (before)", { customClaims })
 
         await getAuth().setCustomUserClaims(uid, {
+          ...customClaims,
           app_v1: {
             plan: "premium",
           },

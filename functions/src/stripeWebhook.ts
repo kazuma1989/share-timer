@@ -4,7 +4,7 @@ import Stripe from "stripe"
 import * as s from "superstruct"
 import { collection } from "./firestorePath"
 import { getEndpointSecret, getStripe } from "./getStripe"
-import { checkoutSessionEventSchema } from "./schema"
+import { CheckoutSession, checkoutSessionEventSchema } from "./schema"
 
 export const stripeWebhook = functions
   .runWith({
@@ -52,11 +52,26 @@ export const stripeWebhook = functions
     }
 
     const session = event.data.object
+    const {
+      client_reference_id,
+      customer_details,
+      customer_email,
+      payment_status,
+      status,
+    } = session
+    const { email = null, name = null, phone = null } = customer_details ?? {}
 
     await getFirestore()
       .collection(collection("checkout-sessions-dev"))
       .doc(session.id)
-      .set(session)
+      .set({
+        client_reference_id,
+        customer_details: { email, name, phone },
+        customer_email,
+        payment_status,
+        status,
+        payload: session,
+      } satisfies CheckoutSession)
 
     functions.logger.info("save session success", { id: session.id })
 
