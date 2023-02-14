@@ -6,7 +6,7 @@ import { checkoutSessionSchema } from "./schema"
 
 export const onWriteCheckoutSession = functions.firestore
   .document(document("checkout-sessions-dev/{id}"))
-  .onWrite(async (change, context) => {
+  .onWrite(async (change) => {
     /**
      * | Operation   | before.exists | after.exists |
      * | ----------- | :-----------: | :----------: |
