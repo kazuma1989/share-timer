@@ -15,10 +15,16 @@
     if (!ok) return
 
     location.assign(
-      "/sign-in.html" +
-        (import.meta.env.VITE_FIRESTORE_EMULATOR
-          ? `?emulator=${import.meta.env.FIREBASE_EMULATORS.auth.port}`
-          : "")
+      "/sign-in.html?" +
+        new URLSearchParams({
+          back: location.pathname + location.search + location.hash,
+          ...(import.meta.env.VITE_FIRESTORE_EMULATOR
+            ? {
+                emulator:
+                  import.meta.env.FIREBASE_EMULATORS.auth.port.toString(),
+              }
+            : {}),
+        })
     )
   }
 </script>

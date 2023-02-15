@@ -99,7 +99,8 @@
 
       const ui = new firebaseui.auth.AuthUI(firebase.auth())
       ui.start("#firebaseui-auth-container", {
-        signInSuccessUrl: location.origin,
+        signInSuccessUrl:
+          new URLSearchParams(location.search).get("back") || location.href,
         signInOptions: [
           firebase.auth.GoogleAuthProvider.PROVIDER_ID,
           // "apple.com",
