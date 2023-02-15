@@ -54,6 +54,7 @@ export const stripeWebhook = functions
     const session = event.data.object
     const {
       client_reference_id,
+      created,
       customer_details,
       customer_email,
       payment_status,
@@ -66,6 +67,7 @@ export const stripeWebhook = functions
       .doc(session.id)
       .set({
         client_reference_id,
+        created,
         customer_details: { email, name, phone },
         customer_email,
         payment_status,

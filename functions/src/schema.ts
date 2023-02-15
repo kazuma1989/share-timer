@@ -19,6 +19,7 @@ export interface CheckoutSession
 
 export const checkoutSessionSchema = s.type({
   client_reference_id: s.nullable(s.string()),
+  created: s.number(),
   customer_details: s.nullable(
     s.type({
       email: s.nullable(s.string()),
