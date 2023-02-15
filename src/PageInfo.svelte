@@ -3,48 +3,23 @@
   import Icon from "./Icon.svelte"
   import QrCode from "./QRCode.svelte"
   import type { Room } from "./schema/roomSchema"
-  import { getItem } from "./storage"
   import { fromRoute } from "./toRoute"
-  import { AbortReason, useLockRoom } from "./useLockRoom"
 
   export let roomId: Room["id"]
 
   $: roomHash = `#${fromRoute(["room", roomId])}`
   $: roomURL = location.origin + location.pathname + roomHash
 
-  const _lockRoom = useLockRoom()
   const lockRoom = async () => {
-    const userId = getItem("userId")
-    if (!userId) return
+    const ok = confirm("まずはサインインが必要です")
+    if (!ok) return
 
-    const abort = new AbortController()
-
-    await _lockRoom(roomId, userId, {
-      signal: abort.signal,
-      onBeforeUpdate() {
-        const confirmed = confirm(
-          "解除の方法はありませんが、本当にロックしますか？"
-        )
-        if (!confirmed) {
-          throw AbortReason("user-deny")
-        }
-      },
-    }).catch((reason: AbortReason) => {
-      switch (reason) {
-        case "already-locked": {
-          alert("すでにロックされています")
-          break
-        }
-
-        case "user-deny": {
-          break
-        }
-
-        default: {
-          throw reason
-        }
-      }
-    })
+    location.assign(
+      "/sign-in.html" +
+        (import.meta.env.VITE_FIRESTORE_EMULATOR
+          ? `?emulator=${import.meta.env.FIREBASE_EMULATORS.auth.port}`
+          : "")
+    )
   }
 </script>
 
