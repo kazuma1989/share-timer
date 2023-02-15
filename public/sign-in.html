@@ -26,8 +26,79 @@
 
         firebase.auth().useEmulator(`${protocol}//${host}:${port}`)
       }
+    </script>
 
-      const uiConfig = {
+    <script type="module">
+      import {
+        html,
+        render,
+        useState,
+        useEffect,
+      } from "https://unpkg.com/htm@3.1.1/preact/standalone.module.js"
+
+      function App() {
+        const [user, setUser] = useState(firebase.auth().currentUser)
+
+        useEffect(
+          () =>
+            firebase.auth().onAuthStateChanged((user) => {
+              setUser(user)
+            }),
+          []
+        )
+
+        if (!user) {
+          return null
+        }
+
+        const onsubmit = (e) => {
+          e.preventDefault()
+          firebase.auth().signOut()
+        }
+
+        const {
+          uid,
+          email,
+          displayName,
+          lastLoginAt,
+          providerData: [provider],
+        } = user
+
+        const info = [
+          ["アカウント", provider?.providerId],
+          ["名前", displayName],
+          ["メール", email],
+        ]
+
+        return html`
+          <main style="text-align: center">
+            <form onsubmit=${onsubmit}>
+              <table>
+                <tbody>
+                  ${info.map(
+                    ([key, value]) =>
+                      html`
+                        <tr>
+                          <th>${key}</th>
+                          <td>${value || "-"}</td>
+                        </tr>
+                      `
+                  )}
+                </tbody>
+              </table>
+
+              <p>
+                <button>ログアウト</button>
+              </p>
+            </form>
+          </main>
+        `
+      }
+
+      render(html`<${App} />`, document.getElementById("root"))
+
+      const ui = new firebaseui.auth.AuthUI(firebase.auth())
+      ui.start("#firebaseui-auth-container", {
         signInSuccessUrl: location.origin,
         signInOptions: [
           firebase.auth.GoogleAuthProvider.PROVIDER_ID,
@@ -41,22 +112,35 @@
           // firebase.auth.PhoneAuthProvider.PROVIDER_ID,
           // firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID,
         ],
-      }
-
-      const ui = new firebaseui.auth.AuthUI(firebase.auth())
-      ui.start("#firebaseui-auth-container", uiConfig)
+      })
     </script>
 
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/awsm.css@3.0.7/dist/awsm_sealed.min.css"
+    />
     <style>
       button:focus {
         /* https://css-tricks.com/copy-the-browsers-native-focus-styles/ */
         outline: Highlight auto medium;
         outline: -webkit-focus-ring-color auto medium;
       }
+
+      *:not(:empty) + .peer-hidden {
+        display: none;
+      }
     </style>
   </head>
 
   <body>
-    <div id="firebaseui-auth-container"></div>
+    <div class="awsm">
+      <header style="text-align: center">
+        <h1>Share Timer</h1>
+      </header>
+    </div>
+
+    <div id="root" class="awsm"></div>
+
+    <div id="firebaseui-auth-container" class="peer-hidden"></div>
   </body>
 </html>
