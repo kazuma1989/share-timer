@@ -20,6 +20,8 @@ import {
   setDoc,
   startAt,
   Timestamp,
+  type CollectionReference,
+  type DocumentReference,
   type FieldValue,
   type Firestore,
   type Unsubscribe,
@@ -78,13 +80,19 @@ export class RemoteFirestore {
     }
   }
 
+  private selectRoom(roomId: Room["id"]): DocumentReference {
+    return doc(collection(this.firestore, "rooms"), roomId)
+  }
+
+  private selectActions(roomId: Room["id"]): CollectionReference {
+    return collection(this.firestore, "rooms", roomId, "actions")
+  }
+
   onSnapshotRoom(
     roomId: Room["id"],
     onNext: ((data: Room | InvalidDoc) => void) & ProxyMarked
   ): Unsubscribe & ProxyMarked {
-    const referenceRoom = doc(collection(this.firestore, "rooms"), roomId)
-
-    const unsubscribe = onSnapshot(referenceRoom, (snapshot) => {
+    const unsubscribe = onSnapshot(this.selectRoom(roomId), (snapshot) => {
       const rawData = snapshot.data({
         serverTimestamps: "estimate",
       })
@@ -113,14 +121,14 @@ export class RemoteFirestore {
   ): Promise<Unsubscribe & ProxyMarked> {
     const selectActions = await getDocs(
       query(
-        collection(this.firestore, "rooms", roomId, "actions"),
+        this.selectActions(roomId),
         where("type", "==", "start"),
         orderBy("createdAt", "asc"),
         limitToLast(1)
       )
     ).then(({ docs: [doc] }) =>
       query(
-        collection(this.firestore, "rooms", roomId, "actions"),
+        this.selectActions(roomId),
         orderBy("createdAt", "asc"),
         ...(hasNoEstimateTimestamp(doc?.metadata) ? [startAt(doc)] : [])
       )
@@ -154,13 +162,13 @@ export class RemoteFirestore {
 
   async dispatch(roomId: Room["id"], action: ActionInput): Promise<void> {
     await addDoc(
-      collection(this.firestore, "rooms", roomId, "actions"),
+      this.selectActions(roomId),
       withMeta(convertServerTimestamp(action))
     )
   }
 
   async setupRoom(
-    roomId: string,
+    roomId: Room["id"],
     aborted: (() => PromiseLike<boolean> | boolean) & ProxyMarked
   ): Promise<void> {
     const emoji = await fetch(
@@ -174,9 +182,7 @@ export class RemoteFirestore {
     await runTransaction(
       this.firestore,
       async (transaction) => {
-        const roomDoc = await transaction.get(
-          doc(collection(this.firestore, "rooms"), roomId)
-        )
+        const roomDoc = await transaction.get(this.selectRoom(roomId))
         if (await aborted()) throw "aborted 2"
 
         if (roomDoc.exists()) {
@@ -193,7 +199,7 @@ export class RemoteFirestore {
         }
 
         transaction.set(
-          doc(collection(this.firestore, "rooms", roomId, "actions")),
+          doc(this.selectActions(roomId)),
           withMeta({
             type: "cancel",
             withDuration: DEFAULT_DURATION,
@@ -219,9 +225,7 @@ export class RemoteFirestore {
     await runTransaction(
       this.firestore,
       async (transaction) => {
-        const roomDoc = await transaction.get(
-          doc(collection(this.firestore, "rooms"), roomId)
-        )
+        const roomDoc = await transaction.get(this.selectRoom(roomId))
         if (await aborted?.()) {
           throw AbortReason("signal")
         }

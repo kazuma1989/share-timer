@@ -26,7 +26,7 @@ const hardCache = createCache(true)
  */
 async function setupRoom(
   firestore: Remote<RemoteFirestore>,
-  roomId: string
+  roomId: Room["id"]
 ): Promise<void> {
   abort.abort()
   abort = new AbortController()
