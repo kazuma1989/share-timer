@@ -1,9 +1,14 @@
-import { isOwnerId, isRoomId, type Room } from "./schema/roomSchema"
+import {
+  isOwnerId,
+  isRoomId,
+  type OwnerId,
+  type Room,
+} from "./schema/roomSchema"
 
 export type Route =
   | [key: "room", roomId: Room["id"]]
   | [key: "info", roomId: Room["id"]]
-  | [key: "newRoom", payload: string, owner?: string]
+  | [key: "newRoom", payload: string, owner?: OwnerId]
   | [key: "unknown", payload: string]
 
 export function toRoute(value: string): Route {
@@ -70,7 +75,7 @@ if (import.meta.vitest) {
     expect(toRoute("olive/new")).toStrictEqual([
       "newRoom",
       "olive/new",
-      "olive",
+      "olive" as OwnerId,
     ] satisfies Route)
   })
 

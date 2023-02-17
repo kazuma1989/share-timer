@@ -9,10 +9,9 @@
   export let route$: Observable<Route>
 
   $: {
-    const [route] = $route$
+    const [route, , ownerId] = $route$
     if (route === "newRoom") {
-      // TODO owner が固定なのを無くす
-      replaceHash(["room", newRoomId("olive")])
+      replaceHash(["room", newRoomId(ownerId)])
     }
   }
 </script>

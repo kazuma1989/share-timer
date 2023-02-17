@@ -43,7 +43,7 @@ export function newRoomId(ownerId?: OwnerId): Room["id"] {
     nanoid(10).replace(/^(.{3})(.{4})(.{3})$/, "$1-$2-$3")) as Room["id"]
 }
 
-type OwnerId = string & { readonly ownerId: unique symbol }
+export type OwnerId = string & { readonly ownerId: unique symbol }
 
 export function isOwnerId(id: string): id is OwnerId {
   return /^[0-9a-z_-]{3,}$/.test(id)
