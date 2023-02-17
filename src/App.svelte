@@ -11,7 +11,8 @@
   $: {
     const [route] = $route$
     if (route === "newRoom") {
-      replaceHash(["room", newRoomId()])
+      // TODO owner が固定なのを無くす
+      replaceHash(["room", newRoomId("olive")])
     }
   }
 </script>

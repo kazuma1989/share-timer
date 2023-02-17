@@ -26,11 +26,21 @@ const roomIdSchema = /*@__PURE__*/ (() =>
   ))()
 
 export function isRoomId(id: string): id is Room["id"] {
-  return /^[a-z]{3}-[a-z]{4}-[a-z]{3}$/.test(id)
+  return /^(?:[0-9a-z_-]+\/)?[a-z]{3}-[a-z]{4}-[a-z]{3}$/.test(id)
 }
 
-export function newRoomId(): Room["id"] {
-  return nanoid(10).replace(/^(.{3})(.{4})(.{3})$/, "$1-$2-$3") as Room["id"]
+export function parseRoomId(id: Room["id"]): { owner?: string; room: string } {
+  if (!id.includes("/")) {
+    return { room: id }
+  }
+
+  const [owner, room] = id.split("/")
+  return { owner, room: room! }
+}
+
+export function newRoomId(owner?: string): Room["id"] {
+  return ((owner ? `${owner}/` : "") +
+    nanoid(10).replace(/^(.{3})(.{4})(.{3})$/, "$1-$2-$3")) as Room["id"]
 }
 
 if (import.meta.vitest) {
@@ -40,8 +50,27 @@ if (import.meta.vitest) {
     expect(s.validate("cnz-some-fmy", roomIdSchema)[1]).toBe("cnz-some-fmy")
   })
 
+  test("room id", () => {
+    expect(s.validate("olive/cnz-some-fmy", roomIdSchema)[1]).toBe(
+      "olive/cnz-some-fmy"
+    )
+  })
+
+  test("parse room id", () => {
+    expect(parseRoomId("olive/cnz-some-fmy" as Room["id"])).toStrictEqual({
+      owner: "olive",
+      room: "cnz-some-fmy",
+    } satisfies ReturnType<typeof parseRoomId>)
+  })
+
   test("generate valid room id", () => {
     const id = newRoomId()
+
+    expect(s.validate(id, roomIdSchema)[1]).toBe(id)
+  })
+
+  test("generate valid room id", () => {
+    const id = newRoomId("olive")
 
     expect(s.validate(id, roomIdSchema)[1]).toBe(id)
   })

@@ -34,6 +34,7 @@ import {
   type ActionInput,
 } from "../../schema/actionSchema"
 import {
+  parseRoomId,
   roomSchema,
   type InvalidDoc,
   type Room,
@@ -81,11 +82,22 @@ export class RemoteFirestore {
   }
 
   private selectRoom(roomId: Room["id"]): DocumentReference {
-    return doc(collection(this.firestore, "rooms"), roomId)
+    const { owner, room } = parseRoomId(roomId)
+
+    return doc(
+      owner
+        ? collection(this.firestore, "owners", owner, "rooms")
+        : collection(this.firestore, "rooms"),
+      room
+    )
   }
 
   private selectActions(roomId: Room["id"]): CollectionReference {
-    return collection(this.firestore, "rooms", roomId, "actions")
+    const { owner, room } = parseRoomId(roomId)
+
+    return owner
+      ? collection(this.firestore, "owners", owner, "rooms", room, "actions")
+      : collection(this.firestore, "rooms", room, "actions")
   }
 
   onSnapshotRoom(

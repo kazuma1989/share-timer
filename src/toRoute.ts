@@ -7,14 +7,33 @@ export type Route =
   | [key: "unknown", payload: string]
 
 export function toRoute(value: string): Route {
-  const [first, second, ...rest] = value.split("/")
+  const [first, second, third, ...rest] = value.split("/")
   const unknown: Route = ["unknown", value]
 
-  if (rest.length !== 0) {
+  if (rest.length !== 0 || first === undefined) {
     return unknown
   }
 
-  if (first !== undefined && isRoomId(first)) {
+  const formerPart = `${first}/${second}`
+
+  if (isRoomId(formerPart)) {
+    const roomId = formerPart
+    switch (third) {
+      case undefined: {
+        return ["room", roomId]
+      }
+
+      case "info": {
+        return ["info", roomId]
+      }
+
+      default: {
+        return unknown
+      }
+    }
+  }
+
+  if (isRoomId(first)) {
     const roomId = first
     switch (second) {
       case undefined: {
@@ -31,7 +50,7 @@ export function toRoute(value: string): Route {
     }
   }
 
-  if (first === "" || first === "new") {
+  if (first === "" || first === "new" || second === "new") {
     return ["newRoom", value]
   }
 
@@ -68,6 +87,13 @@ if (import.meta.vitest) {
   })
 
   test("toRoute", () => {
+    expect(toRoute("olive/new")).toStrictEqual([
+      "newRoom",
+      "olive/new",
+    ] satisfies Route)
+  })
+
+  test("toRoute", () => {
     expect(toRoute("aaa-bbbb-ccc/")).toStrictEqual([
       "unknown",
       "aaa-bbbb-ccc/",
@@ -82,9 +108,23 @@ if (import.meta.vitest) {
   })
 
   test("toRoute", () => {
+    expect(toRoute("olive/aaa-bbbb-ccc")).toStrictEqual([
+      "room",
+      "olive/aaa-bbbb-ccc" as Room["id"],
+    ] satisfies Route)
+  })
+
+  test("toRoute", () => {
     expect(toRoute("aaa-bbbb-ccc/info")).toStrictEqual([
       "info",
       "aaa-bbbb-ccc" as Room["id"],
+    ] satisfies Route)
+  })
+
+  test("toRoute", () => {
+    expect(toRoute("olive/aaa-bbbb-ccc/info")).toStrictEqual([
+      "info",
+      "olive/aaa-bbbb-ccc" as Room["id"],
     ] satisfies Route)
   })
 
@@ -92,9 +132,12 @@ if (import.meta.vitest) {
     const patterns = [
       "",
       "new",
+      "olive/new",
       "aaa-bbbb-ccc/",
       "aaa-bbbb-ccc",
       "aaa-bbbb-ccc/info",
+      "olive/aaa-bbbb-ccc",
+      "olive/aaa-bbbb-ccc/info",
     ]
 
     patterns.forEach((value) => {

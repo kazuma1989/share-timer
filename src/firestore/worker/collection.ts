@@ -7,7 +7,12 @@ import {
 
 export function collection(
   db: Firestore,
-  ...paths: ["rooms"] | ["rooms", string, "actions"] | ["calibrations"]
+  ...paths:
+    | ["rooms"]
+    | ["rooms", string, "actions"]
+    | ["owners", string, "rooms"]
+    | ["owners", string, "rooms", string, "actions"]
+    | ["calibrations"]
 ): CollectionReference {
   return _collection(db, ...withVersionSuffix(paths))
 }
