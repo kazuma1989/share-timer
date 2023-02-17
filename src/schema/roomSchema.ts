@@ -26,7 +26,7 @@ const roomIdSchema = /*@__PURE__*/ (() =>
   ))()
 
 export function isRoomId(id: string): id is Room["id"] {
-  return /^(?:[0-9a-z_-]+\/)?[a-z]{3}-[a-z]{4}-[a-z]{3}$/.test(id)
+  return /^(?:[0-9a-z_-]{3,}\/)?[a-z]{3}-[a-z]{4}-[a-z]{3}$/.test(id)
 }
 
 export function parseRoomId(id: Room["id"]): { owner?: string; room: string } {
@@ -38,9 +38,15 @@ export function parseRoomId(id: Room["id"]): { owner?: string; room: string } {
   return { owner, room: room! }
 }
 
-export function newRoomId(owner?: string): Room["id"] {
-  return ((owner ? `${owner}/` : "") +
+export function newRoomId(ownerId?: OwnerId): Room["id"] {
+  return ((ownerId ? `${ownerId}/` : "") +
     nanoid(10).replace(/^(.{3})(.{4})(.{3})$/, "$1-$2-$3")) as Room["id"]
+}
+
+type OwnerId = string & { readonly ownerId: unique symbol }
+
+export function isOwnerId(id: string): id is OwnerId {
+  return /^[0-9a-z_-]{3,}$/.test(id)
 }
 
 if (import.meta.vitest) {
@@ -70,13 +76,17 @@ if (import.meta.vitest) {
   })
 
   test("generate valid room id", () => {
-    const id = newRoomId("olive")
+    const id = newRoomId("olive" as OwnerId)
 
     expect(s.validate(id, roomIdSchema)[1]).toBe(id)
   })
 
   test("invalid room id", () => {
     expect(() => s.assert("-cnz-some-fmy", roomIdSchema)).toThrow(s.StructError)
+  })
+
+  test("valid owner id", () => {
+    expect(isOwnerId("olive")).toBeTruthy()
   })
 
   test("room name", () => {
