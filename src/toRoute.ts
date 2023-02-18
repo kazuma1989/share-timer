@@ -72,10 +72,10 @@ if (import.meta.vitest) {
   })
 
   test("toRoute newRoom", () => {
-    expect(toRoute("olive/new")).toStrictEqual([
+    expect(toRoute("@olive/new")).toStrictEqual([
       "newRoom",
-      "olive/new",
-      "olive" as OwnerId,
+      "@olive/new",
+      "@olive" as OwnerId,
     ] satisfies Route)
   })
 
@@ -87,9 +87,9 @@ if (import.meta.vitest) {
   })
 
   test("toRoute room", () => {
-    expect(toRoute("olive/aaa-bbbb-ccc")).toStrictEqual([
+    expect(toRoute("@olive/aaa-bbbb-ccc")).toStrictEqual([
       "room",
-      "olive/aaa-bbbb-ccc" as Room["id"],
+      "@olive/aaa-bbbb-ccc" as Room["id"],
     ] satisfies Route)
   })
 
@@ -101,22 +101,22 @@ if (import.meta.vitest) {
   })
 
   test("toRoute info", () => {
-    expect(toRoute("olive/aaa-bbbb-ccc/info")).toStrictEqual([
+    expect(toRoute("@olive/aaa-bbbb-ccc/info")).toStrictEqual([
       "info",
-      "olive/aaa-bbbb-ccc" as Room["id"],
+      "@olive/aaa-bbbb-ccc" as Room["id"],
     ] satisfies Route)
   })
 
   test("toRoute unknown", () => {
     const patterns = [
       "new/",
-      "oli/ve/new",
+      "@oli/ve/new",
       "aaa-????-ccc",
       "aaa-bbbb-ccc/",
-      "oli/ve/aaa-bbbb-ccc",
+      "@oli/ve/aaa-bbbb-ccc",
       "aaa-????-ccc/info",
       "aaa-bbbb-ccc/info/",
-      "oli/ve/aaa-bbbb-ccc/info",
+      "@oli/ve/aaa-bbbb-ccc/info",
     ]
 
     patterns.forEach((value) => {
@@ -129,25 +129,25 @@ if (import.meta.vitest) {
       // new
       "",
       "new",
-      "olive/new",
+      "@olive/new",
 
       // room
       "aaa-bbbb-ccc",
-      "olive/aaa-bbbb-ccc",
+      "@olive/aaa-bbbb-ccc",
 
       // info
       "aaa-bbbb-ccc/info",
-      "olive/aaa-bbbb-ccc/info",
+      "@olive/aaa-bbbb-ccc/info",
 
       // unknown
       "new/",
-      "oli/ve/new",
+      "@oli/ve/new",
       "aaa-????-ccc",
       "aaa-bbbb-ccc/",
-      "oli/ve/aaa-bbbb-ccc",
+      "@oli/ve/aaa-bbbb-ccc",
       "aaa-????-ccc/info",
       "aaa-bbbb-ccc/info/",
-      "oli/ve/aaa-bbbb-ccc/info",
+      "@oli/ve/aaa-bbbb-ccc/info",
     ]
 
     patterns.forEach((value) => {

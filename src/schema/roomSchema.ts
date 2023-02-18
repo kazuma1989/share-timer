@@ -26,7 +26,7 @@ const roomIdSchema = /*@__PURE__*/ (() =>
   ))()
 
 export function isRoomId(id: string): id is Room["id"] {
-  return /^(?:[0-9A-Za-z_-]{3,}\/)?[a-z]{3}-[a-z]{4}-[a-z]{3}$/.test(id)
+  return /^(?:@[0-9A-Za-z_-]{3,}\/)?[a-z]{3}-[a-z]{4}-[a-z]{3}$/.test(id)
 }
 
 export function parseRoomId(id: Room["id"]): { owner?: string; room: string } {
@@ -34,8 +34,8 @@ export function parseRoomId(id: Room["id"]): { owner?: string; room: string } {
     return { room: id }
   }
 
-  const [owner, room] = id.split("/")
-  return { owner, room: room! }
+  const [_owner, room] = id.split("/")
+  return { owner: _owner!.slice(1), room: room! }
 }
 
 export function newRoomId(ownerId?: OwnerId): Room["id"] {
@@ -46,7 +46,7 @@ export function newRoomId(ownerId?: OwnerId): Room["id"] {
 export type OwnerId = string & { readonly ownerId: unique symbol }
 
 export function isOwnerId(id: string): id is OwnerId {
-  return /^[0-9A-Za-z_-]{3,}$/.test(id)
+  return /^@[0-9A-Za-z_-]{3,}$/.test(id)
 }
 
 if (import.meta.vitest) {
@@ -57,13 +57,13 @@ if (import.meta.vitest) {
   })
 
   test("room id", () => {
-    expect(s.validate("olive/cnz-some-fmy", roomIdSchema)[1]).toBe(
-      "olive/cnz-some-fmy"
+    expect(s.validate("@olive/cnz-some-fmy", roomIdSchema)[1]).toBe(
+      "@olive/cnz-some-fmy"
     )
   })
 
   test("parse room id", () => {
-    expect(parseRoomId("olive/cnz-some-fmy" as Room["id"])).toStrictEqual({
+    expect(parseRoomId("@olive/cnz-some-fmy" as Room["id"])).toStrictEqual({
       owner: "olive",
       room: "cnz-some-fmy",
     } satisfies ReturnType<typeof parseRoomId>)
@@ -76,7 +76,7 @@ if (import.meta.vitest) {
   })
 
   test("generate valid room id", () => {
-    const id = newRoomId("olive" as OwnerId)
+    const id = newRoomId("@olive" as OwnerId)
 
     expect(s.validate(id, roomIdSchema)[1]).toBe(id)
   })
@@ -86,7 +86,7 @@ if (import.meta.vitest) {
   })
 
   test("valid owner id", () => {
-    expect(isOwnerId("olive")).toBeTruthy()
+    expect(isOwnerId("@olive")).toBeTruthy()
   })
 
   test("room name", () => {
