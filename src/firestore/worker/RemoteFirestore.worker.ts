@@ -9,6 +9,7 @@ import {
   addDoc,
   connectFirestoreEmulator,
   doc,
+  getDoc,
   getDocFromServer,
   getDocs,
   getFirestore,
@@ -34,7 +35,7 @@ import {
   type ActionInput,
 } from "../../schema/actionSchema"
 import {
-  parseRoomId,
+  detectMode,
   roomSchema,
   type InvalidDoc,
   type Room,
@@ -81,48 +82,68 @@ export class RemoteFirestore {
     }
   }
 
-  private selectRoom(roomId: Room["id"]): DocumentReference {
-    const { owner, room } = parseRoomId(roomId)
+  private async selectRoom(roomId: Room["id"]): Promise<DocumentReference> {
+    if (detectMode(roomId) === "public") {
+      return doc(collection(this.firestore, "rooms"), roomId)
+    }
+
+    const x = await getDoc(
+      doc(collection(this.firestore, "room-owners"), roomId)
+    )
 
     return doc(
-      owner
-        ? collection(this.firestore, "owners", owner, "rooms")
-        : collection(this.firestore, "rooms"),
-      room
+      collection(this.firestore, "owners", x.get("owner"), "rooms"),
+      roomId
     )
   }
 
-  private selectActions(roomId: Room["id"]): CollectionReference {
-    const { owner, room } = parseRoomId(roomId)
+  private async selectActions(
+    roomId: Room["id"]
+  ): Promise<CollectionReference> {
+    if (detectMode(roomId) === "public") {
+      return collection(this.firestore, "rooms", roomId, "actions")
+    }
 
-    return owner
-      ? collection(this.firestore, "owners", owner, "rooms", room, "actions")
-      : collection(this.firestore, "rooms", room, "actions")
+    const x = await getDoc(
+      doc(collection(this.firestore, "room-owners"), roomId)
+    )
+
+    return collection(
+      this.firestore,
+      "owners",
+      x.get("owner"),
+      "rooms",
+      roomId,
+      "actions"
+    )
   }
 
-  onSnapshotRoom(
+  async onSnapshotRoom(
     roomId: Room["id"],
     onNext: ((data: Room | InvalidDoc) => void) & ProxyMarked
-  ): Unsubscribe & ProxyMarked {
-    const unsubscribe = onSnapshot(this.selectRoom(roomId), (snapshot) => {
-      const rawData = snapshot.data({
-        serverTimestamps: "estimate",
-      })
-
-      const [error, data] = s.validate(rawData, roomSchema)
-      if (error) {
-        if (rawData) {
-          console.warn(rawData, error)
-        }
-
-        onNext(["invalid-doc", roomId])
-      } else {
-        onNext({
-          ...data,
-          id: roomId,
+  ): Promise<Unsubscribe & ProxyMarked> {
+    const unsubscribe = onSnapshot(
+      await this.selectRoom(roomId),
+      (snapshot) => {
+        const rawData = snapshot.data({
+          serverTimestamps: "estimate",
         })
+
+        const [error, data] = s.validate(rawData, roomSchema)
+        if (error) {
+          if (rawData) {
+            console.warn(rawData, error)
+          }
+
+          onNext(["invalid-doc", roomId])
+        } else {
+          onNext({
+            ...data,
+            id: roomId,
+          })
+        }
       }
-    })
+    )
 
     return proxy(unsubscribe)
   }
@@ -131,22 +152,23 @@ export class RemoteFirestore {
     roomId: Room["id"],
     onNext: ((data: TimerState) => void) & ProxyMarked
   ): Promise<Unsubscribe & ProxyMarked> {
-    const selectActions = await getDocs(
+    const selectActions = await this.selectActions(roomId)
+    const queryActions = await getDocs(
       query(
-        this.selectActions(roomId),
+        selectActions,
         where("type", "==", "start"),
         orderBy("createdAt", "asc"),
         limitToLast(1)
       )
     ).then(({ docs: [doc] }) =>
       query(
-        this.selectActions(roomId),
+        selectActions,
         orderBy("createdAt", "asc"),
         ...(hasNoEstimateTimestamp(doc?.metadata) ? [startAt(doc)] : [])
       )
     )
 
-    const unsubscribe = onSnapshot(selectActions, (snapshot) => {
+    const unsubscribe = onSnapshot(queryActions, (snapshot) => {
       const actions = snapshot.docs.flatMap((doc): Action[] => {
         const rawData = doc.data({
           serverTimestamps: "estimate",
@@ -174,7 +196,7 @@ export class RemoteFirestore {
 
   async dispatch(roomId: Room["id"], action: ActionInput): Promise<void> {
     await addDoc(
-      this.selectActions(roomId),
+      await this.selectActions(roomId),
       withMeta(convertServerTimestamp(action))
     )
   }
@@ -194,7 +216,7 @@ export class RemoteFirestore {
     await runTransaction(
       this.firestore,
       async (transaction) => {
-        const roomDoc = await transaction.get(this.selectRoom(roomId))
+        const roomDoc = await transaction.get(await this.selectRoom(roomId))
         if (await aborted()) throw "aborted 2"
 
         if (roomDoc.exists()) {
@@ -211,7 +233,7 @@ export class RemoteFirestore {
         }
 
         transaction.set(
-          doc(this.selectActions(roomId)),
+          doc(await this.selectActions(roomId)),
           withMeta({
             type: "cancel",
             withDuration: DEFAULT_DURATION,
@@ -237,7 +259,7 @@ export class RemoteFirestore {
     await runTransaction(
       this.firestore,
       async (transaction) => {
-        const roomDoc = await transaction.get(this.selectRoom(roomId))
+        const roomDoc = await transaction.get(await this.selectRoom(roomId))
         if (await aborted?.()) {
           throw AbortReason("signal")
         }

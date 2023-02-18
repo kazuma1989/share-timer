@@ -1,45 +1,24 @@
-import {
-  isOwnerId,
-  isRoomId,
-  type OwnerId,
-  type Room,
-} from "./schema/roomSchema"
+import { isRoomId, type Room } from "./schema/roomSchema"
 
 export type Route =
   | [key: "room", roomId: Room["id"]]
   | [key: "info", roomId: Room["id"]]
-  | [key: "newRoom", payload: string, owner?: OwnerId]
+  | [key: "newRoom", payload: string]
   | [key: "unknown", payload: string]
 
 export function toRoute(value: string): Route {
-  if (value === "") {
+  if (value === "" || value === "new") {
     return ["newRoom", value]
   }
 
   const unknownRoute: Route = ["unknown", value]
 
-  const params = value.split("/")
-
-  const last = params.pop()!
-  switch (last) {
-    case "info": {
-      const roomId = params.join("/")
-      return isRoomId(roomId) ? ["info", roomId] : unknownRoute
-    }
-
-    case "new": {
-      const ownerId = params.join("/")
-      if (ownerId === "") {
-        return ["newRoom", value]
-      }
-
-      return isOwnerId(ownerId) ? ["newRoom", value, ownerId] : unknownRoute
-    }
-
-    default: {
-      return isRoomId(value) ? ["room", value] : unknownRoute
-    }
+  if (value.endsWith("/info")) {
+    const roomId = value.slice(0, 0 - "/info".length)
+    return isRoomId(roomId) ? ["info", roomId] : unknownRoute
   }
+
+  return isRoomId(value) ? ["room", value] : unknownRoute
 }
 
 export function fromRoute(route: Route): string {
@@ -71,14 +50,6 @@ if (import.meta.vitest) {
     expect(toRoute("new")).toStrictEqual(["newRoom", "new"] satisfies Route)
   })
 
-  test("toRoute newRoom", () => {
-    expect(toRoute("@olive/new")).toStrictEqual([
-      "newRoom",
-      "@olive/new",
-      "@olive" as OwnerId,
-    ] satisfies Route)
-  })
-
   test("toRoute room", () => {
     expect(toRoute("aaa-bbbb-ccc")).toStrictEqual([
       "room",
@@ -87,9 +58,9 @@ if (import.meta.vitest) {
   })
 
   test("toRoute room", () => {
-    expect(toRoute("@olive/aaa-bbbb-ccc")).toStrictEqual([
+    expect(toRoute("p-aaa-bbbb-ccc")).toStrictEqual([
       "room",
-      "@olive/aaa-bbbb-ccc" as Room["id"],
+      "p-aaa-bbbb-ccc" as Room["id"],
     ] satisfies Route)
   })
 
@@ -101,22 +72,22 @@ if (import.meta.vitest) {
   })
 
   test("toRoute info", () => {
-    expect(toRoute("@olive/aaa-bbbb-ccc/info")).toStrictEqual([
+    expect(toRoute("p-aaa-bbbb-ccc/info")).toStrictEqual([
       "info",
-      "@olive/aaa-bbbb-ccc" as Room["id"],
+      "p-aaa-bbbb-ccc" as Room["id"],
     ] satisfies Route)
   })
 
   test("toRoute unknown", () => {
     const patterns = [
       "new/",
-      "@oli/ve/new",
+      "p-new",
       "aaa-????-ccc",
       "aaa-bbbb-ccc/",
-      "@oli/ve/aaa-bbbb-ccc",
+      "z-aaa-bbbb-ccc",
       "aaa-????-ccc/info",
       "aaa-bbbb-ccc/info/",
-      "@oli/ve/aaa-bbbb-ccc/info",
+      "z-aaa-bbbb-ccc/info",
     ]
 
     patterns.forEach((value) => {
@@ -129,25 +100,24 @@ if (import.meta.vitest) {
       // new
       "",
       "new",
-      "@olive/new",
 
       // room
       "aaa-bbbb-ccc",
-      "@olive/aaa-bbbb-ccc",
+      "p-aaa-bbbb-ccc",
 
       // info
       "aaa-bbbb-ccc/info",
-      "@olive/aaa-bbbb-ccc/info",
+      "p-aaa-bbbb-ccc/info",
 
       // unknown
       "new/",
-      "@oli/ve/new",
+      "p-new",
       "aaa-????-ccc",
       "aaa-bbbb-ccc/",
-      "@oli/ve/aaa-bbbb-ccc",
+      "z-aaa-bbbb-ccc",
       "aaa-????-ccc/info",
       "aaa-bbbb-ccc/info/",
-      "@oli/ve/aaa-bbbb-ccc/info",
+      "z-aaa-bbbb-ccc/info",
     ]
 
     patterns.forEach((value) => {

@@ -46,6 +46,11 @@ service cloud.firestore {
       }
     }
 
+    match /room-owners-dev/{room} {
+      allow get;
+      allow create: if hasCreatedAt();
+    }
+
     match /calibrations-dev/{id} {
       allow get;
       allow create: if hasCreatedAt();
