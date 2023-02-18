@@ -10,7 +10,7 @@ service cloud.firestore {
     }
 
     function isSelf(id) {
-      return request.auth.token.id_v1 == id;
+      return request.auth.uid == id;
     }
 
     match /rooms-dev/{room} {

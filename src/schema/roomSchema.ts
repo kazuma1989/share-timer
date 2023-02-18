@@ -26,7 +26,7 @@ const roomIdSchema = /*@__PURE__*/ (() =>
   ))()
 
 export function isRoomId(id: string): id is Room["id"] {
-  return /^(?:[0-9a-z_-]{3,}\/)?[a-z]{3}-[a-z]{4}-[a-z]{3}$/.test(id)
+  return /^(?:[0-9A-Za-z_-]{3,}\/)?[a-z]{3}-[a-z]{4}-[a-z]{3}$/.test(id)
 }
 
 export function parseRoomId(id: Room["id"]): { owner?: string; room: string } {
@@ -46,7 +46,7 @@ export function newRoomId(ownerId?: OwnerId): Room["id"] {
 export type OwnerId = string & { readonly ownerId: unique symbol }
 
 export function isOwnerId(id: string): id is OwnerId {
-  return /^[0-9a-z_-]{3,}$/.test(id)
+  return /^[0-9A-Za-z_-]{3,}$/.test(id)
 }
 
 if (import.meta.vitest) {
