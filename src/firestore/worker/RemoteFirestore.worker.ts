@@ -23,7 +23,6 @@ import {
   Timestamp,
   type CollectionReference,
   type Firestore,
-  type Unsubscribe,
 } from "firebase/firestore"
 import {
   distinctUntilChanged,
@@ -116,7 +115,7 @@ export class RemoteFirestore {
   onSnapshotRoom(
     roomId: Room["id"],
     onNext: ((data: Room | InvalidDoc) => void) & ProxyMarked
-  ): Unsubscribe & ProxyMarked {
+  ): (() => void) & ProxyMarked {
     let room$: Observable<Room | InvalidDoc>
 
     if (detectMode(roomId) === "public") {
@@ -158,7 +157,7 @@ export class RemoteFirestore {
   async onSnapshotTimerState(
     roomId: Room["id"],
     onNext: ((data: TimerState) => void) & ProxyMarked
-  ): Promise<Unsubscribe & ProxyMarked> {
+  ): Promise<(() => void) & ProxyMarked> {
     let selectActions$: Observable<CollectionReference>
 
     if (detectMode(roomId) === "public") {
