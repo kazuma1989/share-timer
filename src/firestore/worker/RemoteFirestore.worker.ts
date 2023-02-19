@@ -10,7 +10,6 @@ import {
   addDoc,
   connectFirestoreEmulator,
   doc,
-  getDoc,
   getDocFromServer,
   getDocs,
   getFirestore,
@@ -21,12 +20,12 @@ import {
   setDoc,
   startAt,
   Timestamp,
-  type CollectionReference,
   type Firestore,
 } from "firebase/firestore"
 import {
   distinctUntilChanged,
   filter,
+  lastValueFrom,
   map,
   of,
   switchMap,
@@ -95,27 +94,6 @@ export class RemoteFirestore {
     }
   }
 
-  private async selectActions(
-    roomId: Room["id"]
-  ): Promise<CollectionReference> {
-    if (detectMode(roomId) === "public") {
-      return collection(this.firestore, "rooms", roomId, "actions")
-    }
-
-    const x = await getDoc(
-      doc(collection(this.firestore, "room-owners"), roomId)
-    )
-
-    return collection(
-      this.firestore,
-      "owners",
-      x.get("owner"),
-      "rooms",
-      roomId,
-      "actions"
-    )
-  }
-
   private getOwnerId(roomId: Room["id"]): Observable<string | null> {
     return this.ownerIdCache(roomId, () =>
       snapshotOf(doc(collection(this.firestore, "room-owners"), roomId)).pipe(
@@ -165,41 +143,38 @@ export class RemoteFirestore {
     roomId: Room["id"],
     onNext: ((data: TimerState) => void) & ProxyMarked
   ): Promise<(() => void) & ProxyMarked> {
-    const selectActions$ =
+    const selectActions =
       detectMode(roomId) === "public"
-        ? of(collection(this.firestore, "rooms", roomId, "actions"))
-        : this.getOwnerId(roomId).pipe(
-            filter(nonNullable),
-            map((owner) =>
-              collection(
-                this.firestore,
-                "owners",
-                owner,
-                "rooms",
-                roomId,
-                "actions"
-              )
+        ? collection(this.firestore, "rooms", roomId, "actions")
+        : await lastValueFrom(
+            this.getOwnerId(roomId).pipe(filter(nonNullable))
+          ).then((owner) =>
+            collection(
+              this.firestore,
+              "owners",
+              owner,
+              "rooms",
+              roomId,
+              "actions"
             )
           )
 
-    const timerState$ = selectActions$.pipe(
-      switchMap((selectActions) =>
-        getDocs(
-          query(
-            selectActions,
-            where("type", "==", "start"),
-            orderBy("createdAt", "asc"),
-            limitToLast(1)
-          )
-        ).then(({ docs: [doc] }) =>
-          query(
-            selectActions,
-            orderBy("createdAt", "asc"),
-            ...(hasNoEstimateTimestamp(doc?.metadata) ? [startAt(doc)] : [])
-          )
-        )
-      ),
-      switchMap((queryActions) => snapshotOf(queryActions)),
+    const queryActions = await getDocs(
+      query(
+        selectActions,
+        where("type", "==", "start"),
+        orderBy("createdAt", "asc"),
+        limitToLast(1)
+      )
+    ).then(({ docs: [doc] }) =>
+      query(
+        selectActions,
+        orderBy("createdAt", "asc"),
+        ...(hasNoEstimateTimestamp(doc?.metadata) ? [startAt(doc)] : [])
+      )
+    )
+
+    const timerState$ = snapshotOf(queryActions).pipe(
       map((snapshot) => {
         const actions = snapshot.docs.flatMap((doc): Action[] => {
           const rawData = doc.data({
@@ -232,10 +207,23 @@ export class RemoteFirestore {
   }
 
   async dispatch(roomId: Room["id"], action: ActionInput): Promise<void> {
-    await addDoc(
-      await this.selectActions(roomId),
-      withMeta(convertServerTimestamp(action))
-    )
+    const selectActions =
+      detectMode(roomId) === "public"
+        ? collection(this.firestore, "rooms", roomId, "actions")
+        : await lastValueFrom(
+            this.getOwnerId(roomId).pipe(filter(nonNullable))
+          ).then((owner) =>
+            collection(
+              this.firestore,
+              "owners",
+              owner,
+              "rooms",
+              roomId,
+              "actions"
+            )
+          )
+
+    await addDoc(selectActions, withMeta(convertServerTimestamp(action)))
   }
 
   async setupRoom(
