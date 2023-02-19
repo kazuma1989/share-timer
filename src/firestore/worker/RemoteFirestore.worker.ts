@@ -4,6 +4,7 @@ import {
   connectAuthEmulator,
   indexedDBLocalPersistence,
   initializeAuth,
+  type Auth,
 } from "firebase/auth"
 import {
   addDoc,
@@ -14,7 +15,6 @@ import {
   getDocs,
   getFirestore,
   limitToLast,
-  onSnapshot,
   query,
   runTransaction,
   serverTimestamp as firestoreServerTimestamp,
@@ -29,6 +29,7 @@ import {
 } from "firebase/firestore"
 import {
   distinctUntilChanged,
+  filter,
   map,
   of,
   switchMap,
@@ -53,6 +54,7 @@ import { timerReducer, type TimerState } from "../../schema/timerReducer"
 import { serverTimestamp } from "../../serverTimestamp"
 import { setTransferHandlers } from "../../setTransferHandlers"
 import { AbortReason } from "../../useLockRoom"
+import { nonNullable } from "../../util/nonNullable"
 import { calibrationSchema, type Calibration } from "./calibrationSchema"
 import { collection } from "./collection"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
@@ -64,6 +66,8 @@ import { withMeta } from "./withMeta"
 
 export class RemoteFirestore {
   private readonly firestore: Firestore
+
+  private readonly auth: Auth
 
   constructor(options: FirebaseOptions) {
     this.firestore = getFirestore(initializeApp(options))
@@ -78,7 +82,7 @@ export class RemoteFirestore {
 
     setTransferHandlers()
 
-    const auth = initializeAuth(this.firestore.app, {
+    this.auth = initializeAuth(this.firestore.app, {
       persistence: indexedDBLocalPersistence,
       // No popupRedirectResolver defined
     })
@@ -88,7 +92,7 @@ export class RemoteFirestore {
       const host = location.hostname
       const port = import.meta.env.FIREBASE_EMULATORS.auth.port
 
-      connectAuthEmulator(auth, `${protocol}//${host}:${port}`)
+      connectAuthEmulator(this.auth, `${protocol}//${host}:${port}`)
     }
   }
 
@@ -174,46 +178,84 @@ export class RemoteFirestore {
     roomId: Room["id"],
     onNext: ((data: TimerState) => void) & ProxyMarked
   ): Promise<Unsubscribe & ProxyMarked> {
-    const selectActions = await this.selectActions(roomId)
-    const queryActions = await getDocs(
-      query(
-        selectActions,
-        where("type", "==", "start"),
-        orderBy("createdAt", "asc"),
-        limitToLast(1)
-      )
-    ).then(({ docs: [doc] }) =>
-      query(
-        selectActions,
-        orderBy("createdAt", "asc"),
-        ...(hasNoEstimateTimestamp(doc?.metadata) ? [startAt(doc)] : [])
-      )
-    )
+    let selectActions$: Observable<CollectionReference>
 
-    const unsubscribe = onSnapshot(queryActions, (snapshot) => {
-      const actions = snapshot.docs.flatMap((doc): Action[] => {
-        const rawData = doc.data({
-          serverTimestamps: "estimate",
+    if (detectMode(roomId) === "public") {
+      selectActions$ = of(
+        collection(this.firestore, "rooms", roomId, "actions")
+      )
+    } else {
+      const ownerId$ = snapshotOf(
+        doc(collection(this.firestore, "room-owners"), roomId)
+      ).pipe(
+        // TODO room-owners owner field に型制約を持たせたい（タイポに気付けない）
+        map((_) => (_.get("owner") || null) as string | null),
+        distinctUntilChanged(),
+        takeWhile((_) => _ === null, true)
+      )
+
+      selectActions$ = ownerId$.pipe(
+        filter(nonNullable),
+        map((owner) =>
+          collection(
+            this.firestore,
+            "owners",
+            owner,
+            "rooms",
+            roomId,
+            "actions"
+          )
+        )
+      )
+    }
+
+    const timerState$ = selectActions$.pipe(
+      switchMap((selectActions) =>
+        getDocs(
+          query(
+            selectActions,
+            where("type", "==", "start"),
+            orderBy("createdAt", "asc"),
+            limitToLast(1)
+          )
+        ).then(({ docs: [doc] }) =>
+          query(
+            selectActions,
+            orderBy("createdAt", "asc"),
+            ...(hasNoEstimateTimestamp(doc?.metadata) ? [startAt(doc)] : [])
+          )
+        )
+      ),
+      switchMap((queryActions) => snapshotOf(queryActions)),
+      map((snapshot) => {
+        const actions = snapshot.docs.flatMap((doc): Action[] => {
+          const rawData = doc.data({
+            serverTimestamps: "estimate",
+          })
+
+          const [error, data] = s.validate(rawData, actionSchema)
+          if (error) {
+            console.debug(rawData, error)
+            return []
+          }
+
+          return [coerceTimestamp(data)]
         })
 
-        const [error, data] = s.validate(rawData, actionSchema)
-        if (error) {
-          console.debug(rawData, error)
-          return []
-        }
-
-        return [coerceTimestamp(data)]
-      })
-
-      onNext(
-        actions.reduce(timerReducer, {
+        return actions.reduce(timerReducer, {
           mode: "editing",
           initialDuration: 0,
         })
-      )
+      })
+    )
+
+    const sub = timerState$.subscribe((_) => {
+      onNext(_)
     })
 
-    return proxy(unsubscribe)
+    return proxy(() => {
+      sub.unsubscribe()
+    })
   }
 
   async dispatch(roomId: Room["id"], action: ActionInput): Promise<void> {
@@ -235,10 +277,20 @@ export class RemoteFirestore {
     const e = emoji[(Math.random() * emoji.length) | 0]!
     const roomName = `${e.value} ${e.name}`
 
+    const owner =
+      detectMode(roomId) === "private" ? this.auth.currentUser!.uid : null
+
     await runTransaction(
       this.firestore,
       async (transaction) => {
-        const roomDoc = await transaction.get(await this.selectRoom(roomId))
+        const roomDoc = await transaction.get(
+          doc(
+            owner
+              ? collection(this.firestore, "owners", owner, "rooms")
+              : collection(this.firestore, "rooms"),
+            roomId
+          )
+        )
         if (await aborted()) throw "aborted 2"
 
         if (roomDoc.exists()) {
@@ -254,8 +306,29 @@ export class RemoteFirestore {
           )
         }
 
+        if (owner) {
+          transaction.set(
+            doc(collection(this.firestore, "room-owners"), roomId),
+            // TODO room-owners の型制約つけたい
+            withMeta({
+              owner,
+            })
+          )
+        }
+
         transaction.set(
-          doc(await this.selectActions(roomId)),
+          doc(
+            owner
+              ? collection(
+                  this.firestore,
+                  "owners",
+                  owner,
+                  "rooms",
+                  roomId,
+                  "actions"
+                )
+              : collection(this.firestore, "rooms", roomId, "actions")
+          ),
           withMeta({
             type: "cancel",
             withDuration: DEFAULT_DURATION,
