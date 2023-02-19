@@ -9,9 +9,9 @@
   export let route$: Observable<Route>
 
   $: {
-    const [route] = $route$
+    const [route, , mode] = $route$
     if (route === "newRoom") {
-      replaceHash(["room", newRoomId()])
+      replaceHash(["room", newRoomId(mode)])
     }
   }
 </script>

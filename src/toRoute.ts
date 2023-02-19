@@ -3,12 +3,12 @@ import { isRoomId, type Room } from "./schema/roomSchema"
 export type Route =
   | [key: "room", roomId: Room["id"]]
   | [key: "info", roomId: Room["id"]]
-  | [key: "newRoom", payload: string]
+  | [key: "newRoom", payload: string, mode: "public" | "private"]
   | [key: "unknown", payload: string]
 
 export function toRoute(value: string): Route {
-  if (value === "" || value === "new") {
-    return ["newRoom", value]
+  if (value === "" || value === "new" || value === "p-new") {
+    return ["newRoom", value, value.startsWith("p-") ? "private" : "public"]
   }
 
   const unknownRoute: Route = ["unknown", value]
@@ -43,11 +43,27 @@ if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
 
   test("toRoute newRoom", () => {
-    expect(toRoute("")).toStrictEqual(["newRoom", ""] satisfies Route)
+    const patterns = ["", "new"]
+
+    patterns.forEach((value) => {
+      expect(toRoute(value)).toStrictEqual([
+        "newRoom",
+        value,
+        "public",
+      ] satisfies Route)
+    })
   })
 
   test("toRoute newRoom", () => {
-    expect(toRoute("new")).toStrictEqual(["newRoom", "new"] satisfies Route)
+    const patterns = ["p-new"]
+
+    patterns.forEach((value) => {
+      expect(toRoute(value)).toStrictEqual([
+        "newRoom",
+        value,
+        "private",
+      ] satisfies Route)
+    })
   })
 
   test("toRoute room", () => {
@@ -81,7 +97,7 @@ if (import.meta.vitest) {
   test("toRoute unknown", () => {
     const patterns = [
       "new/",
-      "p-new",
+      "z-new",
       "aaa-????-ccc",
       "aaa-bbbb-ccc/",
       "z-aaa-bbbb-ccc",
@@ -100,6 +116,7 @@ if (import.meta.vitest) {
       // new
       "",
       "new",
+      "p-new",
 
       // room
       "aaa-bbbb-ccc",
@@ -111,7 +128,7 @@ if (import.meta.vitest) {
 
       // unknown
       "new/",
-      "p-new",
+      "z-new",
       "aaa-????-ccc",
       "aaa-bbbb-ccc/",
       "z-aaa-bbbb-ccc",
