@@ -7,7 +7,7 @@ export type Route =
   | [key: "unknown", payload: string]
 
 export function toRoute(value: string): Route {
-  if (value === "" || value === "new" || value === "p-new") {
+  if (value === "" || value === "new" || value === "p-new" || value === "p-") {
     return ["newRoom", value, value.startsWith("p-") ? "private" : "public"]
   }
 
@@ -55,7 +55,7 @@ if (import.meta.vitest) {
   })
 
   test("toRoute newRoom", () => {
-    const patterns = ["p-new"]
+    const patterns = ["p-", "p-new"]
 
     patterns.forEach((value) => {
       expect(toRoute(value)).toStrictEqual([
@@ -116,6 +116,7 @@ if (import.meta.vitest) {
       // new
       "",
       "new",
+      "p-",
       "p-new",
 
       // room
