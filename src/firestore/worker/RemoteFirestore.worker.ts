@@ -22,7 +22,6 @@ import {
   startAt,
   Timestamp,
   type CollectionReference,
-  type DocumentReference,
   type FieldValue,
   type Firestore,
   type Unsubscribe,
@@ -45,7 +44,6 @@ import {
 } from "../../schema/actionSchema"
 import {
   detectMode,
-  roomSchema,
   type InvalidDoc,
   type Room,
   type RoomInput,
@@ -53,7 +51,6 @@ import {
 import { timerReducer, type TimerState } from "../../schema/timerReducer"
 import { serverTimestamp } from "../../serverTimestamp"
 import { setTransferHandlers } from "../../setTransferHandlers"
-import { AbortReason } from "../../useLockRoom"
 import { nonNullable } from "../../util/nonNullable"
 import { calibrationSchema, type Calibration } from "./calibrationSchema"
 import { collection } from "./collection"
@@ -94,21 +91,6 @@ export class RemoteFirestore {
 
       connectAuthEmulator(this.auth, `${protocol}//${host}:${port}`)
     }
-  }
-
-  private async selectRoom(roomId: Room["id"]): Promise<DocumentReference> {
-    if (detectMode(roomId) === "public") {
-      return doc(collection(this.firestore, "rooms"), roomId)
-    }
-
-    const x = await getDoc(
-      doc(collection(this.firestore, "room-owners"), roomId)
-    )
-
-    return doc(
-      collection(this.firestore, "owners", x.get("owner"), "rooms"),
-      roomId
-    )
   }
 
   private async selectActions(
@@ -334,48 +316,6 @@ export class RemoteFirestore {
             withDuration: DEFAULT_DURATION,
           } satisfies ActionInput)
         )
-      },
-      {
-        maxAttempts: 1,
-      }
-    )
-  }
-
-  async lockRoom(
-    roomId: Room["id"],
-    lockedBy: string,
-    options?: {
-      aborted?: () => boolean | PromiseLike<boolean>
-      onBeforeUpdate?: () => void | PromiseLike<void>
-    } & ProxyMarked
-  ): Promise<void> {
-    const { aborted, onBeforeUpdate } = options ?? {}
-
-    await runTransaction(
-      this.firestore,
-      async (transaction) => {
-        const roomDoc = await transaction.get(await this.selectRoom(roomId))
-        if (await aborted?.()) {
-          throw AbortReason("signal")
-        }
-
-        if (!roomDoc.exists()) {
-          throw AbortReason("room-not-exists")
-        }
-
-        const room = s.create(roomDoc.data(), roomSchema)
-        if (room.lockedBy) {
-          throw AbortReason("already-locked")
-        }
-
-        await onBeforeUpdate?.()
-        if (await aborted?.()) {
-          throw AbortReason("signal")
-        }
-
-        transaction.update(roomDoc.ref, {
-          lockedBy,
-        } satisfies RoomInput)
       },
       {
         maxAttempts: 1,
