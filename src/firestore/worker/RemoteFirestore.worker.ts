@@ -22,7 +22,6 @@ import {
   startAt,
   Timestamp,
   type CollectionReference,
-  type FieldValue,
   type Firestore,
   type Unsubscribe,
 } from "firebase/firestore"
@@ -49,11 +48,11 @@ import {
   type RoomInput,
 } from "../../schema/roomSchema"
 import { timerReducer, type TimerState } from "../../schema/timerReducer"
-import { serverTimestamp } from "../../serverTimestamp"
 import { setTransferHandlers } from "../../setTransferHandlers"
 import { nonNullable } from "../../util/nonNullable"
 import { calibrationSchema, type Calibration } from "./calibrationSchema"
 import { collection } from "./collection"
+import { convertServerTimestamp } from "./convertServerTimestamp"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
 import { mapToRoom } from "./mapToRoom"
 import { orderBy } from "./orderBy"
@@ -349,37 +348,6 @@ export class RemoteFirestore {
   }
 }
 
-if (!import.meta.vitest) {
-  expose(RemoteFirestore)
-}
+expose(RemoteFirestore)
 
 const DEFAULT_DURATION = 3 * 60000
-
-function convertServerTimestamp<T extends Record<string, unknown>>(
-  value: T
-): { [P in keyof T]: T[P] extends typeof serverTimestamp ? FieldValue : T[P] } {
-  return Object.fromEntries(
-    Object.entries(value).map(([key, value]) => [
-      key,
-      value === serverTimestamp ? firestoreServerTimestamp() : value,
-    ])
-  ) as any
-}
-
-if (import.meta.vitest) {
-  const { test, expect } = import.meta.vitest
-
-  test("isSerializedSymbol", async () => {
-    const { FieldValue } = await import("firebase/firestore")
-
-    const x = convertServerTimestamp({
-      a: "A",
-      b: serverTimestamp,
-    })
-
-    expect(x).toMatchObject({
-      a: "A",
-      b: expect.any(FieldValue),
-    } satisfies typeof x)
-  })
-}
