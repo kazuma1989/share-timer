@@ -27,6 +27,14 @@ import {
   type Firestore,
   type Unsubscribe,
 } from "firebase/firestore"
+import {
+  distinctUntilChanged,
+  map,
+  of,
+  switchMap,
+  takeWhile,
+  type Observable,
+} from "rxjs"
 import * as s from "superstruct"
 import {
   actionSchema,
@@ -48,7 +56,9 @@ import { AbortReason } from "../../useLockRoom"
 import { calibrationSchema, type Calibration } from "./calibrationSchema"
 import { collection } from "./collection"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
+import { mapToRoom } from "./mapToRoom"
 import { orderBy } from "./orderBy"
+import { snapshotOf } from "./snapshotOf"
 import { where } from "./where"
 import { withMeta } from "./withMeta"
 
@@ -118,34 +128,46 @@ export class RemoteFirestore {
     )
   }
 
-  async onSnapshotRoom(
+  onSnapshotRoom(
     roomId: Room["id"],
     onNext: ((data: Room | InvalidDoc) => void) & ProxyMarked
-  ): Promise<Unsubscribe & ProxyMarked> {
-    const unsubscribe = onSnapshot(
-      await this.selectRoom(roomId),
-      (snapshot) => {
-        const rawData = snapshot.data({
-          serverTimestamps: "estimate",
-        })
+  ): Unsubscribe & ProxyMarked {
+    let room$: Observable<Room | InvalidDoc>
 
-        const [error, data] = s.validate(rawData, roomSchema)
-        if (error) {
-          if (rawData) {
-            console.warn(rawData, error)
+    if (detectMode(roomId) === "public") {
+      room$ = snapshotOf(doc(collection(this.firestore, "rooms"), roomId)).pipe(
+        mapToRoom(roomId)
+      )
+    } else {
+      const ownerId$ = snapshotOf(
+        doc(collection(this.firestore, "room-owners"), roomId)
+      ).pipe(
+        // TODO room-owners owner field に型制約を持たせたい（タイポに気付けない）
+        map((_) => (_.get("owner") || null) as string | null),
+        distinctUntilChanged(),
+        takeWhile((_) => _ === null, true)
+      )
+
+      room$ = ownerId$.pipe(
+        switchMap((owner) => {
+          if (owner === null) {
+            return of<InvalidDoc>(["invalid-doc", roomId])
           }
 
-          onNext(["invalid-doc", roomId])
-        } else {
-          onNext({
-            ...data,
-            id: roomId,
-          })
-        }
-      }
-    )
+          return snapshotOf(
+            doc(collection(this.firestore, "owners", owner, "rooms"), roomId)
+          ).pipe(mapToRoom(roomId))
+        })
+      )
+    }
 
-    return proxy(unsubscribe)
+    const sub = room$.subscribe((_) => {
+      onNext(_)
+    })
+
+    return proxy(() => {
+      sub.unsubscribe()
+    })
   }
 
   async onSnapshotTimerState(
