@@ -238,6 +238,7 @@ export class RemoteFirestore {
     const e = emoji[(Math.random() * emoji.length) | 0]!
     const roomName = `${e.value} ${e.name}`
 
+    // TODO サインインしていないときの考慮がない
     const owner =
       detectMode(roomId) === "private" ? this.auth.currentUser!.uid : null
 
