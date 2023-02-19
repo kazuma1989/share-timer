@@ -48,7 +48,9 @@ import {
 } from "../../schema/roomSchema"
 import { timerReducer, type TimerState } from "../../schema/timerReducer"
 import { setTransferHandlers } from "../../setTransferHandlers"
+import { createCache } from "../../util/createCache"
 import { nonNullable } from "../../util/nonNullable"
+import { shareRecent } from "../../util/shareRecent"
 import { calibrationSchema, type Calibration } from "./calibrationSchema"
 import { collection } from "./collection"
 import { convertServerTimestamp } from "./convertServerTimestamp"
@@ -63,6 +65,8 @@ export class RemoteFirestore {
   private readonly firestore: Firestore
 
   private readonly auth: Auth
+
+  private readonly ownerIdCache = createCache(true)
 
   constructor(options: FirebaseOptions) {
     this.firestore = getFirestore(initializeApp(options))
@@ -112,38 +116,41 @@ export class RemoteFirestore {
     )
   }
 
+  private getOwnerId(roomId: Room["id"]): Observable<string | null> {
+    return this.ownerIdCache(roomId, () =>
+      snapshotOf(doc(collection(this.firestore, "room-owners"), roomId)).pipe(
+        // TODO room-owners owner field に型制約を持たせたい（タイポに気付けない）
+        map((_) => (_.get("owner") || null) as string | null),
+        distinctUntilChanged(),
+        takeWhile((_) => _ === null, true),
+        shareRecent()
+      )
+    )
+  }
+
   onSnapshotRoom(
     roomId: Room["id"],
     onNext: ((data: Room | InvalidDoc) => void) & ProxyMarked
   ): (() => void) & ProxyMarked {
-    let room$: Observable<Room | InvalidDoc>
+    const room$ =
+      detectMode(roomId) === "public"
+        ? snapshotOf(doc(collection(this.firestore, "rooms"), roomId)).pipe(
+            mapToRoom(roomId)
+          )
+        : this.getOwnerId(roomId).pipe(
+            switchMap((owner) => {
+              if (owner === null) {
+                return of<InvalidDoc>(["invalid-doc", roomId])
+              }
 
-    if (detectMode(roomId) === "public") {
-      room$ = snapshotOf(doc(collection(this.firestore, "rooms"), roomId)).pipe(
-        mapToRoom(roomId)
-      )
-    } else {
-      const ownerId$ = snapshotOf(
-        doc(collection(this.firestore, "room-owners"), roomId)
-      ).pipe(
-        // TODO room-owners owner field に型制約を持たせたい（タイポに気付けない）
-        map((_) => (_.get("owner") || null) as string | null),
-        distinctUntilChanged(),
-        takeWhile((_) => _ === null, true)
-      )
-
-      room$ = ownerId$.pipe(
-        switchMap((owner) => {
-          if (owner === null) {
-            return of<InvalidDoc>(["invalid-doc", roomId])
-          }
-
-          return snapshotOf(
-            doc(collection(this.firestore, "owners", owner, "rooms"), roomId)
-          ).pipe(mapToRoom(roomId))
-        })
-      )
-    }
+              return snapshotOf(
+                doc(
+                  collection(this.firestore, "owners", owner, "rooms"),
+                  roomId
+                )
+              ).pipe(mapToRoom(roomId))
+            })
+          )
 
     const sub = room$.subscribe((_) => {
       onNext(_)
@@ -158,36 +165,22 @@ export class RemoteFirestore {
     roomId: Room["id"],
     onNext: ((data: TimerState) => void) & ProxyMarked
   ): Promise<(() => void) & ProxyMarked> {
-    let selectActions$: Observable<CollectionReference>
-
-    if (detectMode(roomId) === "public") {
-      selectActions$ = of(
-        collection(this.firestore, "rooms", roomId, "actions")
-      )
-    } else {
-      const ownerId$ = snapshotOf(
-        doc(collection(this.firestore, "room-owners"), roomId)
-      ).pipe(
-        // TODO room-owners owner field に型制約を持たせたい（タイポに気付けない）
-        map((_) => (_.get("owner") || null) as string | null),
-        distinctUntilChanged(),
-        takeWhile((_) => _ === null, true)
-      )
-
-      selectActions$ = ownerId$.pipe(
-        filter(nonNullable),
-        map((owner) =>
-          collection(
-            this.firestore,
-            "owners",
-            owner,
-            "rooms",
-            roomId,
-            "actions"
+    const selectActions$ =
+      detectMode(roomId) === "public"
+        ? of(collection(this.firestore, "rooms", roomId, "actions"))
+        : this.getOwnerId(roomId).pipe(
+            filter(nonNullable),
+            map((owner) =>
+              collection(
+                this.firestore,
+                "owners",
+                owner,
+                "rooms",
+                roomId,
+                "actions"
+              )
+            )
           )
-        )
-      )
-    }
 
     const timerState$ = selectActions$.pipe(
       switchMap((selectActions) =>
