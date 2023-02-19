@@ -146,17 +146,15 @@ export class RemoteFirestore {
     const selectActions =
       detectMode(roomId) === "public"
         ? collection(this.firestore, "rooms", roomId, "actions")
-        : await lastValueFrom(
-            this.getOwnerId(roomId).pipe(filter(nonNullable))
-          ).then((owner) =>
-            collection(
-              this.firestore,
-              "owners",
-              owner,
-              "rooms",
-              roomId,
-              "actions"
-            )
+        : collection(
+            this.firestore,
+            "owners",
+            await lastValueFrom(
+              this.getOwnerId(roomId).pipe(filter(nonNullable))
+            ),
+            "rooms",
+            roomId,
+            "actions"
           )
 
     const queryActions = await getDocs(
@@ -210,17 +208,15 @@ export class RemoteFirestore {
     const selectActions =
       detectMode(roomId) === "public"
         ? collection(this.firestore, "rooms", roomId, "actions")
-        : await lastValueFrom(
-            this.getOwnerId(roomId).pipe(filter(nonNullable))
-          ).then((owner) =>
-            collection(
-              this.firestore,
-              "owners",
-              owner,
-              "rooms",
-              roomId,
-              "actions"
-            )
+        : collection(
+            this.firestore,
+            "owners",
+            await lastValueFrom(
+              this.getOwnerId(roomId).pipe(filter(nonNullable))
+            ),
+            "rooms",
+            roomId,
+            "actions"
           )
 
     await addDoc(selectActions, withMeta(convertServerTimestamp(action)))
