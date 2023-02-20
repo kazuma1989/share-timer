@@ -56,6 +56,7 @@ import { convertServerTimestamp } from "./convertServerTimestamp"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
 import { mapToRoom } from "./mapToRoom"
 import { orderBy } from "./orderBy"
+import { roomOwnerSchema, type RoomOwner } from "./roomOwnerSchema"
 import { snapshotOf } from "./snapshotOf"
 import { where } from "./where"
 import { withMeta } from "./withMeta"
@@ -97,8 +98,22 @@ export class RemoteFirestore {
   private getOwnerId(roomId: Room["id"]): Observable<string | null> {
     return this.ownerIdCache(roomId, () =>
       snapshotOf(doc(collection(this.firestore, "room-owners"), roomId)).pipe(
-        // TODO room-owners owner field に型制約を持たせたい（タイポに気付けない）
-        map((_) => (_.get("owner") || null) as string | null),
+        map((snapshot): string | null => {
+          const rawData = snapshot.data({
+            serverTimestamps: "estimate",
+          })
+
+          const [error, data] = s.validate(rawData, roomOwnerSchema)
+          if (error) {
+            if (rawData) {
+              console.warn(rawData, error)
+            }
+
+            return null
+          } else {
+            return data.owner
+          }
+        }),
         distinctUntilChanged(),
         takeWhile((_) => _ === null, true),
         shareRecent()
@@ -267,10 +282,9 @@ export class RemoteFirestore {
         if (owner) {
           transaction.set(
             doc(collection(this.firestore, "room-owners"), roomId),
-            // TODO room-owners の型制約つけたい
             withMeta({
               owner,
-            })
+            } satisfies RoomOwner)
           )
         }
 
