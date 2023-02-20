@@ -15,5 +15,18 @@
       ]
     }
   ],
-  "fieldOverrides": []
+  "fieldOverrides": [
+    {
+      "collectionGroup": "checkout-sessions-dev",
+      "fieldPath": "payload",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "checkout-sessions-v1",
+      "fieldPath": "payload",
+      "ttl": false,
+      "indexes": []
+    }
+  ]
 }
