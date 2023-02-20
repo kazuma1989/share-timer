@@ -241,6 +241,15 @@ export class RemoteFirestore {
     roomId: Room["id"],
     aborted: (() => PromiseLike<boolean> | boolean) & ProxyMarked
   ): Promise<void> {
+    let owner: string | null
+    if (detectMode(roomId) === "public") {
+      owner = null
+    } else if (this.auth.currentUser !== null) {
+      owner = this.auth.currentUser.uid
+    } else {
+      throw "private-room-but-not-signed-in"
+    }
+
     const emoji = await fetch(
       new URL("../../emoji/Animals & Nature.json", import.meta.url)
     ).then<typeof import("../../emoji/Animals & Nature.json")>((_) => _.json())
@@ -248,10 +257,6 @@ export class RemoteFirestore {
 
     const e = emoji[(Math.random() * emoji.length) | 0]!
     const roomName = `${e.value} ${e.name}`
-
-    // TODO サインインしていないときの考慮がない
-    const owner =
-      detectMode(roomId) === "private" ? this.auth.currentUser!.uid : null
 
     await runTransaction(
       this.firestore,
