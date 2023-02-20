@@ -3,39 +3,22 @@ import { isRoomId, type Room } from "./schema/roomSchema"
 export type Route =
   | [key: "room", roomId: Room["id"]]
   | [key: "info", roomId: Room["id"]]
-  | [key: "newRoom", payload: string]
+  | [key: "newRoom", payload: string, mode: "public" | "private"]
   | [key: "unknown", payload: string]
 
 export function toRoute(value: string): Route {
-  const [first, second, ...rest] = value.split("/")
-  const unknown: Route = ["unknown", value]
-
-  if (rest.length !== 0) {
-    return unknown
+  if (value === "" || value === "new" || value === "p-new" || value === "p-") {
+    return ["newRoom", value, value.startsWith("p-") ? "private" : "public"]
   }
 
-  if (first !== undefined && isRoomId(first)) {
-    const roomId = first
-    switch (second) {
-      case undefined: {
-        return ["room", roomId]
-      }
+  const unknownRoute: Route = ["unknown", value]
 
-      case "info": {
-        return ["info", roomId]
-      }
-
-      default: {
-        return unknown
-      }
-    }
+  if (value.endsWith("/info")) {
+    const roomId = value.slice(0, 0 - "/info".length)
+    return isRoomId(roomId) ? ["info", roomId] : unknownRoute
   }
 
-  if (first === "" || first === "new") {
-    return ["newRoom", value]
-  }
-
-  return unknown
+  return isRoomId(value) ? ["room", value] : unknownRoute
 }
 
 export function fromRoute(route: Route): string {
@@ -59,42 +42,100 @@ export function fromRoute(route: Route): string {
 if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
 
-  test("toRoute", () => {
-    expect(toRoute("")).toStrictEqual(["newRoom", ""] satisfies Route)
+  test("toRoute newRoom", () => {
+    const patterns = ["", "new"]
+
+    patterns.forEach((value) => {
+      expect(toRoute(value)).toStrictEqual([
+        "newRoom",
+        value,
+        "public",
+      ] satisfies Route)
+    })
   })
 
-  test("toRoute", () => {
-    expect(toRoute("new")).toStrictEqual(["newRoom", "new"] satisfies Route)
+  test("toRoute newRoom", () => {
+    const patterns = ["p-", "p-new"]
+
+    patterns.forEach((value) => {
+      expect(toRoute(value)).toStrictEqual([
+        "newRoom",
+        value,
+        "private",
+      ] satisfies Route)
+    })
   })
 
-  test("toRoute", () => {
-    expect(toRoute("aaa-bbbb-ccc/")).toStrictEqual([
-      "unknown",
-      "aaa-bbbb-ccc/",
-    ] satisfies Route)
-  })
-
-  test("toRoute", () => {
+  test("toRoute room", () => {
     expect(toRoute("aaa-bbbb-ccc")).toStrictEqual([
       "room",
       "aaa-bbbb-ccc" as Room["id"],
     ] satisfies Route)
   })
 
-  test("toRoute", () => {
+  test("toRoute room", () => {
+    expect(toRoute("p-aaa-bbbb-ccc")).toStrictEqual([
+      "room",
+      "p-aaa-bbbb-ccc" as Room["id"],
+    ] satisfies Route)
+  })
+
+  test("toRoute info", () => {
     expect(toRoute("aaa-bbbb-ccc/info")).toStrictEqual([
       "info",
       "aaa-bbbb-ccc" as Room["id"],
     ] satisfies Route)
   })
 
+  test("toRoute info", () => {
+    expect(toRoute("p-aaa-bbbb-ccc/info")).toStrictEqual([
+      "info",
+      "p-aaa-bbbb-ccc" as Room["id"],
+    ] satisfies Route)
+  })
+
+  test("toRoute unknown", () => {
+    const patterns = [
+      "new/",
+      "z-new",
+      "aaa-????-ccc",
+      "aaa-bbbb-ccc/",
+      "z-aaa-bbbb-ccc",
+      "aaa-????-ccc/info",
+      "aaa-bbbb-ccc/info/",
+      "z-aaa-bbbb-ccc/info",
+    ]
+
+    patterns.forEach((value) => {
+      expect(toRoute(value)).toStrictEqual(["unknown", value] satisfies Route)
+    })
+  })
+
   test("fromRoute", () => {
     const patterns = [
+      // new
       "",
       "new",
-      "aaa-bbbb-ccc/",
+      "p-",
+      "p-new",
+
+      // room
       "aaa-bbbb-ccc",
+      "p-aaa-bbbb-ccc",
+
+      // info
       "aaa-bbbb-ccc/info",
+      "p-aaa-bbbb-ccc/info",
+
+      // unknown
+      "new/",
+      "z-new",
+      "aaa-????-ccc",
+      "aaa-bbbb-ccc/",
+      "z-aaa-bbbb-ccc",
+      "aaa-????-ccc/info",
+      "aaa-bbbb-ccc/info/",
+      "z-aaa-bbbb-ccc/info",
     ]
 
     patterns.forEach((value) => {

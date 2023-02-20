@@ -26,11 +26,16 @@ const roomIdSchema = /*@__PURE__*/ (() =>
   ))()
 
 export function isRoomId(id: string): id is Room["id"] {
-  return /^[a-z]{3}-[a-z]{4}-[a-z]{3}$/.test(id)
+  return /^(?:p-)?[a-z]{3}-[a-z]{4}-[a-z]{3}$/.test(id)
 }
 
-export function newRoomId(): Room["id"] {
-  return nanoid(10).replace(/^(.{3})(.{4})(.{3})$/, "$1-$2-$3") as Room["id"]
+export function detectMode(id: Room["id"]): "public" | "private" {
+  return id.startsWith("p-") ? "private" : "public"
+}
+
+export function newRoomId(mode: "public" | "private" = "public"): Room["id"] {
+  return ((mode === "private" ? "p-" : "") +
+    nanoid(10).replace(/^(.{3})(.{4})(.{3})$/, "$1-$2-$3")) as Room["id"]
 }
 
 if (import.meta.vitest) {
@@ -40,8 +45,30 @@ if (import.meta.vitest) {
     expect(s.validate("cnz-some-fmy", roomIdSchema)[1]).toBe("cnz-some-fmy")
   })
 
+  test("room id", () => {
+    expect(s.validate("p-cnz-some-fmy", roomIdSchema)[1]).toBe("p-cnz-some-fmy")
+  })
+
+  test("detect mode from room id", () => {
+    expect(detectMode("cnz-some-fmy" as Room["id"])).toBe(
+      "public" satisfies ReturnType<typeof detectMode>
+    )
+  })
+
+  test("detect mode from room id", () => {
+    expect(detectMode("p-cnz-some-fmy" as Room["id"])).toBe(
+      "private" satisfies ReturnType<typeof detectMode>
+    )
+  })
+
   test("generate valid room id", () => {
     const id = newRoomId()
+
+    expect(s.validate(id, roomIdSchema)[1]).toBe(id)
+  })
+
+  test("generate valid room id", () => {
+    const id = newRoomId("private")
 
     expect(s.validate(id, roomIdSchema)[1]).toBe(id)
   })

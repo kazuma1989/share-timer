@@ -2,6 +2,7 @@
 interface ImportMetaEnv {
   FIREBASE_EMULATORS: typeof import("../firebase.json")["emulators"]
 
+  VITE_AUTH_EMULATOR: string
   VITE_DB_VERSION: string
   VITE_FIRESTORE_EMULATOR: string
 }

@@ -1,6 +1,12 @@
 import { expose, proxy, type ProxyMarked } from "comlink"
 import { initializeApp, type FirebaseOptions } from "firebase/app"
 import {
+  connectAuthEmulator,
+  indexedDBLocalPersistence,
+  initializeAuth,
+  type Auth,
+} from "firebase/auth"
+import {
   addDoc,
   connectFirestoreEmulator,
   doc,
@@ -8,17 +14,24 @@ import {
   getDocs,
   getFirestore,
   limitToLast,
-  onSnapshot,
   query,
   runTransaction,
   serverTimestamp as firestoreServerTimestamp,
   setDoc,
   startAt,
   Timestamp,
-  type FieldValue,
   type Firestore,
-  type Unsubscribe,
 } from "firebase/firestore"
+import {
+  distinctUntilChanged,
+  filter,
+  lastValueFrom,
+  map,
+  of,
+  switchMap,
+  takeWhile,
+  type Observable,
+} from "rxjs"
 import * as s from "superstruct"
 import {
   actionSchema,
@@ -27,128 +40,216 @@ import {
   type ActionInput,
 } from "../../schema/actionSchema"
 import {
-  roomSchema,
+  detectMode,
   type InvalidDoc,
   type Room,
   type RoomInput,
 } from "../../schema/roomSchema"
 import { timerReducer, type TimerState } from "../../schema/timerReducer"
-import { serverTimestamp } from "../../serverTimestamp"
 import { setTransferHandlers } from "../../setTransferHandlers"
-import { AbortReason } from "../../useLockRoom"
+import { createCache } from "../../util/createCache"
+import { nonNullable } from "../../util/nonNullable"
+import { shareRecent } from "../../util/shareRecent"
 import { calibrationSchema, type Calibration } from "./calibrationSchema"
 import { collection } from "./collection"
+import { convertServerTimestamp } from "./convertServerTimestamp"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
+import { mapToRoom } from "./mapToRoom"
 import { orderBy } from "./orderBy"
+import { roomOwnerSchema, type RoomOwner } from "./roomOwnerSchema"
+import { snapshotOf } from "./snapshotOf"
 import { where } from "./where"
 import { withMeta } from "./withMeta"
 
 export class RemoteFirestore {
-  readonly firestore: Firestore
+  private readonly firestore: Firestore
+
+  private readonly auth: Auth
+
+  private readonly ownerIdCache = createCache(true)
 
   constructor(options: FirebaseOptions) {
-    const firebaseApp = initializeApp(options)
-
-    const firestore = getFirestore(firebaseApp)
+    this.firestore = getFirestore(initializeApp(options))
 
     if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
       const host = location.hostname
       const port = import.meta.env.FIREBASE_EMULATORS.firestore.port
       console.info(`using emulator (${host}:${port})`)
 
-      connectFirestoreEmulator(firestore, host, port)
+      connectFirestoreEmulator(this.firestore, host, port)
     }
 
-    this.firestore = firestore
-
     setTransferHandlers()
+
+    this.auth = initializeAuth(this.firestore.app, {
+      persistence: indexedDBLocalPersistence,
+      // No popupRedirectResolver defined
+    })
+
+    if (import.meta.env.VITE_AUTH_EMULATOR) {
+      const protocol = location.protocol
+      const host = location.hostname
+      const port = import.meta.env.FIREBASE_EMULATORS.auth.port
+
+      connectAuthEmulator(this.auth, `${protocol}//${host}:${port}`)
+    }
+  }
+
+  private getOwnerId(roomId: Room["id"]): Observable<string | null> {
+    return this.ownerIdCache(roomId, () =>
+      snapshotOf(doc(collection(this.firestore, "room-owners"), roomId)).pipe(
+        map((snapshot): string | null => {
+          const rawData = snapshot.data({
+            serverTimestamps: "estimate",
+          })
+
+          const [error, data] = s.validate(rawData, roomOwnerSchema)
+          if (error) {
+            if (rawData) {
+              console.warn(rawData, error)
+            }
+
+            return null
+          } else {
+            return data.owner
+          }
+        }),
+        distinctUntilChanged(),
+        takeWhile((_) => _ === null, true),
+        shareRecent()
+      )
+    )
   }
 
   onSnapshotRoom(
     roomId: Room["id"],
     onNext: ((data: Room | InvalidDoc) => void) & ProxyMarked
-  ): Unsubscribe & ProxyMarked {
-    const referenceRoom = doc(collection(this.firestore, "rooms"), roomId)
+  ): (() => void) & ProxyMarked {
+    const room$ =
+      detectMode(roomId) === "public"
+        ? snapshotOf(doc(collection(this.firestore, "rooms"), roomId)).pipe(
+            mapToRoom(roomId)
+          )
+        : this.getOwnerId(roomId).pipe(
+            switchMap((owner) => {
+              if (owner === null) {
+                return of<InvalidDoc>(["invalid-doc", roomId])
+              }
 
-    const unsubscribe = onSnapshot(referenceRoom, (snapshot) => {
-      const rawData = snapshot.data({
-        serverTimestamps: "estimate",
-      })
+              return snapshotOf(
+                doc(
+                  collection(this.firestore, "owners", owner, "rooms"),
+                  roomId
+                )
+              ).pipe(mapToRoom(roomId))
+            })
+          )
 
-      const [error, data] = s.validate(rawData, roomSchema)
-      if (error) {
-        if (rawData) {
-          console.warn(rawData, error)
-        }
-
-        onNext(["invalid-doc", roomId])
-      } else {
-        onNext({
-          ...data,
-          id: roomId,
-        })
-      }
+    const sub = room$.subscribe((_) => {
+      onNext(_)
     })
 
-    return proxy(unsubscribe)
+    return proxy(() => {
+      sub.unsubscribe()
+    })
   }
 
   async onSnapshotTimerState(
     roomId: Room["id"],
     onNext: ((data: TimerState) => void) & ProxyMarked
-  ): Promise<Unsubscribe & ProxyMarked> {
-    const selectActions = await getDocs(
+  ): Promise<(() => void) & ProxyMarked> {
+    const selectActions =
+      detectMode(roomId) === "public"
+        ? collection(this.firestore, "rooms", roomId, "actions")
+        : collection(
+            this.firestore,
+            "owners",
+            await lastValueFrom(
+              this.getOwnerId(roomId).pipe(filter(nonNullable))
+            ),
+            "rooms",
+            roomId,
+            "actions"
+          )
+
+    const queryActions = await getDocs(
       query(
-        collection(this.firestore, "rooms", roomId, "actions"),
+        selectActions,
         where("type", "==", "start"),
         orderBy("createdAt", "asc"),
         limitToLast(1)
       )
     ).then(({ docs: [doc] }) =>
       query(
-        collection(this.firestore, "rooms", roomId, "actions"),
+        selectActions,
         orderBy("createdAt", "asc"),
         ...(hasNoEstimateTimestamp(doc?.metadata) ? [startAt(doc)] : [])
       )
     )
 
-    const unsubscribe = onSnapshot(selectActions, (snapshot) => {
-      const actions = snapshot.docs.flatMap((doc): Action[] => {
-        const rawData = doc.data({
-          serverTimestamps: "estimate",
+    const timerState$ = snapshotOf(queryActions).pipe(
+      map((snapshot) => {
+        const actions = snapshot.docs.flatMap((doc): Action[] => {
+          const rawData = doc.data({
+            serverTimestamps: "estimate",
+          })
+
+          const [error, data] = s.validate(rawData, actionSchema)
+          if (error) {
+            console.debug(rawData, error)
+            return []
+          }
+
+          return [coerceTimestamp(data)]
         })
 
-        const [error, data] = s.validate(rawData, actionSchema)
-        if (error) {
-          console.debug(rawData, error)
-          return []
-        }
-
-        return [coerceTimestamp(data)]
-      })
-
-      onNext(
-        actions.reduce(timerReducer, {
+        return actions.reduce(timerReducer, {
           mode: "editing",
           initialDuration: 0,
         })
-      )
+      })
+    )
+
+    const sub = timerState$.subscribe((_) => {
+      onNext(_)
     })
 
-    return proxy(unsubscribe)
+    return proxy(() => {
+      sub.unsubscribe()
+    })
   }
 
   async dispatch(roomId: Room["id"], action: ActionInput): Promise<void> {
-    await addDoc(
-      collection(this.firestore, "rooms", roomId, "actions"),
-      withMeta(convertServerTimestamp(action))
-    )
+    const selectActions =
+      detectMode(roomId) === "public"
+        ? collection(this.firestore, "rooms", roomId, "actions")
+        : collection(
+            this.firestore,
+            "owners",
+            await lastValueFrom(
+              this.getOwnerId(roomId).pipe(filter(nonNullable))
+            ),
+            "rooms",
+            roomId,
+            "actions"
+          )
+
+    await addDoc(selectActions, withMeta(convertServerTimestamp(action)))
   }
 
   async setupRoom(
-    roomId: string,
+    roomId: Room["id"],
     aborted: (() => PromiseLike<boolean> | boolean) & ProxyMarked
   ): Promise<void> {
+    let owner: string | null
+    if (detectMode(roomId) === "public") {
+      owner = null
+    } else if (this.auth.currentUser !== null) {
+      owner = this.auth.currentUser.uid
+    } else {
+      throw "private-room-but-not-signed-in"
+    }
+
     const emoji = await fetch(
       new URL("../../emoji/Animals & Nature.json", import.meta.url)
     ).then<typeof import("../../emoji/Animals & Nature.json")>((_) => _.json())
@@ -161,7 +262,12 @@ export class RemoteFirestore {
       this.firestore,
       async (transaction) => {
         const roomDoc = await transaction.get(
-          doc(collection(this.firestore, "rooms"), roomId)
+          doc(
+            owner
+              ? collection(this.firestore, "owners", owner, "rooms")
+              : collection(this.firestore, "rooms"),
+            roomId
+          )
         )
         if (await aborted()) throw "aborted 2"
 
@@ -178,57 +284,33 @@ export class RemoteFirestore {
           )
         }
 
+        if (owner) {
+          transaction.set(
+            doc(collection(this.firestore, "room-owners"), roomId),
+            withMeta({
+              owner,
+            } satisfies RoomOwner)
+          )
+        }
+
         transaction.set(
-          doc(collection(this.firestore, "rooms", roomId, "actions")),
+          doc(
+            owner
+              ? collection(
+                  this.firestore,
+                  "owners",
+                  owner,
+                  "rooms",
+                  roomId,
+                  "actions"
+                )
+              : collection(this.firestore, "rooms", roomId, "actions")
+          ),
           withMeta({
             type: "cancel",
             withDuration: DEFAULT_DURATION,
           } satisfies ActionInput)
         )
-      },
-      {
-        maxAttempts: 1,
-      }
-    )
-  }
-
-  async lockRoom(
-    roomId: Room["id"],
-    lockedBy: string,
-    options?: {
-      aborted?: () => boolean | PromiseLike<boolean>
-      onBeforeUpdate?: () => void | PromiseLike<void>
-    } & ProxyMarked
-  ): Promise<void> {
-    const { aborted, onBeforeUpdate } = options ?? {}
-
-    await runTransaction(
-      this.firestore,
-      async (transaction) => {
-        const roomDoc = await transaction.get(
-          doc(collection(this.firestore, "rooms"), roomId)
-        )
-        if (await aborted?.()) {
-          throw AbortReason("signal")
-        }
-
-        if (!roomDoc.exists()) {
-          throw AbortReason("room-not-exists")
-        }
-
-        const room = s.create(roomDoc.data(), roomSchema)
-        if (room.lockedBy) {
-          throw AbortReason("already-locked")
-        }
-
-        await onBeforeUpdate?.()
-        if (await aborted?.()) {
-          throw AbortReason("signal")
-        }
-
-        transaction.update(roomDoc.ref, {
-          lockedBy,
-        } satisfies RoomInput)
       },
       {
         maxAttempts: 1,
@@ -262,37 +344,6 @@ export class RemoteFirestore {
   }
 }
 
-if (!import.meta.vitest) {
-  expose(RemoteFirestore)
-}
+expose(RemoteFirestore)
 
 const DEFAULT_DURATION = 3 * 60000
-
-function convertServerTimestamp<T extends Record<string, unknown>>(
-  value: T
-): { [P in keyof T]: T[P] extends typeof serverTimestamp ? FieldValue : T[P] } {
-  return Object.fromEntries(
-    Object.entries(value).map(([key, value]) => [
-      key,
-      value === serverTimestamp ? firestoreServerTimestamp() : value,
-    ])
-  ) as any
-}
-
-if (import.meta.vitest) {
-  const { test, expect } = import.meta.vitest
-
-  test("isSerializedSymbol", async () => {
-    const { FieldValue } = await import("firebase/firestore")
-
-    const x = convertServerTimestamp({
-      a: "A",
-      b: serverTimestamp,
-    })
-
-    expect(x).toMatchObject({
-      a: "A",
-      b: expect.any(FieldValue),
-    } satisfies typeof x)
-  })
-}

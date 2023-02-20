@@ -9,6 +9,10 @@ service cloud.firestore {
       return request.resource.data.createdAt == resource.data.createdAt;
     }
 
+    function isSelf(id) {
+      return request.auth.uid == id;
+    }
+
     match /rooms-dev/{room} {
       allow get;
       allow create: if hasCreatedAt();
@@ -29,6 +33,22 @@ service cloud.firestore {
         allow list;
         allow create: if hasCreatedAt();
       }
+    }
+
+    match /owners-dev/{owner}/rooms/{room} {
+      allow get;
+      allow create: if hasCreatedAt() && isSelf(owner);
+      allow update: if keepCreatedAt() && isSelf(owner);
+
+      match /actions/{action} {
+        allow list;
+        allow create: if hasCreatedAt() && isSelf(owner);
+      }
+    }
+
+    match /room-owners-dev/{room} {
+      allow get;
+      allow create: if hasCreatedAt();
     }
 
     match /calibrations-dev/{id} {
