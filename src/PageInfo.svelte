@@ -87,7 +87,7 @@
         href="#new"
         target="_blank"
         class={clsx(
-          "transparent-button block border border-gray-500 px-4 py-3 text-center no-underline after:content-['_↗']"
+          "transparent-button block border border-gray-500 px-4 py-3 text-center text-inherit no-underline after:content-['_↗']"
         )}
       >
         新しいタイマーを開く
