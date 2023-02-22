@@ -2,7 +2,7 @@ import { getAuth } from "firebase-admin/auth"
 import * as functions from "firebase-functions"
 import * as s from "superstruct"
 import { document } from "./firestorePath"
-import { checkoutSessionSchema } from "./schema"
+import { checkoutSessionSchema, CustomClaims } from "./schema"
 
 export const onWriteCheckoutSession = functions.firestore
   .document(document("checkout-sessions-dev/{id}"))
@@ -33,11 +33,17 @@ export const onWriteCheckoutSession = functions.firestore
           break
         }
 
-        const { client_reference_id, payment_status } = data
+        const { client_reference_id, payment_status, products } = data
         if (payment_status !== "paid") break
 
         if (!client_reference_id) {
           functions.logger.error("no client_reference_id exists", { data })
+          break
+        }
+
+        const hasPremium = products?.some((_) => _.metadata?.plan === "premium")
+        if (!hasPremium) {
+          functions.logger.error("no premium product was found", { products })
           break
         }
 
@@ -49,10 +55,8 @@ export const onWriteCheckoutSession = functions.firestore
 
         await getAuth().setCustomUserClaims(uid, {
           ...customClaims,
-          app_v1: {
-            plan: "premium",
-          },
-        })
+          plan_v1: "premium",
+        } satisfies CustomClaims)
 
         functions.logger.debug("customClaims (after)", {
           customClaims: (await getAuth().getUser(uid)).customClaims,

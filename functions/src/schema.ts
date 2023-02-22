@@ -16,7 +16,7 @@ export const checkoutSessionEventSchema = s.type({
 
 export interface Product extends s.Infer<typeof productSchema> {}
 
-export const productSchema = s.type({
+const productSchema = s.type({
   id: s.string(),
   name: s.optional(s.string()),
   metadata: s.optional(
@@ -38,4 +38,10 @@ export const checkoutSessionSchema = s.type({
   emails: s.array(s.string()),
   products: s.nullable(s.array(productSchema)),
   payload: s.any() as unknown as s.Describe<Stripe.Checkout.Session>,
+})
+
+export interface CustomClaims extends s.Infer<typeof customClaimsSchema> {}
+
+const customClaimsSchema = s.type({
+  plan_v1: s.optional(s.literal("premium")),
 })
