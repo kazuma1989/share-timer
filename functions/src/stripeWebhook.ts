@@ -4,6 +4,7 @@ import Stripe from "stripe"
 import * as s from "superstruct"
 import { collection } from "./firestorePath"
 import { getEndpointSecret, getStripe } from "./getStripe"
+import { nonNullable } from "./nonNullable"
 import { CheckoutSession, checkoutSessionEventSchema, Product } from "./schema"
 
 export const stripeWebhook = functions
@@ -57,54 +58,59 @@ export const stripeWebhook = functions
       expand: ["line_items.data.price.product"],
     })
 
-    const {
-      client_reference_id,
-      created,
-      customer_details,
-      customer_email,
-      line_items,
-      payment_status,
-      status,
-    } = session
-
-    const emails = Array.from(
-      new Set([customer_email, customer_details?.email])
-    ).filter((_): _ is NonNullable<typeof _> => !!_)
-
-    const products =
-      line_items?.data.flatMap(({ price }): Product[] => {
-        if (!price) {
-          return []
-        }
-
-        const { product } = price
-
-        if (typeof product === "string") {
-          return [{ id: product }]
-        }
-
-        if (product.deleted) {
-          return []
-        }
-
-        const { id, name, metadata } = product
-        return [{ id, name, metadata }]
-      }) ?? null
-
     await getFirestore()
       .collection(collection("checkout-sessions-dev"))
       .doc(sessionId)
-      .set({
-        client_reference_id,
-        created,
-        payment_status,
-        status,
-        emails,
-        products,
-        payload: session,
-      } satisfies CheckoutSession)
+      .set(toCheckoutSession(session))
 
     functions.logger.info("save session success", { id: sessionId })
 
     res.status(200).json(session)
   })
+
+function toCheckoutSession(session: Stripe.Checkout.Session): CheckoutSession {
+  const {
+    client_reference_id,
+    created,
+    customer_details,
+    customer_email,
+    line_items,
+    payment_status,
+    status,
+  } = session
+
+  const emails = Array.from(
+    new Set([customer_email, customer_details?.email])
+  ).filter(nonNullable)
+
+  const products = line_items?.data.flatMap(toProduct) ?? null
+
+  return {
+    client_reference_id,
+    created,
+    payment_status,
+    status,
+    emails,
+    products,
+    payload: session,
+  }
+}
+
+function toProduct({ price }: Stripe.LineItem): Product[] {
+  if (!price) {
+    return []
+  }
+
+  const { product } = price
+
+  if (typeof product === "string") {
+    return [{ id: product }]
+  }
+
+  if (product.deleted) {
+    return []
+  }
+
+  const { id, name, metadata } = product
+  return [{ id, name, metadata }]
+}
