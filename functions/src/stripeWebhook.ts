@@ -5,7 +5,12 @@ import * as s from "superstruct"
 import { collection } from "./firestorePath"
 import { getEndpointSecret, getStripe } from "./getStripe"
 import { nonNullable } from "./nonNullable"
-import { CheckoutSession, checkoutSessionEventSchema, Product } from "./schema"
+import {
+  CheckoutSession,
+  checkoutSessionEventSchema,
+  CustomClaims,
+  Product,
+} from "./schema"
 
 export const stripeWebhook = functions
   .runWith({
@@ -54,18 +59,58 @@ export const stripeWebhook = functions
 
     const { id: sessionId } = event.data.object
 
-    const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ["line_items.data.price.product"],
-    })
+    const session = toCheckoutSession(
+      await stripe.checkout.sessions.retrieve(sessionId, {
+        expand: ["line_items.data.price.product"],
+      })
+    )
 
-    await getFirestore()
+    const ref = getFirestore()
       .collection(collection("checkout-sessions"))
       .doc(sessionId)
-      .set(toCheckoutSession(session))
 
-    functions.logger.info("save session success", { id: sessionId })
+    await ref.set(session)
+
+    functions.logger.info("save session success", { path: ref.path })
 
     res.status(200).json(session)
+
+    try {
+      const { client_reference_id, payment_status, products } = session
+
+      if (payment_status !== "paid") return
+
+      const hasPremium = products?.some(
+        (_) => _.metadata?.plan_v1 === "premium"
+      )
+      if (!hasPremium) {
+        throw {
+          reason: "paid but no premium product was found",
+          products,
+        }
+      }
+
+      if (!client_reference_id) {
+        throw {
+          reason: "paid but no client_reference_id exists",
+          session,
+        }
+      }
+
+      const uid = client_reference_id
+
+      const ref = getFirestore()
+        .collection(collection("custom-claims"))
+        .doc(uid)
+
+      await ref.set({
+        plan_v1: "premium",
+      } satisfies CustomClaims)
+
+      functions.logger.info("save custom-claims success", { path: ref.path })
+    } catch (error) {
+      functions.logger.error("failed to save custom-claims", { error })
+    }
   })
 
 function toCheckoutSession(session: Stripe.Checkout.Session): CheckoutSession {
