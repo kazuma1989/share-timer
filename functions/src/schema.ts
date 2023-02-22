@@ -21,7 +21,7 @@ const productSchema = s.type({
   name: s.optional(s.string()),
   metadata: s.optional(
     s.type({
-      plan: s.optional(s.literal("premium")),
+      plan_v1: s.optional(s.literal("premium")),
     })
   ),
 })

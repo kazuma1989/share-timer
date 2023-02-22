@@ -41,7 +41,9 @@ export const onWriteCheckoutSession = functions.firestore
           break
         }
 
-        const hasPremium = products?.some((_) => _.metadata?.plan === "premium")
+        const hasPremium = products?.some(
+          (_) => _.metadata?.plan_v1 === "premium"
+        )
         if (!hasPremium) {
           functions.logger.error("no premium product was found", { products })
           break
