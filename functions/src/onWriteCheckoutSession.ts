@@ -2,10 +2,10 @@ import { getAuth } from "firebase-admin/auth"
 import * as functions from "firebase-functions"
 import * as s from "superstruct"
 import { document } from "./firestorePath"
-import { checkoutSessionSchema, CustomClaims } from "./schema"
+import { customClaimsSchema } from "./schema"
 
 export const onWriteCheckoutSession = functions.firestore
-  .document(document("checkout-sessions", "{id}"))
+  .document(document("custom-claims", "{id}"))
   .onWrite(async (change) => {
     /**
      * | Operation   | before.exists | after.exists |
@@ -26,39 +26,21 @@ export const onWriteCheckoutSession = functions.firestore
       case "update": {
         const [error, data] = s.validate(
           change.after.data(),
-          checkoutSessionSchema
+          customClaimsSchema
         )
         if (error) {
-          functions.logger.error(error)
+          functions.logger.warn(error)
           break
         }
 
-        const { client_reference_id, payment_status, products } = data
-        if (payment_status !== "paid") break
+        const uid = change.after.id
+        const customClaims = data
 
-        if (!client_reference_id) {
-          functions.logger.error("no client_reference_id exists", { data })
-          break
-        }
+        functions.logger.debug("customClaims (before)", {
+          customClaims: (await getAuth().getUser(uid)).customClaims,
+        })
 
-        const hasPremium = products?.some(
-          (_) => _.metadata?.plan_v1 === "premium"
-        )
-        if (!hasPremium) {
-          functions.logger.error("no premium product was found", { products })
-          break
-        }
-
-        const uid = client_reference_id
-
-        const { customClaims } = await getAuth().getUser(uid)
-
-        functions.logger.debug("customClaims (before)", { customClaims })
-
-        await getAuth().setCustomUserClaims(uid, {
-          ...customClaims,
-          plan_v1: "premium",
-        } satisfies CustomClaims)
+        await getAuth().setCustomUserClaims(uid, customClaims)
 
         functions.logger.debug("customClaims (after)", {
           customClaims: (await getAuth().getUser(uid)).customClaims,

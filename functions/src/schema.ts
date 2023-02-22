@@ -29,7 +29,7 @@ const productSchema = s.type({
 export interface CheckoutSession
   extends s.Infer<typeof checkoutSessionSchema> {}
 
-export const checkoutSessionSchema = s.type({
+const checkoutSessionSchema = s.type({
   client_reference_id: s.nullable(s.string()),
   created: s.number(),
   payment_status: s.enums(["paid", "unpaid", "no_payment_required"]),
@@ -42,6 +42,6 @@ export const checkoutSessionSchema = s.type({
 
 export interface CustomClaims extends s.Infer<typeof customClaimsSchema> {}
 
-const customClaimsSchema = s.type({
+export const customClaimsSchema = s.type({
   plan_v1: s.optional(s.literal("premium")),
 })
