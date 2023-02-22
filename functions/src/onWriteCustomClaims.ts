@@ -4,7 +4,7 @@ import * as s from "superstruct"
 import { document } from "./firestorePath"
 import { customClaimsSchema } from "./schema"
 
-export const onWriteCheckoutSession = functions.firestore
+export const onWriteCustomClaims = functions.firestore
   .document(document("custom-claims", "{id}"))
   .onWrite(async (change) => {
     /**
