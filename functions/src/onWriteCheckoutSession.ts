@@ -5,7 +5,7 @@ import { document } from "./firestorePath"
 import { checkoutSessionSchema, CustomClaims } from "./schema"
 
 export const onWriteCheckoutSession = functions.firestore
-  .document(document("checkout-sessions-dev/{id}"))
+  .document(document("checkout-sessions", "{id}"))
   .onWrite(async (change) => {
     /**
      * | Operation   | before.exists | after.exists |

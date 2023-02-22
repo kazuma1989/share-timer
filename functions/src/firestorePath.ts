@@ -1,7 +1,18 @@
-export function collection<T extends "checkout-sessions-dev">(path: T): T {
-  return path
+import { defineString } from "firebase-functions/params"
+
+const DB_VERSION$ = defineString("DB_VERSION")
+
+export function collection(...paths: ["checkout-sessions"]): string {
+  return withVersionSuffix(paths).join("/")
 }
 
-export function document<T extends "checkout-sessions-dev/{id}">(path: T): T {
-  return path
+export function document(...paths: ["checkout-sessions", "{id}"]): string {
+  return withVersionSuffix(paths).join("/")
+}
+
+function withVersionSuffix(
+  paths: [string, ...string[]]
+): [string, ...string[]] {
+  const [root, ...rest] = paths
+  return [root + "-" + DB_VERSION$.value(), ...rest]
 }
