@@ -4,7 +4,7 @@ import Stripe from "stripe"
 import * as s from "superstruct"
 import { collection } from "./firestorePath"
 import { getEndpointSecret, getStripe } from "./getStripe"
-import { CheckoutSession, checkoutSessionEventSchema } from "./schema"
+import { CheckoutSession, checkoutSessionEventSchema, Product } from "./schema"
 
 export const stripeWebhook = functions
   .runWith({
@@ -51,31 +51,60 @@ export const stripeWebhook = functions
       return
     }
 
-    const session = event.data.object
+    const { id: sessionId } = event.data.object
+
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ["line_items.data.price.product"],
+    })
+
     const {
       client_reference_id,
       created,
       customer_details,
       customer_email,
+      line_items,
       payment_status,
       status,
     } = session
-    const { email = null, name = null, phone = null } = customer_details ?? {}
+
+    const emails = Array.from(
+      new Set([customer_email, customer_details?.email])
+    ).filter((_): _ is NonNullable<typeof _> => !!_)
+
+    const products =
+      line_items?.data.flatMap(({ price }): Product[] => {
+        if (!price) {
+          return []
+        }
+
+        const { product } = price
+
+        if (typeof product === "string") {
+          return [{ id: product }]
+        }
+
+        if (product.deleted) {
+          return []
+        }
+
+        const { id, name, metadata } = product
+        return [{ id, name, metadata }]
+      }) ?? null
 
     await getFirestore()
       .collection(collection("checkout-sessions-dev"))
-      .doc(session.id)
+      .doc(sessionId)
       .set({
         client_reference_id,
         created,
-        customer_details: { email, name, phone },
-        customer_email,
         payment_status,
         status,
+        emails,
+        products,
         payload: session,
       } satisfies CheckoutSession)
 
-    functions.logger.info("save session success", { id: session.id })
+    functions.logger.info("save session success", { id: sessionId })
 
     res.status(200).json(session)
   })
