@@ -82,6 +82,13 @@
       "rules": {
         "@typescript-eslint/no-unused-vars": "off"
       }
+    },
+
+    {
+      "files": ["./functions/**/*.ts"],
+      "parserOptions": {
+        "project": ["./functions/tsconfig.json"]
+      }
     }
   ]
 }

@@ -87,22 +87,37 @@
         href="#new"
         target="_blank"
         class={clsx(
-          "transparent-button block border border-gray-500 px-4 py-3 text-center no-underline after:content-['_↗']"
+          "transparent-button block border border-gray-500 px-4 py-3 text-center text-inherit no-underline after:content-['_↗']"
         )}
       >
         新しいタイマーを開く
       </a>
     </p>
 
-    <p>
-      <button
-        type="button"
-        class="transparent-button block w-full border border-gray-500 px-4 py-3"
-        on:click={lockRoom}
-      >
-        編集をロックする (experimental)
-      </button>
-    </p>
+    {#if import.meta.env.DEV}
+      <p>
+        <a
+          href="/checkout.html"
+          class={clsx(
+            "transparent-button block border border-gray-500 px-4 py-3 text-center text-inherit no-underline"
+          )}
+        >
+          購入画面を開く (experimental)
+        </a>
+      </p>
+    {/if}
+
+    {#if import.meta.env.DEV}
+      <p>
+        <button
+          type="button"
+          class="transparent-button block w-full border border-gray-500 px-4 py-3"
+          on:click={lockRoom}
+        >
+          編集をロックする (experimental)
+        </button>
+      </p>
+    {/if}
   </div>
 
   <footer>

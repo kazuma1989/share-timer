@@ -1,0 +1,24 @@
+{
+  "name": "functions",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "stripe": "stripe listen --forward-to localhost:5001/share-timer-2b51a/us-central1/stripeWebhook",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "18"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "firebase-admin": "11.5.x",
+    "firebase-functions": "4.2.x",
+    "stripe": "11.9.x",
+    "superstruct": "1.0.x"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "3.0.x",
+    "typescript": "4.9.x"
+  },
+  "private": true
+}

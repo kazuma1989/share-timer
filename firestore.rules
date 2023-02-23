@@ -35,6 +35,10 @@ service cloud.firestore {
       }
     }
 
+    match /checkout-sessions-dev/{session} {
+      allow list: if request.auth != null && request.auth.uid == resource.data.client_reference_id;
+    }
+
     match /owners-dev/{owner}/rooms/{room} {
       allow get;
       allow create: if hasCreatedAt() && isSelf(owner);
