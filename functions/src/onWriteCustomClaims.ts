@@ -1,10 +1,11 @@
 import { getAuth } from "firebase-admin/auth"
 import * as functions from "firebase-functions"
 import * as s from "superstruct"
+import { document } from "./firestorePath"
 import { customClaimsSchema } from "./schema"
 
 export const onWriteCustomClaims = functions.firestore
-  .document("custom-claims-dev/{id}")
+  .document(document("custom-claims", "{id}"))
   .onWrite(async (change) => {
     /**
      * | Operation   | before.exists | after.exists |
