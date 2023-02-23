@@ -6,11 +6,7 @@ import type { SignInState } from "./firestore/worker/RemoteAuth.worker"
 import { observeWorker } from "./util/observeWorker"
 import { shareRecent } from "./util/shareRecent"
 
-if (import.meta.env.DEV) {
-  run()
-}
-
-async function run(): Promise<void> {
+export default async function start(target: HTMLElement): Promise<void> {
   const firestore = await initRemoteFirestore()
 
   const auth = await initRemoteAuth()
@@ -43,7 +39,7 @@ async function run(): Promise<void> {
   })
 
   new Checkout({
-    target: document.getElementById("root")!,
+    target,
     props: {
       uid,
       email,

@@ -11,7 +11,10 @@
 
     <link rel="preload" crossorigin href="/__/firebase/init.json" as="fetch" />
 
-    <script type="module" src="/src/main.ts"></script>
+    <script type="module">
+      import start from "./src/main"
+      start(document.getElementById("root"))
+    </script>
 
     <link rel="stylesheet" href="/src/global.css" />
 

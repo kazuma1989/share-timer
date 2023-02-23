@@ -7,7 +7,10 @@
 
     <title>Checkout</title>
 
-    <script type="module" src="/src/main-checkout.ts"></script>
+    <script type="module">
+      import start from "./src/main-checkout"
+      if (import.meta.env.DEV) start(document.getElementById("root"))
+    </script>
 
     <link rel="stylesheet" href="/src/global.css" />
   </head>

@@ -8,11 +8,9 @@ import smallAlert from "./sound/small-alert.mp3"
 import { createAudio, keyWithAudio, keyWithMediaPermission } from "./useAudio"
 import { keyWithDarkMode, observeDarkMode } from "./useDarkMode"
 
-run()
-
-async function run(): Promise<void> {
+export default async function start(target: HTMLElement): Promise<void> {
   const skeleton = new AppSkeleton({
-    target: document.getElementById("root")!,
+    target,
   })
 
   // https://neos21.net/blog/2018/08/19-01.html
