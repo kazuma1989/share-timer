@@ -22,11 +22,13 @@ declare const process: {
     HOST?: string
     PORT?: string
     PREVIEW_PORT?: string
+
+    CI?: "true"
   }
 }
 
 export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
-  const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env
+  const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT, CI } = process.env
 
   return {
     appType: "mpa",
@@ -74,7 +76,7 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
         : undefined,
 
       // bundle analyze
-      bundleBuddy(),
+      !CI && bundleBuddy(),
     ],
   }
 })
