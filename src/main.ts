@@ -1,16 +1,20 @@
 import App from "./App.svelte"
-import AppSkeleton from "./AppSkeleton.svelte"
 import { firestoreImplContext } from "./firestore/firestoreImplContext"
 import { initRemoteFirestore } from "./firestore/initRemoteFirestore"
 import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
+import PageRoomSkeleton from "./PageRoomSkeleton.svelte"
+import Skeleton from "./Skeleton.svelte"
 import smallAlert from "./sound/small-alert.mp3"
 import { createAudio, keyWithAudio, keyWithMediaPermission } from "./useAudio"
 import { keyWithDarkMode, observeDarkMode } from "./useDarkMode"
 
 export default async function start(target: HTMLElement): Promise<void> {
-  const skeleton = new AppSkeleton({
+  const skeleton = new Skeleton({
     target,
+    props: {
+      skeleton: PageRoomSkeleton,
+    },
   })
 
   // https://neos21.net/blog/2018/08/19-01.html
