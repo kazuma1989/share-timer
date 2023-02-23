@@ -22,6 +22,45 @@
 
         firebase.auth().useEmulator(`${protocol}//${host}:${port}`)
       }
+
+      customElements.define(
+        "firebaseui-auth",
+        class FirebaseuiAuth extends HTMLElement {
+          constructor() {
+            super()
+
+            const shadowRoot = this.attachShadow({ mode: "open" })
+
+            const link = shadowRoot.appendChild(document.createElement("link"))
+            link.rel = "stylesheet"
+            link.href =
+              "https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.css"
+
+            const ui = new firebaseui.auth.AuthUI(firebase.auth())
+            const container = shadowRoot.appendChild(
+              document.createElement("div")
+            )
+
+            ui.start(container, {
+              signInSuccessUrl:
+                new URLSearchParams(location.search).get("back") ||
+                location.href,
+              signInOptions: [
+                firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                // "apple.com",
+                // "microsoft.com",
+                // "yahoo.com",
+                // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+                // firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+                // firebase.auth.GithubAuthProvider.PROVIDER_ID,
+                // firebase.auth.EmailAuthProvider.PROVIDER_ID,
+                // firebase.auth.PhoneAuthProvider.PROVIDER_ID,
+                // firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID,
+              ],
+            })
+          }
+        }
+      )
     </script>
 
     <script type="module">
@@ -92,35 +131,6 @@
       }
 
       render(html`<${App} />`, document.getElementById("root"))
-
-      const shadowRoot = document
-        .getElementById("firebaseui-auth-container")
-        .attachShadow({ mode: "open" })
-
-      const css = shadowRoot.appendChild(document.createElement("link"))
-      css.rel = "stylesheet"
-      css.href =
-        "https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.css"
-
-      const ui = new firebaseui.auth.AuthUI(firebase.auth())
-      const container = shadowRoot.appendChild(document.createElement("div"))
-
-      ui.start(container, {
-        signInSuccessUrl:
-          new URLSearchParams(location.search).get("back") || location.href,
-        signInOptions: [
-          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-          // "apple.com",
-          // "microsoft.com",
-          // "yahoo.com",
-          // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-          // firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-          // firebase.auth.GithubAuthProvider.PROVIDER_ID,
-          // firebase.auth.EmailAuthProvider.PROVIDER_ID,
-          // firebase.auth.PhoneAuthProvider.PROVIDER_ID,
-          // firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID,
-        ],
-      })
     </script>
 
     <link
@@ -149,6 +159,6 @@
 
     <div id="root" class="awsm"></div>
 
-    <div id="firebaseui-auth-container" class="peer-hidden"></div>
+    <firebaseui-auth class="peer-hidden"></firebaseui-auth>
   </body>
 </html>
