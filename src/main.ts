@@ -1,4 +1,5 @@
 import App from "./App.svelte"
+import { defineStart } from "./defineStart"
 import { firestoreImplContext } from "./firestore/firestoreImplContext"
 import { initRemoteFirestore } from "./firestore/initRemoteFirestore"
 import { observeAudioPermission } from "./observeAudioPermission"
@@ -9,7 +10,7 @@ import smallAlert from "./sound/small-alert.mp3"
 import { createAudio, keyWithAudio, keyWithMediaPermission } from "./useAudio"
 import { keyWithDarkMode, observeDarkMode } from "./useDarkMode"
 
-export default async function start(target: HTMLElement): Promise<void> {
+export default defineStart(async (target) => {
   const skeleton = new Skeleton({
     target,
     props: {
@@ -44,4 +45,4 @@ export default async function start(target: HTMLElement): Promise<void> {
       keyWithDarkMode(darkMode$),
     ]),
   })
-}
+})

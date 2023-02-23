@@ -1,12 +1,13 @@
 import { filter, firstValueFrom } from "rxjs"
 import Checkout from "./Checkout.svelte"
+import { defineStart } from "./defineStart"
 import { initRemoteAuth } from "./firestore/initRemoteAuth"
 import { initRemoteFirestore } from "./firestore/initRemoteFirestore"
 import type { SignInState } from "./firestore/worker/RemoteAuth.worker"
 import { observeWorker } from "./util/observeWorker"
 import { shareRecent } from "./util/shareRecent"
 
-export default async function start(target: HTMLElement): Promise<void> {
+export default defineStart(async (target) => {
   const firestore = await initRemoteFirestore()
 
   const auth = await initRemoteAuth()
@@ -48,4 +49,4 @@ export default async function start(target: HTMLElement): Promise<void> {
       },
     },
   })
-}
+})
