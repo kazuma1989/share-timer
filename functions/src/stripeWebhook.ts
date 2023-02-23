@@ -1,4 +1,4 @@
-import { getFirestore } from "firebase-admin/firestore"
+import { getFirestore, Timestamp } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
 import Stripe from "stripe"
 import * as s from "superstruct"
@@ -132,7 +132,7 @@ function toCheckoutSession(session: Stripe.Checkout.Session): CheckoutSession {
 
   return {
     client_reference_id,
-    created,
+    created: Timestamp.fromMillis(created * 1_000),
     payment_status,
     status,
     emails,

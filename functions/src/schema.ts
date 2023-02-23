@@ -1,3 +1,4 @@
+import { Timestamp } from "firebase-admin/firestore"
 import Stripe from "stripe"
 import * as s from "superstruct"
 
@@ -31,7 +32,7 @@ export interface CheckoutSession
 
 const checkoutSessionSchema = s.type({
   client_reference_id: s.nullable(s.string()),
-  created: s.number(),
+  created: s.instance(Timestamp),
   payment_status: s.enums(["paid", "unpaid", "no_payment_required"]),
   status: s.nullable(s.enums(["open", "complete", "expired"])),
 
