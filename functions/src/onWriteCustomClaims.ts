@@ -21,6 +21,9 @@ export const onWriteCustomClaims = functions.firestore
       ? "create"
       : "update"
 
+    let uid: string
+    let customClaims: object | null
+
     switch (changeType) {
       case "create":
       case "update": {
@@ -30,27 +33,30 @@ export const onWriteCustomClaims = functions.firestore
         )
         if (error) {
           functions.logger.warn(error)
-          break
+          return
         }
 
-        const uid = change.after.id
-        const customClaims = data
-
-        functions.logger.debug("customClaims (before)", {
-          customClaims: (await getAuth().getUser(uid)).customClaims,
-        })
-
-        await getAuth().setCustomUserClaims(uid, customClaims)
-
-        functions.logger.debug("customClaims (after)", {
-          customClaims: (await getAuth().getUser(uid)).customClaims,
-        })
+        uid = change.after.id
+        customClaims = data
 
         break
       }
 
       case "delete": {
+        uid = change.before.id
+        customClaims = null
+
         break
       }
     }
+
+    functions.logger.debug("customClaims (before)", {
+      customClaims: (await getAuth().getUser(uid)).customClaims,
+    })
+
+    await getAuth().setCustomUserClaims(uid, customClaims)
+
+    functions.logger.debug("customClaims (after)", {
+      customClaims: (await getAuth().getUser(uid)).customClaims,
+    })
   })
