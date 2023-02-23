@@ -12,7 +12,9 @@ import { setTransferHandlers } from "./setTransferHandlers"
 import { observeWorker } from "./util/observeWorker"
 import { shareRecent } from "./util/shareRecent"
 
-run()
+if (import.meta.env.DEV) {
+  run()
+}
 
 async function run(): Promise<void> {
   const Firestore = wrap<typeof RemoteFirestore>(new RemoteFirestoreWorker())
