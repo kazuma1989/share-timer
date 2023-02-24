@@ -19,7 +19,7 @@ export default {
 
   kit: {
     adapter: adapterStatic({
-      outDir: hosting.find((_) => _.target === "app")?.public,
+      pages: hosting.find((_) => _.target === "app")?.public,
     }),
   },
 }
