@@ -8,7 +8,6 @@
   import type { Room } from "./schema/roomSchema"
   import type { TimerState } from "./schema/timerReducer"
   import { serverTimestamp } from "./serverTimestamp"
-  import { getItem } from "./storage"
   import TimeViewer from "./TimeViewer.svelte"
   import { useDispatch } from "./useDispatch"
   import { getId } from "./util/getId"
@@ -23,7 +22,7 @@
   const id = (_: "timer" | "status") => _id + _
 
   $: state = $timerState$
-  $: ({ id: roomId, lockedBy } = $room$)
+  $: ({ id: roomId } = $room$)
 
   $: initialDuration$ = timerState$.pipe(
     map((_) => _.initialDuration),
@@ -31,7 +30,7 @@
   )
   $: duration = $initialDuration$
 
-  $: locked = lockedBy && lockedBy !== getItem("userId")
+  const locked = false
   $: [pending, dispatch] = useDispatch(roomId)
 
   let button: {

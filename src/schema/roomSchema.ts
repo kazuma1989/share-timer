@@ -16,7 +16,6 @@ export function isRoom(value: Room | InvalidDoc): value is Room {
 export const roomSchema = /*@__PURE__*/ (() =>
   s.type({
     name: s.optional(s.size(s.string(), 0, 1_000)),
-    lockedBy: s.optional(s.size(s.string(), 10)),
   }))()
 
 const roomIdSchema = /*@__PURE__*/ (() =>
