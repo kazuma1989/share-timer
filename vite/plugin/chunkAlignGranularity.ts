@@ -12,10 +12,6 @@ export default function chunkAlignGranularity(): Plugin {
         build: {
           // モジュールサイズが小さすぎると TTFB が律速するので、ある程度のかたまりを維持できるようにアセットをまとめる
           assetsInlineLimit: 4096 * 2,
-
-          // CSS が細かくなりすぎないようまとめる
-          // Tailwind を使っているとどっちにしろチャンク分割が起きない可能性があるが、明示的に設定しておく
-          cssCodeSplit: false,
         },
       }
     },
