@@ -5,7 +5,6 @@ import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
 import chunkAlignGranularity from "./vite/plugin/chunkAlignGranularity"
 import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
-import prefetchWorker from "./vite/plugin/prefetchWorker"
 import vitest from "./vite/plugin/vitest"
 
 declare const process: {
@@ -61,7 +60,6 @@ export default defineConfig(async ({ command, mode }) => {
 
       // Build config
       chunkAlignGranularity(),
-      prefetchWorker(),
 
       // Test config
       vitest(),
