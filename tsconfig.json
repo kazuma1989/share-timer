@@ -10,13 +10,21 @@
     // null check 強化
     "strict": true,
     "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
 
-    // JSON を使いたい
+    // JSON を default import で使いたい
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
 
     // node_modules 同士の整合はチェックしない
     "skipLibCheck": true,
+
+    // .svelte ファイルでは JS を書けてしまうので許可しても変わりないらしい
+    "allowJs": true,
+    "checkJs": true,
+
+    // Svelte compiler のエラーを見やすくできるらしい
+    "sourceMap": true,
 
     // 手軽に tsc コマンドで検査したい
     "noEmit": true
