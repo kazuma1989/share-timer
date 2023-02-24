@@ -42,7 +42,6 @@
     "@sveltejs/kit": "1.8.x",
     "@sveltejs/vite-plugin-svelte": "2.0.x",
     "@tailwindcss/typography": "0.5.x",
-    "@tsconfig/svelte": "3.0.x",
     "autoprefixer": "10.4.x",
     "clsx": "1.2.x",
     "comlink": "4.3.x",
