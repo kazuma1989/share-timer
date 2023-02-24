@@ -1,6 +1,6 @@
 import { sveltekit } from "@sveltejs/kit/vite"
 import { defineConfig } from "vite"
-import { emulators, hosting } from "./firebase.json"
+import { emulators } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
 import chunkAlignGranularity from "./vite/plugin/chunkAlignGranularity"
@@ -18,7 +18,6 @@ declare const process: {
      */
     BROWSER?: string
 
-    BUILD_PATH?: string
     HOST?: string
     PORT?: string
     PREVIEW_PORT?: string
@@ -28,7 +27,7 @@ declare const process: {
 }
 
 export default defineConfig(async ({ command, mode }) => {
-  const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT, CI } = process.env
+  const { BROWSER, HOST, PORT, PREVIEW_PORT, CI } = process.env
 
   return {
     define: {
@@ -42,7 +41,6 @@ export default defineConfig(async ({ command, mode }) => {
     },
 
     build: {
-      outDir: BUILD_PATH || hosting.find((_) => _.target === "app")?.public,
       sourcemap: true,
     },
 
