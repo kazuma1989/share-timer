@@ -1,4 +1,4 @@
-import { HtmlTagDescriptor, Plugin } from "vite"
+import type { HtmlTagDescriptor, Plugin } from "vite"
 
 export default function prefetchWorker(): Plugin {
   return {

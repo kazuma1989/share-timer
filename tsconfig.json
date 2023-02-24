@@ -2,10 +2,6 @@
 {
   "extends": "./.svelte-kit/tsconfig.json",
 
-  "references": [{ "path": "./tsconfig.node.json" }],
-
-  "include": ["./src/**/*"],
-
   "compilerOptions": {
     // null check 強化
     "strict": true,

@@ -1,5 +1,5 @@
 import { svelte } from "@sveltejs/vite-plugin-svelte"
-import { defineConfig, UserConfig } from "vite"
+import { defineConfig, type UserConfig } from "vite"
 import { emulators, hosting } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"

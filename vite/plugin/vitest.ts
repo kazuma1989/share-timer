@@ -1,6 +1,6 @@
 /// <reference types="vitest" />
 import * as path from "node:path"
-import { Plugin } from "vite"
+import type { Plugin } from "vite"
 
 /**
  * Vitest を使えるようにする

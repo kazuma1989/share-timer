@@ -1,4 +1,4 @@
-import { Plugin } from "vite"
+import type { Plugin } from "vite"
 
 /**
  * 設定ずみの vite-plugin-checker を返す

@@ -1,4 +1,4 @@
-import { Plugin } from "vite"
+import type { Plugin } from "vite"
 
 /**
  * チャンク粒度をある程度のファイルサイズに揃える

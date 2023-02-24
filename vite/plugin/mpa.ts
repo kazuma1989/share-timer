@@ -1,6 +1,6 @@
 import * as fs from "node:fs/promises"
 import * as path from "node:path"
-import { Plugin } from "vite"
+import type { Plugin } from "vite"
 
 export default function mpa(): Plugin {
   return {
