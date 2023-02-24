@@ -5,6 +5,7 @@ import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
 import chunkAlignGranularity from "./vite/plugin/chunkAlignGranularity"
 import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
+import mpa from "./vite/plugin/mpa"
 import prefetchWorker from "./vite/plugin/prefetchWorker"
 import vitest from "./vite/plugin/vitest"
 
@@ -22,15 +23,15 @@ declare const process: {
     HOST?: string
     PORT?: string
     PREVIEW_PORT?: string
+
+    CI?: "true"
   }
 }
 
 export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
-  const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT } = process.env
+  const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT, CI } = process.env
 
   return {
-    appType: "mpa",
-
     define: {
       "import.meta.env.FIREBASE_EMULATORS": JSON.stringify(emulators),
     },
@@ -56,6 +57,7 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
     },
 
     plugins: [
+      mpa(),
       svelte(),
 
       // Firebase
@@ -74,7 +76,7 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
         : undefined,
 
       // bundle analyze
-      bundleBuddy(),
+      !CI && bundleBuddy(),
     ],
   }
 })

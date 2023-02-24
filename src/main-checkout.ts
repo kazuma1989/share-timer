@@ -1,33 +1,16 @@
-import { wrap } from "comlink"
 import { filter, firstValueFrom } from "rxjs"
 import Checkout from "./Checkout.svelte"
-import type {
-  RemoteAuth,
-  SignInState,
-} from "./firestore/worker/RemoteAuth.worker"
-import RemoteAuthWorker from "./firestore/worker/RemoteAuth.worker?worker"
-import type { RemoteFirestore } from "./firestore/worker/RemoteFirestore.worker"
-import RemoteFirestoreWorker from "./firestore/worker/RemoteFirestore.worker?worker"
-import { setTransferHandlers } from "./setTransferHandlers"
+import { defineStart } from "./defineStart"
+import { initRemoteAuth } from "./firestore/initRemoteAuth"
+import { initRemoteFirestore } from "./firestore/initRemoteFirestore"
+import type { SignInState } from "./firestore/worker/RemoteAuth.worker"
 import { observeWorker } from "./util/observeWorker"
 import { shareRecent } from "./util/shareRecent"
 
-if (import.meta.env.DEV) {
-  run()
-}
+export default defineStart(async (target) => {
+  const firestore = await initRemoteFirestore()
 
-async function run(): Promise<void> {
-  const Firestore = wrap<typeof RemoteFirestore>(new RemoteFirestoreWorker())
-  const firestore = await new Firestore(
-    await fetch("/__/firebase/init.json").then((_) => _.json())
-  )
-
-  setTransferHandlers()
-
-  const Auth = wrap<typeof RemoteAuth>(new RemoteAuthWorker())
-  const auth = await new Auth(
-    await fetch("/__/firebase/init.json").then((_) => _.json())
-  )
+  const auth = await initRemoteAuth()
 
   const authUser$ = observeWorker<SignInState>((onNext) =>
     auth.onAuthStateChanged(onNext)
@@ -57,7 +40,7 @@ async function run(): Promise<void> {
   })
 
   new Checkout({
-    target: document.getElementById("root")!,
+    target,
     props: {
       uid,
       email,
@@ -66,4 +49,4 @@ async function run(): Promise<void> {
       },
     },
   })
-}
+})

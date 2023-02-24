@@ -1,31 +1,25 @@
-import { wrap } from "comlink"
 import App from "./App.svelte"
-import AppSkeleton from "./AppSkeleton.svelte"
+import { defineStart } from "./defineStart"
 import { firestoreImplContext } from "./firestore/firestoreImplContext"
-import type { RemoteFirestore } from "./firestore/worker/RemoteFirestore.worker"
-import RemoteFirestoreWorker from "./firestore/worker/RemoteFirestore.worker?worker"
+import { initRemoteFirestore } from "./firestore/initRemoteFirestore"
 import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
-import { setTransferHandlers } from "./setTransferHandlers"
+import PageRoomSkeleton from "./PageRoomSkeleton.svelte"
+import Skeleton from "./Skeleton.svelte"
 import smallAlert from "./sound/small-alert.mp3"
-import { getItem, setItem } from "./storage"
 import { createAudio, keyWithAudio, keyWithMediaPermission } from "./useAudio"
 import { keyWithDarkMode, observeDarkMode } from "./useDarkMode"
-import { nanoid } from "./util/nanoid"
 
-run()
-
-async function run(): Promise<void> {
-  const skeleton = new AppSkeleton({
-    target: document.getElementById("root")!,
+export default defineStart(async (target) => {
+  const skeleton = new Skeleton({
+    target,
+    props: {
+      skeleton: PageRoomSkeleton,
+    },
   })
 
   // https://neos21.net/blog/2018/08/19-01.html
   document.body.addEventListener("touchstart", () => {}, { passive: true })
-
-  if (!getItem("userId")) {
-    setItem("userId", nanoid(10))
-  }
 
   const darkMode$ = observeDarkMode()
 
@@ -37,13 +31,7 @@ async function run(): Promise<void> {
 
   const route$ = observeHash()
 
-  const Firestore = wrap<typeof RemoteFirestore>(new RemoteFirestoreWorker())
-  const firestore = await new Firestore(
-    await fetch("/__/firebase/init.json").then((_) => _.json())
-  )
-
-  setTransferHandlers()
-  // firestore.getEstimatedDiff().then(setEstimatedDiff)
+  const firestore = await initRemoteFirestore()
 
   new App({
     target: skeleton.appRoot!,
@@ -57,4 +45,4 @@ async function run(): Promise<void> {
       keyWithDarkMode(darkMode$),
     ]),
   })
-}
+})
