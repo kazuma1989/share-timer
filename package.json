@@ -21,7 +21,8 @@
     "format": "prettier --write \"./src/**/*.{css,html,js,ts,svelte}\"",
     "lint": "eslint \"./src/**/*.{ts,svelte}\"",
     "lint:unused": "npx -y ts-unused-exports ./tsconfig.json",
-    "check": "tsc --project ./tsconfig.json && svelte-check --tsconfig ./tsconfig.json",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "upgrade": "npx -y npm-check-updates --upgrade",
     "deploy": "firebase deploy",
     "deploy:firestore": "firebase deploy --only firestore",
@@ -37,6 +38,8 @@
     "tailwind-init": "tailwindcss init -p"
   },
   "dependencies": {
+    "@sveltejs/adapter-static": "2.0.x",
+    "@sveltejs/kit": "1.8.x",
     "@sveltejs/vite-plugin-svelte": "2.0.x",
     "@tailwindcss/typography": "0.5.x",
     "@tsconfig/svelte": "3.0.x",
