@@ -1,11 +1,10 @@
-import { svelte } from "@sveltejs/vite-plugin-svelte"
-import { defineConfig, type UserConfig } from "vite"
+import { sveltekit } from "@sveltejs/kit/vite"
+import { defineConfig } from "vite"
 import { emulators, hosting } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
 import chunkAlignGranularity from "./vite/plugin/chunkAlignGranularity"
 import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
-import mpa from "./vite/plugin/mpa"
 import prefetchWorker from "./vite/plugin/prefetchWorker"
 import vitest from "./vite/plugin/vitest"
 
@@ -28,7 +27,7 @@ declare const process: {
   }
 }
 
-export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
+export default defineConfig(async ({ command, mode }) => {
   const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT, CI } = process.env
 
   return {
@@ -57,8 +56,7 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
     },
 
     plugins: [
-      mpa(),
-      svelte(),
+      sveltekit(),
 
       // Firebase
       firebaseReservedURL(),
