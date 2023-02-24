@@ -1,6 +1,6 @@
 // https://www.typescriptlang.org/ja/tsconfig
 {
-  "extends": "@tsconfig/svelte/tsconfig.json",
+  "extends": "./.svelte-kit/tsconfig.json",
 
   "references": [{ "path": "./tsconfig.node.json" }],
 
@@ -11,11 +11,12 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
 
-    // import.meta を使いたい
-    "module": "ESNext",
-
     // JSON を使いたい
     "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+
+    // node_modules 同士の整合はチェックしない
+    "skipLibCheck": true,
 
     // 手軽に tsc コマンドで検査したい
     "noEmit": true
