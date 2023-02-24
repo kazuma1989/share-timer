@@ -1,6 +1,6 @@
 import { wrap, type Remote } from "comlink"
 import type { RemoteAuth } from "./worker/RemoteAuth.worker"
-import RemoteAuthWorker from "./worker/RemoteAuth.worker?worker"
+import RemoteAuthWorker from "./worker/RemoteAuth.worker?worker&inline"
 
 export async function initRemoteAuth(): Promise<Remote<RemoteAuth>> {
   const Auth = wrap<typeof RemoteAuth>(new RemoteAuthWorker())
