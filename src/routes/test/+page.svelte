@@ -1,6 +1,7 @@
 <script lang="ts">
   import { browser } from "$app/environment"
-  import { Observable, of } from "rxjs"
+  import { ifBrowser } from "$lib/ifBrowser"
+  import { Observable } from "rxjs"
   import { readable, type Readable } from "svelte/store"
   import { observeDarkMode } from "../../useDarkMode"
 
@@ -16,9 +17,7 @@
     })
   })
 
-  const theme$ = browser
-    ? observeDarkMode()
-    : of<Observed<ReturnType<typeof observeDarkMode>>>("light")
+  const theme$ = ifBrowser(observeDarkMode, "light")
 
   theme$.subscribe((_) => {
     console.log(_)
