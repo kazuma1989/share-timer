@@ -1,19 +1,49 @@
 <script lang="ts">
-  import { browser } from "$app/environment"
-  import { ifBrowser } from "$lib/ifBrowser"
+  import smallAlert from "$lib/assets/small-alert.mp3"
+  import { observeAudioPermission } from "$lib/observeAudioPermission"
+  import { createAudio } from "$lib/useAudio"
+  import App from "../../App.svelte"
+  import { initRemoteFirestore } from "../../firestore/initRemoteFirestore"
+  import { observeHash } from "../../observeHash"
+  import PageRoomSkeleton from "../../PageRoomSkeleton.svelte"
   import { observeDarkMode } from "../../useDarkMode"
+  import { createVideoTimer } from "../../useVideoTimer"
+  import Setup from "../Setup.svelte"
 
-  const theme$ = ifBrowser(observeDarkMode, "light")
+  async function setup() {
+    const darkMode$ = observeDarkMode()
 
-  theme$.subscribe((_) => {
-    console.log(_)
-  })
+    const context = new AudioContext()
+    const permission$ = observeAudioPermission(context)
+
+    const audioData = await fetch(smallAlert).then((_) => _.arrayBuffer())
+    const audio = createAudio(context, audioData)
+
+    const video = createVideoTimer()
+
+    const route$ = observeHash()
+
+    const firestore = await initRemoteFirestore()
+
+    return {
+      audio,
+      permission$,
+      darkMode$,
+      video,
+      firestore,
+      route$,
+    }
+  }
 </script>
 
-<p>theme: {$theme$}</p>
+<div class="peer contents">
+  {#await setup() then { route$, ...props }}
+    <Setup {...props}>
+      <App {route$} />
+    </Setup>
+  {/await}
+</div>
 
-{#if browser}
-  <h1>BROWSER YES</h1>
-{:else}
-  <h1>NODE_JS</h1>
-{/if}
+<div class="hidden peer-empty:contents">
+  <PageRoomSkeleton />
+</div>
