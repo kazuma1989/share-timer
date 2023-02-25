@@ -1,3 +1,4 @@
+import smallAlert from "$lib/assets/small-alert.mp3"
 import App from "./App.svelte"
 import { defineStart } from "./defineStart"
 import { firestoreImplContext } from "./firestore/firestoreImplContext"
@@ -6,7 +7,6 @@ import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
 import PageRoomSkeleton from "./PageRoomSkeleton.svelte"
 import Skeleton from "./Skeleton.svelte"
-import smallAlert from "./sound/small-alert.mp3"
 import { createAudio, keyWithAudio, keyWithMediaPermission } from "./useAudio"
 import { keyWithDarkMode, observeDarkMode } from "./useDarkMode"
 
