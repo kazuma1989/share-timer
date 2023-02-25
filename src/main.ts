@@ -5,20 +5,11 @@ import { firestoreImplContext } from "./firestore/firestoreImplContext"
 import { initRemoteFirestore } from "./firestore/initRemoteFirestore"
 import { observeAudioPermission } from "./observeAudioPermission"
 import { observeHash } from "./observeHash"
-import PageRoomSkeleton from "./PageRoomSkeleton.svelte"
-import Skeleton from "./Skeleton.svelte"
 import { createAudio, keyWithAudio, keyWithMediaPermission } from "./useAudio"
 import { keyWithDarkMode, observeDarkMode } from "./useDarkMode"
 import { createVideoTimer, keyWithVideoTimer } from "./useVideoTimer"
 
 export default defineStart(async (target) => {
-  const skeleton = new Skeleton({
-    target,
-    props: {
-      skeleton: PageRoomSkeleton,
-    },
-  })
-
   const darkMode$ = observeDarkMode()
 
   const context = new AudioContext()
@@ -34,7 +25,7 @@ export default defineStart(async (target) => {
   const firestore = await initRemoteFirestore()
 
   new App({
-    target: skeleton.appRoot!,
+    target,
     props: {
       route$,
     },

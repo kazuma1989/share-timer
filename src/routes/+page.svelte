@@ -1,12 +1,15 @@
 <script lang="ts">
   import { onMount } from "svelte"
   import main from "../main"
+  import PageRoomSkeleton from "../PageRoomSkeleton.svelte"
+  import Skeleton from "../Skeleton.svelte"
 
-  let root: HTMLElement
-
+  let root: HTMLElement | undefined
   onMount(async () => {
-    await main(root)
+    await main(root!)
   })
 </script>
 
-<div bind:this={root} />
+<Skeleton bind:appRoot={root}>
+  <PageRoomSkeleton />
+</Skeleton>
