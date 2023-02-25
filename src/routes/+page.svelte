@@ -1,13 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte"
+  import main from "../main"
 
   let root: HTMLElement
 
   onMount(async () => {
-    const main = (await import("../main")).default
-
-    main(root)
+    await main(root)
   })
 </script>
 
-<div id="root" bind:this={root} />
+<div bind:this={root} />
