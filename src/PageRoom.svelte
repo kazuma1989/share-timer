@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { useAudio } from "$lib/useAudio"
   import { firstValueFrom, map, merge, partition, type Observable } from "rxjs"
   import ConfigArea from "./ConfigArea.svelte"
   import FlashCover from "./FlashCover.svelte"
@@ -7,7 +8,6 @@
   import { setTitleAsTimeViewer } from "./setTitleAsTimeViewer"
   import Timer from "./Timer.svelte"
   import { fromRoute } from "./toRoute"
-  import { useAudio } from "./useAudio"
   import { useConfig } from "./useConfig"
   import { useRoom } from "./useRoom"
   import { useSetup } from "./useSetup"

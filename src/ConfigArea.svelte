@@ -1,10 +1,10 @@
 <script lang="ts">
+  import { useMediaPermission } from "$lib/useAudio"
   import clsx from "clsx"
   import { placeDialog } from "./action/placeDialog"
   import { showModal } from "./action/showModal"
   import Icon from "./Icon.svelte"
   import { getItem, setItem } from "./storage"
-  import { useMediaPermission } from "./useAudio"
   import { toggleConfig, useConfig } from "./useConfig"
   import { getId } from "./util/getId"
 

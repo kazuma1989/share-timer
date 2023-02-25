@@ -1,3 +1,4 @@
+import { nonNullable } from "$lib/util/nonNullable"
 import { expose, proxy, type ProxyMarked } from "comlink"
 import { initializeApp, type FirebaseOptions } from "firebase/app"
 import {
@@ -48,7 +49,6 @@ import {
 import { timerReducer, type TimerState } from "../../schema/timerReducer"
 import { setTransferHandlers } from "../../setTransferHandlers"
 import { createCache } from "../../util/createCache"
-import { nonNullable } from "../../util/nonNullable"
 import { shareRecent } from "../../util/shareRecent"
 import { calibrationSchema, type Calibration } from "./calibrationSchema"
 import { collection } from "./collection"

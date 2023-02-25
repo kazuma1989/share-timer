@@ -1,18 +1,18 @@
 <script lang="ts">
   import smallAlert from "$lib/assets/small-alert.mp3"
-  import { onMount } from "svelte"
-  import App from "../App.svelte"
-  import { firestoreImplContext } from "../firestore/firestoreImplContext"
-  import { initRemoteFirestore } from "../firestore/initRemoteFirestore"
-  import { observeAudioPermission } from "../observeAudioPermission"
-  import { observeHash } from "../observeHash"
-  import PageRoomSkeleton from "../PageRoomSkeleton.svelte"
-  import Skeleton from "../Skeleton.svelte"
+  import { observeAudioPermission } from "$lib/observeAudioPermission"
   import {
     createAudio,
     keyWithAudio,
     keyWithMediaPermission,
-  } from "../useAudio"
+  } from "$lib/useAudio"
+  import { onMount } from "svelte"
+  import App from "../App.svelte"
+  import { firestoreImplContext } from "../firestore/firestoreImplContext"
+  import { initRemoteFirestore } from "../firestore/initRemoteFirestore"
+  import { observeHash } from "../observeHash"
+  import PageRoomSkeleton from "../PageRoomSkeleton.svelte"
+  import Skeleton from "../Skeleton.svelte"
   import { keyWithDarkMode, observeDarkMode } from "../useDarkMode"
   import { createVideoTimer, keyWithVideoTimer } from "../useVideoTimer"
 

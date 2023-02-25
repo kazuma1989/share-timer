@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { assertNonNullable } from "$lib/util/assertNonNullable"
   import clsx from "clsx"
   import {
     combineLatestWith,
@@ -16,7 +17,6 @@
   import type { TimerState } from "./schema/timerReducer"
   import { useDarkMode } from "./useDarkMode"
   import { useVideoTimer } from "./useVideoTimer"
-  import { assertNonNullable } from "./util/assertNonNullable"
   import { bufferedLast } from "./util/bufferedLast"
   import { floor } from "./util/floor"
   import { formatDuration } from "./util/formatDuration"
