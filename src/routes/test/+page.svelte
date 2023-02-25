@@ -1,40 +1,18 @@
 <script lang="ts">
   import { browser } from "$app/environment"
   import { ifBrowser } from "$lib/ifBrowser"
-  import { Observable } from "rxjs"
-  import { readable, type Readable } from "svelte/store"
   import { observeDarkMode } from "../../useDarkMode"
-
-  type X<T> = T extends Readable<infer R> ? R : never
-
-  const browser$ = readable(browser, (set) => {
-    set(browser)
-  })
-
-  const x$ = new Observable<X<typeof browser$>>((subscriber) => {
-    browser$.subscribe((_) => {
-      subscriber.next(_)
-    })
-  })
 
   const theme$ = ifBrowser(observeDarkMode, "light")
 
   theme$.subscribe((_) => {
     console.log(_)
   })
-
-  browser$.subscribe((value) => {
-    console.log({ value })
-  })
-
-  console.log({
-    browser,
-  })
 </script>
 
 <p>theme: {$theme$}</p>
 
-{#if $browser$}
+{#if browser}
   <h1>BROWSER YES</h1>
 {:else}
   <h1>NODE_JS</h1>
