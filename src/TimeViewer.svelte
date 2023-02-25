@@ -1,26 +1,3 @@
-<script lang="ts" context="module">
-  const video = window.document.createElement("video")
-  video.setAttribute("role", "timer")
-
-  // フォーカス可能にしておかないと VoiceOver が読んでくれない
-  video.tabIndex = 0
-
-  // 自動再生可能なように muted, playsInline はともに true.
-  video.autoplay = true
-  video.muted = true
-  video.playsInline = true
-
-  const play = video.play.bind(video)
-  const requestPictureInPicture = video.requestPictureInPicture.bind(video)
-
-  // controls off にしておくので、扱いやすいようなイベントをあらかじめ付与
-  video.addEventListener("click", play, { passive: true })
-  video.addEventListener("dblclick", requestPictureInPicture, { passive: true })
-
-  // なるべく再生状態を維持する（タイマーの再生・停止の概念もあってややこしくなるため）
-  video.addEventListener("pause", play, { passive: true })
-</script>
-
 <script lang="ts">
   import clsx from "clsx"
   import {
@@ -38,6 +15,7 @@
   import { now } from "./now"
   import type { TimerState } from "./schema/timerReducer"
   import { useDarkMode } from "./useDarkMode"
+  import { useVideoTimer } from "./useVideoTimer"
   import { assertNonNullable } from "./util/assertNonNullable"
   import { bufferedLast } from "./util/bufferedLast"
   import { floor } from "./util/floor"
@@ -48,6 +26,8 @@
   export let timerState$: Observable<TimerState>
   export { className as class }
   let className: string = ""
+
+  const video = useVideoTimer()
 
   $: duration$ = timerState$.pipe(
     bufferedLast(interval("worker", 400).pipe(startWith(undefined))),

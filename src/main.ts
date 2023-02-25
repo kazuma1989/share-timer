@@ -9,6 +9,7 @@ import PageRoomSkeleton from "./PageRoomSkeleton.svelte"
 import Skeleton from "./Skeleton.svelte"
 import { createAudio, keyWithAudio, keyWithMediaPermission } from "./useAudio"
 import { keyWithDarkMode, observeDarkMode } from "./useDarkMode"
+import { createVideoTimer, keyWithVideoTimer } from "./useVideoTimer"
 
 export default defineStart(async (target) => {
   const skeleton = new Skeleton({
@@ -26,6 +27,8 @@ export default defineStart(async (target) => {
   const audioData = await fetch(smallAlert).then((_) => _.arrayBuffer())
   const audio = createAudio(context, audioData)
 
+  const video = createVideoTimer()
+
   const route$ = observeHash()
 
   const firestore = await initRemoteFirestore()
@@ -40,6 +43,7 @@ export default defineStart(async (target) => {
       keyWithAudio(audio),
       keyWithMediaPermission(permission$),
       keyWithDarkMode(darkMode$),
+      keyWithVideoTimer(video),
     ]),
   })
 })
