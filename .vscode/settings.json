@@ -19,5 +19,8 @@
   ],
 
   // TypeScriptバージョンをリポジトリのものに揃える。
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+
+  // SvelteKit の $lib import などを優先
+  "typescript.preferences.importModuleSpecifier": "non-relative"
 }
