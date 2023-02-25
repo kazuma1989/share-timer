@@ -43,6 +43,9 @@
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": "warn",
 
+    // no-undef も同様
+    "no-undef": "off",
+
     // https://typescript-eslint.io/rules/switch-exhaustiveness-check/
     "@typescript-eslint/switch-exhaustiveness-check": "error",
 
