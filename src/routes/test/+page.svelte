@@ -1,14 +1,22 @@
 <script lang="ts">
+  import { browser } from "$app/environment"
   import smallAlert from "$lib/assets/small-alert.mp3"
   import { observeAudioPermission } from "$lib/observeAudioPermission"
-  import { createAudio } from "$lib/useAudio"
+  import {
+    createAudio,
+    keyWithAudio,
+    keyWithMediaPermission,
+  } from "$lib/useAudio"
   import App from "../../App.svelte"
+  import { firestoreImplContext } from "../../firestore/firestoreImplContext"
   import { initRemoteFirestore } from "../../firestore/initRemoteFirestore"
   import { observeHash } from "../../observeHash"
   import PageRoomSkeleton from "../../PageRoomSkeleton.svelte"
-  import { observeDarkMode } from "../../useDarkMode"
-  import { createVideoTimer } from "../../useVideoTimer"
+  import { keyWithDarkMode, observeDarkMode } from "../../useDarkMode"
+  import { createVideoTimer, keyWithVideoTimer } from "../../useVideoTimer"
   import Setup from "../Setup.svelte"
+
+  const route$ = browser ? observeHash() : null
 
   async function setup() {
     const darkMode$ = observeDarkMode()
@@ -21,25 +29,24 @@
 
     const video = createVideoTimer()
 
-    const route$ = observeHash()
-
     const firestore = await initRemoteFirestore()
 
-    return {
-      audio,
-      permission$,
-      darkMode$,
-      video,
-      firestore,
-      route$,
-    }
+    return new Map([
+      ...firestoreImplContext(firestore),
+      keyWithAudio(audio),
+      keyWithMediaPermission(permission$),
+      keyWithDarkMode(darkMode$),
+      keyWithVideoTimer(video),
+    ])
   }
 </script>
 
 <div class="peer contents">
-  {#await setup() then { route$, ...props }}
-    <Setup {...props}>
-      <App {route$} />
+  {#await setup() then context}
+    <Setup {context}>
+      {#if route$}
+        <App {route$} />
+      {/if}
     </Setup>
   {/await}
 </div>
