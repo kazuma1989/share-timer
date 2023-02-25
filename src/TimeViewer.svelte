@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  const video = document.createElement("video")
+  const video = window.document.createElement("video")
   video.setAttribute("role", "timer")
 
   // フォーカス可能にしておかないと VoiceOver が読んでくれない

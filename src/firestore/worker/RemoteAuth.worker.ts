@@ -31,8 +31,8 @@ export class RemoteAuth {
     })
 
     if (import.meta.env.VITE_AUTH_EMULATOR) {
-      const protocol = location.protocol
-      const host = location.hostname
+      const protocol = self.location.protocol
+      const host = self.location.hostname
       const port = import.meta.env.FIREBASE_EMULATORS.auth.port
 
       connectAuthEmulator(this.auth, `${protocol}//${host}:${port}`)

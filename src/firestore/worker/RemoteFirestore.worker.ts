@@ -72,7 +72,7 @@ export class RemoteFirestore {
     this.firestore = getFirestore(initializeApp(options))
 
     if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
-      const host = location.hostname
+      const host = self.location.hostname
       const port = import.meta.env.FIREBASE_EMULATORS.firestore.port
       console.info(`using emulator (${host}:${port})`)
 
@@ -87,8 +87,8 @@ export class RemoteFirestore {
     })
 
     if (import.meta.env.VITE_AUTH_EMULATOR) {
-      const protocol = location.protocol
-      const host = location.hostname
+      const protocol = self.location.protocol
+      const host = self.location.hostname
       const port = import.meta.env.FIREBASE_EMULATORS.auth.port
 
       connectAuthEmulator(this.auth, `${protocol}//${host}:${port}`)

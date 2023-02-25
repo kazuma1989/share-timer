@@ -6,9 +6,9 @@ export function observeAudioPermission(
   context: AudioContext
 ): Observable<Permission> {
   return fromEvent(
-    document,
+    window.document,
     // https://qiita.com/zprodev/items/7fcd8335d7e8e613a01f#解決策-1
-    (document.ontouchend
+    (window.document.ontouchend
       ? "touchend"
       : "mouseup") satisfies keyof DocumentEventMap,
     {

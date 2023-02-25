@@ -18,7 +18,7 @@ export default defineStart(async (target) => {
 
   const notSignedIn$ = authUser$.pipe(filter((_) => _ === "not-signed-in"))
   notSignedIn$.subscribe(() => {
-    location.assign(
+    window.location.assign(
       "/sign-in.html" +
         (import.meta.env.VITE_FIRESTORE_EMULATOR
           ? `?emulator=${import.meta.env.FIREBASE_EMULATORS.auth.port}`

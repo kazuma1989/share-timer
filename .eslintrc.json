@@ -70,7 +70,16 @@
       {
         "name": "Date",
         "message": "Please use calibrated server time (the now() function) instead."
-      }
+      },
+      // cf. https://www.npmjs.com/package/confusing-browser-globals
+      "addEventListener",
+      "alert",
+      "confirm",
+      "document",
+      "history",
+      "location",
+      "name",
+      "status"
     ]
   },
 

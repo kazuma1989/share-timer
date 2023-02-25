@@ -18,7 +18,7 @@ export const placeDialog: Action<HTMLDialogElement, HTMLElement> = (
     dialog.style.height = `${height}px`
   })
 
-  resize.observe(document.body)
+  resize.observe(dialog.ownerDocument.documentElement)
 
   return {
     update(target) {

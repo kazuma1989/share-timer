@@ -15,13 +15,13 @@ export function setTitleAsTimeViewer(
     distinctUntilChanged()
   )
 
-  const previousTitle = document.title
+  const previousTitle = window.document.title
   const sub = duration$.subscribe((duration) => {
-    document.title = formatDuration(duration)
+    window.document.title = formatDuration(duration)
   })
 
   return () => {
     sub.unsubscribe()
-    document.title = previousTitle
+    window.document.title = previousTitle
   }
 }

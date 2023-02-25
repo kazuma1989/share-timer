@@ -8,16 +8,19 @@
   export let roomId: Room["id"]
 
   $: roomHash = `#${fromRoute(["room", roomId])}`
-  $: roomURL = location.origin + location.pathname + roomHash
+  $: roomURL = window.location.origin + window.location.pathname + roomHash
 
   const lockRoom = async () => {
-    const ok = confirm("まずはサインインが必要です")
+    const ok = window.confirm("まずはサインインが必要です")
     if (!ok) return
 
-    location.assign(
+    window.location.assign(
       "/sign-in.html?" +
         new URLSearchParams({
-          back: location.pathname + location.search + location.hash,
+          back:
+            window.location.pathname +
+            window.location.search +
+            window.location.hash,
           ...(import.meta.env.VITE_FIRESTORE_EMULATOR
             ? {
                 emulator:

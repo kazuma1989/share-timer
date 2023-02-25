@@ -18,9 +18,6 @@ export default defineStart(async (target) => {
     },
   })
 
-  // https://neos21.net/blog/2018/08/19-01.html
-  document.body.addEventListener("touchstart", () => {}, { passive: true })
-
   const darkMode$ = observeDarkMode()
 
   const context = new AudioContext()
