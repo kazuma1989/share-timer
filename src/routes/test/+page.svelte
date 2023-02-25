@@ -2,6 +2,7 @@
   import { browser } from "$app/environment"
   import smallAlert from "$lib/assets/small-alert.mp3"
   import { observeAudioPermission } from "$lib/observeAudioPermission"
+  import SetContext from "$lib/SetContext.svelte"
   import {
     createAudio,
     keyWithAudio,
@@ -14,7 +15,6 @@
   import PageRoomSkeleton from "../../PageRoomSkeleton.svelte"
   import { keyWithDarkMode, observeDarkMode } from "../../useDarkMode"
   import { createVideoTimer, keyWithVideoTimer } from "../../useVideoTimer"
-  import Setup from "../Setup.svelte"
 
   const route$ = browser ? observeHash() : null
 
@@ -43,11 +43,11 @@
 
 <div class="peer contents">
   {#await setup() then context}
-    <Setup {context}>
+    <SetContext {context}>
       {#if route$}
         <App {route$} />
       {/if}
-    </Setup>
+    </SetContext>
   {/await}
 </div>
 
