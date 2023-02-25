@@ -1,6 +1,6 @@
 <script lang="ts">
   import { browser } from "$app/environment"
-  import { Observable, of, switchMap } from "rxjs"
+  import { Observable, of } from "rxjs"
   import { readable, type Readable } from "svelte/store"
   import { observeDarkMode } from "../../useDarkMode"
 
@@ -16,11 +16,11 @@
     })
   })
 
-  const y$ = x$.pipe(
-    switchMap((browser) => (browser ? observeDarkMode() : of("light" as const)))
-  )
+  const theme$ = browser
+    ? observeDarkMode()
+    : of<Observed<ReturnType<typeof observeDarkMode>>>("light")
 
-  y$.subscribe((_) => {
+  theme$.subscribe((_) => {
     console.log(_)
   })
 
@@ -32,6 +32,8 @@
     browser,
   })
 </script>
+
+<p>theme: {$theme$}</p>
 
 {#if $browser$}
   <h1>BROWSER YES</h1>
