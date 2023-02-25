@@ -1,24 +1,21 @@
 <script lang="ts">
   import smallAlert from "$lib/assets/small-alert.mp3"
   import { observeAudioPermission } from "$lib/observeAudioPermission"
+  import SetContext from "$lib/SetContext.svelte"
   import {
     createAudio,
     keyWithAudio,
     keyWithMediaPermission,
   } from "$lib/useAudio"
-  import { onMount } from "svelte"
   import App from "../App.svelte"
   import { firestoreImplContext } from "../firestore/firestoreImplContext"
   import { initRemoteFirestore } from "../firestore/initRemoteFirestore"
   import { observeHash } from "../observeHash"
   import PageRoomSkeleton from "../PageRoomSkeleton.svelte"
-  import Skeleton from "../Skeleton.svelte"
   import { keyWithDarkMode, observeDarkMode } from "../useDarkMode"
   import { createVideoTimer, keyWithVideoTimer } from "../useVideoTimer"
 
-  let root: HTMLElement | undefined
-
-  onMount(async () => {
+  const setup$ = (async () => {
     const darkMode$ = observeDarkMode()
 
     const context = new AudioContext()
@@ -33,11 +30,8 @@
 
     const firestore = await initRemoteFirestore()
 
-    new App({
-      target: root!,
-      props: {
-        route$,
-      },
+    return {
+      route$,
       context: new Map([
         ...firestoreImplContext(firestore),
         keyWithAudio(audio),
@@ -45,10 +39,18 @@
         keyWithDarkMode(darkMode$),
         keyWithVideoTimer(video),
       ]),
-    })
-  })
+    }
+  })()
 </script>
 
-<Skeleton bind:appRoot={root}>
+<div class="peer contents">
+  {#await setup$ then { context, route$ }}
+    <SetContext {context}>
+      <App {route$} />
+    </SetContext>
+  {/await}
+</div>
+
+<div class="hidden peer-empty:contents">
   <PageRoomSkeleton />
-</Skeleton>
+</div>
