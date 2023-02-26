@@ -82,7 +82,7 @@
   </button>
 
   <a
-    href={infoHash}
+    href="/info/{infoHash}"
     title="情報を開く"
     class="transparent-button inline-grid h-12 w-12 place-items-center text-2xl"
     bind:this={infoButton}

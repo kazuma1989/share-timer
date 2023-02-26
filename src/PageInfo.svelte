@@ -7,8 +7,8 @@
 
   export let roomId: Room["id"]
 
-  $: roomHash = `#${fromRoute(["room", roomId])}`
-  $: roomURL = window.location.origin + window.location.pathname + roomHash
+  $: roomHash = "#" + fromRoute(["room", roomId])
+  $: roomURL = window.location.origin + "/" + roomHash
 
   const lockRoom = async () => {
     const ok = window.confirm("まずはサインインが必要です")
@@ -43,7 +43,7 @@
   <div>
     <a
       title="タイマーに戻る"
-      href={roomHash}
+      href="/{roomHash}"
       class="transparent-button my-2 -ml-4 inline-grid h-12 w-12 place-items-center text-2xl !text-inherit"
     >
       <Icon name="arrow-left" />
@@ -87,7 +87,7 @@
 
     <p>
       <a
-        href="#new"
+        href="/"
         target="_blank"
         class={clsx(
           "transparent-button block border border-gray-500 px-4 py-3 text-center text-inherit no-underline after:content-['_↗']"

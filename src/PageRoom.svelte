@@ -64,7 +64,7 @@
       </div>
 
       <ConfigArea
-        infoHash="#{fromRoute(['info', roomId])}"
+        infoHash="#{fromRoute(['room', roomId])}"
         class="flex items-center justify-evenly px-6"
       />
     </Timer>
