@@ -11,13 +11,15 @@
   import App from "../App.svelte"
   import { firestoreImplContext } from "../firestore/firestoreImplContext"
   import { initRemoteFirestore } from "../firestore/initRemoteFirestore"
-  import { observeHash } from "../observeHash"
+  import { observeRoute } from "../observeHash"
   import PageRoomSkeleton from "../PageRoomSkeleton.svelte"
   import { keyWithDarkMode, observeDarkMode } from "../useDarkMode"
   import { createVideoTimer, keyWithVideoTimer } from "../useVideoTimer"
 
-  const setup$ = (async () => {
-    if (!browser) throw "not CSR"
+  const route$ = observeRoute()
+
+  const context$ = (async () => {
+    if (!browser) throw "client-side only context"
 
     const darkMode$ = observeDarkMode()
 
@@ -29,25 +31,20 @@
 
     const video = createVideoTimer()
 
-    const route$ = observeHash()
-
     const firestore = await initRemoteFirestore()
 
-    return {
-      route$,
-      context: new Map([
-        ...firestoreImplContext(firestore),
-        keyWithAudio(audio),
-        keyWithMediaPermission(permission$),
-        keyWithDarkMode(darkMode$),
-        keyWithVideoTimer(video),
-      ]),
-    }
+    return new Map([
+      ...firestoreImplContext(firestore),
+      keyWithAudio(audio),
+      keyWithMediaPermission(permission$),
+      keyWithDarkMode(darkMode$),
+      keyWithVideoTimer(video),
+    ])
   })()
 </script>
 
 <div class="peer contents">
-  {#await setup$ then { context, route$ }}
+  {#await context$ then context}
     <SetContext {context}>
       <App {route$} />
     </SetContext>

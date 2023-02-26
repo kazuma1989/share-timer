@@ -2,22 +2,32 @@ import {
   distinctUntilChanged,
   fromEvent,
   map,
-  Observable,
+  of,
   startWith,
+  type Observable,
 } from "rxjs"
 import { fromRoute, toRoute, type Route } from "./toRoute"
 import { shareRecent } from "./util/shareRecent"
 
-export function observeHash(): Observable<Route> {
+function observeHash(): Observable<string> {
+  if (!globalThis.window) {
+    return of("")
+  }
+
+  const window = globalThis.window
+
   return fromEvent(window, "hashchange" satisfies keyof WindowEventMap, {
     passive: true,
   }).pipe(
     startWith(null),
     map(() => window.location.hash.slice("#".length)),
     distinctUntilChanged(),
-    map(toRoute),
     shareRecent()
   )
+}
+
+export function observeRoute(): Observable<Route> {
+  return observeHash().pipe(map(toRoute))
 }
 
 export function setHash(route: Route): void {

@@ -11,12 +11,12 @@
   import App from "../../App.svelte"
   import { firestoreImplContext } from "../../firestore/firestoreImplContext"
   import { initRemoteFirestore } from "../../firestore/initRemoteFirestore"
-  import { observeHash } from "../../observeHash"
+  import { observeRoute } from "../../observeHash"
   import PageRoomSkeleton from "../../PageRoomSkeleton.svelte"
   import { keyWithDarkMode, observeDarkMode } from "../../useDarkMode"
   import { createVideoTimer, keyWithVideoTimer } from "../../useVideoTimer"
 
-  const route$ = browser ? observeHash() : null
+  const route$ = browser ? observeRoute() : null
 
   async function setup() {
     const darkMode$ = observeDarkMode()
