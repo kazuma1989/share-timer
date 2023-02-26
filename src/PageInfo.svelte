@@ -1,9 +1,9 @@
 <script lang="ts">
+  import { fromRoute } from "$lib/toRoute"
   import clsx from "clsx"
   import Icon from "./Icon.svelte"
   import QrCode from "./QRCode.svelte"
   import type { Room } from "./schema/roomSchema"
-  import { fromRoute } from "./toRoute"
 
   export let roomId: Room["id"]
 

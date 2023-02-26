@@ -2,6 +2,7 @@
   import { browser } from "$app/environment"
   import smallAlert from "$lib/assets/small-alert.mp3"
   import { observeAudioPermission } from "$lib/observeAudioPermission"
+  import { observeRoute } from "$lib/observeHash"
   import SetContext from "$lib/SetContext.svelte"
   import {
     createAudio,
@@ -11,7 +12,6 @@
   import App from "../../App.svelte"
   import { firestoreImplContext } from "../../firestore/firestoreImplContext"
   import { initRemoteFirestore } from "../../firestore/initRemoteFirestore"
-  import { observeRoute } from "../../observeHash"
   import PageRoomSkeleton from "../../PageRoomSkeleton.svelte"
   import { keyWithDarkMode, observeDarkMode } from "../../useDarkMode"
   import { createVideoTimer, keyWithVideoTimer } from "../../useVideoTimer"

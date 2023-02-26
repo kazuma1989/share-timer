@@ -1,10 +1,10 @@
 <script lang="ts">
+  import { replaceHash } from "$lib/observeHash"
+  import type { Route } from "$lib/toRoute"
   import type { Observable } from "rxjs"
-  import { replaceHash } from "./observeHash"
   import PageInfoSkeleton from "./PageInfoSkeleton.svelte"
   import PageRoom from "./PageRoom.svelte"
   import { newRoomId } from "./schema/roomSchema"
-  import type { Route } from "./toRoute"
 
   export let route$: Observable<Route>
 
