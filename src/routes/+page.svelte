@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from "$app/environment"
   import smallAlert from "$lib/assets/small-alert.mp3"
   import { observeAudioPermission } from "$lib/observeAudioPermission"
   import SetContext from "$lib/SetContext.svelte"
@@ -16,6 +17,8 @@
   import { createVideoTimer, keyWithVideoTimer } from "../useVideoTimer"
 
   const setup$ = (async () => {
+    if (!browser) throw "not CSR"
+
     const darkMode$ = observeDarkMode()
 
     const context = new AudioContext()
