@@ -11,11 +11,11 @@
   } from "$lib/useAudio"
   import { firestoreImplContext } from "../firestore/firestoreImplContext"
   import { initRemoteFirestore } from "../firestore/initRemoteFirestore"
-  import PageRoom from "../PageRoom.svelte"
-  import PageRoomSkeleton from "../PageRoomSkeleton.svelte"
   import { newRoomId } from "../schema/roomSchema"
   import { keyWithDarkMode, observeDarkMode } from "../useDarkMode"
   import { createVideoTimer, keyWithVideoTimer } from "../useVideoTimer"
+  import PageRoom from "./PageRoom.svelte"
+  import PageRoomSkeleton from "./PageRoomSkeleton.svelte"
 
   const route$ = observeRoute()
 

@@ -1,10 +1,10 @@
 <script lang="ts">
+  import Icon from "$lib/Icon.svelte"
   import { observeRoute } from "$lib/observeHash"
   import QrCode from "$lib/QRCode.svelte"
   import { fromRoute } from "$lib/toRoute"
   import clsx from "clsx"
   import { map } from "rxjs"
-  import Icon from "../../Icon.svelte"
 
   const roomId$ = observeRoute().pipe(
     map(([_, roomId]) => (_ === "room" ? roomId : undefined))

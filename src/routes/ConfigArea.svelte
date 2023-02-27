@@ -1,12 +1,12 @@
 <script lang="ts">
+  import { placeDialog } from "$lib/action/placeDialog"
+  import { showModal } from "$lib/action/showModal"
+  import Icon from "$lib/Icon.svelte"
   import { useMediaPermission } from "$lib/useAudio"
   import clsx from "clsx"
-  import { placeDialog } from "./action/placeDialog"
-  import { showModal } from "./action/showModal"
-  import Icon from "./Icon.svelte"
-  import { getItem, setItem } from "./storage"
+  import { getItem, setItem } from "../storage"
+  import { getId } from "../util/getId"
   import { toggleConfig, useConfig } from "./useConfig"
-  import { getId } from "./util/getId"
 
   export let infoHash: string
   export { className as class }

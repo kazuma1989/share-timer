@@ -1,6 +1,6 @@
 <script lang="ts">
   import clsx from "clsx"
-  import icons from "./icon.json"
+  import icons from "./assets/icon.json"
 
   /**
    * @see https://materialdesignicons.com

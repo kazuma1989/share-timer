@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { assertNonNullable } from "$lib/util/assertNonNullable"
   import clsx from "clsx"
   import {
     combineLatestWith,
@@ -10,18 +9,19 @@
     type Observable,
   } from "rxjs"
   import type { Action } from "svelte/types/runtime/action"
+  import { mapToCurrentDuration } from "../mapToCurrentDuration"
+  import { now } from "../now"
+  import type { TimerState } from "../schema/timerReducer"
+  import { useDarkMode } from "../useDarkMode"
+  import { useVideoTimer } from "../useVideoTimer"
+  import { bufferedLast } from "../util/bufferedLast"
+  import { floor } from "../util/floor"
+  import { formatDuration } from "../util/formatDuration"
+  import { humanReadableLabelOf } from "../util/humanReadableLabelOf"
+  import { interval } from "../util/interval"
   import { connectStreamTo } from "./action/connectStreamTo"
   import { prependElement } from "./action/prependElement"
-  import { mapToCurrentDuration } from "./mapToCurrentDuration"
-  import { now } from "./now"
-  import type { TimerState } from "./schema/timerReducer"
-  import { useDarkMode } from "./useDarkMode"
-  import { useVideoTimer } from "./useVideoTimer"
-  import { bufferedLast } from "./util/bufferedLast"
-  import { floor } from "./util/floor"
-  import { formatDuration } from "./util/formatDuration"
-  import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
-  import { interval } from "./util/interval"
+  import { assertNonNullable } from "./util/assertNonNullable"
 
   export let timerState$: Observable<TimerState>
   export { className as class }
