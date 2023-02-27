@@ -6,10 +6,10 @@
     keyWithAudio,
     keyWithMediaPermission,
   } from "$lib/useAudio"
+  import { keyWithDarkMode, observeDarkMode } from "$lib/useDarkMode"
+  import { createVideoTimer, keyWithVideoTimer } from "$lib/useVideoTimer"
   import { firestoreImplContext } from "../firestore/firestoreImplContext"
   import { initRemoteFirestore } from "../firestore/initRemoteFirestore"
-  import { keyWithDarkMode, observeDarkMode } from "../useDarkMode"
-  import { createVideoTimer, keyWithVideoTimer } from "../useVideoTimer"
 
   const context$ = (async () => {
     if (!browser) throw "client-side only context"

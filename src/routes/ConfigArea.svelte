@@ -2,10 +2,10 @@
   import { placeDialog } from "$lib/action/placeDialog"
   import { showModal } from "$lib/action/showModal"
   import Icon from "$lib/Icon.svelte"
+  import { getItem, setItem } from "$lib/storage"
   import { useMediaPermission } from "$lib/useAudio"
   import { getId } from "$lib/util/getId"
   import clsx from "clsx"
-  import { getItem, setItem } from "../storage"
   import { toggleConfig, useConfig } from "./useConfig"
 
   export let infoHash: string

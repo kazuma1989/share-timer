@@ -1,3 +1,4 @@
+import { setTransferHandlers } from "$lib/setTransferHandlers"
 import { createCache } from "$lib/util/createCache"
 import { nonNullable } from "$lib/util/nonNullable"
 import { shareRecent } from "$lib/util/shareRecent"
@@ -49,7 +50,6 @@ import {
   type RoomInput,
 } from "../../schema/roomSchema"
 import { timerReducer, type TimerState } from "../../schema/timerReducer"
-import { setTransferHandlers } from "../../setTransferHandlers"
 import { calibrationSchema, type Calibration } from "./calibrationSchema"
 import { collection } from "./collection"
 import { convertServerTimestamp } from "./convertServerTimestamp"

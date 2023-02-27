@@ -1,4 +1,4 @@
-import { createContext } from "./createContext"
+import { createContext } from "../createContext"
 
 export const [keyWithVideoTimer, useVideoTimer] =
   createContext<HTMLVideoElement>("VideoTimer")

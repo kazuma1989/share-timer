@@ -1,6 +1,6 @@
 import { distinctUntilChanged, map, Observable } from "rxjs"
-import { createContext } from "./createContext"
-import { observeMediaQuery } from "./observeMediaQuery"
+import { createContext } from "../createContext"
+import { observeMediaQuery } from "../observeMediaQuery"
 
 export const [keyWithDarkMode, useDarkMode] =
   createContext<Observable<"dark" | "light">>("DarkModeProvider")
