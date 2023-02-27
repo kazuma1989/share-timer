@@ -59,7 +59,6 @@ if (import.meta.vitest) {
 
   test("basic", () => {
     scheduler.run(({ expectObservable, cold, hot }) => {
-      // eslint-disable-next-line no-restricted-globals
       const now0 = Date.now()
       const i = Array(5).keys()
       const nowMock = () => now0 + i.next().value

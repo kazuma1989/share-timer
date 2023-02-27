@@ -2,7 +2,6 @@ import { interval } from "$lib/util/interval"
 import { filter, map, withLatestFrom, type Observable } from "rxjs"
 import { mapToCurrentDuration } from "../mapToCurrentDuration"
 import { notifyFirstZero } from "../notifyFirstZero"
-import { now } from "../now"
 import type { TimerState } from "../schema/timerReducer"
 
 export function setSoundCall(
@@ -11,7 +10,7 @@ export function setSoundCall(
   play: () => void
 ): () => void {
   const sounding$ = timerState$.pipe(
-    mapToCurrentDuration(interval("worker", 100).pipe(map(now))),
+    mapToCurrentDuration(interval("worker", 100).pipe(map(Date.now))),
     notifyFirstZero(),
     withLatestFrom(enabled$),
     map(([notified, enabled]) => enabled && notified)

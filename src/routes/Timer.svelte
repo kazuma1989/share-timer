@@ -7,7 +7,6 @@
   import clsx from "clsx"
   import { distinctUntilChanged, map, type Observable } from "rxjs"
   import type { HTMLButtonAttributes } from "svelte/elements"
-  import { now } from "../now"
   import type { Room } from "../schema/roomSchema"
   import type { TimerState } from "../schema/timerReducer"
   import { serverTimestamp } from "../serverTimestamp"
@@ -119,7 +118,7 @@
         {`タイマーは編集中、値は${humanReadableLabelOf(state.initialDuration)}`}
       {:else if state.mode === "running"}
         {`タイマーは実行中、残り${humanReadableLabelOf(
-          state.restDuration - (now() - state.startedAt)
+          state.restDuration - (Date.now() - state.startedAt)
         )}`}
       {:else if state.mode === "paused"}
         {`タイマーは一時停止中、残り${humanReadableLabelOf(

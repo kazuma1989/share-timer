@@ -14,16 +14,12 @@ import {
   addDoc,
   connectFirestoreEmulator,
   doc,
-  getDocFromServer,
   getDocs,
   getFirestore,
   limitToLast,
   query,
   runTransaction,
-  serverTimestamp as firestoreServerTimestamp,
-  setDoc,
   startAt,
-  Timestamp,
   type Firestore,
 } from "firebase/firestore"
 import {
@@ -50,7 +46,6 @@ import {
   type RoomInput,
 } from "../../schema/roomSchema"
 import { timerReducer, type TimerState } from "../../schema/timerReducer"
-import { calibrationSchema, type Calibration } from "./calibrationSchema"
 import { collection } from "./collection"
 import { convertServerTimestamp } from "./convertServerTimestamp"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
@@ -346,31 +341,6 @@ export class RemoteFirestore {
     return proxy(() => {
       sub.unsubscribe()
     })
-  }
-
-  /**
-   * serverTimestamp() - Timestamp.now()
-   */
-  async getEstimatedDiff(): Promise<number> {
-    // eslint-disable-next-line no-restricted-globals
-    const _now = Date.now()
-
-    const clientDoc = doc(collection(this.firestore, "calibrations"))
-    await setDoc(
-      clientDoc,
-      withMeta({
-        clientTime: Timestamp.fromMillis(_now),
-        serverTime: firestoreServerTimestamp() as Timestamp,
-      } satisfies Calibration)
-    )
-
-    const serverDoc = await getDocFromServer(clientDoc)
-    const { clientTime, serverTime } = s.create(
-      serverDoc.data(),
-      calibrationSchema
-    )
-
-    return serverTime.toMillis() - clientTime.toMillis()
   }
 }
 

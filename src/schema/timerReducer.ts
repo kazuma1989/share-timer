@@ -71,7 +71,6 @@ export function timerReducer(state: TimerState, action: Action): TimerState {
 if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
 
-  // eslint-disable-next-line no-restricted-globals
   const _now = Date.now()
 
   test("set initial state", () => {

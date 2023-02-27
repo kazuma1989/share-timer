@@ -10,7 +10,6 @@
   } from "rxjs"
   import type { Action } from "svelte/types/runtime/action"
   import { mapToCurrentDuration } from "../mapToCurrentDuration"
-  import { now } from "../now"
   import type { TimerState } from "../schema/timerReducer"
   import { connectStreamTo } from "./action/connectStreamTo"
   import { prependElement } from "./action/prependElement"
@@ -31,7 +30,7 @@
 
   $: duration$ = timerState$.pipe(
     bufferedLast(interval("worker", 400).pipe(startWith(undefined))),
-    mapToCurrentDuration(interval("worker", 100).pipe(map(now))),
+    mapToCurrentDuration(interval("worker", 100).pipe(map(Date.now))),
     map((_) => floor(_.duration)),
     distinctUntilChanged()
   )

@@ -21,8 +21,7 @@ export function coerceTimestamp<T extends Record<string, unknown>>(
       key,
       s.is(value, timestamp())
         ? value === serverTimestamp
-          ? // eslint-disable-next-line no-restricted-globals
-            Date.now()
+          ? Date.now()
           : toMillis(value)
         : value,
     ])

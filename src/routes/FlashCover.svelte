@@ -4,7 +4,6 @@
   import { map, Observable, withLatestFrom } from "rxjs"
   import { mapToCurrentDuration } from "../mapToCurrentDuration"
   import { notifyFirstZero } from "../notifyFirstZero"
-  import { now } from "../now"
   import type { TimerState } from "../schema/timerReducer"
   import { useConfig } from "./useConfig"
 
@@ -15,7 +14,7 @@
   const config$ = useConfig()
 
   $: flashing$ = timerState$.pipe(
-    mapToCurrentDuration(interval("ui").pipe(map(now))),
+    mapToCurrentDuration(interval("ui").pipe(map(Date.now))),
     notifyFirstZero(),
     withLatestFrom(config$),
     map(([notified, config]) => config.flash === "on" && notified)
