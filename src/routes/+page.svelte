@@ -1,9 +1,6 @@
-<script lang="ts">
-  import { browser } from "$app/environment"
+<script lang="ts" context="module">
   import smallAlert from "$lib/assets/small-alert.mp3"
   import { observeAudioPermission } from "$lib/observeAudioPermission"
-  import { observeRoute, replaceHash } from "$lib/observeHash"
-  import SetContext from "$lib/SetContext.svelte"
   import {
     createAudio,
     keyWithAudio,
@@ -11,13 +8,8 @@
   } from "$lib/useAudio"
   import { firestoreImplContext } from "../firestore/firestoreImplContext"
   import { initRemoteFirestore } from "../firestore/initRemoteFirestore"
-  import { newRoomId } from "../schema/roomSchema"
   import { keyWithDarkMode, observeDarkMode } from "../useDarkMode"
   import { createVideoTimer, keyWithVideoTimer } from "../useVideoTimer"
-  import PageRoom from "./PageRoom.svelte"
-  import PageRoomSkeleton from "./PageRoomSkeleton.svelte"
-
-  const route$ = observeRoute()
 
   const context$ = (async () => {
     if (!browser) throw "client-side only context"
@@ -42,6 +34,17 @@
       keyWithVideoTimer(video),
     ])
   })()
+</script>
+
+<script lang="ts">
+  import { browser } from "$app/environment"
+  import { observeRoute, replaceHash } from "$lib/observeHash"
+  import SetContext from "$lib/SetContext.svelte"
+  import { newRoomId } from "../schema/roomSchema"
+  import PageRoom from "./PageRoom.svelte"
+  import PageRoomSkeleton from "./PageRoomSkeleton.svelte"
+
+  const route$ = observeRoute()
 
   $: if (browser) {
     const [route, , mode] = $route$
