@@ -246,8 +246,8 @@ export class RemoteFirestore {
     }
 
     const emoji = await fetch(
-      new URL("../../../emoji/Animals & Nature.json", import.meta.url)
-    ).then<typeof import("../../../emoji/Animals & Nature.json")>((_) =>
+      new URL("../../assets/emoji/Animals & Nature.json", import.meta.url)
+    ).then<typeof import("../../assets/emoji/Animals & Nature.json")>((_) =>
       _.json()
     )
     if (await aborted()) throw "aborted 1"
