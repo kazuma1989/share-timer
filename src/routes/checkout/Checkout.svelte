@@ -1,5 +1,6 @@
 <script lang="ts">
-  import "https://js.stripe.com/v3/pricing-table.js"
+  // @ts-expect-error
+  import("https://js.stripe.com/v3/pricing-table.js")
 
   export let uid: string
   export let email: string | null

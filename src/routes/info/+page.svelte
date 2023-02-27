@@ -117,7 +117,7 @@
     {#if import.meta.env.DEV}
       <p>
         <a
-          href="/checkout.html"
+          href="/checkout/"
           class={clsx(
             "transparent-button block border border-gray-500 px-4 py-3"
           )}
