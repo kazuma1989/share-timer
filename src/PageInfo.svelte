@@ -45,7 +45,7 @@
       <a
         title="タイマーに戻る"
         href="/{roomHash}"
-        class="transparent-button my-2 -ml-4 inline-grid h-12 w-12 place-items-center text-2xl !text-inherit"
+        class="transparent-button my-2 -ml-4 inline-grid h-12 w-12 place-items-center text-2xl"
       >
         <Icon name="arrow-left" />
       </a>
@@ -104,7 +104,7 @@
         href="/"
         target="_blank"
         class={clsx(
-          "transparent-button block border border-gray-500 px-4 py-3 text-center text-inherit no-underline after:content-['_↗']"
+          "transparent-button block border border-gray-500 px-4 py-3 after:content-['_↗']"
         )}
       >
         新しいタイマーを開く
@@ -116,7 +116,7 @@
         <a
           href="/checkout.html"
           class={clsx(
-            "transparent-button block border border-gray-500 px-4 py-3 text-center text-inherit no-underline"
+            "transparent-button block border border-gray-500 px-4 py-3"
           )}
         >
           購入画面を開く (experimental)

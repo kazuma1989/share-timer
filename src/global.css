@@ -25,6 +25,10 @@
   .transparent-button {
     @apply cursor-pointer rounded-md transition-colors hover:bg-dark/10 active:bg-dark/20 dark:hover:bg-light/20 dark:active:bg-light/30;
   }
+  a.transparent-button {
+    @apply text-center text-inherit no-underline;
+    font-weight: inherit;
+  }
 
   .circle-button {
     @apply h-20 w-20 cursor-pointer select-none rounded-full border-4 border-double transition-colors;
