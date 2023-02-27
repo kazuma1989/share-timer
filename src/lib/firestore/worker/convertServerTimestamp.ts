@@ -2,7 +2,7 @@ import {
   serverTimestamp as firestoreServerTimestamp,
   type FieldValue,
 } from "firebase/firestore"
-import { serverTimestamp } from "../../serverTimestamp"
+import { serverTimestamp } from "../../Timestamp"
 
 export function convertServerTimestamp<T extends Record<string, unknown>>(
   value: T

@@ -3,7 +3,7 @@
   import Icon from "$lib/Icon.svelte"
   import type { Room } from "$lib/schema/roomSchema"
   import type { TimerState } from "$lib/schema/timerReducer"
-  import { serverTimestamp } from "$lib/serverTimestamp"
+  import { serverTimestamp } from "$lib/Timestamp"
   import TimeViewer from "$lib/TimeViewer.svelte"
   import { getId } from "$lib/util/getId"
   import { humanReadableLabelOf } from "$lib/util/humanReadableLabelOf"

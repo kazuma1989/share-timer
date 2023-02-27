@@ -1,5 +1,5 @@
 import * as s from "superstruct"
-import { serverTimestamp, toMillis, type Timestamp } from "../serverTimestamp"
+import { serverTimestamp, toMillis, type Timestamp } from "../Timestamp"
 
 export type Action = TimestampFieldToMillis<ActionInput>
 
