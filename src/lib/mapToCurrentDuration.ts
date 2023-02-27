@@ -1,4 +1,3 @@
-import { shareRecent } from "$lib/util/shareRecent"
 import {
   combineLatestWith,
   map,
@@ -7,6 +6,7 @@ import {
   type OperatorFunction,
 } from "rxjs"
 import type { TimerState } from "./schema/timerReducer"
+import { shareRecent } from "./util/shareRecent"
 
 export interface CurrentDuration {
   mode: TimerState["mode"]

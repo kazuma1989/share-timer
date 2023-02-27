@@ -1,5 +1,5 @@
-import { createContext } from "./createContext"
-import type { Room } from "./schema/roomSchema"
+import { createContext } from "$lib/createContext"
+import type { Room } from "$lib/schema/roomSchema"
 
 export function useSetup(
   roomId: Room["id"]

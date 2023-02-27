@@ -1,6 +1,6 @@
-import { createContext } from "./createContext"
-import type { ActionInput } from "./schema/actionSchema"
-import type { Room } from "./schema/roomSchema"
+import { createContext } from "$lib/createContext"
+import type { ActionInput } from "$lib/schema/actionSchema"
+import type { Room } from "$lib/schema/roomSchema"
 
 export function useDispatch(
   roomId: Room["id"]

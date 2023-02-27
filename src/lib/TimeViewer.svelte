@@ -9,10 +9,10 @@
     type Observable,
   } from "rxjs"
   import type { Action } from "svelte/types/runtime/action"
-  import { mapToCurrentDuration } from "../mapToCurrentDuration"
-  import type { TimerState } from "../schema/timerReducer"
   import { connectStreamTo } from "./action/connectStreamTo"
   import { prependElement } from "./action/prependElement"
+  import { mapToCurrentDuration } from "./mapToCurrentDuration"
+  import type { TimerState } from "./schema/timerReducer"
   import { useDarkMode } from "./useDarkMode"
   import { useVideoTimer } from "./useVideoTimer"
   import { assertNonNullable } from "./util/assertNonNullable"

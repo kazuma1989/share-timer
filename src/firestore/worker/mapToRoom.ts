@@ -1,7 +1,7 @@
+import { roomSchema, type InvalidDoc, type Room } from "$lib/schema/roomSchema"
 import type { DocumentSnapshot } from "firebase/firestore"
 import { map, type OperatorFunction } from "rxjs"
 import * as s from "superstruct"
-import { roomSchema, type InvalidDoc, type Room } from "../../schema/roomSchema"
 
 export function mapToRoom(
   roomId: Room["id"]

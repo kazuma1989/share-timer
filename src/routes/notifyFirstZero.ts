@@ -1,5 +1,5 @@
+import type { CurrentDuration } from "$lib/mapToCurrentDuration"
 import { distinctUntilChanged, pipe, scan, type OperatorFunction } from "rxjs"
-import type { CurrentDuration } from "./mapToCurrentDuration"
 
 export function notifyFirstZero(): OperatorFunction<CurrentDuration, boolean> {
   return pipe(

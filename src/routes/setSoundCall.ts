@@ -1,8 +1,8 @@
+import { mapToCurrentDuration } from "$lib/mapToCurrentDuration"
+import type { TimerState } from "$lib/schema/timerReducer"
 import { interval } from "$lib/util/interval"
 import { filter, map, withLatestFrom, type Observable } from "rxjs"
-import { mapToCurrentDuration } from "../mapToCurrentDuration"
-import { notifyFirstZero } from "../notifyFirstZero"
-import type { TimerState } from "../schema/timerReducer"
+import { notifyFirstZero } from "./notifyFirstZero"
 
 export function setSoundCall(
   timerState$: Observable<TimerState>,

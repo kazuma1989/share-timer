@@ -39,8 +39,8 @@
 <script lang="ts">
   import { browser } from "$app/environment"
   import { observeRoute, replaceHash } from "$lib/observeHash"
+  import { newRoomId } from "$lib/schema/roomSchema"
   import SetContext from "$lib/SetContext.svelte"
-  import { newRoomId } from "../schema/roomSchema"
   import PageRoom from "./PageRoom.svelte"
   import PageRoomSkeleton from "./PageRoomSkeleton.svelte"
 

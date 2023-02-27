@@ -1,5 +1,5 @@
-import type { ActionInput } from "../schema/actionSchema"
-import type { Room } from "../schema/roomSchema"
+import type { ActionInput } from "$lib/schema/actionSchema"
+import type { Room } from "$lib/schema/roomSchema"
 import { useFirestore } from "./useFirestore"
 
 export function useDispatchImpl(

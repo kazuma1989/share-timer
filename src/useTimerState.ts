@@ -1,7 +1,7 @@
+import { createContext } from "$lib/createContext"
+import type { Room } from "$lib/schema/roomSchema"
+import type { TimerState } from "$lib/schema/timerReducer"
 import { Observable, of } from "rxjs"
-import { createContext } from "./createContext"
-import type { Room } from "./schema/roomSchema"
-import type { TimerState } from "./schema/timerReducer"
 
 export function useTimerState(roomId: Room["id"]): Observable<TimerState> {
   return _useImpl()(roomId)

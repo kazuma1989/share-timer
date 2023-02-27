@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { isRoom, type InvalidDoc, type Room } from "$lib/schema/roomSchema"
   import { fromRoute } from "$lib/toRoute"
   import { useAudio } from "$lib/useAudio"
   import { firstValueFrom, map, merge, partition, type Observable } from "rxjs"
-  import { isRoom, type InvalidDoc, type Room } from "../schema/roomSchema"
   import { useRoom } from "../useRoom"
   import { useSetup } from "../useSetup"
   import { useTimerState } from "../useTimerState"
