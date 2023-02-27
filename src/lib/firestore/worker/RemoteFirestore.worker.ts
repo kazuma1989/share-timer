@@ -246,7 +246,7 @@ export class RemoteFirestore {
     }
 
     const emoji = await fetch(
-      new URL("../../emoji/Animals & Nature.json", import.meta.url)
+      new URL("../../../emoji/Animals & Nature.json", import.meta.url)
     ).then<typeof import("../../../emoji/Animals & Nature.json")>((_) =>
       _.json()
     )
