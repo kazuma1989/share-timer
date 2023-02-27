@@ -1,8 +1,8 @@
-import { serverTimestamp } from "$lib/serverTimestamp"
 import {
   serverTimestamp as firestoreServerTimestamp,
   type FieldValue,
 } from "firebase/firestore"
+import { serverTimestamp } from "../../serverTimestamp"
 
 export function convertServerTimestamp<T extends Record<string, unknown>>(
   value: T

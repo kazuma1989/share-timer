@@ -1,5 +1,5 @@
-import { setTransferHandlers } from "$lib/setTransferHandlers"
 import { wrap, type Remote } from "comlink"
+import { setTransferHandlers } from "../setTransferHandlers"
 import type { RemoteFirestore } from "./worker/RemoteFirestore.worker"
 import RemoteFirestoreWorker from "./worker/RemoteFirestore.worker?worker"
 

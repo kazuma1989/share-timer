@@ -1,5 +1,7 @@
 <script lang="ts" context="module">
   import smallAlert from "$lib/assets/small-alert.mp3"
+  import { firestoreImplContext } from "$lib/firestore/firestoreImplContext"
+  import { initRemoteFirestore } from "$lib/firestore/initRemoteFirestore"
   import { observeAudioPermission } from "$lib/observeAudioPermission"
   import {
     createAudio,
@@ -8,8 +10,6 @@
   } from "$lib/useAudio"
   import { keyWithDarkMode, observeDarkMode } from "$lib/useDarkMode"
   import { createVideoTimer, keyWithVideoTimer } from "$lib/useVideoTimer"
-  import { firestoreImplContext } from "../firestore/firestoreImplContext"
-  import { initRemoteFirestore } from "../firestore/initRemoteFirestore"
 
   const context$ = (async () => {
     if (!browser) throw "client-side only context"

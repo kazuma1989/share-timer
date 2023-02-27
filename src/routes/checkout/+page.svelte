@@ -1,11 +1,11 @@
 <script lang="ts">
   import { browser } from "$app/environment"
+  import { initRemoteAuth } from "$lib/firestore/initRemoteAuth"
+  import { initRemoteFirestore } from "$lib/firestore/initRemoteFirestore"
+  import type { SignInState } from "$lib/firestore/worker/RemoteAuth.worker"
   import { observeWorker } from "$lib/util/observeWorker"
   import { shareRecent } from "$lib/util/shareRecent"
   import { filter, firstValueFrom } from "rxjs"
-  import { initRemoteAuth } from "../../firestore/initRemoteAuth"
-  import { initRemoteFirestore } from "../../firestore/initRemoteFirestore"
-  import type { SignInState } from "../../firestore/worker/RemoteAuth.worker"
   import Checkout from "./Checkout.svelte"
 
   const props$ = (async () => {

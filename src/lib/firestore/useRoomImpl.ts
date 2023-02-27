@@ -1,8 +1,8 @@
-import type { InvalidDoc, Room } from "$lib/schema/roomSchema"
-import { createCache } from "$lib/util/createCache"
-import { observeWorker } from "$lib/util/observeWorker"
-import { shareRecent } from "$lib/util/shareRecent"
 import type { Observable } from "rxjs"
+import type { InvalidDoc, Room } from "../schema/roomSchema"
+import { createCache } from "../util/createCache"
+import { observeWorker } from "../util/observeWorker"
+import { shareRecent } from "../util/shareRecent"
 import { useFirestore } from "./useFirestore"
 
 export function useRoomImpl(roomId: Room["id"]): Observable<Room | InvalidDoc> {

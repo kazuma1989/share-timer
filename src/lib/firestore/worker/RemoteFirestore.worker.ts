@@ -1,20 +1,3 @@
-import {
-  actionSchema,
-  coerceTimestamp,
-  type Action,
-  type ActionInput,
-} from "$lib/schema/actionSchema"
-import {
-  detectMode,
-  type InvalidDoc,
-  type Room,
-  type RoomInput,
-} from "$lib/schema/roomSchema"
-import { timerReducer, type TimerState } from "$lib/schema/timerReducer"
-import { setTransferHandlers } from "$lib/setTransferHandlers"
-import { createCache } from "$lib/util/createCache"
-import { nonNullable } from "$lib/util/nonNullable"
-import { shareRecent } from "$lib/util/shareRecent"
 import { expose, proxy, type ProxyMarked } from "comlink"
 import { initializeApp, type FirebaseOptions } from "firebase/app"
 import {
@@ -46,6 +29,23 @@ import {
   type Observable,
 } from "rxjs"
 import * as s from "superstruct"
+import {
+  actionSchema,
+  coerceTimestamp,
+  type Action,
+  type ActionInput,
+} from "../../schema/actionSchema"
+import {
+  detectMode,
+  type InvalidDoc,
+  type Room,
+  type RoomInput,
+} from "../../schema/roomSchema"
+import { timerReducer, type TimerState } from "../../schema/timerReducer"
+import { setTransferHandlers } from "../../setTransferHandlers"
+import { createCache } from "../../util/createCache"
+import { nonNullable } from "../../util/nonNullable"
+import { shareRecent } from "../../util/shareRecent"
 import { collection } from "./collection"
 import { convertServerTimestamp } from "./convertServerTimestamp"
 import { hasNoEstimateTimestamp } from "./hasNoEstimateTimestamp"
@@ -247,7 +247,9 @@ export class RemoteFirestore {
 
     const emoji = await fetch(
       new URL("../../emoji/Animals & Nature.json", import.meta.url)
-    ).then<typeof import("../../emoji/Animals & Nature.json")>((_) => _.json())
+    ).then<typeof import("../../../emoji/Animals & Nature.json")>((_) =>
+      _.json()
+    )
     if (await aborted()) throw "aborted 1"
 
     const e = emoji[(Math.random() * emoji.length) | 0]!
