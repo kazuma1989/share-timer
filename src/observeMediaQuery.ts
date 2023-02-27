@@ -1,5 +1,5 @@
+import { shareRecent } from "$lib/util/shareRecent"
 import { fromEvent, map, startWith, type Observable } from "rxjs"
-import { shareRecent } from "./util/shareRecent"
 
 export function observeMediaQuery(
   mql: MediaQueryList

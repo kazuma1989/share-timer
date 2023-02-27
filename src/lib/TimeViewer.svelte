@@ -14,14 +14,14 @@
   import type { TimerState } from "../schema/timerReducer"
   import { useDarkMode } from "../useDarkMode"
   import { useVideoTimer } from "../useVideoTimer"
-  import { bufferedLast } from "../util/bufferedLast"
-  import { floor } from "../util/floor"
-  import { formatDuration } from "../util/formatDuration"
-  import { humanReadableLabelOf } from "../util/humanReadableLabelOf"
-  import { interval } from "../util/interval"
   import { connectStreamTo } from "./action/connectStreamTo"
   import { prependElement } from "./action/prependElement"
   import { assertNonNullable } from "./util/assertNonNullable"
+  import { bufferedLast } from "./util/bufferedLast"
+  import { floor } from "./util/floor"
+  import { formatDuration } from "./util/formatDuration"
+  import { humanReadableLabelOf } from "./util/humanReadableLabelOf"
+  import { interval } from "./util/interval"
 
   export let timerState$: Observable<TimerState>
   export { className as class }

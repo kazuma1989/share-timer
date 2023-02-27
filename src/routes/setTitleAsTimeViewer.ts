@@ -1,10 +1,10 @@
+import { floor } from "$lib/util/floor"
+import { formatDuration } from "$lib/util/formatDuration"
+import { interval } from "$lib/util/interval"
 import { distinctUntilChanged, map, type Observable } from "rxjs"
-import { mapToCurrentDuration } from "./mapToCurrentDuration"
-import { now } from "./now"
-import type { TimerState } from "./schema/timerReducer"
-import { floor } from "./util/floor"
-import { formatDuration } from "./util/formatDuration"
-import { interval } from "./util/interval"
+import { mapToCurrentDuration } from "../mapToCurrentDuration"
+import { now } from "../now"
+import type { TimerState } from "../schema/timerReducer"
 
 export function setTitleAsTimeViewer(
   timerState$: Observable<TimerState>

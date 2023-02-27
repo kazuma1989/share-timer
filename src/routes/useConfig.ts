@@ -1,5 +1,5 @@
+import { shareRecent } from "$lib/util/shareRecent"
 import { Observable, scan, startWith, Subject } from "rxjs"
-import { shareRecent } from "../util/shareRecent"
 
 interface Config {
   flash: "on" | "off"

@@ -1,11 +1,11 @@
 <script lang="ts">
+  import { interval } from "$lib/util/interval"
   import clsx from "clsx"
   import { map, Observable, withLatestFrom } from "rxjs"
   import { mapToCurrentDuration } from "../mapToCurrentDuration"
   import { notifyFirstZero } from "../notifyFirstZero"
   import { now } from "../now"
   import type { TimerState } from "../schema/timerReducer"
-  import { interval } from "../util/interval"
   import { useConfig } from "./useConfig"
 
   export let timerState$: Observable<TimerState>

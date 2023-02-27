@@ -7,7 +7,7 @@ import {
   type Observable,
 } from "rxjs"
 import { fromRoute, toRoute, type Route } from "./toRoute"
-import { shareRecent } from "../util/shareRecent"
+import { shareRecent } from "./util/shareRecent"
 
 function observeHash(): Observable<string> {
   if (!globalThis.window) {

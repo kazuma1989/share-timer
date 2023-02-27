@@ -4,12 +4,12 @@
   import { firstValueFrom, map, merge, partition, type Observable } from "rxjs"
   import { isRoom, type InvalidDoc, type Room } from "../schema/roomSchema"
   import { setSoundCall } from "../setSoundCall"
-  import { setTitleAsTimeViewer } from "../setTitleAsTimeViewer"
   import { useRoom } from "../useRoom"
   import { useSetup } from "../useSetup"
   import { useTimerState } from "../useTimerState"
   import ConfigArea from "./ConfigArea.svelte"
   import FlashCover from "./FlashCover.svelte"
+  import { setTitleAsTimeViewer } from "./setTitleAsTimeViewer"
   import Timer from "./Timer.svelte"
   import { useConfig } from "./useConfig"
 

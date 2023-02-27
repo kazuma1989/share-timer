@@ -1,5 +1,5 @@
+import { nanoid } from "$lib/util/nanoid"
 import * as s from "superstruct"
-import { nanoid } from "../util/nanoid"
 
 export interface Room extends s.Infer<typeof roomSchema> {
   id: string & { readonly roomId: unique symbol }

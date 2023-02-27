@@ -2,6 +2,8 @@
   import DurationSelect from "$lib/DurationSelect.svelte"
   import Icon from "$lib/Icon.svelte"
   import TimeViewer from "$lib/TimeViewer.svelte"
+  import { getId } from "$lib/util/getId"
+  import { humanReadableLabelOf } from "$lib/util/humanReadableLabelOf"
   import clsx from "clsx"
   import { distinctUntilChanged, map, type Observable } from "rxjs"
   import type { HTMLButtonAttributes } from "svelte/elements"
@@ -10,8 +12,6 @@
   import type { TimerState } from "../schema/timerReducer"
   import { serverTimestamp } from "../serverTimestamp"
   import { useDispatch } from "../useDispatch"
-  import { getId } from "../util/getId"
-  import { humanReadableLabelOf } from "../util/humanReadableLabelOf"
 
   export let room$: Observable<Room>
   export let timerState$: Observable<TimerState>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import clsx from "clsx"
-  import { parseDuration } from "../util/parseDuration"
   import Slider from "./Slider.svelte"
+  import { parseDuration } from "./util/parseDuration"
 
   export let value: number
   export { className as class }
