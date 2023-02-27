@@ -1,19 +1,11 @@
 <script lang="ts">
   import { observeRoute } from "$lib/observeHash"
+  import { map } from "rxjs"
   import PageInfo from "../../PageInfo.svelte"
-  import PageInfoSkeleton from "../../PageInfoSkeleton.svelte"
 
-  const route$ = observeRoute()
+  const roomId$ = observeRoute().pipe(
+    map(([_, roomId]) => (_ === "room" ? roomId : undefined))
+  )
 </script>
 
-<div class="peer contents">
-  {#if $route$[0] === "room"}
-    {@const [, roomId] = $route$}
-
-    <PageInfo {roomId} />
-  {/if}
-</div>
-
-<div class="hidden peer-empty:contents">
-  <PageInfoSkeleton />
-</div>
+<PageInfo roomId={$roomId$} />

@@ -5,10 +5,10 @@
   import QrCode from "./QRCode.svelte"
   import type { Room } from "./schema/roomSchema"
 
-  export let roomId: Room["id"]
+  export let roomId: Room["id"] | undefined = undefined
 
-  $: roomHash = "#" + fromRoute(["room", roomId])
-  $: roomURL = window.location.origin + "/" + roomHash
+  $: roomHash = roomId ? "#" + fromRoute(["room", roomId]) : ""
+  $: roomURL = roomHash ? window.location.origin + "/" + roomHash : ""
 
   const lockRoom = async () => {
     const ok = window.confirm("まずはサインインが必要です")
@@ -41,13 +41,17 @@
   )}
 >
   <div>
-    <a
-      title="タイマーに戻る"
-      href="/{roomHash}"
-      class="transparent-button my-2 -ml-4 inline-grid h-12 w-12 place-items-center text-2xl !text-inherit"
-    >
-      <Icon name="arrow-left" />
-    </a>
+    {#if roomHash}
+      <a
+        title="タイマーに戻る"
+        href="/{roomHash}"
+        class="transparent-button my-2 -ml-4 inline-grid h-12 w-12 place-items-center text-2xl !text-inherit"
+      >
+        <Icon name="arrow-left" />
+      </a>
+    {:else}
+      <div class="my-2 h-12 w-12" />
+    {/if}
 
     <h1>
       <ruby>
@@ -60,19 +64,29 @@
     <p>URL でタイマーを簡単共有！</p>
 
     <p class="text-center">
-      <a href={roomURL} class="break-words">
-        <QrCode
-          data={roomURL}
-          width={160}
-          height={160}
-          class="mb-2 inline-block"
-        />
-        <br />
+      {#if roomURL}
+        <a href={roomURL} class="break-words">
+          <QrCode
+            data={roomURL}
+            width={160}
+            height={160}
+            class="mb-2 inline-block"
+          />
+          <br />
 
-        <span>
-          {roomURL}
+          <span>
+            {roomURL}
+          </span>
+        </a>
+      {:else}
+        <span class={clsx("animate-pulse text-dark/20 dark:text-white/30")}>
+          <span
+            class={clsx("inline-block h-[160px] w-[160px] rounded bg-current")}
+          />
+          <br />
+          <span class={clsx("inline-block h-2 w-64 rounded bg-current")} />
         </span>
-      </a>
+      {/if}
     </p>
 
     <p>
