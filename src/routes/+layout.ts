@@ -33,6 +33,7 @@ export const load = (async ({ data, fetch }) => {
   const firestore = await initRemoteFirestore(data.options)
 
   return {
+    firestore,
     context: new Map([
       ...firestoreImplContext(firestore),
       keyWithAudio(audio),

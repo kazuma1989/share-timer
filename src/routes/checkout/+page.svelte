@@ -2,17 +2,17 @@
   import { browser } from "$app/environment"
   import { goto } from "$app/navigation"
   import { initRemoteAuth } from "$lib/firestore/initRemoteAuth"
-  import { initRemoteFirestore } from "$lib/firestore/initRemoteFirestore"
   import type { SignInState } from "$lib/firestore/worker/RemoteAuth.worker"
   import { observeWorker } from "$lib/util/observeWorker"
   import { shareRecent } from "$lib/util/shareRecent"
   import { filter, firstValueFrom } from "rxjs"
+  import type { PageData } from "./$types"
   import Checkout from "./Checkout.svelte"
+
+  export let data: PageData
 
   const props$ = (async () => {
     if (!browser) throw "client-side only context"
-
-    const firestore = await initRemoteFirestore()
 
     const auth = await initRemoteAuth()
 
@@ -45,7 +45,7 @@
 
     // TODO デバッグしてるだけなので消したい
     const x$ = observeWorker((onNext) =>
-      firestore.onSnapshotCheckoutSession(uid, onNext)
+      data.firestore!.onSnapshotCheckoutSession(uid, onNext)
     )
     x$.subscribe((_) => {
       console.log(_)
