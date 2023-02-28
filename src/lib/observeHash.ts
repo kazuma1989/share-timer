@@ -31,10 +31,6 @@ export function observeRoute(): Observable<Route> {
   return observeHash().pipe(map(toRoute))
 }
 
-export function setHash(route: Route): void {
-  window.location.assign("#" + fromRoute(route))
-}
-
 export function replaceHash(route: Route): void {
   goto("#" + fromRoute(route), { replaceState: true })
   window.location.replace("#" + fromRoute(route))
