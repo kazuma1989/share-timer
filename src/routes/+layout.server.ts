@@ -6,7 +6,9 @@ installPolyfills()
 
 export const load = (async ({ fetch }) => {
   const options: FirebaseOptions = await fetch(
-    "https://sharetimer.web.app/__/firebase/init.json"
+    `https://${
+      import.meta.env.FIREBASE_PROJECTS_DEFAULT
+    }.web.app/__/firebase/init.json`
   ).then((_) => _.json())
 
   return {
