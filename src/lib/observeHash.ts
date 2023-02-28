@@ -1,3 +1,4 @@
+import { goto } from "$app/navigation"
 import {
   distinctUntilChanged,
   fromEvent,
@@ -35,5 +36,6 @@ export function setHash(route: Route): void {
 }
 
 export function replaceHash(route: Route): void {
+  goto("#" + fromRoute(route), { replaceState: true })
   window.location.replace("#" + fromRoute(route))
 }
