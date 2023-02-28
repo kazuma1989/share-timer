@@ -1,7 +1,7 @@
 import { browser } from "$app/environment"
 import { goto } from "$app/navigation"
 import { page } from "$app/stores"
-import { distinctUntilChanged, map, Observable } from "rxjs"
+import { distinctUntilChanged, fromEvent, map, merge, Observable } from "rxjs"
 import { fromRoute, toRoute, type Route } from "./toRoute"
 import { shareRecent } from "./util/shareRecent"
 
@@ -17,12 +17,20 @@ export function replaceRoute(route: Route): void {
 }
 
 function observeHash(): Observable<`#${string}`> {
-  return new Observable<URL>((sub) =>
-    page.subscribe((_) => {
-      sub.next(_.url)
-    })
+  return merge(
+    new Observable<string>((sub) =>
+      page.subscribe((_) => {
+        sub.next(_.url.hash)
+      })
+    ),
+    window
+      ? fromEvent<WindowEventMap["hashchange"]>(
+          window,
+          "hashchange" satisfies keyof WindowEventMap
+        ).pipe(map(() => window.location.hash))
+      : []
   ).pipe(
-    map((_) => (_.hash || "#") as `#${string}`),
+    map((_) => (_ || "#") as `#${string}`),
     distinctUntilChanged(),
     shareRecent()
   )
