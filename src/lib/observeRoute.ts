@@ -1,3 +1,4 @@
+import { browser } from "$app/environment"
 import { goto } from "$app/navigation"
 import { page } from "$app/stores"
 import { distinctUntilChanged, map, Observable } from "rxjs"
@@ -28,5 +29,7 @@ function observeHash(): Observable<`#${string}`> {
 }
 
 function replaceHash(hash: `#${string}`): void {
+  if (!browser) return
+
   goto(hash, { replaceState: true })
 }

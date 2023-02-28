@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { browser } from "$app/environment"
   import { observeRoute, replaceRoute } from "$lib/observeRoute"
   import { newRoomId } from "$lib/schema/roomSchema"
   import PageRoom from "./PageRoom.svelte"
@@ -7,7 +6,7 @@
 
   const route$ = observeRoute()
 
-  $: if (browser) {
+  $: {
     const [route, , mode] = $route$
 
     if (route !== "room") {
