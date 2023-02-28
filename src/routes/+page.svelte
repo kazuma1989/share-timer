@@ -2,17 +2,8 @@
   import { browser } from "$app/environment"
   import { observeRoute, replaceHash } from "$lib/observeHash"
   import { newRoomId } from "$lib/schema/roomSchema"
-  import { setContext } from "svelte"
-  import type { PageData } from "./$types"
   import PageRoom from "./PageRoom.svelte"
   import PageRoomSkeleton from "./PageRoomSkeleton.svelte"
-
-  export let data: PageData
-
-  console.log("setContext!")
-  data.context?.forEach((value, key) => {
-    setContext(key, value)
-  })
 
   const route$ = observeRoute()
 

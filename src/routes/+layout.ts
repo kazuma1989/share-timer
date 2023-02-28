@@ -17,11 +17,8 @@ export const trailingSlash = "always"
 
 export const load = (async ({ data, fetch }) => {
   if (!browser) {
-    console.log("+layout in server!")
     return {}
   }
-
-  console.log("+layout in browser!")
 
   const darkMode$ = observeDarkMode()
 
