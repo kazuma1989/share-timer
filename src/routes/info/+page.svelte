@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { goto } from "$app/navigation"
+  import { page } from "$app/stores"
   import Icon from "$lib/Icon.svelte"
   import { observeRoute } from "$lib/observeRoute"
   import QrCode from "$lib/QRCode.svelte"
@@ -11,19 +13,19 @@
   )
 
   $: roomHash = $roomId$ ? "#" + fromRoute(["room", $roomId$]) : ""
-  $: roomURL = roomHash ? window.location.origin + "/" + roomHash : ""
+  $: roomURL = roomHash ? $page.url.origin + "/" + roomHash : ""
 
   const lockRoom = async () => {
     const ok = window.confirm("まずはサインインが必要です")
     if (!ok) return
 
-    window.location.assign(
-      "/sign-in.html?" +
+    const { pathname, search, hash } = $page.url
+
+    goto(
+      "/sign-in.html" +
+        "?" +
         new URLSearchParams({
-          back:
-            window.location.pathname +
-            window.location.search +
-            window.location.hash,
+          back: pathname + search + hash,
           ...(import.meta.env.VITE_FIRESTORE_EMULATOR
             ? {
                 emulator:
