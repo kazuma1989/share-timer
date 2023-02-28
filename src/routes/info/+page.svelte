@@ -1,12 +1,13 @@
 <script lang="ts">
-  import { goto } from "$app/navigation"
+  import { afterNavigate, goto } from "$app/navigation"
   import { page } from "$app/stores"
   import Icon from "$lib/Icon.svelte"
   import { observeRoute } from "$lib/observeRoute"
   import QrCode from "$lib/QRCode.svelte"
   import { fromRoute } from "$lib/toRoute"
+  import type { AfterNavigate } from "@sveltejs/kit"
   import clsx from "clsx"
-  import { map } from "rxjs"
+  import { map, Observable } from "rxjs"
 
   const roomId$ = observeRoute().pipe(
     map(([_, roomId]) => (_ === "room" ? roomId : undefined))
@@ -35,6 +36,12 @@
         })
     )
   }
+
+  const nav$ = new Observable<AfterNavigate>((sub) => {
+    afterNavigate((nav) => {
+      sub.next(nav)
+    })
+  })
 </script>
 
 <article
@@ -51,6 +58,12 @@
         title="タイマーに戻る"
         href="/{roomHash}"
         class="transparent-button my-2 -ml-4 inline-grid h-12 w-12 place-items-center text-2xl"
+        on:click={(e) => {
+          if (e.currentTarget.href !== $nav$.from?.url.toString()) return
+
+          e.preventDefault()
+          window.history.back()
+        }}
       >
         <Icon name="arrow-left" />
       </a>
