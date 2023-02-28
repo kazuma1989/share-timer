@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from "$app/navigation"
   import { setContext } from "svelte"
   import "../global.css"
   import type { LayoutData } from "./$types"
@@ -9,6 +10,14 @@
     setContext(key, value)
   })
 </script>
+
+<svelte:window
+  on:hashchange={(e) => {
+    // よくわからんが page store が hashchange を拾わないので補っている
+    // https://github.com/sveltejs/kit/issues/4554
+    goto(e.newURL, { replaceState: true })
+  }}
+/>
 
 <svelte:head>
   <title>Share Timer</title>
