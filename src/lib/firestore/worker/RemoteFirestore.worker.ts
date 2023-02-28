@@ -67,11 +67,11 @@ export class RemoteFirestore {
     this.firestore = getFirestore(initializeApp(options))
 
     if (import.meta.env.VITE_FIRESTORE_EMULATOR) {
-      const host = self.location.hostname
+      const { hostname } = self.location
       const port = import.meta.env.FIREBASE_EMULATORS.firestore.port
-      console.info(`using emulator (${host}:${port})`)
+      console.info(`using emulator (${hostname}:${port})`)
 
-      connectFirestoreEmulator(this.firestore, host, port)
+      connectFirestoreEmulator(this.firestore, hostname, port)
     }
 
     setTransferHandlers()
@@ -82,11 +82,10 @@ export class RemoteFirestore {
     })
 
     if (import.meta.env.VITE_AUTH_EMULATOR) {
-      const protocol = self.location.protocol
-      const host = self.location.hostname
+      const { protocol, hostname } = self.location
       const port = import.meta.env.FIREBASE_EMULATORS.auth.port
 
-      connectAuthEmulator(this.auth, `${protocol}//${host}:${port}`)
+      connectAuthEmulator(this.auth, `${protocol}//${hostname}:${port}`)
     }
   }
 
