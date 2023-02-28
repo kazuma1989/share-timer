@@ -1,48 +1,18 @@
-<script lang="ts" context="module">
-  import smallAlert from "$lib/assets/small-alert.mp3"
-  import { firestoreImplContext } from "$lib/firestore/firestoreImplContext"
-  import { initRemoteFirestore } from "$lib/firestore/initRemoteFirestore"
-  import { observeAudioPermission } from "$lib/observeAudioPermission"
-  import {
-    createAudio,
-    keyWithAudio,
-    keyWithMediaPermission,
-  } from "$lib/useAudio"
-  import { keyWithDarkMode, observeDarkMode } from "$lib/useDarkMode"
-  import { createVideoTimer, keyWithVideoTimer } from "$lib/useVideoTimer"
-
-  const context$ = (async () => {
-    if (!browser) throw "client-side only context"
-
-    const darkMode$ = observeDarkMode()
-
-    const context = new AudioContext()
-    const permission$ = observeAudioPermission(context)
-
-    const audioData = await fetch(smallAlert).then((_) => _.arrayBuffer())
-    const audio = createAudio(context, audioData)
-
-    const video = createVideoTimer()
-
-    const firestore = await initRemoteFirestore()
-
-    return new Map([
-      ...firestoreImplContext(firestore),
-      keyWithAudio(audio),
-      keyWithMediaPermission(permission$),
-      keyWithDarkMode(darkMode$),
-      keyWithVideoTimer(video),
-    ])
-  })()
-</script>
-
 <script lang="ts">
   import { browser } from "$app/environment"
   import { observeRoute, replaceHash } from "$lib/observeHash"
   import { newRoomId } from "$lib/schema/roomSchema"
-  import SetContext from "$lib/SetContext.svelte"
+  import { setContext } from "svelte"
+  import type { PageData } from "./$types"
   import PageRoom from "./PageRoom.svelte"
   import PageRoomSkeleton from "./PageRoomSkeleton.svelte"
+
+  export let data: PageData
+
+  console.log("setContext!")
+  data.context?.forEach((value, key) => {
+    setContext(key, value)
+  })
 
   const route$ = observeRoute()
 
@@ -56,15 +26,11 @@
 </script>
 
 <div class="peer contents">
-  {#await context$ then context}
-    <SetContext {context}>
-      {#if $route$[0] === "room"}
-        {@const [, roomId] = $route$}
+  {#if $route$[0] === "room"}
+    {@const [, roomId] = $route$}
 
-        <PageRoom {roomId} />
-      {/if}
-    </SetContext>
-  {/await}
+    <PageRoom {roomId} />
+  {/if}
 </div>
 
 <div class="hidden peer-empty:contents">
