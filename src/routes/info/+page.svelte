@@ -1,6 +1,6 @@
 <script lang="ts">
   import Icon from "$lib/Icon.svelte"
-  import { observeRoute } from "$lib/observeHash"
+  import { observeRoute } from "$lib/observeRoute"
   import QrCode from "$lib/QRCode.svelte"
   import { fromRoute } from "$lib/toRoute"
   import clsx from "clsx"

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { browser } from "$app/environment"
-  import { observeRoute, replaceHash } from "$lib/observeHash"
+  import { observeRoute, replaceRoute } from "$lib/observeRoute"
   import { newRoomId } from "$lib/schema/roomSchema"
   import PageRoom from "./PageRoom.svelte"
   import PageRoomSkeleton from "./PageRoomSkeleton.svelte"
@@ -11,7 +11,7 @@
     const [route, , mode] = $route$
 
     if (route !== "room") {
-      replaceHash(["room", newRoomId(mode)])
+      replaceRoute(["room", newRoomId(mode)])
     }
   }
 </script>
