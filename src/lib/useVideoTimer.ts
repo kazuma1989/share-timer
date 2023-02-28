@@ -16,7 +16,7 @@ export function createVideoTimer(): HTMLVideoElement {
   video.playsInline = true
 
   const play = video.play.bind(video)
-  const requestPictureInPicture = video.requestPictureInPicture.bind(video)
+  const requestPictureInPicture = video.requestPictureInPicture?.bind(video)
 
   // controls off にしておくので、扱いやすいようなイベントをあらかじめ付与
   video.addEventListener("click", play, { passive: true })
