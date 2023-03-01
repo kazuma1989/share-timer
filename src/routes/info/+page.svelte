@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterNavigate, goto } from "$app/navigation"
+  import { afterNavigate } from "$app/navigation"
   import { page } from "$app/stores"
   import Icon from "$lib/Icon.svelte"
   import { observeRoute } from "$lib/observeRoute"
@@ -22,7 +22,7 @@
 
     const { pathname, search, hash } = $page.url
 
-    goto(
+    window.location.assign(
       "/sign-in/" +
         "?" +
         new URLSearchParams({

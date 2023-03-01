@@ -25,7 +25,7 @@
     notSignedIn$.subscribe(() => {
       const { pathname, search, hash } = $page.url
 
-      goto(
+      window.location.assign(
         "/sign-in/" +
           "?" +
           new URLSearchParams({
