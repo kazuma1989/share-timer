@@ -23,7 +23,7 @@
     const { pathname, search, hash } = $page.url
 
     goto(
-      "/sign-in.html" +
+      "/sign-in/" +
         "?" +
         new URLSearchParams({
           back: pathname + search + hash,
