@@ -1,15 +1,16 @@
-import { browser } from "$app/environment"
-import { goto } from "$app/navigation"
-import { page } from "$app/stores"
-import { distinctUntilChanged, map, Observable } from "rxjs"
+import {
+  distinctUntilChanged,
+  fromEvent,
+  map,
+  of,
+  startWith,
+  type Observable,
+} from "rxjs"
 import { fromRoute, toRoute, type Route } from "./toRoute"
 import { shareRecent } from "./util/shareRecent"
 
 export function observeRoute(): Observable<Route> {
-  return observeHash().pipe(
-    map((_) => _.slice("#".length)),
-    map(toRoute)
-  )
+  return observeHash().pipe(map((_) => toRoute(_.slice("#".length))))
 }
 
 export function replaceRoute(route: Route): void {
@@ -17,19 +18,25 @@ export function replaceRoute(route: Route): void {
 }
 
 function observeHash(): Observable<`#${string}`> {
-  return new Observable<string>((sub) =>
-    page.subscribe((_) => {
-      sub.next(_.url.hash)
-    })
+  if (!window) {
+    return of("#")
+  }
+
+  return fromEvent<WindowEventMap["hashchange"]>(
+    window,
+    "hashchange" satisfies keyof WindowEventMap,
+    { passive: true }
   ).pipe(
-    map((_) => (_ || "#") as `#${string}`),
+    map((e) => new URL(e.newURL).hash),
+    startWith(window.location.hash),
+    map((hash) => (hash || "#") as `#${string}`),
     distinctUntilChanged(),
     shareRecent()
   )
 }
 
 function replaceHash(hash: `#${string}`): void {
-  if (!browser) return
+  if (!window) return
 
-  goto(hash, { replaceState: true })
+  window.location.replace(hash)
 }
