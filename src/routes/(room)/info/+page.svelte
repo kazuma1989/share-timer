@@ -53,25 +53,25 @@
   )}
 >
   <div>
-    {#if roomHash}
-      <a
-        title="タイマーに戻る"
-        href="/{roomHash}"
-        class="transparent-button my-2 -ml-4 inline-grid h-12 w-12 place-items-center text-2xl"
-        on:click={(e) => {
-          if (e.currentTarget.href !== $nav$.from?.url.toString()) return
+    <div class="h-0">
+      {#if roomHash}
+        <a
+          title="タイマーに戻る"
+          href="/{roomHash}"
+          class="transparent-button my-2 -ml-4 inline-grid h-12 w-12 place-items-center text-2xl"
+          on:click={(e) => {
+            if (e.currentTarget.href !== $nav$.from?.url.toString()) return
 
-          e.preventDefault()
-          window.history.back()
-        }}
-      >
-        <Icon name="arrow-left" />
-      </a>
-    {:else}
-      <div class="my-2 h-12 w-12" />
-    {/if}
+            e.preventDefault()
+            window.history.back()
+          }}
+        >
+          <Icon name="arrow-left" />
+        </a>
+      {/if}
+    </div>
 
-    <h1>
+    <h1 class="mt-16">
       <ruby>
         Share Timer <rp>(</rp>
         <rt class="text-xs">シェア タイマー</rt>
