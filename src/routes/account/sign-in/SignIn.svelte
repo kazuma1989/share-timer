@@ -21,12 +21,14 @@
 
 {#if user}
   <div class="grid place-items-center">
-    <form on:submit|preventDefault={onSubmit}>
+    <form class="w-full" on:submit|preventDefault={onSubmit}>
       <table>
         <tbody>
           <tr>
             <th>アカウント</th>
-            <td>{user.providerData[0]?.providerId || "-"}</td>
+            <td>
+              {user.providerData.map((_) => _.providerId).join(", ") || "-"}
+            </td>
           </tr>
 
           <tr>
@@ -42,7 +44,11 @@
       </table>
 
       <p class="text-center">
-        <button>ログアウト</button>
+        <button
+          class="transparent-button block w-full border border-gray-500 px-4 py-3"
+        >
+          ログアウト
+        </button>
       </p>
     </form>
   </div>
