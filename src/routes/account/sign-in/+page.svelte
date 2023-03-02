@@ -1,5 +1,7 @@
 <script lang="ts">
   import { browser } from "$app/environment"
+  import Icon from "$lib/Icon.svelte"
+  import clsx from "clsx"
   import SignIn from "./SignIn.svelte"
 </script>
 
@@ -22,10 +24,9 @@
       new URLSearchParams(window.location.search).get("emulator")
     )
     if (port) {
-      const protocol = window.location.protocol
-      const host = window.location.hostname
+      const { protocol, hostname } = window.location
 
-      firebase.auth().useEmulator(`${protocol}//${host}:${port}`)
+      firebase.auth().useEmulator(`${protocol}//${hostname}:${port}`)
     }
 
     customElements.define(
@@ -47,6 +48,9 @@
             window.document.createElement("style")
           )
           style.textContent = `
+            :host {
+              display: block;
+            }
             button:focus {
               /* https://css-tricks.com/copy-the-browsers-native-focus-styles/ */
               outline: Highlight auto medium;
@@ -82,14 +86,42 @@
   </script>
 </svelte:head>
 
-<header class="text-center">
-  <h1>Share Timer</h1>
-</header>
+<main class={clsx("mx-auto h-screen max-w-prose", "prose-theme-base", "px-6")}>
+  <div class="h-0">
+    <a
+      title="タイマーに戻る"
+      href="/"
+      class="transparent-button my-2 -ml-4 inline-grid h-12 w-12 place-items-center text-2xl"
+    >
+      <Icon name="arrow-left" />
+    </a>
+  </div>
 
-<div class="peer">
-  {#if browser}
-    <SignIn />
-  {/if}
-</div>
+  <h1 class="mt-16">
+    <ruby>
+      Share Timer <rp>(</rp>
+      <rt class="text-xs">シェア タイマー</rt>
+      <rp>)</rp>
+    </ruby>
+  </h1>
 
-<firebaseui-auth class="peer-[:not(:empty)]:hidden" />
+  <p>URL でタイマーを簡単共有！</p>
+
+  <div class="peer">
+    {#if browser}
+      <SignIn />
+    {/if}
+  </div>
+
+  <firebaseui-auth class="peer-[:not(:empty)]:hidden" />
+
+  <!-- <p>
+    <a
+      href="/"
+      target="_blank"
+      class={clsx("transparent-button block border border-gray-500 px-4 py-3")}
+    >
+      新しいタイマーを開く
+    </a>
+  </p> -->
+</main>
