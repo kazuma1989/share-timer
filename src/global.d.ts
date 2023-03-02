@@ -3,3 +3,5 @@
 /// <reference types="svelte" />
 /// <reference types="vite/client" />
 /// <reference types="vitest/importMeta" />
+
+declare module "https://*"
