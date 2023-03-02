@@ -23,7 +23,7 @@
     const { pathname, search, hash } = $page.url
 
     window.location.assign(
-      "/sign-in/" +
+      "/account/sign-in/" +
         "?" +
         new URLSearchParams({
           back: pathname + search + hash,
@@ -132,7 +132,7 @@
     {#if import.meta.env.DEV}
       <p>
         <a
-          href="/checkout/"
+          href="/account/checkout/"
           class={clsx(
             "transparent-button block border border-gray-500 px-4 py-3"
           )}

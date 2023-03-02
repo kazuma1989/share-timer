@@ -1,14 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation"
-  import { setContext } from "svelte"
   import "../global.css"
-  import type { LayoutData } from "./$types"
-
-  export let data: LayoutData
-
-  data.context?.forEach((value, key) => {
-    setContext(key, value)
-  })
 </script>
 
 <svelte:window

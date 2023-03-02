@@ -1,6 +1,5 @@
 <script lang="ts">
   import { browser } from "$app/environment"
-  import { goto } from "$app/navigation"
   import { page } from "$app/stores"
   import { initRemoteAuth } from "$lib/firestore/initRemoteAuth"
   import type { SignInState } from "$lib/firestore/worker/RemoteAuth.worker"
@@ -26,7 +25,7 @@
       const { pathname, search, hash } = $page.url
 
       window.location.assign(
-        "/sign-in/" +
+        "/account/sign-in/" +
           "?" +
           new URLSearchParams({
             back: pathname + search + hash,
