@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { browser } from "$app/environment"
+  import SignIn from "./SignIn.svelte"
 </script>
 
 <svelte:head>
@@ -78,92 +80,16 @@
       }
     )
   </script>
-
-  <script type="module">
-    import {
-      html,
-      render,
-      useEffect,
-      useState,
-    } from "https://unpkg.com/htm@3.1.1/preact/standalone.module.js"
-
-    function App() {
-      const [user, setUser] = useState(firebase.auth().currentUser)
-
-      useEffect(
-        () =>
-          firebase.auth().onAuthStateChanged((user) => {
-            setUser(user)
-          }),
-        []
-      )
-
-      if (!user) {
-        return null
-      }
-
-      const onsubmit = (e) => {
-        e.preventDefault()
-        firebase.auth().signOut()
-      }
-
-      const {
-        uid,
-        email,
-        displayName,
-        lastLoginAt,
-        providerData: [provider],
-      } = user
-
-      const info = [
-        ["アカウント", provider?.providerId],
-        ["名前", displayName],
-        ["メール", email],
-      ]
-
-      return html`
-        <main style="text-align: center">
-          <form onsubmit=${onsubmit}>
-            <table>
-              <tbody>
-                ${info.map(
-                  ([key, value]) =>
-                    html`
-                      <tr>
-                        <th>${key}</th>
-                        <td>${value || "-"}</td>
-                      </tr>
-                    `
-                )}
-              </tbody>
-            </table>
-
-            <p>
-              <button>ログアウト</button>
-            </p>
-          </form>
-        </main>
-      `
-    }
-
-    render(html`<${App} />`, window.document.getElementById("root"))
-  </script>
-
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/awsm.css@3.0.7/dist/awsm.min.css"
-  />
-  <style>
-    :not(:empty) + .peer-hidden {
-      display: none;
-    }
-  </style>
 </svelte:head>
 
-<header style="text-align: center">
+<header class="text-center">
   <h1>Share Timer</h1>
 </header>
 
-<div id="root" />
+<div class="peer">
+  {#if browser}
+    <SignIn />
+  {/if}
+</div>
 
-<firebaseui-auth class="peer-hidden" />
+<firebaseui-auth class="peer-[:not(:empty)]:hidden" />
