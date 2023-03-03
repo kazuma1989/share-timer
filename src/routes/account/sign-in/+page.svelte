@@ -9,7 +9,7 @@
   import { browser } from "$app/environment"
   import Icon from "$lib/Icon.svelte"
   import clsx from "clsx"
-  import SignIn from "./SignIn.svelte"
+  import UserInfo from "./UserInfo.svelte"
 
   const auth = () => firebase.auth()
 
@@ -67,7 +67,7 @@
 
   {#if browser}
     <div class="peer">
-      <SignIn auth={auth()} />
+      <UserInfo auth={auth()} />
     </div>
 
     <firebaseui-auth class="peer-[:not(:empty)]:hidden my-14" />
