@@ -4,7 +4,6 @@ import { emulators } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
 import chunkAlignGranularity from "./vite/plugin/chunkAlignGranularity"
-import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
 import vitest from "./vite/plugin/vitest"
 
 declare const process: {
@@ -54,9 +53,6 @@ export default defineConfig(async ({ command, mode }) => {
 
     plugins: [
       sveltekit(),
-
-      // Firebase
-      firebaseReservedURL(),
 
       // Build config
       chunkAlignGranularity(),
