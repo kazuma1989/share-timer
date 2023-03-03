@@ -41,13 +41,17 @@
             this.attachShadow({ mode: "open" })
           }
 
-          connectedCallback() {
+          async connectedCallback() {
             const link = this.shadowRoot.appendChild(
               window.document.createElement("link")
             )
             link.rel = "stylesheet"
             link.href =
               "https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.css"
+
+            const linkLoaded$ = new Promise((resolve) => {
+              link.onload = resolve
+            })
 
             const style = this.shadowRoot.appendChild(
               window.document.createElement("style")
@@ -70,6 +74,8 @@
             const ui =
               firebaseui.auth.AuthUI.getInstance() ??
               new firebaseui.auth.AuthUI(firebase.auth())
+
+            await linkLoaded$
 
             ui.start(container, {
               signInSuccessUrl:
