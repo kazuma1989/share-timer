@@ -2,7 +2,6 @@ import { sveltekit } from "@sveltejs/kit/vite"
 import { defineConfig } from "vite"
 import { emulators } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
-import { getFirebaserc } from "./vite/getFirebaserc"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
 import chunkAlignGranularity from "./vite/plugin/chunkAlignGranularity"
 import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
@@ -29,14 +28,9 @@ declare const process: {
 export default defineConfig(async ({ command, mode }) => {
   const { BROWSER, HOST, PORT, PREVIEW_PORT, CI } = process.env
 
-  const rc = await getFirebaserc()
-
   return {
     define: {
       "import.meta.env.FIREBASE_EMULATORS": JSON.stringify(emulators),
-      "import.meta.env.FIREBASE_PROJECTS_DEFAULT": JSON.stringify(
-        rc?.projects.default
-      ),
     },
 
     server: {
