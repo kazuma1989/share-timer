@@ -1,5 +1,6 @@
 <script lang="ts" context="module">
   import options from "$lib/assets/init.json"
+  import { defineFirebaseuiAuth } from "./defineFirebaseuiAuth"
   import type { Firebase, FirebaseUI } from "./types"
 
   declare const firebase: Firebase
@@ -7,6 +8,15 @@
 
   if (browser) {
     firebase.initializeApp(options)
+
+    defineFirebaseuiAuth(firebase, firebaseui)
+
+    if (import.meta.env.VITE_AUTH_EMULATOR) {
+      const { protocol, hostname } = window.location
+      const port = import.meta.env.FIREBASE_EMULATORS.auth.port
+
+      firebase.auth().useEmulator(`${protocol}//${hostname}:${port}`)
+    }
   }
 </script>
 
@@ -17,19 +27,6 @@
   import UserInfo from "./UserInfo.svelte"
 
   const auth = () => firebase.auth()
-
-  if (browser) {
-    import("./defineFirebaseuiAuth").then((_) => {
-      _.defineFirebaseuiAuth(firebase, firebaseui)
-    })
-
-    if (import.meta.env.VITE_AUTH_EMULATOR) {
-      const { protocol, hostname } = window.location
-      const port = import.meta.env.FIREBASE_EMULATORS.auth.port
-
-      firebase.auth().useEmulator(`${protocol}//${hostname}:${port}`)
-    }
-  }
 </script>
 
 <svelte:head>
