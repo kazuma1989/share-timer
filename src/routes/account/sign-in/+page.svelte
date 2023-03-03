@@ -1,8 +1,13 @@
 <script lang="ts" context="module">
+  import options from "$lib/assets/init.json"
   import type { Firebase, FirebaseUI } from "./types"
 
   declare const firebase: Firebase
   declare const firebaseui: FirebaseUI
+
+  if (browser) {
+    firebase.initializeApp(options)
+  }
 </script>
 
 <script lang="ts">
@@ -36,8 +41,6 @@
   <script
     src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"
   ></script>
-  <script src="/__/firebase/init.js"></script>
-
   <script
     src="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth__ja.js"
   ></script>
