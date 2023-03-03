@@ -1,7 +1,8 @@
 <script lang="ts">
   import { readable } from "svelte/store"
+  import type { Firebase } from "./types"
 
-  export let auth: import("firebase/compat").default.auth.Auth
+  export let auth: ReturnType<Firebase["auth"]>
 
   $: user$ = readable(auth.currentUser, (set) =>
     auth.onAuthStateChanged((user: any) => {

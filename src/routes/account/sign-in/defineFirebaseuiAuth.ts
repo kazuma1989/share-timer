@@ -1,14 +1,9 @@
-declare const firebase: typeof import("firebase/compat").default
-declare const firebaseui: {
-  auth: {
-    AuthUI: {
-      new (auth: import("firebase/compat").default.auth.Auth): any
-      getInstance(): any
-    }
-  }
-}
+import type { Firebase, FirebaseUI } from "./types"
 
-export function defineFirebaseuiAuth() {
+export function defineFirebaseuiAuth(
+  firebase: Firebase,
+  firebaseui: FirebaseUI
+) {
   if (customElements.get("firebaseui-auth")) return
 
   customElements.define(

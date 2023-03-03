@@ -1,5 +1,8 @@
 <script lang="ts" context="module">
-  declare const firebase: typeof import("firebase/compat").default
+  import type { Firebase, FirebaseUI } from "./types"
+
+  declare const firebase: Firebase
+  declare const firebaseui: FirebaseUI
 </script>
 
 <script lang="ts">
@@ -12,7 +15,7 @@
 
   if (browser) {
     import("./defineFirebaseuiAuth").then((_) => {
-      _.defineFirebaseuiAuth()
+      _.defineFirebaseuiAuth(firebase, firebaseui)
     })
 
     if (import.meta.env.VITE_AUTH_EMULATOR) {
