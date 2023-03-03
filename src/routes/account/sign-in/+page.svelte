@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  declare const firebase: import("firebase/compat").default.app.App
+  declare const firebase: typeof import("firebase/compat").default
 </script>
 
 <script lang="ts">
@@ -10,11 +10,17 @@
 
   const auth = () => firebase.auth()
 
-  if (browser && import.meta.env.VITE_AUTH_EMULATOR) {
-    const { protocol, hostname } = window.location
-    const port = import.meta.env.FIREBASE_EMULATORS.auth.port
+  if (browser) {
+    import("./defineFirebaseuiAuth").then((_) => {
+      _.defineFirebaseuiAuth()
+    })
 
-    firebase.auth().useEmulator(`${protocol}//${hostname}:${port}`)
+    if (import.meta.env.VITE_AUTH_EMULATOR) {
+      const { protocol, hostname } = window.location
+      const port = import.meta.env.FIREBASE_EMULATORS.auth.port
+
+      firebase.auth().useEmulator(`${protocol}//${hostname}:${port}`)
+    }
   }
 </script>
 
@@ -32,75 +38,6 @@
   <script
     src="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth__ja.js"
   ></script>
-  <script>
-    if (!customElements.get("firebaseui-auth")) {
-      customElements.define(
-        "firebaseui-auth",
-        class FirebaseuiAuth extends HTMLElement {
-          constructor() {
-            super()
-
-            this.attachShadow({ mode: "open" })
-          }
-
-          async connectedCallback() {
-            const link = this.shadowRoot.appendChild(
-              window.document.createElement("link")
-            )
-            link.rel = "stylesheet"
-            link.href =
-              "https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.css"
-
-            const linkLoaded$ = new Promise((resolve) => {
-              link.onload = resolve
-            })
-
-            const style = this.shadowRoot.appendChild(
-              window.document.createElement("style")
-            )
-            style.textContent = `
-              :host {
-                display: block;
-              }
-              button:focus {
-                /* https://css-tricks.com/copy-the-browsers-native-focus-styles/ */
-                outline: Highlight auto medium;
-                outline: -webkit-focus-ring-color auto medium;
-              }
-            `
-
-            const container = this.shadowRoot.appendChild(
-              window.document.createElement("div")
-            )
-
-            const ui =
-              firebaseui.auth.AuthUI.getInstance() ??
-              new firebaseui.auth.AuthUI(firebase.auth())
-
-            await linkLoaded$
-
-            ui.start(container, {
-              signInSuccessUrl:
-                new URLSearchParams(window.location.search).get("back") ||
-                window.location.href,
-              signInOptions: [
-                firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-                // "apple.com",
-                // "microsoft.com",
-                // "yahoo.com",
-                // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-                // firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-                // firebase.auth.GithubAuthProvider.PROVIDER_ID,
-                firebase.auth.EmailAuthProvider.PROVIDER_ID,
-                // firebase.auth.PhoneAuthProvider.PROVIDER_ID,
-                // firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID,
-              ],
-            })
-          }
-        }
-      )
-    }
-  </script>
 </svelte:head>
 
 <main class={clsx("mx-auto h-screen max-w-prose", "prose-theme-base", "px-6")}>
