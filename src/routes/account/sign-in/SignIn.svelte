@@ -1,25 +1,23 @@
-<script lang="ts" context="module">
-  declare const firebase: {
-    auth(): import("firebase/auth").Auth
-  }
-</script>
-
 <script lang="ts">
   import { readable } from "svelte/store"
 
-  const user$ = readable(firebase.auth().currentUser, (set) =>
-    firebase.auth().onAuthStateChanged((user: any) => {
+  export let auth: import("firebase/compat").default.auth.Auth
+
+  $: user$ = readable(auth.currentUser, (set) =>
+    auth.onAuthStateChanged((user: any) => {
       set(user)
     })
   )
   $: user = $user$
 
   const onSubmit = () => {
-    firebase.auth().signOut()
+    auth.signOut()
   }
 </script>
 
 {#if user}
+  {@const { providerData, displayName, email } = user}
+
   <div class="grid place-items-center">
     <form class="w-full" on:submit|preventDefault={onSubmit}>
       <table>
@@ -27,18 +25,21 @@
           <tr>
             <th>アカウント</th>
             <td>
-              {user.providerData.map((_) => _.providerId).join(", ") || "-"}
+              {providerData
+                .map((_) => _?.providerId)
+                .filter((_) => !!_)
+                .join(", ") || "-"}
             </td>
           </tr>
 
           <tr>
             <th>名前</th>
-            <td>{user.displayName || "-"}</td>
+            <td>{displayName || "-"}</td>
           </tr>
 
           <tr>
             <th>メール</th>
-            <td>{user.email || "-"}</td>
+            <td>{email || "-"}</td>
           </tr>
         </tbody>
       </table>

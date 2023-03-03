@@ -1,8 +1,14 @@
+<script lang="ts" context="module">
+  declare const firebase: import("firebase/compat").default.app.App
+</script>
+
 <script lang="ts">
   import { browser } from "$app/environment"
   import Icon from "$lib/Icon.svelte"
   import clsx from "clsx"
   import SignIn from "./SignIn.svelte"
+
+  const auth = () => firebase.auth()
 </script>
 
 <svelte:head>
@@ -125,7 +131,7 @@
 
   {#if browser}
     <div class="peer">
-      <SignIn />
+      <SignIn auth={auth()} />
     </div>
 
     <firebaseui-auth class="peer-[:not(:empty)]:hidden my-14" />
