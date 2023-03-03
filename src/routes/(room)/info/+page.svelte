@@ -27,12 +27,6 @@
         "?" +
         new URLSearchParams({
           back: pathname + search + hash,
-          ...(import.meta.env.VITE_FIRESTORE_EMULATOR
-            ? {
-                emulator:
-                  import.meta.env.FIREBASE_EMULATORS.auth.port.toString(),
-              }
-            : {}),
         })
     )
   }

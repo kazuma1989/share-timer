@@ -9,6 +9,13 @@
   import SignIn from "./SignIn.svelte"
 
   const auth = () => firebase.auth()
+
+  if (browser && import.meta.env.VITE_AUTH_EMULATOR) {
+    const { protocol, hostname } = window.location
+    const port = import.meta.env.FIREBASE_EMULATORS.auth.port
+
+    firebase.auth().useEmulator(`${protocol}//${hostname}:${port}`)
+  }
 </script>
 
 <svelte:head>
@@ -26,17 +33,6 @@
     src="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth__ja.js"
   ></script>
   <script>
-    {
-      const port = Number(
-        new URLSearchParams(window.location.search).get("emulator")
-      )
-      if (port) {
-        const { protocol, hostname } = window.location
-
-        firebase.auth().useEmulator(`${protocol}//${hostname}:${port}`)
-      }
-    }
-
     if (!customElements.get("firebaseui-auth")) {
       customElements.define(
         "firebaseui-auth",
