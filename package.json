@@ -34,6 +34,7 @@
     "firebase-indexes-export": "firebase firestore:indexes > firestore.indexes.json",
     "firebase-emulators-init": "firebase init emulators",
     "firebase-emulators-start": "firebase emulators:start --only auth,firestore,functions",
+    "update-init-json": "curl -L https://sharetimer.web.app/__/firebase/init.json -o ./src/lib/assets/init.json",
     "log-build": "npm run build | tee build_$(date +%s).log",
     "tailwind-init": "tailwindcss init -p"
   },

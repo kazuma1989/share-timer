@@ -12,7 +12,7 @@ import { keyWithDarkMode, observeDarkMode } from "$lib/useDarkMode"
 import { createVideoTimer, keyWithVideoTimer } from "$lib/useVideoTimer"
 import type { LayoutLoad } from "./$types"
 
-export const load = (async ({ parent, fetch }) => {
+export const load = (async ({ fetch }) => {
   if (!browser) {
     return {}
   }
@@ -27,8 +27,7 @@ export const load = (async ({ parent, fetch }) => {
 
   const video = createVideoTimer()
 
-  const data = await parent()
-  const firestore = await initRemoteFirestore(data.options)
+  const firestore = await initRemoteFirestore()
 
   return {
     firestore,
