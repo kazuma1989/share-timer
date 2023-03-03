@@ -1,6 +1,5 @@
 <script lang="ts">
   import { browser } from "$app/environment"
-  import { goto } from "$app/navigation"
   import { page } from "$app/stores"
   import { initRemoteAuth } from "$lib/firestore/initRemoteAuth"
   import type { SignInState } from "$lib/firestore/worker/RemoteAuth.worker"
@@ -25,17 +24,11 @@
     notSignedIn$.subscribe(() => {
       const { pathname, search, hash } = $page.url
 
-      goto(
-        "/sign-in/" +
+      window.location.assign(
+        "/account/sign-in/" +
           "?" +
           new URLSearchParams({
             back: pathname + search + hash,
-            ...(import.meta.env.VITE_FIRESTORE_EMULATOR
-              ? {
-                  emulator:
-                    import.meta.env.FIREBASE_EMULATORS.auth.port.toString(),
-                }
-              : {}),
           })
       )
     })

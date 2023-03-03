@@ -15,7 +15,7 @@ import type { LayoutLoad } from "./$types"
 export const prerender = true
 export const trailingSlash = "always"
 
-export const load = (async ({ data, fetch }) => {
+export const load = (async ({ parent, fetch }) => {
   if (!browser) {
     return {}
   }
@@ -30,6 +30,7 @@ export const load = (async ({ data, fetch }) => {
 
   const video = createVideoTimer()
 
+  const data = await parent()
   const firestore = await initRemoteFirestore(data.options)
 
   return {

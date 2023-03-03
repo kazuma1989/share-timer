@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterNavigate, goto } from "$app/navigation"
+  import { afterNavigate } from "$app/navigation"
   import { page } from "$app/stores"
   import Icon from "$lib/Icon.svelte"
   import { observeRoute } from "$lib/observeRoute"
@@ -22,17 +22,11 @@
 
     const { pathname, search, hash } = $page.url
 
-    goto(
-      "/sign-in/" +
+    window.location.assign(
+      "/account/sign-in/" +
         "?" +
         new URLSearchParams({
           back: pathname + search + hash,
-          ...(import.meta.env.VITE_FIRESTORE_EMULATOR
-            ? {
-                emulator:
-                  import.meta.env.FIREBASE_EMULATORS.auth.port.toString(),
-              }
-            : {}),
         })
     )
   }
@@ -53,25 +47,25 @@
   )}
 >
   <div>
-    {#if roomHash}
-      <a
-        title="タイマーに戻る"
-        href="/{roomHash}"
-        class="transparent-button my-2 -ml-4 inline-grid h-12 w-12 place-items-center text-2xl"
-        on:click={(e) => {
-          if (e.currentTarget.href !== $nav$.from?.url.toString()) return
+    <div class="h-0">
+      {#if roomHash}
+        <a
+          title="タイマーに戻る"
+          href="/{roomHash}"
+          class="transparent-button my-2 -ml-4 inline-grid h-12 w-12 place-items-center text-2xl"
+          on:click={(e) => {
+            if (e.currentTarget.href !== $nav$.from?.url.toString()) return
 
-          e.preventDefault()
-          window.history.back()
-        }}
-      >
-        <Icon name="arrow-left" />
-      </a>
-    {:else}
-      <div class="my-2 h-12 w-12" />
-    {/if}
+            e.preventDefault()
+            window.history.back()
+          }}
+        >
+          <Icon name="arrow-left" />
+        </a>
+      {/if}
+    </div>
 
-    <h1>
+    <h1 class="mt-16">
       <ruby>
         Share Timer <rp>(</rp>
         <rt class="text-xs">シェア タイマー</rt>
@@ -132,7 +126,7 @@
     {#if import.meta.env.DEV}
       <p>
         <a
-          href="/checkout/"
+          href="/account/checkout/"
           class={clsx(
             "transparent-button block border border-gray-500 px-4 py-3"
           )}

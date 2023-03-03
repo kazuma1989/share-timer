@@ -1,6 +1,6 @@
 import type { FirebaseOptions } from "firebase/app"
+import { installPolyfills } from "../installPolyfills"
 import type { LayoutServerLoad } from "./$types"
-import { installPolyfills } from "./installPolyfills"
 
 installPolyfills()
 

@@ -1,5 +1,4 @@
 <script lang="ts">
-  // @ts-expect-error
   import("https://js.stripe.com/v3/pricing-table.js")
 
   export let uid: string
@@ -18,7 +17,7 @@
 </p>
 
 <stripe-pricing-table
-  pricing-table-id="prctbl_1MapS3GVtjqV2UHuZe0qNP7l"
+  pricing-table-id={import.meta.env.VITE_STRIPE_PRICING_TABLE_ID}
   publishable-key={import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY}
   client-reference-id={uid}
   customer-email={email}
