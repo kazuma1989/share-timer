@@ -1,12 +1,9 @@
-import { svelte } from "@sveltejs/vite-plugin-svelte"
-import { defineConfig, UserConfig } from "vite"
-import { emulators, hosting } from "./firebase.json"
+import { sveltekit } from "@sveltejs/kit/vite"
+import { defineConfig } from "vite"
+import { emulators } from "./firebase.json"
 import { getChecker } from "./vite/getChecker"
 import bundleBuddy from "./vite/plugin/bundleBuddy"
 import chunkAlignGranularity from "./vite/plugin/chunkAlignGranularity"
-import firebaseReservedURL from "./vite/plugin/firebaseReservedURL"
-import mpa from "./vite/plugin/mpa"
-import prefetchWorker from "./vite/plugin/prefetchWorker"
 import vitest from "./vite/plugin/vitest"
 
 declare const process: {
@@ -19,7 +16,6 @@ declare const process: {
      */
     BROWSER?: string
 
-    BUILD_PATH?: string
     HOST?: string
     PORT?: string
     PREVIEW_PORT?: string
@@ -28,8 +24,8 @@ declare const process: {
   }
 }
 
-export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
-  const { BROWSER, BUILD_PATH, HOST, PORT, PREVIEW_PORT, CI } = process.env
+export default defineConfig(async ({ command, mode }) => {
+  const { BROWSER, HOST, PORT, PREVIEW_PORT, CI } = process.env
 
   return {
     define: {
@@ -43,7 +39,6 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
     },
 
     build: {
-      outDir: BUILD_PATH || hosting.find((_) => _.target === "app")?.public,
       sourcemap: true,
     },
 
@@ -57,15 +52,10 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
     },
 
     plugins: [
-      mpa(),
-      svelte(),
-
-      // Firebase
-      firebaseReservedURL(),
+      sveltekit(),
 
       // Build config
       chunkAlignGranularity(),
-      prefetchWorker(),
 
       // Test config
       vitest(),

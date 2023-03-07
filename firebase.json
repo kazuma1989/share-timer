@@ -11,7 +11,7 @@
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "headers": [
         {
-          "source": "**/*.@(css|js)",
+          "source": "_app/immutable/**/*",
           "headers": [
             {
               "key": "Cache-Control",

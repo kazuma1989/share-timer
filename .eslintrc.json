@@ -18,7 +18,7 @@
 
   // https://typescript-eslint.io/docs/linting/typed-linting/
   "parserOptions": {
-    "project": ["./tsconfig.json", "./tsconfig.node.json"],
+    "project": ["./tsconfig.json"],
     "extraFileExtensions": [".svelte"]
   },
 
@@ -43,6 +43,9 @@
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": "warn",
 
+    // no-undef も同様
+    "no-undef": "off",
+
     // https://typescript-eslint.io/rules/switch-exhaustiveness-check/
     "@typescript-eslint/switch-exhaustiveness-check": "error",
 
@@ -64,10 +67,15 @@
 
     "no-restricted-globals": [
       "error",
-      {
-        "name": "Date",
-        "message": "Please use calibrated server time (the now() function) instead."
-      }
+      // cf. https://www.npmjs.com/package/confusing-browser-globals
+      "addEventListener",
+      "alert",
+      "confirm",
+      "document",
+      "history",
+      "location",
+      "name",
+      "status"
     ]
   },
 

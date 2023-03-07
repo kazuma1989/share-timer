@@ -1,4 +1,4 @@
-import { Plugin } from "vite"
+import type { Plugin } from "vite"
 
 /**
  * https://bundle-buddy.com で分析するための graph.json を生成する

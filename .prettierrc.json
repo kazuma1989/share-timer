@@ -1,7 +1,8 @@
 {
   "semi": false,
-  "plugins": ["prettier-plugin-svelte"],
+  "plugins": ["prettier-plugin-organize-imports", "prettier-plugin-svelte"],
   "pluginSearchDirs": ["."],
+  "organizeImportsSkipDestructiveCodeActions": true,
   "overrides": [
     {
       "files": "*.svelte",

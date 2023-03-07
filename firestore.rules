@@ -54,15 +54,5 @@ service cloud.firestore {
       allow get;
       allow create: if hasCreatedAt();
     }
-
-    match /calibrations-dev/{id} {
-      allow get;
-      allow create: if hasCreatedAt();
-    }
-
-    match /calibrations-v1/{id} {
-      allow get;
-      allow create: if hasCreatedAt();
-    }
   }
 }
